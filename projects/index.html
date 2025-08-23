@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Projects — Wassim Lagnaoui</title>
+    <meta name="description" content="Enterprise projects and the Restaurant Management System by Wassim Lagnaoui.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E🚀%3C/text%3E%3C/svg%3E" />
+    <script>
+      (function(){try{const t=localStorage.getItem('theme');const d=window.matchMedia('(prefers-color-scheme: dark)').matches; if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter var", "Inter", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Helvetica", "Arial", "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <!-- Decorative background to match Home -->
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10">
+      <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div>
+    </div>
+    <header class="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30 transition group-hover:scale-105">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="./" class="text-indigo-600 dark:text-indigo-400">Projects</a>
+          <a href="../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
+          <a href="../#contact" class="hover:text-indigo-600 dark:hover:text-indigo-400">Contact</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm transition hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-14">
+      <header class="max-w-3xl">
+        <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Projects</h1>
+        <p class="mt-3 text-slate-600 dark:text-slate-300">My full‑stack project first, followed by brief employer‑owned enterprise work.</p>
+      </header>
+
+      <section class="mt-10">
+        <div class="flex items-end justify-between"><h2 class="text-2xl font-bold">Restaurant Management System</h2><a class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline" href="https://github.com/wl0182/Restaurant-Ordering-System" target="_blank" rel="noreferrer">GitHub repo</a></div>
+        <p class="mt-3 max-w-3xl text-slate-600 dark:text-slate-300">Full‑stack system for servers, kitchen staff, and administrators. Real‑time queueing, role‑based access, analytics, and responsive UIs.</p>
+        <div class="mt-6 grid gap-6 md:grid-cols-2">
+          <div class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md dark:border-slate-700/60 dark:bg-slate-900/60">
+            <h3 class="font-semibold">Project Overview</h3>
+            <p class="mt-2 text-sm text-slate-700 dark:text-slate-300">End‑to‑end restaurant operations: staff authentication, menu and pricing, order taking, kitchen queue, table sessions, and admin analytics — all with a responsive UI.</p>
+            <h3 class="font-semibold">Key Features</h3>
+            <ul class="mt-3 list-disc pl-5 text-sm text-slate-700 dark:text-slate-300 space-y-1">
+              <li>JWT auth with role‑based access (Admin/Staff).</li>
+              <li>Real‑time kitchen queue and order tracking.</li>
+              <li>Menu, staff, and session management with analytics.</li>
+              <li>Responsive design for handheld devices.</li>
+            </ul>
+            <h3 class="mt-5 font-semibold">Tech Stack</h3>
+            <p class="mt-2 text-sm text-slate-700 dark:text-slate-300">Java 17, Spring Boot, Spring Security, JPA, PostgreSQL • React (Vite), Tailwind • Swagger • Docker & Compose • Jenkins • JUnit/Mockito</p>
+            <a href="../tutorials/" class="mt-4 inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800">Learn to build it →</a>
+           </div>
+          <div class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md dark:border-slate-700/60 dark:bg-slate-900/60">
+            <h3 class="font-semibold">Run with Docker Compose</h3>
+            <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code>git clone https://github.com/wl0182/Restaurant-Ordering-System.git
+cd Restaurant-Ordering-System
+
+# .env
+POSTGRES_DB=your_db_name
+POSTGRES_USER=your_db_user
+POSTGRES_PASSWORD=your_db_password
+SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/your_db_name
+SPRING_DATASOURCE_USERNAME=your_db_user
+SPRING_DATASOURCE_PASSWORD=your_db_password
+JWT_SECRET=your_secure_jwt_secret
+
+docker-compose up</code></pre>
+            <div class="mt-3 text-sm text-slate-700 dark:text-slate-300 space-y-1">
+              <div>Frontend: http://localhost:3000</div>
+              <div>Backend: http://localhost:8080</div>
+              <div>Swagger: http://localhost:8080/swagger-ui/index.html</div>
+            </div>
+            <div class="mt-4 text-sm text-slate-700 dark:text-slate-300 space-y-1">
+              <div class="font-medium">Default Admin</div>
+              <div>Email: admin@example.com • Password: Password</div>
+            </div>
+            <div class="mt-4 text-sm text-slate-700 dark:text-slate-300 space-y-1">
+              <div class="font-medium">Docker Hub</div>
+              <div><a class="text-indigo-600 hover:underline dark:text-indigo-400" href="https://hub.docker.com/r/wassim4592/restaurant_backend" target="_blank" rel="noreferrer">wassim4592/restaurant_backend:latest</a></div>
+              <div><a class="text-indigo-600 hover:underline dark:text-indigo-400" href="https://hub.docker.com/r/wassim4592/restaurant_frontend" target="_blank" rel="noreferrer">wassim4592/restaurant_frontend:latest</a></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="mt-14">
+        <h2 class="text-2xl font-bold">Enterprise Projects <span class="text-xs font-normal text-slate-500">(employer‑owned)</span></h2>
+        <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md dark:border-slate-700/60 dark:bg-slate-900/60">
+            <div class="flex items-center justify-between"><h3 class="font-semibold">Backend Modernization</h3><span class="text-xs text-slate-500">Employer‑owned</span></div>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Migrated on‑prem services to Kubernetes with PostgreSQL and Spring Data JPA.</p>
+          </article>
+          <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md dark:border-slate-700/60 dark:bg-slate-900/60">
+            <div class="flex items-center justify-between"><h3 class="font-semibold">License Lookup & User Mapping</h3><span class="text-xs text-slate-500">Employer‑owned</span></div>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Role‑aware REST APIs with JWT auth and OpenAPI for internal users.</p>
+          </article>
+          <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md dark:border-slate-700/60 dark:bg-slate-900/60">
+            <div class="flex items-center justify-between"><h3 class="font-semibold">Notification Preprocessing</h3><span class="text-xs text-slate-500">Employer‑owned</span></div>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">CTE‑based SQL jobs preparing payloads for email dispatch reliability.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2024 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('themeToggle').addEventListener('click', function(){
+        const root=document.documentElement; const d=root.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+  </body>
+</html>

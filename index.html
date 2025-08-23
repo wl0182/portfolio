@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Wassim Lagnaoui — Portfolio</title>
+    <meta name="description" content="Portfolio of a Java/Spring Boot backend developer with experience in cloud migrations, DevOps, and scalable REST APIs.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E🚀%3C/text%3E%3C/svg%3E" />
+
+    <script>
+      // Apply saved theme before Tailwind loads to prevent FOUC
+      (function () {
+        try {
+          const t = localStorage.getItem('theme');
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (t === 'dark' || (!t && prefersDark)) document.documentElement.classList.add('dark');
+        } catch {}
+      })();
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter var", "Inter", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Helvetica", "Arial", "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <!-- Decorative background -->
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10">
+      <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div>
+    </div>
+
+    <header class="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="#home" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30 transition group-hover:scale-105">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="./projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="./tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="./course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
+          <a href="#contact" class="hover:text-indigo-600 dark:hover:text-indigo-400">Contact</a>
+        </nav>
+        <div class="flex items-center gap-3">
+          <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm transition hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+            <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+            <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
+          <a href="#contact" class="hidden rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-indigo-600/30 transition hover:bg-indigo-500 active:scale-95 md:inline-block">Hire me</a>
+        </div>
+      </div>
+    </header>
+
+    <main id="home" class="mx-auto max-w-7xl px-6">
+      <!-- Hero -->
+      <section class="relative py-20">
+        <div class="grid items-center gap-10 md:grid-cols-2">
+          <div>
+            <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl">
+              Learn Java and Spring Boot with Me
+            </h1>
+            <p class="mt-5 max-w-prose text-lg text-slate-600 dark:text-slate-300">
+              Experienced Java developer teaching the skills needed to build full‑stack applications with Spring Boot, React, PostgreSQL, Docker, and CI/CD.
+            </p>
+            <div class="mt-8 flex flex-wrap items-center gap-3">
+              <a href="./projects/" class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-3 font-semibold text-white shadow-sm shadow-indigo-600/30 transition hover:bg-indigo-500 active:scale-95">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
+                View projects
+              </a>
+              <a href="#skills" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/></svg>
+                Explore skills
+              </a>
+              <a href="https://github.com/wl0182" target="_blank" rel="noreferrer" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M12 .5a12 12 0 0 0-3.79 23.4c.6.11.82-.26.82-.58 0-.29-.01-1.05-.02-2.06-3.34.73-4.04-1.61-4.04-1.61-.55-1.4-1.34-1.77-1.34-1.77-1.09-.75.08-.73.08-.73 1.2.09 1.83 1.23 1.83 1.23 1.07 1.83 2.82 1.3 3.5.99.11-.77.42-1.3.76-1.6-2.66-.3-5.46-1.33-5.46-5.9 0-1.3.47-2.36 1.23-3.19-.12-.3-.53-1.52.12-3.16 0 0 1-.32 3.3 1.22a11.5 11.5 0 0 1 6 0C17.22 6.53 18.22 6.85 18.22 6.85c.65 1.64.24 2.86.12 3.16.76.83 1.22 1.89 1.22 3.19 0 4.58-2.8 5.59-5.47 5.89.43.37.81 1.1.81 2.22 0 1.6-.01 2.88-.01 3.27 0 .32.22.7.83.58A12 12 0 0 0 12 .5Z" clip-rule="evenodd"/></svg>
+                GitHub
+              </a>
+            </div>
+            <p class="mt-6 text-sm text-slate-500 dark:text-slate-400">Fluent in Arabic, English, and French.</p>
+          </div>
+          <div class="relative mx-auto w-full max-w-md">
+            <div class="absolute -inset-4 -z-10 rounded-3xl bg-gradient-to-tr from-indigo-500/30 via-fuchsia-500/30 to-emerald-500/30 blur-2xl"></div>
+            <div class="rounded-3xl border border-slate-200/60 bg-white/70 p-6 shadow-xl shadow-slate-900/5 backdrop-blur dark:border-slate-700/60 dark:bg-slate-900/60">
+              <ul class="mt-6 space-y-3 text-sm">
+                <li class="flex items-start gap-3"><span class="mt-1 h-2.5 w-2.5 rounded-full bg-emerald-500"></span><span>Java Core</span></li>
+                <li class="flex items-start gap-3"><span class="mt-1 h-2.5 w-2.5 rounded-full bg-indigo-500"></span><span>Spring Boot And Spring Data</span></li>
+                <li class="flex items-start gap-3"><span class="mt-1 h-2.5 w-2.5 rounded-full bg-fuchsia-500"></span><span>Spring Security with JWT</span></li>
+                <li class="flex items-start gap-3"><span class="mt-1 h-2.5 w-2.5 rounded-full bg-sky-500"></span><span>React, Vite and Tailwind CSS</span></li>
+                <li class="flex items-start gap-3"><span class="mt-1 h-2.5 w-2.5 rounded-full bg-amber-500"></span><span>Docker, CI/CD with Jenkins</span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- About -->
+      <section id="about" class="scroll-mt-24 py-14">
+        <h2 class="text-2xl font-bold">About</h2>
+        <p class="mt-4 max-w-3xl text-slate-600 dark:text-slate-300">
+          Java full‑stack engineer focused on teaching and building real projects. I work across the stack: Spring Boot and Java on the backend; React, Vite, and Tailwind on the frontend; PostgreSQL, Docker, and CI/CD to ship reliably.
+        </p>
+      </section>
+
+      <!-- Skills -->
+      <section id="skills" class="scroll-mt-24 py-14">
+        <h2 class="text-2xl font-bold">Skills</h2>
+        <div class="mt-6 grid gap-6 md:grid-cols-3">
+          <div class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md dark:border-slate-700/60 dark:bg-slate-900/60">
+            <h3 class="font-semibold">Core</h3>
+            <div class="mt-3 flex flex-wrap gap-2 text-sm">
+              <span class="rounded-md bg-slate-100 px-2.5 py-1 dark:bg-slate-800">Java</span>
+              <span class="rounded-md bg-slate-100 px-2.5 py-1 dark:bg-slate-800">Spring Boot</span>
+              <span class="rounded-md bg-slate-100 px-2.5 py-1 dark:bg-slate-800">REST APIs</span>
+              <span class="rounded-md bg-slate-100 px-2.5 py-1 dark:bg-slate-800">SQL</span>
+              <span class="rounded-md bg-slate-100 px-2.5 py-1 dark:bg-slate-800">Hibernate/JPA</span>
+            </div>
+          </div>
+          <div class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md dark:border-slate-700/60 dark:bg-slate-900/60">
+            <h3 class="font-semibold">DevOps & Databases</h3>
+            <div class="mt-3 flex flex-wrap gap-2 text-sm">
+              <span class="rounded-md bg-slate-100 px-2.5 py-1 dark:bg-slate-800">Docker</span>
+              <span class="rounded-md bg-slate-100 px-2.5 py-1 dark:bg-slate-800">Kubernetes</span>
+              <span class="rounded-md bg-slate-100 px-2.5 py-1 dark:bg-slate-800">Jenkins</span>
+              <span class="rounded-md bg-slate-100 px-2.5 py-1 dark:bg-slate-800">Maven</span>
+              <span class="rounded-md bg-slate-100 px-2.5 py-1 dark:bg-slate-800">PostgreSQL</span>
+              <span class="rounded-md bg-slate-100 px-2.5 py-1 dark:bg-slate-800">Oracle</span>
+            </div>
+          </div>
+          <div class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md dark:border-slate-700/60 dark:bg-slate-900/60">
+            <h3 class="font-semibold">Frontend</h3>
+            <div class="mt-3 flex flex-wrap gap-2 text-sm">
+              <span class="rounded-md bg-slate-100 px-2.5 py-1 dark:bg-slate-800">React</span>
+              <span class="rounded-md bg-slate-100 px-2.5 py-1 dark:bg-slate-800">Vite</span>
+              <span class="rounded-md bg-slate-100 px-2.5 py-1 dark:bg-slate-800">Tailwind CSS</span>
+              <span class="rounded-md bg-slate-100 px-2.5 py-1 dark:bg-slate-800">TypeScript</span>
+              <span class="rounded-md bg-slate-100 px-2.5 py-1 dark:bg-slate-800">JWT/OAuth</span>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4 text-sm text-slate-500 dark:text-slate-400">Also: JUnit, Mockito, Swagger/OpenAPI, Git/GitHub, Prometheus/Grafana (basic).</div>
+      </section>
+
+      <!-- Projects teaser -->
+      <section class="scroll-mt-24 py-14">
+        <div class="flex items-end justify-between gap-4">
+          <h2 class="text-2xl font-bold">Projects</h2>
+          <a href="./projects/" class="text-sm text-indigo-600 hover:underline dark:text-indigo-400">View all</a>
+        </div>
+        <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <a class="group block rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 transition hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-700/60 dark:bg-slate-900/60" href="https://github.com/wl0182/Restaurant-Ordering-System" target="_blank" rel="noreferrer">
+            <div class="flex items-center justify-between">
+              <h3 class="font-semibold">Restaurant Management System</h3>
+              <span class="text-xs text-slate-500">Full‑stack • Spring Boot • React</span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">My end‑to‑end project for servers, kitchen, and admins: auth, menu, orders, analytics.</p>
+          </a>
+          <div class="group rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 dark:border-slate-700/60 dark:bg-slate-900/60">
+            <div class="flex items-center justify-between">
+              <h3 class="font-semibold">Enterprise Platform — API Gateway</h3>
+              <span class="text-xs text-slate-500">Employer‑owned</span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Gateway with rate limiting, circuit breaking, and tracing across microservices.</p>
+          </div>
+          <div class="group rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 dark:border-slate-700/60 dark:bg-slate-900/60">
+            <div class="flex items-center justify-between">
+              <h3 class="font-semibold">Enterprise Data Pipelines</h3>
+              <span class="text-xs text-slate-500">Employer‑owned</span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Optimized SQL/CTE jobs and reporting flows; code not publicly shareable.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Docs placeholder (for future GitHub Pages docs import) -->
+      <section id="docs" class="scroll-mt-24 py-14">
+        <h2 class="text-2xl font-bold">Docs</h2>
+        <p class="mt-4 max-w-3xl text-slate-600 dark:text-slate-300">
+          This section can embed or link to your documentation site hosted on GitHub Pages. Replace this with links to your docs or use an iframe if appropriate.
+        </p>
+        <div class="mt-4 flex gap-3">
+          <a href="./docs/" class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Open docs</a>
+          <a href="#" class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">How to integrate</a>
+        </div>
+      </section>
+
+      <!-- Contact -->
+      <section id="contact" class="scroll-mt-24 py-14">
+        <div class="rounded-2xl border border-slate-200/60 bg-white/70 p-8 shadow-md shadow-slate-900/5 backdrop-blur dark:border-slate-700/60 dark:bg-slate-900/60">
+          <h2 class="text-2xl font-bold">Contact</h2>
+          <p class="mt-2 text-slate-600 dark:text-slate-300">Open to backend roles, consulting, and collaborations.</p>
+          <div class="mt-6 flex flex-wrap items-center gap-3">
+            <a href="mailto:lagnaouiw@gmail.com" class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-3 font-semibold text-white shadow-sm shadow-indigo-600/30 transition hover:bg-indigo-500 active:scale-95">
+               <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="m22 6-10 7L2 6"/></svg>
+               Email me
+             </a>
+            <a href="https://www.linkedin.com/in/wassim-lagnaoui-222aa2358/" target="_blank" rel="noreferrer" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800">LinkedIn</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+       <div class="mx-auto max-w-7xl px-6">
+        <p>© 2024 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      // Theme toggle
+      document.getElementById('themeToggle').addEventListener('click', function () {
+        const root = document.documentElement;
+        const isDark = root.classList.toggle('dark');
+        try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch {}
+      });
+    </script>
+  </body>
+</html>

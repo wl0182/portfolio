@@ -1,0 +1,150 @@
+<h1>Project Bootstrapping: Spring Boot + PostgreSQL</h1>
+
+<p>This short guide helps you bootstrap the application: pick the right Spring dependencies, set up PostgreSQL, and configure <code>application.yml</code> so the app connects to the database successfully.</p>
+
+<hr/>
+
+<h2>Step 1 — Generate a Spring Boot project</h2>
+<p>Use Spring Initializr (start.spring.io) with:</p>
+<ul>
+    <li>Project: Maven, Language: Java, Spring Boot: 3.x, Java: 17</li>
+    <li>Dependencies:
+        <ul>
+            <li>Spring Web</li>
+            <li>Spring Data JPA</li>
+            <li>Validation</li>
+            <li>Spring Security (if you plan to add auth later)</li>
+            <li>PostgreSQL Driver</li>
+            <li>Lombok (optional but recommended)</li>
+            <li>Spring Boot DevTools (optional)</li>
+        </ul>
+    </li>
+</ul>
+<p>Download and unzip, or import directly into your IDE.</p>
+
+<h3>If you need to add dependencies manually</h3>
+<p>Ensure your <code>pom.xml</code> includes the following (only the relevant parts shown):</p>
+<pre><code class="language-xml">&lt;dependencies&gt;
+  &lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+  &lt;/dependency&gt;
+  &lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;
+  &lt;/dependency&gt;
+  &lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-validation&lt;/artifactId&gt;
+  &lt;/dependency&gt;
+  &lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
+  &lt;/dependency&gt;
+  &lt;dependency&gt;
+    &lt;groupId&gt;org.postgresql&lt;/groupId&gt;
+    &lt;artifactId&gt;postgresql&lt;/artifactId&gt;
+    &lt;scope&gt;runtime&lt;/scope&gt;
+  &lt;/dependency&gt;
+  &lt;dependency&gt;
+    &lt;groupId&gt;org.projectlombok&lt;/groupId&gt;
+    &lt;artifactId&gt;lombok&lt;/artifactId&gt;
+    &lt;optional&gt;true&lt;/optional&gt;
+  &lt;/dependency&gt;
+  &lt;!-- Optional, useful in development --&gt;
+  &lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-devtools&lt;/artifactId&gt;
+    &lt;scope&gt;runtime&lt;/scope&gt;
+    &lt;optional&gt;true&lt;/optional&gt;
+  &lt;/dependency&gt;
+&lt;/dependencies&gt;
+</code></pre>
+
+<hr/>
+
+<h2>Step 2 — Install and prepare PostgreSQL</h2>
+<h3>Option A: Local install</h3>
+<ul>
+    <li>macOS: <code>brew install postgresql</code>, then start the service.</li>
+    <li>Windows/Linux: install from the official site (or your package manager).</li>
+</ul>
+
+<h3>Option B: Docker (quickest)</h3>
+<pre><code class="language-bash">docker run --name restaurant_postgres -e POSTGRES_PASSWORD=your_password -p 5432:5432 -d postgres:14
+</code></pre>
+
+<h3>Create a database and user</h3>
+<pre><code class="language-sql">-- inside psql (\c to connect), or any SQL client
+CREATE DATABASE restaurant_db;
+CREATE USER restaurant_user WITH ENCRYPTED PASSWORD 'your_password';
+GRANT ALL PRIVILEGES ON DATABASE restaurant_db TO restaurant_user;
+</code></pre>
+
+<hr/>
+
+<h2>Step 3 — Configure Spring (YAML)</h2>
+<p>Put the base configuration in <code>src/main/resources/application.yml</code> and keep secrets in an optional <code>application-local.yml</code> that is imported by the base file.</p>
+
+<h3>application.yml</h3>
+<pre><code class="language-yaml">spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/restaurant_db
+    username: restaurant_user
+  config:
+    import: optional:application-local.yml
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+jwt:
+  expiration: 86400000 # (1 day in ms)
+
+server:
+  port: 8080
+</code></pre>
+
+<h3>application-local.yml</h3>
+<pre><code class="language-yaml">spring:
+  datasource:
+    password: ${POSTGRES_PASSWORD:default_db_password}
+jwt:
+  secret: ${JWT_SECRET:default_jwt_secret}
+</code></pre>
+
+<h3>Why this split?</h3>
+<ul>
+    <li><code>application.yml</code> is safe to commit and documents the connection details (without the password).</li>
+    <li><code>application-local.yml</code> holds secrets and can read from environment variables; it’s optional and ignored in other environments.</li>
+</ul>
+
+<hr/>
+
+<h2>Step 4 — Run and verify</h2>
+<ol>
+    <li>Export environment variables (optional but recommended):
+        <pre><code class="language-bash">export POSTGRES_PASSWORD=your_password
+export JWT_SECRET=dev_jwt_secret
+</code></pre>
+    </li>
+    <li>Start the app:
+        <pre><code class="language-bash">./mvnw spring-boot:run
+</code></pre>
+    </li>
+    <li>Watch the logs for a successful connection to PostgreSQL and Hibernate schema update messages.</li>
+</ol>
+
+<hr/>
+
+<h2>Common issues</h2>
+<ul>
+    <li><strong>Connection refused</strong>: Check that PostgreSQL is running and that the URL/port are correct.</li>
+    <li><strong>Auth errors</strong>: Ensure the DB user/password match what you created. If using Docker, the hostname in a multi-container setup may be <code>db</code> instead of <code>localhost</code>.</li>
+    <li><strong>DDL auto-update</strong>: <code>ddl-auto: update</code> is for development. Plan migrations for production later.</li>
+</ul>
+
+<p>That’s it. Your application is now bootstrapped with the right dependencies, a running PostgreSQL, and a working YAML configuration.</p>

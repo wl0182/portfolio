@@ -1,0 +1,324 @@
+<h1>Spring Boot Tutorial Series — Tutorial 1: Building the Domain Model</h1>
+<p>A practical, step-by-step tutorial to build the domain model. Each step shows a small code snippet and a short, English explanation.</p>
+<hr />
+
+<h2>Step-by-step: Build entities and explain as they are created</h2>
+
+<h3>0. Prerequisites</h3>
+<p>Required dependencies include:</p>
+<ul>
+  <li>spring-boot-starter-data-jpa</li>
+  <li>spring-boot-starter-validation</li>
+  <li>spring-boot-starter-security (User implements UserDetails)</li>
+  <li>lombok</li>
+  <li>JDBC driver (e.g., postgresql)</li>
+</ul>
+<p>Dev config (application.yml), example:</p>
+<pre><code class="language-yaml">spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/restaurant
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update  # dev only; prefer Flyway/Liquibase in production
+    show-sql: true
+</code></pre>
+<h4>Explanation:</h4>
+<ul>
+  <li><code>datasource</code>: tells Spring Boot how to connect to your database (URL, <code>username</code>, <code>password</code>). JPA uses this connection to read and write entities.</li>
+  <li><code>jpa.hibernate.ddl-auto=update</code>: during development, Hibernate updates the schema to match your entities at startup. In production, switch to managed migrations (Flyway/Liquibase) so every change is versioned and reviewed.</li>
+  <li><code>show-sql=true</code>: logs the SQL Hibernate runs. Great for learning and debugging, but turn it off in noisy environments.</li>
+  <li>Validation starter: activates Bean Validation so annotations like <code>@NotBlank</code> and <code>@Email</code> are enforced automatically in controllers and on persistence.</li>
+  <li>Security starter: required because our <code>User</code> implements <code>UserDetails</code> and integrates with Spring Security.</li>
+</ul>
+<hr />
+
+<h3>1. Create the model package</h3>
+<p>Create a package:</p>
+<pre><code class="language-text">com.wassimlagnaoui.RestaurantOrder.model
+</code></pre>
+<p><strong>Purpose:</strong><br />
+Keep all entities and enums together so component scanning and repository wiring stay predictable. Grouping the domain model under one package also makes it easy to apply consistent conventions and to find related code (entities, enums, and later their DTOs and repositories in neighboring packages).</p>
+<hr />
+
+<h3>2. MenuItem — a flat entity</h3>
+<pre><code class="language-java">@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Table(name = "menu_item")
+public class MenuItem {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, updatable = false)
+    private Long id;
+
+    @Column(name = "name", nullable = false, length = 100)
+    private String name; // name shown in the menu
+
+    @Column(name = "description", length = 500)
+    private String description;
+
+    @Column(name = "price", nullable = false)
+    private Double price;
+
+    @Column(name = "image_url", length = 255)
+    private String imageUrl;
+
+    @Column(name = "category", length = 50)
+    private String category;
+
+    @Column(name = "available", nullable = false)
+    private boolean available;
+}
+</code></pre>
+<h4>Explanation:</h4>
+<ul>
+  <li><strong>Purpose of the class:</strong> <code>MenuItem</code> models one dish or drink on the menu with its display details and price. It’s a standalone entity without child relationships.</li>
+  <li><code>id</code>: primary key of the table; <code>@Id</code> marks the identifier; <code>@GeneratedValue(IDENTITY)</code> lets the DB auto-increment; <code>@Column(name="id", nullable=false, updatable=false)</code> documents the column mapping and prevents accidental updates.</li>
+  <li><code>name</code>: human-friendly name shown in the menu; <code>@Column(name="name", nullable=false, length=100)</code> enforces presence and caps length to keep UI/DB consistent.</li>
+  <li><code>description</code>: short text describing the item; <code>@Column(name="description", length=500)</code> allows generous text while keeping storage bounded.</li>
+  <li><code>price</code>: numeric cost; <code>@Column(name="price", nullable=false)</code> ensures a value is always provided. In production prefer <code>BigDecimal</code> with <code>precision/scale</code> for currency.</li>
+  <li><code>imageUrl</code>: optional link used by the UI; <code>@Column(name="image_url", length=255)</code> maps camelCase to snake_case and bounds URL length.</li>
+  <li><code>category</code>: grouping like “Starters”, “Mains”; <code>@Column(name="category", length=50)</code> constrains values and simplifies indexing.</li>
+  <li><code>available</code>: stock/visibility toggle; <code>@Column(name="available", nullable=false)</code> guarantees a definite boolean in the DB.</li>
+  <li><strong>Class-level:</strong> <code>@Entity</code> + <code>@Table(name="menu_item")</code> map the class; Lombok <code>@Data</code>, <code>@Builder</code>, <code>@NoArgsConstructor</code>, <code>@AllArgsConstructor</code> generate boilerplate.</li>
+</ul>
+<hr />
+
+<h3>3. Order — parent aggregate with relationships</h3>
+<pre><code class="language-java">@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Table(name = "orders")
+public class Order {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private Double total;
+    private LocalDateTime orderDate;
+
+    // Option A: store as String; Option B: use enum with @Enumerated
+    private String status;
+    // @Enumerated(EnumType.STRING)
+    // private OrderStatus status;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List&lt;OrderItem&gt; items;
+
+    @ManyToOne
+    @JoinColumn(name = "table_session_id")
+    private TableSession tableSession;
+}
+</code></pre>
+<h4>Explanation:</h4>
+<ul>
+  <li><strong>Purpose of the class:</strong> <code>Order</code> represents a customer’s order and acts as the parent aggregate for its <code>OrderItem</code> lines. It connects to a <code>TableSession</code> so you know which visit it belongs to.</li>
+  <li><code>id</code>: primary key for the order; <code>@Id</code> designates the identifier; <code>@GeneratedValue(strategy = GenerationType.IDENTITY)</code> relies on the database to assign it automatically.</li>
+  <li><code>total</code>: monetary sum of the items; compute it from <code>items</code> to avoid drift, or store it for faster reads and keep it consistent in a service layer.</li>
+  <li><code>orderDate</code>: timestamp set when the order is created; use it for reporting and sorting; no special annotation needed unless you customize column details via <code>@Column</code>.</li>
+  <li><code>status</code>: lifecycle state as text for simplicity; for safer code switch to an enum and add <code>@Enumerated(EnumType.STRING)</code> so the DB stores readable names rather than ordinals.</li>
+  <li><code>items</code>: lines belonging to this order; <code>@OneToMany(mappedBy = "order", cascade = CascadeType.ALL)</code> means the foreign key lives on <code>OrderItem</code> and cascading lets you persist/delete the whole graph in one operation.</li>
+  <li><code>tableSession</code>: which visit/table this order belongs to; <code>@ManyToOne</code> establishes the relationship and <code>@JoinColumn(name = "table_session_id")</code> controls the foreign key column name and nullability.</li>
+  <li><strong>Class-level:</strong> <code>@Entity</code>, <code>@Table(name = "orders")</code> map persistence; Lombok reduces boilerplate with <code>@Data</code>, <code>@Builder</code>, <code>@NoArgsConstructor</code>, <code>@AllArgsConstructor</code>.</li>
+</ul>
+<hr />
+
+<h3>4. OrderItem — owning side of the Order relationship</h3>
+<pre><code class="language-java">@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class OrderItem {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private Integer quantity;
+
+    @Column(name = "served")
+    private Boolean served = false;
+
+    @ManyToOne
+    private MenuItem menuItem;
+
+    @ManyToOne
+    private Order order; // owning side: holds the FK used by mappedBy in Order
+}
+</code></pre>
+<h4>Explanation:</h4>
+<ul>
+  <li><strong>Purpose of the class:</strong> <code>OrderItem</code> captures one line of an order: which <code>MenuItem</code> was chosen, how many, and whether it has been served.</li>
+  <li><code>id</code>: primary key for the line item; <code>@Id</code> marks it as the identifier; <code>@GeneratedValue(strategy = GenerationType.IDENTITY)</code> lets the database assign it.</li>
+  <li><code>quantity</code>: how many units were ordered; add <code>@Positive</code> so it’s strictly greater than zero and consider a max limit for sanity.</li>
+  <li><code>served</code>: workflow flag that starts <code>false</code> and flips to <code>true</code> when delivered; <code>@Column(name = "served")</code> shows how to customize the column name (useful when matching an existing schema).</li>
+  <li><code>menuItem</code>: which product this line refers to; <code>@ManyToOne</code> creates the foreign key (by default column <code>menu_item_id</code>), customize with <code>@JoinColumn</code> if needed.</li>
+  <li><code>order</code>: reference to the parent <code>Order</code>; <code>@ManyToOne</code> makes this the owning side that holds the foreign key used by <code>mappedBy</code> in <code>Order</code>.</li>
+  <li><strong>Class-level:</strong> <code>@Entity</code> enables persistence; Lombok annotations generate boilerplate.</li>
+</ul>
+<hr />
+
+<h3>5. TableSession — grouping orders by table/time</h3>
+<pre><code class="language-java">@Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class TableSession {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private LocalDateTime sessionStart;
+    private LocalDateTime sessionEnd;
+    private String tableNumber;
+
+    @OneToMany(mappedBy = "tableSession")
+    private List&lt;Order&gt; orders;
+}
+</code></pre>
+<h4>Explanation:</h4>
+<ul>
+  <li><strong>Purpose of the class:</strong> <code>TableSession</code> models a single seating at a table so multiple <code>Order</code>s can be tied to one visit and closed together.</li>
+  <li><code>id</code>: primary key of the session; <code>@Id</code> identifies it; <code>@GeneratedValue(strategy = GenerationType.IDENTITY)</code> delegates ID creation to the database.</li>
+  <li><code>sessionStart</code>: when the guests were seated; set at open; consider indexing if you filter sessions by time often.</li>
+  <li><code>sessionEnd</code>: when the session is closed; remains <code>null</code> while active; can be used to compute duration and turnover.</li>
+  <li><code>tableNumber</code>: human-friendly identifier like "7" or "A3"; add an index or uniqueness if your business rules require it.</li>
+  <li><code>orders</code>: all orders placed during this session; <code>@OneToMany(mappedBy = "tableSession")</code> indicates the FK is on <code>Order</code> and this side is read-only for the association key.</li>
+  <li><strong>Class-level:</strong> <code>@Entity</code> for persistence and Lombok for boilerplate (<code>@Data</code>, <code>@Builder</code>, <code>@NoArgsConstructor</code>, <code>@AllArgsConstructor</code>).</li>
+</ul>
+<hr />
+
+<h3>6. OrderStatus — domain enum for lifecycle</h3>
+<pre><code class="language-java">public enum OrderStatus { PLACED, PREPARING, READY, SERVED, CANCELLED }
+</code></pre>
+<h4>Explanation:</h4>
+<ul>
+  <li><strong>Purpose of the enum:</strong> defines the allowed lifecycle states for an order, making the domain explicit and preventing invalid values.</li>
+  <li><strong>Values and persistence:</strong>
+    <ul>
+      <li>States: <code>PLACED</code> → <code>PREPARING</code> → <code>READY</code> → <code>SERVED</code> (or <code>CANCELLED</code>).</li>
+      <li>Persist with <code>@Enumerated(EnumType.STRING)</code> in your entity to store readable names that won’t break if constants are reordered.</li>
+    </ul>
+  </li>
+</ul>
+<hr />
+
+<h3>7. User — integrate with Spring Security</h3>
+<pre><code class="language-java">@Entity
+@Table(name = "users")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class User implements UserDetails {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
+    @Email(message = "Valid Email Required")
+    private String email;
+
+    private String password;
+    private String phone;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+    @Override
+    public Collection&lt;? extends GrantedAuthority&gt; getAuthorities() { return List.of(role); }
+    @Override public String getUsername() { return this.email; }
+    @Override public boolean isAccountNonExpired() { return true; }
+    @Override public boolean isAccountNonLocked() { return true; }
+    @Override public boolean isCredentialsNonExpired() { return true; }
+    @Override public boolean isEnabled() { return true; }
+}
+</code></pre>
+<h4>Explanation:</h4>
+<ul>
+  <li><strong>Purpose of the class:</strong> <code>User</code> represents an application account and integrates with Spring Security by implementing <code>UserDetails</code> so it can be authenticated/authorized.</li>
+  <li><code>id</code>: primary key of the user; <code>@Id</code> marks it; <code>@GeneratedValue(strategy = GenerationType.IDENTITY)</code> lets the DB assign it.</li>
+  <li><code>name</code>: person’s display name; <code>@Column(nullable = false)</code> ensures the column can’t be <code>NULL</code> at the database level.</li>
+  <li><code>email</code>: login identifier and contact; <code>@Column(nullable = false)</code> enforces presence, and <code>@Email</code> validates the format; also add a unique index in the database to prevent duplicates.</li>
+  <li><code>password</code>: hashed credential (e.g., <code>BCrypt</code>); never store plain text; compare via a configured <code>PasswordEncoder</code>.</li>
+  <li><code>phone</code>: optional contact number; add formatting/validation as needed for your locale.</li>
+  <li><code>role</code>: business role for the account; <code>@Enumerated(EnumType.STRING)</code> stores the role’s name for readability and stability.</li>
+  <li><strong>Class-level and interfaces:</strong> <code>@Entity</code>, <code>@Table(name = "users")</code> control persistence mapping; Lombok reduces boilerplate; implementing <code>UserDetails</code> requires exposing authorities and account status flags used by Spring Security.</li>
+</ul>
+<hr />
+
+<h3>8. Staff — reference data for access checks and metadata</h3>
+<pre><code class="language-java">@Entity
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class Staff {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false, updatable = false)
+    private Long id;
+
+    @Column(name = "first_name", nullable = false, length = 50)
+    private String firstName;
+
+    @Column(name = "last_name", nullable = false, length = 50)
+    private String lastName;
+
+    @Column(name = "email", nullable = false, unique = true, length = 120)
+    private String email;
+
+    @Column(name = "employee_id", nullable = false, unique = true)
+    private Long employeeId;
+
+    @Column(name = "role", nullable = false, length = 40)
+    private String role; // e.g., waiter, chef, manager
+}
+</code></pre>
+<h4>Explanation:</h4>
+<ul>
+  <li><strong>Purpose of the class:</strong> <code>Staff</code> lists valid employees; useful for validating registrations, linking orders to staff, and reporting.</li>
+  <li><code>id</code>: primary key for the staff row; <code>@Id</code> marks it; <code>@GeneratedValue(IDENTITY)</code> uses DB auto-increment; <code>@Column(name="id", nullable=false, updatable=false)</code> documents the mapping and prevents updates.</li>
+  <li><code>firstName</code>: given name for display/search; <code>@Column(name="first_name", nullable=false, length=50)</code> enforces presence and caps length.</li>
+  <li><code>lastName</code>: family name; <code>@Column(name="last_name", nullable=false, length=50)</code> mirrors constraints for consistency.</li>
+  <li><code>email</code>: contact and potential login key; <code>@Column(name="email", nullable=false, unique=true, length=120)</code> prevents duplicates and controls size.</li>
+  <li><code>employeeId</code>: organization identifier; <code>@Column(name="employee_id", nullable=false, unique=true)</code> guarantees one-to-one mapping with an employee.</li>
+  <li><code>role</code>: operational role (waiter/chef/manager); <code>@Column(name="role", nullable=false, length=40)</code> constrains allowed text length for indexes/UI.</li>
+  <li><strong>Class-level:</strong> <code>@Entity</code> for persistence and Lombok for boilerplate.</li>
+</ul>
+<hr />
+
+<h3>9. Key Takeaways: Naming, validation, and migrations</h3>
+<p><strong>Tips:</strong></p>
+<ul>
+  <li>Enums: prefer <code>EnumType.STRING</code> so names are stored, not fragile ordinal numbers.</li>
+  <li>Validation: add <code>@NotBlank</code>, <code>@Positive</code>, and <code>@Email</code> to fail fast on bad input, both at the API layer and before persistence.</li>
+  <li>Naming: keep table/column names consistent (snake_case in DB). It simplifies queries and migrations.</li>
+  <li>Migrations: in production, manage schema with Flyway/Liquibase instead of <code>ddl-auto</code> so every change is traceable.</li>
+  <li>Defaults: when a field needs a default, set it in your migration scripts and mirror it in code for clarity.</li>
+</ul>
+<hr />
+
+<h2>Annotation Summary</h2>
+<ul>
+  <li><strong>@Entity</strong>: Marks a class as a JPA entity managed by the persistence context and mapped to a database table.</li>
+  <li><strong>@Table</strong>: Customizes table metadata (name, schema, indexes, unique constraints). Defaults to the entity name if omitted.</li>
+  <li><strong>@Id</strong>: Declares the primary key field of the entity (mandatory for persistence).</li>
+  <li><strong>@GeneratedValue</strong>: Configures primary key generation strategy (IDENTITY, SEQUENCE, TABLE, AUTO). IDENTITY uses DB auto-increment.</li>
+  <li><strong>@OneToMany</strong>: Declares a one-to-many relationship; placed on the non-owning side with mappedBy referencing the owning field.</li>
+  <li><strong>@ManyToOne</strong>: Declares the many-to-one association; usually the owning side that holds the foreign key column.</li>
+  <li><strong>@JoinColumn</strong>: Specifies the foreign key column name and nullability on the owning side of a relationship.</li>
+  <li><strong>@Enumerated(EnumType.STRING)</strong>: Persists enum values as their names (stable across enum reordering).</li>
+  <li><strong>@Column</strong>: Customizes column details (name, length, nullable, unique, precision/scale).</li>
+  <li><strong>@Email</strong>: Bean Validation constraint ensuring a syntactically valid email address.</li>
+  <li><strong>@NotBlank</strong>: Bean Validation constraint ensuring non-null, non-whitespace content for strings.</li>
+  <li><strong>@Positive</strong>: Bean Validation constraint ensuring numeric values are &gt; 0.</li>
+  <li><strong>Lombok @Data</strong>: Generates getters, setters, equals, hashCode, toString.</li>
+  <li><strong>Lombok @Builder</strong>: Adds a fluent builder for constructing instances.</li>
+  <li><strong>Lombok @NoArgsConstructor / @AllArgsConstructor</strong>: Generate constructors; JPA requires a no-args constructor (at least protected).</li>
+  <li><strong>UserDetails</strong>: Spring Security contract exposing username, password, authorities, and account status flags.</li>
+</ul>
+
