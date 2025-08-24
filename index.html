@@ -48,18 +48,18 @@
         </a>
         <nav class="hidden items-center gap-6 md:flex">
           <a href="#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+           <a href="./blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
           <a href="#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
           <a href="./projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
           <a href="./tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
           <a href="./course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
-          <a href="#contact" class="hover:text-indigo-600 dark:hover:text-indigo-400">Contact</a>
         </nav>
         <div class="flex items-center gap-3">
           <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm transition hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
             <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
             <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
           </button>
-          <a href="#contact" class="hidden rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-indigo-600/30 transition hover:bg-indigo-500 active:scale-95 md:inline-block">Hire me</a>
+          <a href="#contact" class="hidden rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-indigo-600/30 transition hover:bg-indigo-500 active:scale-95 md:inline-block">Contact me</a>
         </div>
       </div>
     </header>
@@ -184,15 +184,34 @@
         </div>
       </section>
 
-      <!-- Docs placeholder (for future GitHub Pages docs import) -->
-      <section id="docs" class="scroll-mt-24 py-14">
-        <h2 class="text-2xl font-bold">Docs</h2>
-        <p class="mt-4 max-w-3xl text-slate-600 dark:text-slate-300">
-          This section can embed or link to your documentation site hosted on GitHub Pages. Replace this with links to your docs or use an iframe if appropriate.
-        </p>
-        <div class="mt-4 flex gap-3">
-          <a href="./docs/" class="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Open docs</a>
-          <a href="#" class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-100">How to integrate</a>
+      <!-- Courses (replaces Docs) -->
+      <section id="courses" class="scroll-mt-24 py-14">
+        <div class="flex items-end justify-between gap-4">
+          <h2 class="text-2xl font-bold">Courses</h2>
+          <a href="./course/" class="text-sm text-indigo-600 hover:underline dark:text-indigo-400">View all</a>
+        </div>
+        <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <a class="group block rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 transition hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-700/60 dark:bg-slate-900/60" href="./tutorials/">
+            <div class="flex items-center justify-between">
+              <h3 class="font-semibold">Tutorial on How to build a Full Stack Application</h3>
+              <span class="text-xs text-slate-500">12‑part series</span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Step‑by‑step guide using Spring Boot, React, PostgreSQL, JWT, Docker, and CI/CD.</p>
+          </a>
+          <a class="group block rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 transition hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-700/60 dark:bg-slate-900/60" href="./course/">
+            <div class="flex items-center justify-between">
+              <h3 class="font-semibold">Java & Spring Boot Concepts</h3>
+              <span class="text-xs text-slate-500">Mini‑course</span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Concise explanations with practical snippets: Streams, JPA, Security, Testing.</p>
+          </a>
+          <div class="group rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 dark:border-slate-700/60 dark:bg-slate-900/60">
+            <div class="flex items-center justify-between">
+              <h3 class="font-semibold">Coming Soon: Docker & CI/CD Playbook</h3>
+              <span class="text-xs text-slate-500">Planned</span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Create lean images, compose services, and automate builds and releases.</p>
+          </div>
         </div>
       </section>
 
@@ -214,7 +233,7 @@
 
     <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
        <div class="mx-auto max-w-7xl px-6">
-        <p>© 2024 wassim lagnaoui. All rights reserved.</p>
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
       </div>
     </footer>
 

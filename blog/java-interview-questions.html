@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Java Interview Questions — 50 Q&A</title>
+    <meta name="description" content="50 essential Java interview questions with concise answers." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E☕%3C/text%3E%3C/svg%3E" />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: { extend: { fontFamily: { sans: ["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } }
+      };
+    </script>
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10">
+      <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div>
+    </div>
+
+    <header class="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="./" class="text-indigo-600 dark:text-indigo-400">Blog</a>
+          <a href="../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <header class="max-w-3xl">
+        <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Java Interview Questions</h1>
+        <p class="mt-2 text-slate-600 dark:text-slate-300">50 concise Q&A to refresh core Java knowledge before your interview.</p>
+        <a href="./" class="mt-4 inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Blog</a>
+      </header>
+
+      <section class="mt-8">
+        <ol class="space-y-6 text-sm">
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">1) JDK vs JRE vs JVM?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">JVM runs bytecode; JRE = JVM + libraries to run Java apps; JDK = JRE + tools (javac, javadoc) to develop and run.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">2) What are the four OOP pillars?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Encapsulation, Inheritance, Polymorphism, Abstraction.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">3) Why is String immutable?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Safety for class loaders/security, caching in string pool, thread-safety, and stable hash codes for use as keys.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">4) StringBuilder vs StringBuffer?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Both are mutable; StringBuffer is synchronized (thread-safe, slower). StringBuilder is non-synchronized (faster, single-threaded).</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">5) equals() and hashCode() contract?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Equal objects must have equal hashCodes. If you override equals, override hashCode to maintain collections consistency.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">6) List vs Set vs Map?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">List: ordered, duplicates. Set: unique elements. Map: key→value pairs, keys unique.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">7) ArrayList vs LinkedList?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">ArrayList: fast random access, slower inserts/removes in middle. LinkedList: fast inserts/removes at ends, poor random access.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">8) How does HashMap work?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Computes hash of key, finds bucket, resolves collisions via linked list/tree bins; equals() confirms key matching.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">9) ConcurrentHashMap vs HashMap?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">ConcurrentHashMap supports safe concurrent access with internal segmentation; HashMap is not thread-safe.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">10) Fail-fast vs fail-safe iterators?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Fail-fast throw ConcurrentModificationException; fail-safe iterate over a snapshot and allow concurrent mods.</p>
+          </li>
+
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">11) final, finally, finalize?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">final: non-changeable; finally: block that always runs; finalize(): deprecated GC callback, don’t use.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">12) Checked vs unchecked exceptions?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Checked must be declared/handled (IOException); unchecked extend RuntimeException (NullPointerException).</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">13) try-with-resources?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Auto-closes resources implementing AutoCloseable, reducing leaks and boilerplate.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">14) Functional interface?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">An interface with a single abstract method (SAM). Enables lambdas; examples: Runnable, Callable, Comparator.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">15) Lambda vs anonymous class?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Lambdas are concise for functional interfaces; anonymous classes can implement multiple methods or capture more context.</p>
+          </li>
+
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">16) Stream intermediate vs terminal ops?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Intermediate return a Stream (lazy): map, filter. Terminal produce a result/side effect: collect, forEach, reduce.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">17) When to use Optional?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">To model optional returns, not fields. Avoid using it in collections or as method parameters.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">18) record classes?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Immutable data carriers with auto-generated equals/hashCode/toString and canonical constructor.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">19) var and type inference?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Local variable type inference; improves readability when the type is obvious from the initializer.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">20) Switch expressions (Java 14+)?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Use arrow labels and yield values; avoids fall-through, more concise than traditional switch.</p>
+          </li>
+
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">21) Sealed classes (Java 17)?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Restrict which classes can extend/implement a type, enabling exhaustive handling and stronger modelling.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">22) ClassLoader basics?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Loads classes into the JVM; follows parent delegation (bootstrap → platform → application) for security and consistency.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">23) JVM memory areas?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Heap (objects), Stack (frames), Metaspace (class metadata), Code cache, and Native memory.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">24) Strong vs soft vs weak vs phantom refs?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">GC priority: strong retained; soft cleared under memory pressure; weak cleared eagerly; phantom used for cleanup tracking.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">25) What is garbage collection?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Automatic reclamation of unreachable objects; collectors include G1, ZGC, Shenandoah (low pause goals).</p>
+          </li>
+
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">26) volatile keyword?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Ensures visibility of writes across threads and prevents reordering; does not provide atomicity for compound actions.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">27) synchronized vs ReentrantLock?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">synchronized is simpler (intrinsic lock). ReentrantLock offers tryLock, fairness, interruptible waits, multiple conditions.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">28) wait/notify/notifyAll usage?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Call on the monitor within synchronized blocks; wait releases the lock and suspends until notify/notifyAll signals.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">29) Thread states?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">NEW, RUNNABLE, BLOCKED, WAITING, TIMED_WAITING, TERMINATED.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">30) Executor framework benefits?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Decouples task submission from execution; thread pools improve throughput and resource control.</p>
+          </li>
+
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">31) Future vs CompletableFuture?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">CompletableFuture supports chaining, composition, and async callbacks; Future is a simple placeholder requiring blocking get().</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">32) What is a deadlock?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Threads wait on each other’s locks cyclically; avoid by consistent lock ordering or using timeouts/tryLock.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">33) Livelock vs starvation?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Livelock: threads keep responding to each other without progress. Starvation: a thread never gets CPU/resources.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">34) Comparable vs Comparator?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Comparable defines natural ordering within the class; Comparator defines external custom orderings.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">35) Serialization and transient?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Serialization converts objects to byte streams; transient fields are skipped to protect sensitive/derived data.</p>
+          </li>
+
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">36) Reflection basics?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Inspect/modify classes at runtime (Class, Method, Field). Use carefully—can break encapsulation and hurt performance.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">37) What are annotations?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Metadata for code processed by tooling or at runtime (e.g., @Override, @Deprecated, custom annotations with retention/targets).</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">38) Generics and type erasure?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Generics provide compile-time type safety; erasure removes type info at runtime, limiting reflection on generic types.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">39) PECS rule for wildcards?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Producer Extends, Consumer Super: use ? extends T to read; ? super T to write.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">40) Autoboxing pitfalls?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Nulls can cause NPE; boxed equality uses object identity, not value; performance overhead vs primitives.</p>
+          </li>
+
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">41) Why BigDecimal for money?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Avoids binary floating-point rounding errors; supports exact decimal arithmetic and scale control.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">42) java.time vs java.util.Date?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">java.time is immutable, thread-safe, and comprehensive; Date/Calendar are mutable and error-prone.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">43) Locale and timezone concerns?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Always specify ZoneId/Locale when parsing/formatting; store instants in UTC, present in user’s zone.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">44) Defensive copying?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Return copies of mutable fields and accept copies in constructors to preserve encapsulation.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">45) Immutable vs unmodifiable collections?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Immutable: contents can’t change. Unmodifiable: wrapper prevents changes via that reference but underlying may mutate.</p>
+          </li>
+
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">46) When to use EnumMap/EnumSet?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">When keys/elements are enums. They’re memory-efficient and fast due to array/bit-vector implementations.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">47) What is a memory leak in Java?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Unintended object retention via references (caches, listeners) preventing GC; fix by clearing references and using weak refs if apt.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">48) equals() vs ==?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">== compares references for objects and values for primitives; equals() compares logical equality (if overridden).</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">49) Static vs instance members?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Static belong to the class (one per class); instance belong to each object. Static methods can’t access instance state directly.</p>
+          </li>
+          <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="font-semibold">50) Best practices for equals/hashCode/toString?</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Follow contracts, include significant fields, keep them consistent with immutability; consider records for value types.</p>
+          </li>
+        </ol>
+      </section>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 WASSIM LAGNAOUI. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('themeToggle').addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+  </body>
+</html>
