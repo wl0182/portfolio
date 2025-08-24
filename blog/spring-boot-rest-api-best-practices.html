@@ -45,14 +45,21 @@
     <main class="mx-auto max-w-7xl px-6 py-10">
       <header class="max-w-3xl">
         <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Spring Boot REST API Best Practices</h1>
-        <p class="mt-2 text-slate-600 dark:text-slate-300">Design robust, evolvable APIs with validation, error handling, and versioning.</p>
+        <p class="mt-2 text-slate-600 dark:text-slate-300">A practical guide to robust, evolvable Spring Boot REST APIs: resource modeling, validation, error handling, versioning, security, and documentation.</p>
         <a href="./" class="mt-4 inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Blog</a>
       </header>
 
       <section class="mt-8 space-y-8">
         <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
-          <h2 class="text-xl font-semibold">1) Resource modeling and URLs</h2>
-          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Use nouns and hierarchies. Prefer plural collection names and predictable paths.</p>
+          <h2 class="text-xl font-semibold">Resource modeling and URLs</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Resource-oriented URLs describe things rather than actions. Using plural nouns for collections and stable IDs for items helps consumers predict paths, while shallow hierarchies convey natural containment without over-coupling.</p>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-600 dark:text-slate-300 space-y-1">
+            <li>Collections are typically plural, while single items are addressed by ID: <code>/orders</code> and <code>/orders/{orderId}</code>.</li>
+            <li>HTTP verbs represent actions; keeping verbs out of the path keeps URLs noun-focused (e.g., <code>POST /orders</code>, <code>GET /orders/{id}</code>, <code>PUT/PATCH /orders/{id}</code>, <code>DELETE /orders/{id}</code>).</li>
+            <li>Relationships and containment can be shown hierarchically when helpful: <code>/orders/{id}/items</code>, <code>/customers/{id}/orders</code>. Shallow nesting (≤2 levels) stays readable.</li>
+            <li>Domain actions can be expressed as sub-resources (e.g., <code>POST /orders/{id}/cancellation</code>) rather than verb-like paths.</li>
+            <li>Lowercase, hyphen-separated segments and extension-less paths keep names consistent and easy to scan.</li>
+          </ul>
           <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code>// Good
 GET /api/v1/orders
 GET /api/v1/orders/{id}
@@ -64,8 +71,15 @@ POST /api/v1/createOrder  // avoid
         </article>
 
         <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
-          <h2 class="text-xl font-semibold">2) DTOs and validation</h2>
-          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Decouple persistence entities from API contracts. Validate inputs with Bean Validation.</p>
+          <h2 class="text-xl font-semibold">DTOs and validation</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Using DTOs, which are consumer-focused data shapes decoupled from persistence entities, is preferable and recommended because it stabilizes the API contract and prevents leaking internals. Validating inputs at the edge helps fail fast with clear, field-level feedback.</p>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-600 dark:text-slate-300 space-y-1">
+            <li>Request/response DTOs remain independent from JPA entities, which avoids exposing lazy fields, internal IDs, or persistence concerns.</li>
+            <li>Jakarta Bean Validation annotations (e.g., <code>@NotNull</code>, <code>@NotBlank</code>, <code>@Positive</code>, <code>@Email</code>, <code>@Pattern</code>) express constraints; nested objects are validated via <code>@Valid</code>.</li>
+            <li>Enums and numeric ranges communicate domain rules, which protects invariants and improves error messages.</li>
+            <li>Validation errors are translated into a consistent API error shape, avoiding raw stack traces and ambiguous 500s.</li>
+            <li>Explicit mapping (e.g., MapStruct or manual mappers) provides control over which fields are exposed and how they’re named.</li>
+          </ul>
           <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code class="language-java">public record CreateOrderItemDTO(
   @NotNull Long menuItemId,
   @Positive int quantity
@@ -91,8 +105,14 @@ public class OrderController {
         </article>
 
         <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
-          <h2 class="text-xl font-semibold">3) Consistent error handling (Problem Details)</h2>
-          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Return structured errors. Consider RFC 7807 <code>application/problem+json</code>.</p>
+          <h2 class="text-xl font-semibold">Consistent error handling (Problem Details)</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">A predictable error format enables clients to automate handling and display. RFC 7807 (Problem Details) describes fields such as <code>type</code>, <code>title</code>, <code>status</code>, <code>detail</code>, and <code>instance</code> for interoperable errors.</p>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-600 dark:text-slate-300 space-y-1">
+            <li>Known exceptions map to standard HTTP status codes: 400 for validation, 401/403 for auth, 404 for not found, 409 for conflicts, 422 for semantic errors.</li>
+            <li>Machine-friendly error codes and per-field details make client-side error rendering and retries reliable.</li>
+            <li>Stack traces or internal class names are not exposed; a correlation/trace ID helps support investigations.</li>
+            <li>Setting <code>Content-Type: application/problem+json</code> and a consistent schema keeps errors uniform across endpoints.</li>
+          </ul>
           <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code class="language-java">@ControllerAdvice
 public class ApiExceptionHandler {
   @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -116,8 +136,14 @@ public class ApiExceptionHandler {
         </article>
 
         <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
-          <h2 class="text-xl font-semibold">4) Versioning strategy</h2>
-          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Prefer URI versioning for simplicity; header versioning for strict contract control.</p>
+          <h2 class="text-xl font-semibold">Versioning strategy</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Clear version boundaries help manage breaking changes, while a documented deprecation policy sets expectations for removals and migration.</p>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-600 dark:text-slate-300 space-y-1">
+            <li>Path-based versions (e.g., <code>/api/v1</code>) are simple and cache-friendly; media-type or header versions offer stricter contract control.</li>
+            <li>Query-param versioning tends to be less clear than path or media-type approaches.</li>
+            <li>Deprecations can be documented in OpenAPI and release notes; the <code>Sunset</code> header communicates timelines.</li>
+            <li>Within a version, changes remain additive to preserve backward compatibility.</li>
+          </ul>
           <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code>// URI versioning
 GET /api/v1/orders
 GET /api/v2/orders  // breaking changes live here
@@ -129,8 +155,14 @@ Accept: application/vnd.example.order+json;version=2
         </article>
 
         <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
-          <h2 class="text-xl font-semibold">5) Pagination, filtering, sorting</h2>
-          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Expose consistent query parameters and return metadata links when useful.</p>
+          <h2 class="text-xl font-semibold">Pagination, filtering, sorting</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Consistent query parameters and clear metadata make list endpoints predictable and performant, especially at scale.</p>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-600 dark:text-slate-300 space-y-1">
+            <li>Common parameters include <code>page</code>, <code>size</code>, and <code>sort=field,asc|desc</code>; capping <code>size</code> protects the service from heavy requests.</li>
+            <li>Total counts and navigation links aid pagination UIs; stable ordering yields deterministic pages.</li>
+            <li>Filtering via query params (e.g., <code>status=READY</code>, ranges like <code>createdAfter=...</code>) narrows result sets efficiently.</li>
+            <li>Whitelisting sortable/filterable fields avoids injection risks and unbounded database work.</li>
+          </ul>
           <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code>// Requests
 GET /api/v1/orders?page=0&size=20&sort=createdAt,desc&status=READY
 
@@ -147,8 +179,14 @@ GET /api/v1/orders?page=0&size=20&sort=createdAt,desc&status=READY
         </article>
 
         <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
-          <h2 class="text-xl font-semibold">6) Security and auth</h2>
-          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Use HTTPS, JWT/OAuth2, and scope/role checks in controllers and services.</p>
+          <h2 class="text-xl font-semibold">Security and auth</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Every endpoint benefits from authentication and authorization, which reduce risk exposure and limit access to appropriate identities.</p>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-600 dark:text-slate-300 space-y-1">
+            <li>HTTPS is enforced end-to-end; JWT/OAuth2 tokens are validated, and scopes/roles are checked at controller and service layers.</li>
+            <li>Least privilege and clear segregation (e.g., separate admin routes) constrain potential damage.</li>
+            <li>Stateless auth suits APIs; when sessions are used, CSRF protections are applied.</li>
+            <li>Secrets and tokens are never logged; keys are rotated and stored in secure systems (vault/KMS).</li>
+          </ul>
           <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code class="language-java">@RestController
 @RequestMapping("/api/v1/admin")
 @PreAuthorize("hasRole('ADMIN')")
@@ -170,8 +208,13 @@ class AdminController {
         </article>
 
         <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
-          <h2 class="text-xl font-semibold">7) Idempotency and safety</h2>
-          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">GET must be safe; POST should be idempotent when creating with client-provided keys; use Idempotency-Key</p>
+          <h2 class="text-xl font-semibold">Idempotency and safety</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Designing for retries reduces user-facing errors. Safe methods do not change state, and idempotent operations return the same outcome when repeated.</p>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-600 dark:text-slate-300 space-y-1">
+            <li><code>GET</code> is safe by definition; <code>PUT</code> and <code>DELETE</code> are idempotent; <code>POST</code> can be made idempotent via client-supplied identifiers or an <code>Idempotency-Key</code>.</li>
+            <li>Deduplication is achieved by storing the idempotency key and response for a defined window.</li>
+            <li>Idempotency should hold across network retries and timeouts to prevent duplicated side effects (e.g., double charges).</li>
+          </ul>
           <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code>// Client sends a unique key per logical create attempt
 POST /api/v1/payments
 Idempotency-Key: 3a7b...  // repeat with same key returns the same result
@@ -179,8 +222,13 @@ Idempotency-Key: 3a7b...  // repeat with same key returns the same result
         </article>
 
         <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
-          <h2 class="text-xl font-semibold">8) Documentation (OpenAPI/Swagger)</h2>
-          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Generate machine-readable contracts and interactive docs for consumers.</p>
+          <h2 class="text-xl font-semibold">Documentation (OpenAPI/Swagger)</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">A self-describing API keeps the contract in sync with the implementation and helps consumers explore and integrate faster.</p>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-600 dark:text-slate-300 space-y-1">
+            <li>Controller and DTO annotations allow the OpenAPI generator to capture types, constraints, examples, and auth details.</li>
+            <li>Error schemas and response codes clarify failure modes; required scopes and headers are documented alongside endpoints.</li>
+            <li>Documentation generation can be automated in CI and published via Swagger UI in appropriate environments.</li>
+          </ul>
           <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code>// build.gradle snippet
 implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0"
 // UI at /swagger-ui.html or /swagger-ui/index.html
@@ -188,17 +236,24 @@ implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0"
         </article>
 
         <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
-          <h2 class="text-xl font-semibold">9) Stability and backward compatibility</h2>
-          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Add fields in a backward-compatible way. Don’t remove or repurpose fields in-place.</p>
+          <h2 class="text-xl font-semibold">Stability and backward compatibility</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Backward compatibility allows evolution without breaking consumers. Additive changes are favored, while removals are planned and communicated.</p>
           <ul class="mt-3 list-disc pl-5 text-sm text-slate-600 dark:text-slate-300 space-y-1">
-            <li>Use additive changes in the same version; deprecate before removal in the next major.</li>
-            <li>Document deprecations and timelines in OpenAPI and release notes.</li>
+            <li>New optional fields can be added; changing field meaning or types is avoided within the same version.</li>
+            <li>Deprecations are marked in OpenAPI and release notes, with clear timelines toward removal.</li>
+            <li>Clients are typically tolerant in reading (ignore unknown fields) and strict in writing (omit unstable fields).</li>
           </ul>
         </article>
 
         <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
-          <h2 class="text-xl font-semibold">10) Testing and performance</h2>
-          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Mix unit, slice (@WebMvcTest), and integration tests; measure latencies.</p>
+          <h2 class="text-xl font-semibold">Testing and performance</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Correctness and performance are supported by layered tests and measurement, from fast unit tests to end-to-end checks.</p>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-600 dark:text-slate-300 space-y-1">
+            <li>Unit tests cover business logic; slice tests (e.g., <code>@WebMvcTest</code>) verify web layers; integration tests exercise the real HTTP stack.</li>
+            <li>Test data builders and isolated fixtures keep tests readable and deterministic, reducing flakiness.</li>
+            <li>Contract tests or schema validation against OpenAPI detect breaking changes before release.</li>
+            <li>Latencies and throughput are measured against budgets; profiling identifies hotspots prior to optimization.</li>
+          </ul>
           <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code class="language-java">@WebMvcTest(OrderController.class)
 class OrderControllerTest {
   @Autowired MockMvc mvc;
