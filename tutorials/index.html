@@ -9,19 +9,8 @@
     <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <script>
-      tailwind.config = {
-        darkMode: 'class',
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ["Inter var", "Inter", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Helvetica", "Arial", "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"],
-            },
-          },
-        },
-      };
+      tailwind.config = { darkMode: 'class', theme: { extend: { fontFamily: { sans: ["Inter var", "Inter", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Helvetica", "Arial", "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"] } } } };
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
   </head>
   <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
     <!-- Decorative background to match Home -->
@@ -53,32 +42,61 @@
     </header>
 
     <main class="mx-auto max-w-7xl px-6 py-10">
-      <header>
+      <header class="max-w-3xl">
         <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Tutorials: Restaurant App</h1>
-        <p class="mt-2 text-slate-600 dark:text-slate-300">Twelve-part series covering the full stack. Click a lesson to load its content.</p>
+        <p class="mt-2 text-slate-600 dark:text-slate-300">Twelve-part series covering the full stack. Click a lesson to open its page.</p>
       </header>
 
-      <div class="mt-8 grid gap-6 lg:grid-cols-[280px_1fr]">
-        <aside class="lg:sticky lg:top-20 lg:self-start">
-          <nav id="toc" class="space-y-1 text-sm">
-            <button data-slug="tutorial-01.html" class="w-full text-left rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800">01. Project Setup & Architecture</button>
-            <button data-slug="tutorial-02.html" class="w-full text-left rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800">02. Domain Model & JPA</button>
-            <button data-slug="tutorial-03.md" class="w-full text-left rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800">03. Auth with Spring Security & JWT</button>
-            <button data-slug="tutorial-04.md" class="w-full text-left rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800">04. Menu Management APIs</button>
-            <button data-slug="tutorial-05.md" class="w-full text-left rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800">05. Kitchen Queue & Realtime</button>
-            <button data-slug="tutorial-06.md" class="w-full text-left rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800">06. Orders & Sessions</button>
-            <button data-slug="tutorial-07.md" class="w-full text-left rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800">07. Admin Dashboard</button>
-            <button data-slug="tutorial-08.md" class="w-full text-left rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800">08. Analytics & Reporting</button>
-            <button data-slug="tutorial-09.md" class="w-full text-left rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800">09. Testing (JUnit/Mockito)</button>
-            <button data-slug="tutorial-10.md" class="w-full text-left rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800">10. Frontend (React + Vite)</button>
-            <button data-slug="tutorial-11.md" class="w-full text-left rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800">11. Docker & Compose</button>
-            <button data-slug="tutorial-12.md" class="w-full text-left rounded-md px-3 py-2 hover:bg-slate-100 dark:hover:bg-slate-800">12. CI/CD (Jenkins)</button>
-          </nav>
-        </aside>
-        <section>
-          <div id="lesson" class="prose prose-slate max-w-none dark:prose-invert"></div>
-        </section>
-      </div>
+      <section class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <a href="./content/tutorial-01.html" class="group block rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 transition hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-700/60 dark:bg-slate-900/60">
+          <div class="flex items-center justify-between"><h3 class="font-semibold">01. Kickstart the Backend: Spring Boot + PostgreSQL</h3><span class="text-xs text-slate-500">HTML</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Bootstrap Spring Boot and wire it to PostgreSQL the right way.</p>
+        </a>
+        <a href="./content/tutorial-02.html" class="group block rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 transition hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-700/60 dark:bg-slate-900/60">
+          <div class="flex items-center justify-between"><h3 class="font-semibold">02. Design the Domain: Entities, Relationships & JPA</h3><span class="text-xs text-slate-500">HTML</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Model entities, map relations, and apply JPA naming/validation.</p>
+        </a>
+        <a href="./content/tutorial-03.html" class="group block rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 transition hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-700/60 dark:bg-slate-900/60">
+          <div class="flex items-center justify-between"><h3 class="font-semibold">03. Repositories, Associations & DTOs</h3><span class="text-xs text-slate-500">Markdown</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Build repositories, navigate associations, and shape DTOs.</p>
+        </a>
+        <a href="./content/tutorial-04.html" class="group block rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 transition hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-700/60 dark:bg-slate-900/60">
+          <div class="flex items-center justify-between"><h3 class="font-semibold">04. Menu Items API: Endpoints, DTOs, Services</h3><span class="text-xs text-slate-500">Markdown</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">CRUD endpoints with validation and layered design.</p>
+        </a>
+        <a href="./content/tutorial-05.html" class="group block rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 transition hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-700/60 dark:bg-slate-900/60">
+          <div class="flex items-center justify-between"><h3 class="font-semibold">05. Staff API: Endpoints, DTOs, Services</h3><span class="text-xs text-slate-500">Markdown</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Staff management with clean service and repository layers.</p>
+        </a>
+        <a href="./content/tutorial-06.html" class="group block rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 transition hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-700/60 dark:bg-slate-900/60">
+          <div class="flex items-center justify-between"><h3 class="font-semibold">06. Tables API: Endpoints, DTOs, Services</h3><span class="text-xs text-slate-500">Markdown</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Table sessions and seating flows with proper boundaries.</p>
+        </a>
+        <a href="./content/tutorial-07.html" class="group block rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 transition hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-700/60 dark:bg-slate-900/60">
+          <div class="flex items-center justify-between"><h3 class="font-semibold">07. Orders API, Part 1</h3><span class="text-xs text-slate-500">Markdown</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Create orders, add items, and handle basic workflows.</p>
+        </a>
+        <a href="./content/tutorial-08.html" class="group block rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 transition hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-700/60 dark:bg-slate-900/60">
+          <div class="flex items-center justify-between"><h3 class="font-semibold">08. Orders API, Part 2</h3><span class="text-xs text-slate-500">Markdown</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Status transitions, serving, and advanced flows.</p>
+        </a>
+        <a href="./content/tutorial-09.html" class="group block rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 transition hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-700/60 dark:bg-slate-900/60">
+          <div class="flex items-center justify-between"><h3 class="font-semibold">09. Analytics API: Stats Endpoints</h3><span class="text-xs text-slate-500">Markdown</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Aggregations, KPIs, and efficient reporting queries.</p>
+        </a>
+        <a href="./content/tutorial-10.html" class="group block rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 transition hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-700/60 dark:bg-slate-900/60">
+          <div class="flex items-center justify-between"><h3 class="font-semibold">10. Global Exception Handling</h3><span class="text-xs text-slate-500">Markdown</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Consistent error responses and validation feedback.</p>
+        </a>
+        <a href="./content/tutorial-11.html" class="group block rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 transition hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-700/60 dark:bg-slate-900/60">
+          <div class="flex items-center justify-between"><h3 class="font-semibold">11. API Security with JWT</h3><span class="text-xs text-slate-500">Markdown</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Login, tokens, filters, and role-based access.</p>
+        </a>
+        <a href="./content/tutorial-12.html" class="group block rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 transition hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-700/60 dark:bg-slate-900/60">
+          <div class="flex items-center justify-between"><h3 class="font-semibold">12. Docker & CI: Containerization with Jenkins</h3><span class="text-xs text-slate-500">Markdown</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Containerize the app and automate builds with Jenkins.</p>
+        </a>
+      </section>
     </main>
 
     <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
@@ -88,41 +106,10 @@
     </footer>
 
     <script>
-       document.getElementById('themeToggle').addEventListener('click', function(){
-         const r=document.documentElement; const d=r.classList.toggle('dark');
-         try{localStorage.setItem('theme',d?'dark':'light');}catch{}
-       });
-
-        async function load(slug){
-          const el=document.getElementById('lesson');
-          el.innerHTML='<div class="text-sm text-slate-500">Loading...</div>';
-          try{
-            const res=await fetch('./content/'+slug,{cache:'no-store'});
-            const text=await res.text();
-            if (slug.endsWith('.md')) {
-              el.innerHTML = marked.parse(text);
-            } else {
-              el.innerHTML = text; // assume pre-styled HTML
-            }
-            if (window.Prism && typeof Prism.highlightAllUnder === 'function') {
-              Prism.highlightAllUnder(el);
-            }
-          }catch(e){
-            el.innerHTML='<div class="text-sm text-rose-500">Failed to load. Check that tutorials/content/'+slug+' exists.</div>'
-          }
-        }
-        document.getElementById('toc').addEventListener('click', (e)=>{
-          if(e.target.matches('button[data-slug]')){ load(e.target.dataset.slug); }
-        });
-        // Load first lesson by default
-        load('tutorial-01.html');
-      </script>
-      <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
-      <script>
-        if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
-          Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
-        }
-      </script>
+      document.getElementById('themeToggle').addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
   </body>
 </html>
