@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Java Coding Questions and Programs</title>
+    <meta name="description" content="Coding interview questions with problem descriptions and Java solutions." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E☕%3C/text%3E%3C/svg%3E" />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="./" class="text-indigo-600 dark:text-indigo-400">Blog</a>
+          <a href="../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <header class="max-w-3xl">
+        <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Java Coding Questions & Programs</h1>
+        <p class="mt-2 text-slate-600 dark:text-slate-300">Problem descriptions with Java solutions.</p>
+        <a href="./" class="mt-4 inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Blog</a>
+      </header>
+
+      <section id="problemsList" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+        <h2>Problems and Solutions</h2>
+        <p>Each problem statement is followed by a clean, idiomatic Java solution.</p>
+
+        <div class="not-prose mt-4 flex items-center justify-end gap-2">
+          <button id="expandAllProblems" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Expand all</button>
+          <button id="collapseAllProblems" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Collapse all</button>
+        </div>
+
+        <h3>1. Two Sum</h3>
+        <p>Given an array of integers, find two numbers that add up to a specific target.</p>
+        <pre><code class="language-java">public int[] twoSum(int[] nums, int target) {
+ Map&lt;Integer, Integer&gt; map = new HashMap&lt;&gt;();
+ for (int i = 0; i &lt; nums.length; i++) {
+ int complement = target - nums[i];
+ if (map.containsKey(complement)) {
+ return new int[] { map.get(complement), i };
+ }
+ map.put(nums[i], i);
+ }
+ return new int[] {};
+}</code></pre>
+
+        <h3>2. Reverse a String</h3>
+        <p>Write a function to reverse a string without using built-in functions.</p>
+        <pre><code class="language-java">public String reverseString(String s) {
+ return new StringBuilder(s).reverse().toString();
+}</code></pre>
+
+        <h3>3. Palindrome Check</h3>
+        <p>Determine if a given string is a palindrome.</p>
+        <pre><code class="language-java">public boolean isPalindrome(String s) {
+ int left = 0, right = s.length() - 1;
+ while (left &lt; right) {
+ if (s.charAt(left++) != s.charAt(right--)) return false;
+ }
+ return true;
+}</code></pre>
+
+        <h3>4. Merge Two Sorted Lists</h3>
+        <p>Merge two sorted linked lists and return it as a new sorted list.</p>
+        <pre><code class="language-java">public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+ if (l1 == null) return l2;
+ if (l2 == null) return l1;
+ if (l1.val &lt; l2.val) {
+ l1.next = mergeTwoLists(l1.next, l2);
+ return l1;
+ } else {
+ l2.next = mergeTwoLists(l1, l2.next);
+ return l2;
+ }
+}</code></pre>
+
+        <h3>5. Longest Substring Without Repeating Characters</h3>
+        <p>Find the length of the longest substring without repeating characters.</p>
+        <pre><code class="language-java">public int lengthOfLongestSubstring(String s) {
+ Set&lt;Character&gt; set = new HashSet&lt;&gt;();
+ int left = 0, maxLen = 0;
+ for (int right = 0; right &lt; s.length(); right++) {
+ while (set.contains(s.charAt(right))) {
+ set.remove(s.charAt(left++));
+ }
+ set.add(s.charAt(right));
+ maxLen = Math.max(maxLen, right - left + 1);
+ }
+ return maxLen;
+}</code></pre>
+
+        <h3>6. Valid Parentheses</h3>
+        <p>Given a string containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.</p>
+        <pre><code class="language-java">public boolean isValid(String s) {
+ Stack&lt;Character&gt; stack = new Stack&lt;&gt;();
+ for (char c : s.toCharArray()) {
+ if (c == '(' || c == '{' || c == '[') {
+ stack.push(c);
+ } else if (!stack.isEmpty() &&
+ ((c == ')' && stack.peek() == '(') ||
+ (c == '}' && stack.peek() == '{') ||
+ (c == ']' && stack.peek() == '['))) {
+ stack.pop();
+ } else {
+ return false;
+ }
+ }
+ return stack.isEmpty();
+}</code></pre>
+
+        <h3>7. Search in Rotated Sorted Array</h3>
+        <p>Search for a target value in a rotated sorted array.</p>
+        <pre><code class="language-java">public int search(int[] nums, int target) {
+ int left = 0, right = nums.length - 1;
+ while (left &lt;= right) {
+ int mid = (left + right) / 2;
+ if (nums[mid] == target) return mid;
+ if (nums[left] &lt;= nums[mid]) {
+ if (nums[left] &lt;= target && target &lt; nums[mid]) right = mid -
+1;
+ else left = mid + 1;
+ } else {
+ if (nums[mid] &lt; target && target &lt;= nums[right]) left = mid +
+1;
+ else right = mid - 1;
+ }
+ }
+ return -1;
+}</code></pre>
+
+        <h3>8. Container With Most Water</h3>
+        <p>Given n non-negative integers, find two lines that together with the x-axis form a container, such that the container contains the most water.</p>
+        <pre><code class="language-java">public int maxArea(int[] height) {
+ int left = 0, right = height.length - 1, max = 0;
+ while (left &lt; right) {
+ max = Math.max(max, Math.min(height[left], height[right]) * (right - left));
+ if (height[left] &lt; height[right]) left++;
+ else right--;
+ }
+ return max;
+}</code></pre>
+
+        <h3>9. 3Sum</h3>
+        <p>Find all unique triplets in the array which gives the sum of zero.</p>
+        <pre><code class="language-java">public List&lt;List&lt;Integer&gt;&gt; threeSum(int[] nums) {
+ Arrays.sort(nums);
+ List&lt;List&lt;Integer&gt;&gt; result = new ArrayList&lt;&gt;();
+ for (int i = 0; i &lt; nums.length - 2; i++) {
+ if (i &gt; 0 && nums[i] == nums[i - 1]) continue;
+ int left = i + 1, right = nums.length - 1;
+ while (left &lt; right) {
+ int sum = nums[i] + nums[left] + nums[right];
+ if (sum == 0) {
+ result.add(Arrays.asList(nums[i], nums[left++],
+nums[right--]));
+ while (left &lt; right && nums[left] == nums[left - 1]) left++;
+ while (left &lt; right && nums[right] == nums[right + 1]) right--;
+ } else if (sum &lt; 0) left++;
+ else right--;
+ }
+ }
+ return result;
+}</code></pre>
+
+        <h3>10. Remove Nth Node From End of List</h3>
+        <p>Remove the n-th node from the end of a linked list and return its head.</p>
+        <pre><code class="language-java">public ListNode removeNthFromEnd(ListNode head, int n) {
+ ListNode dummy = new ListNode(0);
+ dummy.next = head;
+ ListNode slow = dummy, fast = dummy;
+ for (int i = 0; i &lt;= n; i++) fast = fast.next;
+ while (fast != null) {
+ slow = slow.next;
+ fast = fast.next;
+ }
+ slow.next = slow.next.next;
+ return dummy.next;
+}</code></pre>
+
+        <h3>11. Maximum Subarray</h3>
+        <p>Find the contiguous subarray with the largest sum.</p>
+        <pre><code class="language-java">public int maxSubArray(int[] nums) {
+ int max = nums[0], currentSum = nums[0];
+ for (int i = 1; i &lt; nums.length; i++) {
+ currentSum = Math.max(nums[i], currentSum + nums[i]);
+ max = Math.max(max, currentSum);
+ }
+ return max;
+}</code></pre>
+
+        <h3>12. Climbing Stairs</h3>
+        <p>You are climbing a staircase. It takes n steps to reach the top. Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?</p>
+        <pre><code class="language-java">public int climbStairs(int n) {
+ if (n &lt;= 2) return n;
+ int first = 1, second = 2;
+ for (int i = 3; i &lt;= n; i++) {
+ int third = first + second;
+ first = second;
+ second = third;
+ }
+ return second;
+}</code></pre>
+
+        <h3>13. Set Matrix Zeroes</h3>
+        <p>Given a m x n matrix, if an element is 0, set its entire row and column to 0.</p>
+        <pre><code class="language-java">public void setZeroes(int[][] matrix) {
+ boolean firstRow = false, firstCol = false;
+ for (int i = 0; i &lt; matrix.length; i++) {
+ for (int j = 0; j &lt; matrix[0].length; j++) {
+ if (matrix[i][j] == 0) {
+ if (i == 0) firstRow = true;
+ if (j == 0) firstCol = true;
+ matrix[i][0] = 0;
+ matrix[0][j] = 0;
+ }
+ }
+ }
+ for (int i = 1; i &lt; matrix.length; i++) {
+ for (int j = 1; j &lt; matrix[0].length; j++) {
+ if (matrix[i][0] == 0 || matrix[0][j] == 0) matrix[i][j] = 0;
+ }
+ }
+ if (firstRow) Arrays.fill(matrix[0], 0);
+ if (firstCol) for (int i = 0; i &lt; matrix.length; i++) matrix[i][0] = 0;
+}</code></pre>
+
+        <h3>14. Group Anagrams</h3>
+        <p>Given an array of strings, group anagrams together.</p>
+        <pre><code class="language-java">public List&lt;List&lt;String&gt;&gt; groupAnagrams(String[] strs) {
+ Map&lt;String, List&lt;String&gt;&gt; map = new HashMap&lt;&gt;();
+ for (String s : strs) {
+ char[] chars = s.toCharArray();
+ Arrays.sort(chars);
+ String key = new String(chars);
+ map.putIfAbsent(key, new ArrayList&lt;&gt;());
+ map.get(key).add(s);
+ }
+ return new ArrayList&lt;&gt;(map.values());
+}</code></pre>
+
+        <h3>15. Merge Intervals</h3>
+        <p>Given a collection of intervals, merge all overlapping intervals.</p>
+        <pre><code class="language-java">public int[][] merge(int[][] intervals) {
+ Arrays.sort(intervals, (a, b) -&gt; Integer.compare(a[0], b[0]));
+ List&lt;int[]&gt; merged = new ArrayList&lt;&gt;();
+ for (int[] interval : intervals) {
+ if (merged.isEmpty() || merged.get(merged.size() - 1)[1] &lt;
+interval[0]) {
+ merged.add(interval);
+ } else {
+ merged.get(merged.size() - 1)[1] =
+Math.max(merged.get(merged.size() - 1)[1], interval[1]);
+ }
+ }
+ return merged.toArray(new int[merged.size()][]);
+}</code></pre>
+
+        <h3>16. Linked List Cycle</h3>
+        <p>Given a linked list, determine if it has a cycle in it.</p>
+        <pre><code class="language-java">public boolean hasCycle(ListNode head) {
+ if (head == null || head.next == null) return false;
+ ListNode slow = head, fast = head.next;
+ while (slow != fast) {
+ if (fast == null || fast.next == null) return false;
+ slow = slow.next;
+ fast = fast.next.next;
+ }
+ return true;
+}</code></pre>
+
+        <h3>17. Implement Stack using Queues</h3>
+        <p>Implement a last-in-first-out (LIFO) stack using only two queues.</p>
+        <pre><code class="language-java">class MyStack {
+ Queue&lt;Integer&gt; queue = new LinkedList&lt;&gt;();
+ public void push(int x) {
+ queue.add(x);
+ for (int i = 1; i &lt; queue.size(); i++) {
+ queue.add(queue.poll());
+ }
+ }
+ public int pop() {
+ return queue.poll();
+ }
+ public int top() {
+ return queue.peek();
+ }
+ public boolean empty() {
+ return queue.isEmpty();
+ }
+}</code></pre>
+
+        <h3>18. Minimum Window Substring</h3>
+        <p>Given two strings s and t, find the minimum window in s which will contain all the characters in t.</p>
+        <pre><code class="language-java">public String minWindow(String s, String t) {
+ if (s.length() &lt; t.length()) return "";
+ Map&lt;Character, Integer&gt; map = new HashMap&lt;&gt;();
+ for (char c : t.toCharArray()) map.put(c, map.getOrDefault(c, 0) + 1);
+ int left = 0, count = 0, minLen = Integer.MAX_VALUE, start = 0;
+ for (int right = 0; right &lt; s.length(); right++) {
+ char c = s.charAt(right);
+ if (map.containsKey(c)) {
+ map.put(c, map.get(c) - 1);
+ if (map.get(c) &gt;= 0) count++;
+ }
+ while (count == t.length()) {
+ if (right - left + 1 &lt; minLen) {
+ minLen = right - left + 1;
+ start = left;
+ }
+ char lc = s.charAt(left++);
+ if (map.containsKey(lc)) {
+ map.put(lc, map.get(lc) + 1);
+ if (map.get(lc) &gt; 0) count--;
+ }
+ }
+ }
+ return minLen == Integer.MAX_VALUE ? "" : s.substring(start, start +
+minLen);
+}</code></pre>
+
+        <h3>19. Word Search</h3>
+        <p>Given a 2D board and a word, find if the word exists in the grid.</p>
+        <pre><code class="language-java">public boolean exist(char[][] board, String word) {
+ for (int i = 0; i &lt; board.length; i++) {
+ for (int j = 0; j &lt; board[0].length; j++) {
+ if (dfs(board, word, i, j, 0)) return true;
+ }
+ }
+ return false;
+}
+private boolean dfs(char[][] board, String word, int i, int j, int index) {
+ if (index == word.length()) return true;
+ if (i &lt; 0 || j &lt; 0 || i &gt;= board.length || j &gt;= board[0].length ||
+board[i][j] != word.charAt(index)) return false;
+ char temp = board[i][j];
+ board[i][j] = '#';
+ boolean found = dfs(board, word, i + 1, j, index + 1) ||
+ dfs(board, word, i - 1, j, index + 1) ||
+ dfs(board, word, i, j + 1, index + 1) ||
+ dfs(board, word, i, j - 1, index + 1);
+ board[i][j] = temp;
+ return found;
+}</code></pre>
+
+        <h3>29. Number of Islands</h3>
+        <p>Given a 2D grid of '1's (land) and '0's (water), count the number of islands.</p>
+        <pre><code class="language-java">public int numIslands(char[][] grid) {
+ int count = 0;
+ for (int i = 0; i &lt; grid.length; i++) {
+ for (int j = 0; j &lt; grid[0].length; j++) {
+ if (grid[i][j] == '1') {
+ count++;
+ dfs(grid, i, j);
+ }
+ }
+ }
+ return count;
+}
+private void dfs(char[][] grid, int i, int j) {
+ if (i &lt; 0 || i &gt;= grid.length || j &lt; 0 || j &gt;= grid[0].length ||
+grid[i][j] == '0') return;
+ grid[i][j] = '0';
+ dfs(grid, i + 1, j);
+ dfs(grid, i - 1, j);
+ dfs(grid, i, j + 1);
+ dfs(grid, i, j - 1);
+}</code></pre>
+
+        <h3>30. Course Schedule</h3>
+        <p>There are a total of numCourses you have to take, labeled from 0 to numCourses-1. Some courses may have prerequisites. Determine if you can finish all courses.</p>
+        <pre><code class="language-java">public boolean canFinish(int numCourses, int[][] prerequisites) {
+ List&lt;List&lt;Integer&gt;&gt; graph = new ArrayList&lt;&gt;();
+ for (int i = 0; i &lt; numCourses; i++) graph.add(new ArrayList&lt;&gt;());
+ int[] inDegree = new int[numCourses];
+ for (int[] prereq : prerequisites) {
+ graph.get(prereq[1]).add(prereq[0]);
+ inDegree[prereq[0]]++;
+ }
+ Queue&lt;Integer&gt; queue = new LinkedList&lt;&gt;();
+ for (int i = 0; i &lt; numCourses; i++) if (inDegree[i] == 0) queue.add(i);
+ int count = 0;
+ while (!queue.isEmpty()) {
+ int course = queue.poll();
+ count++;
+ for (int next : graph.get(course)) {
+ if (--inDegree[next] == 0) queue.add(next);
+ }
+ }
+ return count == numCourses;
+}</code></pre>
+
+        <h3>31. Implement Trie (Prefix Tree)</h3>
+        <p>Implement a trie with insert, search, and startsWith methods.</p>
+        <pre><code class="language-java">class Trie {
+ private TrieNode root;
+ public Trie() {
+ root = new TrieNode();
+ }
+ public void insert(String word) {
+ TrieNode node = root;
+ for (char c : word.toCharArray()) {
+ if (!node.containsKey(c)) node.put(c, new TrieNode());
+ node = node.get(c);
+ }
+ node.setEnd();
+ }
+ public boolean search(String word) {
+ TrieNode node = searchPrefix(word);
+ return node != null && node.isEnd();
+ }
+ public boolean startsWith(String prefix) {
+ return searchPrefix(prefix) != null;
+ }
+ private TrieNode searchPrefix(String word) {
+ TrieNode node = root;
+ for (char c : word.toCharArray()) {
+ if (node.containsKey(c)) node = node.get(c);
+ else return null;
+ }
+ return node;
+ }
+}
+class TrieNode {
+ private TrieNode[] links;
+ private final int R = 26;
+ private boolean isEnd;
+ public TrieNode() {
+ links = new TrieNode[R];
+ }
+ public boolean containsKey(char ch) {
+ return links[ch - 'a'] != null;
+ }
+ public TrieNode get(char ch) {
+ return links[ch - 'a'];
+ }
+ public void put(char ch, TrieNode node) {
+ links[ch - 'a'] = node;
+ }
+ public void setEnd() {
+ isEnd = true;
+ }
+ public boolean isEnd() {
+ return isEnd;
+ }
+}</code></pre>
+
+        <h3>32. Add and Search Word - Data structure design</h3>
+        <p>Design a data structure that supports the addition of words and the search for a word in a dictionary.</p>
+        <pre><code class="language-java">class WordDictionary {
+ private TrieNode root;
+ public WordDictionary() {
+ root = new TrieNode();
+ }
+ public void addWord(String word) {
+ TrieNode node = root;
+ for (char c : word.toCharArray()) {
+ if (!node.containsKey(c)) node.put(c, new TrieNode());
+ node = node.get(c);
+ }
+ node.setEnd();
+ }
+ public boolean search(String word) {
+ return search(word, 0, root);
+ }
+ private boolean search(String word, int index, TrieNode node) {
+ if (index == word.length()) return node.isEnd();
+ char c = word.charAt(index);
+ if (c == '.') {
+ for (char ch = 'a'; ch &lt;= 'z'; ch++) {
+ if (node.containsKey(ch) && search(word, index + 1, node.get(ch))) return true;
+ }
+ return false;
+ } else {
+ return node.containsKey(c) && search(word, index + 1, node.get(c));
+ }
+ }
+}</code></pre>
+      </section>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 WASSIM LAGNAOUI. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('themeToggle').addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+    <script>
+      // Transform each question (h3) and its following content into a collapsible card
+      (function(){
+        const section = document.getElementById('problemsList');
+        if(!section) return;
+        // Collect all h3 nodes first (static snapshot)
+        const headings = Array.from(section.querySelectorAll('h3'));
+        headings.forEach(h3 => {
+          // Gather siblings until next h3 or end of section
+          const contentWrapper = document.createElement('div');
+          contentWrapper.className = 'mt-4 space-y-3 text-sm text-slate-700 dark:text-slate-300';
+          let node = h3.nextSibling;
+          while (node && !(node.nodeType === 1 && node.tagName === 'H3')) {
+            const next = node.nextSibling;
+            contentWrapper.appendChild(node);
+            node = next;
+          }
+
+          // Build details/summary
+          const details = document.createElement('details');
+          details.className = 'group';
+          const summary = document.createElement('summary');
+          summary.className = 'flex items-center justify-between cursor-pointer select-none rounded-lg px-2 py-2 hover:bg-slate-50 transition dark:hover:bg-slate-800/60';
+          const title = document.createElement('span');
+          title.className = 'text-base font-semibold text-slate-800 dark:text-slate-100';
+          title.textContent = h3.textContent;
+          const icon = document.createElementNS('http://www.w3.org/2000/svg','svg');
+          icon.setAttribute('viewBox','0 0 24 24');
+          icon.setAttribute('fill','none');
+          icon.setAttribute('stroke','currentColor');
+          icon.setAttribute('stroke-width','2');
+          icon.classList.add('h-5','w-5','text-slate-500','transition-transform','duration-200','group-open:rotate-180');
+          const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+          path.setAttribute('d','M6 9l6 6 6-6');
+          icon.appendChild(path);
+          summary.appendChild(title);
+          summary.appendChild(icon);
+
+          // Build article card and mount
+          const card = document.createElement('article');
+          card.className = 'not-prose rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60 mt-6';
+          details.appendChild(summary);
+          details.appendChild(contentWrapper);
+          card.appendChild(details);
+
+          // Replace original h3 with card
+          section.insertBefore(card, h3);
+          section.removeChild(h3);
+        });
+
+        // Expand/Collapse all handlers
+        const expandBtn = document.getElementById('expandAllProblems');
+        const collapseBtn = document.getElementById('collapseAllProblems');
+        expandBtn && expandBtn.addEventListener('click', ()=>{
+          section.querySelectorAll('details').forEach(d => d.open = true);
+        });
+        collapseBtn && collapseBtn.addEventListener('click', ()=>{
+          section.querySelectorAll('details').forEach(d => d.open = false);
+        });
+      })();
+    </script>
+  </body>
+</html>
