@@ -14,6 +14,7 @@
         theme: { extend: { fontFamily: { sans: ["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } }
       };
     </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
   </head>
   <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
     <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10">
@@ -47,7 +48,7 @@
     <main class="mx-auto max-w-7xl px-6 py-10">
       <header class="max-w-3xl">
         <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Java Interview Questions</h1>
-        <p class="mt-2 text-slate-600 dark:text-slate-300">50 concise Q&A to refresh core Java knowledge before your interview.</p>
+        <p class="mt-2 text-slate-600 dark:text-slate-300">50 concise Q&amp;A to refresh core Java knowledge before your interview.</p>
         <a href="./" class="mt-4 inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Blog</a>
       </header>
 
@@ -55,211 +56,264 @@
         <ol class="space-y-6 text-sm">
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">1) JDK vs JRE vs JVM?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">JVM runs bytecode; JRE = JVM + libraries to run Java apps; JDK = JRE + tools (javac, javadoc) to develop and run.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">The JVM (Java Virtual Machine) executes Java bytecode (.class). The JRE (Java Runtime Environment) = JVM + core libraries (rt.jar, modules) and resources required to run Java apps. The JDK (Java Development Kit) = JRE + developer tools like <code>javac</code>, <code>javadoc</code>, <code>jar</code>, and monitoring tools. You develop with the JDK and deploy with a JRE-equivalent (in modern Java, the modular runtime image).</p>
+            <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code># compile and run
+javac Hello.java
+java Hello</code></pre>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">2) What are the four OOP pillars?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Encapsulation, Inheritance, Polymorphism, Abstraction.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300"><strong>Encapsulation</strong> hides implementation via access modifiers and exposes behavior; <strong>Inheritance</strong> reuses and specializes behavior; <strong>Polymorphism</strong> lets a single interface represent many concrete types; <strong>Abstraction</strong> focuses on essential behavior and hides details, often via interfaces/abstract classes.</p>
+            <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code class="language-java">interface Shape { double area(); }
+class Circle implements Shape { double r; Circle(double r){this.r=r;} public double area(){return Math.PI*r*r;} }</code></pre>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">3) Why is String immutable?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Safety for class loaders/security, caching in string pool, thread-safety, and stable hash codes for use as keys.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Immutability ensures security (class loaders/URLs can’t be altered), enables string interning (pool caching), thread-safety without locks, and stable hash codes for map keys. Operations like concatenation create new instances.</p>
+            <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code class="language-java">String a = "hi"; String b = a.replace("h", "H"); // a remains "hi"</code></pre>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">4) StringBuilder vs StringBuffer?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Both are mutable; StringBuffer is synchronized (thread-safe, slower). StringBuilder is non-synchronized (faster, single-threaded).</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Both are mutable string builders. <code>StringBuffer</code> is synchronized (thread-safe, slower). <code>StringBuilder</code> is not synchronized (faster) and is preferred in single-threaded contexts.</p>
+            <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code class="language-java">StringBuilder sb = new StringBuilder().append("Hello ").append("World");</code></pre>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">5) equals() and hashCode() contract?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Equal objects must have equal hashCodes. If you override equals, override hashCode to maintain collections consistency.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">If <code>a.equals(b)</code> is true then <code>a.hashCode()==b.hashCode()</code> must be true. Equal objects must have equal hash codes. Violating this breaks hash-based collections. Always override both together for value objects.</p>
+            <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code class="language-java">record Point(int x,int y){}</code></pre>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">6) List vs Set vs Map?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">List: ordered, duplicates. Set: unique elements. Map: key→value pairs, keys unique.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300"><strong>List</strong> keeps order and allows duplicates; <strong>Set</strong> enforces uniqueness; <strong>Map</strong> stores key→value pairs with unique keys. Choose based on whether you need ordering, uniqueness, or key-based access.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">7) ArrayList vs LinkedList?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">ArrayList: fast random access, slower inserts/removes in middle. LinkedList: fast inserts/removes at ends, poor random access.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">ArrayList offers O(1) random access, amortized O(1) append, but O(n) middle inserts/removals. LinkedList offers O(1) add/remove at ends, but O(n) access and extra memory for pointers. Prefer ArrayList for most cases.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">8) How does HashMap work?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Computes hash of key, finds bucket, resolves collisions via linked list/tree bins; equals() confirms key matching.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">It computes a hash from the key, finds the bucket index, and resolves collisions with a linked list or tree bins (since Java 8). It uses <code>equals()</code> to confirm key equality. Good hashCode distribution reduces collisions.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">9) ConcurrentHashMap vs HashMap?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">ConcurrentHashMap supports safe concurrent access with internal segmentation; HashMap is not thread-safe.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300"><code>ConcurrentHashMap</code> supports concurrent reads/writes with internal partitioning and CAS; no null keys/values. <code>HashMap</code> is not thread-safe; concurrent access can corrupt it.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">10) Fail-fast vs fail-safe iterators?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Fail-fast throw ConcurrentModificationException; fail-safe iterate over a snapshot and allow concurrent mods.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Fail-fast iterators (e.g., <code>ArrayList</code>) detect structural modifications and throw <code>ConcurrentModificationException</code>. Fail-safe iterators (e.g., <code>CopyOnWriteArrayList</code>) iterate over a snapshot and allow concurrent modifications.</p>
           </li>
 
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">11) final, finally, finalize?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">final: non-changeable; finally: block that always runs; finalize(): deprecated GC callback, don’t use.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300"><code>final</code> applies to variables (no reassign), methods (no override), classes (no extend). <code>finally</code> is a try-block clause that always runs. <code>finalize()</code> is deprecated; use try-with-resources/cleaners instead.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">12) Checked vs unchecked exceptions?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Checked must be declared/handled (IOException); unchecked extend RuntimeException (NullPointerException).</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Checked exceptions (e.g., <code>IOException</code>) must be declared/handled; represent recoverable conditions. Unchecked (subclasses of <code>RuntimeException</code>) represent programming errors (NPE, IAE) and don’t require declaration.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">13) try-with-resources?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Auto-closes resources implementing AutoCloseable, reducing leaks and boilerplate.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Automatically closes resources implementing <code>AutoCloseable</code>, even on exceptions, reducing leaks and boilerplate.</p>
+            <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code class="language-java">try (var in = Files.newBufferedReader(path)) { return in.readLine(); }</code></pre>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">14) Functional interface?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">An interface with a single abstract method (SAM). Enables lambdas; examples: Runnable, Callable, Comparator.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">An interface with exactly one abstract method (SAM). Enables lambda expressions and method references. Examples: <code>Runnable</code>, <code>Callable</code>, <code>Comparator</code>, and the <code>java.util.function</code> types.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">15) Lambda vs anonymous class?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Lambdas are concise for functional interfaces; anonymous classes can implement multiple methods or capture more context.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Lambdas are concise and target functional interfaces; they capture effectively final variables. Anonymous classes can override multiple methods (when implementing/ extending types) and have their own scope, but are more verbose.</p>
           </li>
 
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">16) Stream intermediate vs terminal ops?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Intermediate return a Stream (lazy): map, filter. Terminal produce a result/side effect: collect, forEach, reduce.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Intermediate ops (lazy) return a Stream (<code>map</code>, <code>filter</code>, <code>peek</code>). Terminal ops produce a result/side effect (<code>collect</code>, <code>reduce</code>, <code>forEach</code>) and trigger the pipeline.</p>
+            <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code class="language-java">List&lt;Integer&gt; evens = nums.stream().filter(n -> n%2==0).toList();</code></pre>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">17) When to use Optional?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">To model optional returns, not fields. Avoid using it in collections or as method parameters.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Use as a return type when a value may be absent; avoid as fields, method params, or collection elements. Prefer <code>Optional.orElseThrow</code>/<code>ifPresent</code> over <code>isPresent/get</code>.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">18) record classes?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Immutable data carriers with auto-generated equals/hashCode/toString and canonical constructor.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Records are immutable data carriers with auto-generated <code>equals/hashCode/toString</code> and canonical constructors. Use them for DTOs and value types. You can still define custom methods and compact constructors.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">19) var and type inference?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Local variable type inference; improves readability when the type is obvious from the initializer.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300"><code>var</code> infers local variable types from the initializer, improving readability when the type is obvious. It’s not dynamic typing—the inferred type is fixed at compile time.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">20) Switch expressions (Java 14+)?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Use arrow labels and yield values; avoids fall-through, more concise than traditional switch.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Switch expressions use arrow labels and yield values; they avoid fall‑through by default and can be used inline.</p>
+            <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code class="language-java">int score = switch(grade){ case A->5; case B->4; default->0; };</code></pre>
           </li>
 
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">21) Sealed classes (Java 17)?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Restrict which classes can extend/implement a type, enabling exhaustive handling and stronger modelling.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Sealed classes/interfaces restrict which classes can extend/implement them (via <code>permits</code>), enabling exhaustive handling and tighter models. Good for algebraic data types.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">22) ClassLoader basics?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Loads classes into the JVM; follows parent delegation (bootstrap → platform → application) for security and consistency.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Bootstrap → Platform → Application loaders follow parent delegation to enhance security and consistency. Custom loaders can isolate plugins or load from non-standard sources.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">23) JVM memory areas?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Heap (objects), Stack (frames), Metaspace (class metadata), Code cache, and Native memory.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Heap (objects), Stack (frames per thread), Metaspace (class metadata), Code cache (JIT), and Native memory. GC manages the heap; stack is managed per-thread.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">24) Strong vs soft vs weak vs phantom refs?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">GC priority: strong retained; soft cleared under memory pressure; weak cleared eagerly; phantom used for cleanup tracking.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Strong: default, prevents GC. Soft: retained until memory pressure (caches). Weak: collected eagerly (e.g., WeakHashMap keys). Phantom: used with ReferenceQueues for post-mortem cleanup tracking.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">25) What is garbage collection?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Automatic reclamation of unreachable objects; collectors include G1, ZGC, Shenandoah (low pause goals).</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Automatic reclamation of unreachable objects. Modern collectors (G1, ZGC, Shenandoah) aim for low pause times using generational spaces, region-based heaps, and concurrent phases.</p>
           </li>
 
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">26) volatile keyword?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Ensures visibility of writes across threads and prevents reordering; does not provide atomicity for compound actions.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300"><code>volatile</code> enforces visibility and ordering guarantees for a variable across threads. It doesn’t make compound actions atomic; use locks/atomics for that.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">27) synchronized vs ReentrantLock?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">synchronized is simpler (intrinsic lock). ReentrantLock offers tryLock, fairness, interruptible waits, multiple conditions.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300"><code>synchronized</code> is simpler (intrinsic monitor), automatically released. <code>ReentrantLock</code> provides features like tryLock, timed lock, fairness, and multiple conditions; but requires manual unlock in finally.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">28) wait/notify/notifyAll usage?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Call on the monitor within synchronized blocks; wait releases the lock and suspends until notify/notifyAll signals.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Call on an object’s monitor inside synchronized blocks. <code>wait()</code> releases the lock and suspends the thread; <code>notify()</code> wakes one waiter; <code>notifyAll()</code> wakes all. Prefer higher-level concurrency utilities when possible.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">29) Thread states?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">NEW, RUNNABLE, BLOCKED, WAITING, TIMED_WAITING, TERMINATED.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">NEW, RUNNABLE, BLOCKED, WAITING, TIMED_WAITING, TERMINATED. They reflect lifecycle from creation to completion including lock/contention and timed waits.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">30) Executor framework benefits?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Decouples task submission from execution; thread pools improve throughput and resource control.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Separates task submission from execution; thread pools improve throughput and resource control. Use <code>ExecutorService</code> for lifecycle, <code>ScheduledExecutorService</code> for periodic tasks.</p>
           </li>
 
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">31) Future vs CompletableFuture?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">CompletableFuture supports chaining, composition, and async callbacks; Future is a simple placeholder requiring blocking get().</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300"><code>CompletableFuture</code> supports async composition, callbacks, and chaining (<code>thenApply</code>, <code>thenCombine</code>, <code>allOf</code>). <code>Future</code> is a simple handle requiring blocking <code>get()</code> and lacks composition.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">32) What is a deadlock?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Threads wait on each other’s locks cyclically; avoid by consistent lock ordering or using timeouts/tryLock.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">A circular wait where threads hold locks and wait for each other. Avoid with consistent lock ordering, timeouts (<code>tryLock</code>), or reducing lock granularity.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">33) Livelock vs starvation?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Livelock: threads keep responding to each other without progress. Starvation: a thread never gets CPU/resources.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Livelock: threads respond to each other but make no progress (they keep yielding). Starvation: a thread never gets CPU/resources due to unfair scheduling or lock acquisition.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">34) Comparable vs Comparator?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Comparable defines natural ordering within the class; Comparator defines external custom orderings.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300"><code>Comparable</code> defines natural ordering inside the class (<code>compareTo</code>), used by <code>Collections.sort</code>. <code>Comparator</code> defines external ordering; you can chain with <code>thenComparing</code>.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">35) Serialization and transient?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Serialization converts objects to byte streams; transient fields are skipped to protect sensitive/derived data.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Serialization converts objects to byte streams. Mark fields <code>transient</code> to skip them (e.g., passwords, derived values). Prefer explicit DTOs or JSON libraries over native serialization for services.</p>
           </li>
 
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">36) Reflection basics?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Inspect/modify classes at runtime (Class, Method, Field). Use carefully—can break encapsulation and hurt performance.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Reflection inspects/modifies classes at runtime (Class, Field, Method). Powerful for frameworks and tooling but can break encapsulation and hurt performance; use judiciously.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">37) What are annotations?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Metadata for code processed by tooling or at runtime (e.g., @Override, @Deprecated, custom annotations with retention/targets).</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Metadata attached to code, processed at compile time or runtime (via reflection). Examples: <code>@Override</code>, <code>@Deprecated</code>; custom annotations can drive frameworks and AOP.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">38) Generics and type erasure?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Generics provide compile-time type safety; erasure removes type info at runtime, limiting reflection on generic types.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Generics ensure compile-time type safety. Due to type erasure, type parameters aren’t available at runtime, leading to limitations (no <code>new T()</code>). Use <code>Class&lt;T&gt;</code> tokens when needed.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">39) PECS rule for wildcards?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Producer Extends, Consumer Super: use ? extends T to read; ? super T to write.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300"><em>Producer Extends, Consumer Super</em>: use <code>? extends T</code> when you only read (the producer), and <code>? super T</code> when you insert (the consumer). Helps keep APIs flexible.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">40) Autoboxing pitfalls?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Nulls can cause NPE; boxed equality uses object identity, not value; performance overhead vs primitives.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Auto conversion between primitives and wrappers can cause NPEs (unboxing null), performance overhead, and confusing equality (<code>==</code> compares identity for wrappers).</p>
           </li>
 
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">41) Why BigDecimal for money?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Avoids binary floating-point rounding errors; supports exact decimal arithmetic and scale control.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Floating point (double/float) is binary-based and can’t exactly represent decimals; <code>BigDecimal</code> supports precise decimal arithmetic. Specify scale/rounding explicitly.</p>
+            <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code class="language-java">BigDecimal price = new BigDecimal("19.99").setScale(2, RoundingMode.HALF_UP);</code></pre>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">42) java.time vs java.util.Date?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">java.time is immutable, thread-safe, and comprehensive; Date/Calendar are mutable and error-prone.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300"><code>java.time</code> API (JSR-310) is immutable, thread-safe, and expressive (<code>Instant</code>, <code>LocalDate</code>, <code>ZonedDateTime</code>). <code>Date/Calendar</code> are mutable and error-prone.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">43) Locale and timezone concerns?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Always specify ZoneId/Locale when parsing/formatting; store instants in UTC, present in user’s zone.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Always specify <code>ZoneId</code>/<code>Locale</code> when parsing/formatting. Store instants in UTC and render in the user’s timezone. Be careful with DST transitions.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">44) Defensive copying?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Return copies of mutable fields and accept copies in constructors to preserve encapsulation.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Return copies of mutable fields and copy inputs in constructors to protect invariants and avoid representation exposure.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">45) Immutable vs unmodifiable collections?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Immutable: contents can’t change. Unmodifiable: wrapper prevents changes via that reference but underlying may mutate.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Immutable collections can’t change state; unmodifiable wrappers prevent modification via that reference but the underlying collection might still mutate. Prefer true immutability for safety.</p>
           </li>
 
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">46) When to use EnumMap/EnumSet?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">When keys/elements are enums. They’re memory-efficient and fast due to array/bit-vector implementations.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">When keys/elements are enums. <code>EnumMap</code> uses arrays internally (fast, memory efficient); <code>EnumSet</code> uses bit vectors.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">47) What is a memory leak in Java?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Unintended object retention via references (caches, listeners) preventing GC; fix by clearing references and using weak refs if apt.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Unintentional object retention prevents GC and increases heap usage (e.g., static collections, caches without eviction, listeners not removed). Detect with profilers and fix by clearing references or using weak refs.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">48) equals() vs ==?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">== compares references for objects and values for primitives; equals() compares logical equality (if overridden).</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300"><code>==</code> compares references for objects (and primitive values for primitives). <code>equals()</code> compares logical equality when overridden. For strings, use <code>equals</code>, not <code>==</code>.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">49) Static vs instance members?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Static belong to the class (one per class); instance belong to each object. Static methods can’t access instance state directly.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Static members belong to the class (one per class loader); instance members belong to each object. Static methods can’t access instance fields directly because they don’t have a <code>this</code> reference.</p>
           </li>
+
           <li class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
             <p class="font-semibold">50) Best practices for equals/hashCode/toString?</p>
-            <p class="mt-1 text-slate-600 dark:text-slate-300">Follow contracts, include significant fields, keep them consistent with immutability; consider records for value types.</p>
+            <p class="mt-1 text-slate-600 dark:text-slate-300">Include significant fields, maintain consistency with immutability and the general contracts, and avoid including volatile/derived fields. Consider using records or IDE generation to reduce errors.</p>
           </li>
         </ol>
       </section>
@@ -276,6 +330,14 @@
         const r=document.documentElement; const d=r.classList.toggle('dark');
         try{localStorage.setItem('theme', d?'dark':'light');}catch{}
       });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
     </script>
   </body>
 </html>

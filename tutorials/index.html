@@ -21,6 +21,7 @@
       };
     </script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
   </head>
   <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
     <!-- Decorative background to match Home -->
@@ -103,6 +104,9 @@
             } else {
               el.innerHTML = text; // assume pre-styled HTML
             }
+            if (window.Prism && typeof Prism.highlightAllUnder === 'function') {
+              Prism.highlightAllUnder(el);
+            }
           }catch(e){
             el.innerHTML='<div class="text-sm text-rose-500">Failed to load. Check that tutorials/content/'+slug+' exists.</div>'
           }
@@ -112,6 +116,13 @@
         });
         // Load first lesson by default
         load('tutorial-01.html');
+      </script>
+      <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+      <script>
+        if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+          Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        }
       </script>
   </body>
 </html>
