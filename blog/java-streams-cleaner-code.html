@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Why Java Streams Make Your Code Cleaner (and When They Don’t)</title>
+    <meta name="description" content="A practical guide to Java Streams: where they shine, when to avoid them, patterns, pitfalls, performance notes, and readable alternatives." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E☕%3C/text%3E%3C/svg%3E" />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{extend:{fontFamily:{sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"]}}}};
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <header class="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <div class="flex items-center gap-2 md:gap-3">
+          <nav class="hidden items-center gap-6 md:flex">
+            <a href="../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+            <a href="./" class="text-indigo-600 dark:text-indigo-400">Blog</a>
+            <a href="../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+            <a href="../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+            <a href="../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+            <a href="../course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
+          </nav>
+          <button id="menuToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 md:hidden dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Open menu">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+        </div>
+      </div>
+      <nav id="mobileNav" class="mx-auto hidden max-w-7xl gap-6 px-6 pb-4 md:hidden">
+        <div class="grid grid-cols-2 gap-3 text-sm">
+          <a href="../#about" class="rounded-lg border border-slate-200 bg-white px-3 py-2 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800">About</a>
+          <a href="./" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-indigo-600 dark:border-slate-800 dark:bg-slate-900 dark:text-indigo-400">Blog</a>
+          <a href="../#skills" class="rounded-lg border border-slate-200 bg-white px-3 py-2 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800">Skills</a>
+          <a href="../projects/" class="rounded-lg border border-slate-200 bg-white px-3 py-2 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800">Projects</a>
+          <a href="../tutorials/" class="rounded-lg border border-slate-200 bg-white px-3 py-2 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800">Tutorials</a>
+          <a href="../course/" class="rounded-lg border border-slate-200 bg-white px-3 py-2 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800">Courses</a>
+        </div>
+      </nav>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="mx-auto max-w-4xl">
+        <a href="./" class="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          Back to Blog
+        </a>
+        <header class="mt-4">
+          <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl">Why Java Streams Make Your Code Cleaner (and When They Don’t)</h1>
+          <p class="mt-3 text-sm text-slate-600 dark:text-slate-300">Readable transformations, fewer loops, and fewer bugs—plus the moments to stick with simple for-loops.</p>
+          <div class="mt-6 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <span class="grid h-9 w-9 place-items-center rounded-full bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+              <div class="text-sm leading-tight">
+                <div class="font-medium">Wassim Lagnaoui</div>
+                <div class="text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+              </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700 dark:border-indigo-900/50 dark:bg-indigo-950/50 dark:text-indigo-300">Java</span>
+              <span class="rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700 dark:border-sky-900/50 dark:bg-sky-950/50 dark:text-sky-300">Streams</span>
+              <div class="ml-2 flex items-center gap-2">
+                <a data-share="x" class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800" href="#" aria-label="Share on X">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2h3.308l-7.227 8.26L23 22h-6.8l-5.316-6.932L4.7 22H1.39l7.73-8.835L1 2h6.977l4.787 6.35L18.244 2zm-1.19 18h1.833L7.04 3.917H5.09L17.055 20z"/></svg>
+                </a>
+                <a data-share="linkedin" class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800" href="#" aria-label="Share on LinkedIn">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0V8zm7.5 0h4.8v2.2h.1c.7-1.3 2.4-2.7 5-2.7 5.3 0 6.3 3.5 6.3 8.1V24h-5V16.2c0-1.9 0-4.4-2.7-4.4-2.7 0-3.1 2.1-3.1 4.2V24h-5V8z"/></svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <section class="mt-8 space-y-8">
+          <h2 class="text-xl font-semibold">What are Java Streams?</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Streams are a fluent API for describing computations over sequences of data. Instead of writing loops that manage indexes and mutable accumulators, you compose operations like filter, map, and collect into a pipeline. Nothing happens until a terminal operation runs, which makes pipelines both expressive and efficient.</p>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">A stream is not a collection and it doesn’t store elements; it describes how to process elements from a source (like a collection) through intermediate steps to a result.</p>
+
+          <h2 class="text-xl font-semibold">Why Streams often feel cleaner</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">They let you focus on the “what” (keep these, transform those, aggregate) rather than the “how” (loop counters, temporary lists). The intent reads like a sentence.</p>
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code class="language-java">// From orders, get paid totals in EUR, newest first
+var totals = orders.stream()
+  .filter(Order::isPaid)
+  .map(o -&gt; currency.convert(o.total(), "EUR"))
+  .sorted(Comparator.reverseOrder())
+  .toList();</code></pre>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">This reads as: keep paid orders, convert totals, sort, done.</p>
+
+          <h2 class="text-xl font-semibold">Core operations in practice</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300"><strong>Filtering and mapping</strong> select elements and reshape them; <strong>collectors</strong> turn pipelines into collections or summaries.</p>
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code class="language-java">// Group users by role
+Map&lt;Role, List&lt;User&gt;&gt; byRole = users.stream()
+  .collect(Collectors.groupingBy(User::role));
+
+// Count orders per customer
+Map&lt;Long, Long&gt; counts = orders.stream()
+  .collect(Collectors.groupingBy(Order::customerId, Collectors.counting()));
+
+// Combined summary
+var summary = orders.stream().collect(Collectors.summarizingDouble(Order::total));</code></pre>
+
+          <h2 class="text-xl font-semibold">Flattening with flatMap</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">When each element contains a collection, <code>flatMap</code> avoids nested loops by projecting to a single stream of children.</p>
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code class="language-java">// All items across all orders
+List&lt;OrderItem&gt; items = orders.stream()
+  .flatMap(o -&gt; o.items().stream())
+  .toList();</code></pre>
+
+          <h2 class="text-xl font-semibold">Optional and Streams</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Optional pairs well with streams to express safe, readable access without nested null checks.</p>
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code class="language-java">String email = userRepo.findById(id)
+  .map(User::profile)
+  .map(Profile::email)
+  .orElse("unknown@example.com");</code></pre>
+
+          <h2 class="text-xl font-semibold">When a for-loop is better</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">If you need many steps, early exits, mutation across iterations, or intricate exception handling, a loop keeps control flow obvious.</p>
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code class="language-java">// Multiple conditions, early breaks, counters — simpler with a loop
+int retries = 0; double total = 0;
+for (Order o : orders) {
+  if (!o.isPaid()) continue;
+  if (o.isFlagged()) break;
+  try { total += currency.convert(o.total(), "EUR"); }
+  catch (ConversionException e) { if (++retries &gt; 2) break; }
+}</code></pre>
+
+          <h2 class="text-xl font-semibold">Performance and pitfalls</h2>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-600 dark:text-slate-300 space-y-1">
+            <li>Streams aren’t inherently faster than loops; they’re often on par. Measure.</li>
+            <li>Boxing hurts throughput—prefer primitive streams (<code>IntStream</code>, <code>LongStream</code>).</li>
+            <li><code>parallel()</code> shines for CPU-bound bulk work; avoid for small tasks and IO.</li>
+            <li>Avoid stateful lambdas that mutate external variables; they break expectations.</li>
+          </ul>
+
+          <h2 class="text-xl font-semibold">Patterns for readability</h2>
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code class="language-java">// Name intermediate steps
+Stream&lt;Order&gt; paid = orders.stream().filter(Order::isPaid);
+Stream&lt;Double&gt; eurTotals = paid.map(o -&gt; currency.convert(o.total(), "EUR"));
+List&lt;Double&gt; sorted = eurTotals.sorted().toList();</code></pre>
+
+          <h2 class="text-xl font-semibold">Parallel streams in context</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Use parallel streams when the workload is CPU-heavy, the data set is large, and operations are side‑effect free. Otherwise, stick with sequential streams or dedicated executors for IO.</p>
+        </section>
+      </div>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 WASSIM LAGNAOUI. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('themeToggle').addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+      (function(){
+        const b=document.getElementById('menuToggle');
+        const n=document.getElementById('mobileNav');
+        if(b&&n){b.addEventListener('click',()=>n.classList.toggle('hidden'));}
+      })();
+      (function(){
+        const url=encodeURIComponent(location.href);
+        const title=encodeURIComponent(document.title);
+        const x=document.querySelector('[data-share="x"]');
+        const li=document.querySelector('[data-share="linkedin"]');
+        if(x) x.href=`https://twitter.com/intent/tweet?text=${title}&url=${url}`;
+        if(li) li.href=`https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
+      })();
+      (function(){
+        document.querySelectorAll('pre').forEach((pre)=>{
+          pre.className = pre.className.replace(/\btext-xs\b/g,'text-sm');
+          if(!/\btext-sm\b/.test(pre.className)) pre.classList.add('text-sm');
+          pre.classList.add('relative');
+          const btn=document.createElement('button');
+          btn.type='button';
+          btn.className='absolute right-2 top-2 rounded-md border border-slate-700/40 bg-slate-800/70 px-2.5 py-1 text-xs text-slate-200 backdrop-blur hover:bg-slate-700/70 active:scale-95';
+          btn.textContent='Copy';
+          btn.addEventListener('click', async ()=>{
+            const code=pre.querySelector('code');
+            if(!code) return;
+            try{await navigator.clipboard.writeText(code.innerText); btn.textContent='Copied!'; setTimeout(()=>btn.textContent='Copy',1500);}catch{btn.textContent='Error'; setTimeout(()=>btn.textContent='Copy',1500)}
+          });
+          pre.appendChild(btn);
+        });
+        document.querySelectorAll('pre > code[class*="language-"]').forEach((code)=>{
+          const pre=code.parentElement;
+          const m=(code.className.match(/language-([\w-]+)/)||[])[1];
+          if(!m || pre.querySelector('.code-lang')) return;
+          pre.classList.add('pt-8'); pre.style.position='relative';
+          const label=document.createElement('span');
+          label.className='code-lang absolute left-2 top-2 rounded bg-slate-800/70 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-slate-200';
+          label.textContent=m; pre.appendChild(label);
+        });
+      })();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>

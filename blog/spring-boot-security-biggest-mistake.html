@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>The Biggest Mistake Developers Make with Spring Boot Security</title>
+    <meta name="description" content="The common trap: trusting the web layer or the client. How to enforce authorization in depth with HTTP config, method security, and data-level checks." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E🔐%3C/text%3E%3C/svg%3E" />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{extend:{fontFamily:{sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"]}}}};
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <header class="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="./" class="text-indigo-600 dark:text-indigo-400">Blog</a>
+          <a href="../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
+        </nav>
+        <div class="flex items-center gap-2 md:gap-3">
+          <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+            <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+            <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
+          <button id="menuToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 md:hidden dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Open menu">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+        </div>
+      </div>
+      <nav id="mobileNav" class="mx-auto hidden max-w-7xl gap-6 px-6 pb-4 md:hidden">
+        <div class="grid grid-cols-2 gap-3 text-sm">
+          <a href="../#about" class="rounded-lg border border-slate-200 bg-white px-3 py-2 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800">About</a>
+          <a href="./" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-indigo-600 dark:border-slate-800 dark:bg-slate-900 dark:text-indigo-400">Blog</a>
+          <a href="../#skills" class="rounded-lg border border-slate-200 bg-white px-3 py-2 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800">Skills</a>
+          <a href="../projects/" class="rounded-lg border border-slate-200 bg-white px-3 py-2 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800">Projects</a>
+          <a href="../tutorials/" class="rounded-lg border border-slate-200 bg-white px-3 py-2 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800">Tutorials</a>
+          <a href="../course/" class="rounded-lg border border-slate-200 bg-white px-3 py-2 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800">Courses</a>
+        </div>
+      </nav>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="mx-auto max-w-4xl">
+        <a href="./" class="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          Back to Blog
+        </a>
+        <div class="mt-6">
+          <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl">The Biggest Mistake Developers Make with Spring Boot Security</h1>
+          <p class="mt-3 text-base text-slate-600 dark:text-slate-300">Relying on endpoint checks or trusting the client. Fix it with layered authorization and safe defaults.</p>
+
+          <div class="mt-6 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <span class="grid h-9 w-9 place-items-center rounded-full bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+              <div class="text-sm leading-tight">
+                <div class="font-medium">Wassim Lagnaoui</div>
+                <div class="text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+              </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700 dark:border-indigo-900/50 dark:bg-indigo-950/50 dark:text-indigo-300">Spring Boot</span>
+              <span class="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/50 dark:text-emerald-300">Security</span>
+              <div class="ml-2 flex items-center gap-2">
+                <a data-share="x" class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800" href="#" aria-label="Share on X">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2h3.308l-7.227 8.26L23 22h-6.8l-5.316-6.932L4.7 22H1.39l7.73-8.835L1 2h6.977l4.787 6.35L18.244 2zm-1.19 18h1.833L7.04 3.917H5.09L17.055 20z"/></svg>
+                </a>
+                <a data-share="linkedin" class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800" href="#" aria-label="Share on LinkedIn">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0V8zm7.5 0h4.8v2.2h.1c.7-1.3 2.4-2.7 5-2.7 5.3 0 6.3 3.5 6.3 8.1V24h-5V16.2c0-1.9 0-4.4-2.7-4.4-2.7 0-3.1 2.1-3.1 4.2V24h-5V8z"/></svg>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <article class="prose prose-slate prose-lg max-w-none mx-auto mt-8 dark:prose-invert prose-a:text-indigo-600 dark:prose-a:text-indigo-400 prose-pre:bg-slate-950 prose-code:before:content-none prose-code:after:content-none">
+            <p class="lead">Most Spring Boot apps aren’t “hacked.” They’re misconfigured. A role check sits in a controller, a permissive matcher slips into the HTTP config, or a service trusts a user‑supplied ID. Nothing exotic—just enough to leak data when someone guesses another identifier or replays a token.</p>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300"><strong>The root cause:</strong> trusting a single guard (usually the web layer) instead of telling the same authorization story at the route, method, and data levels. The fix isn’t fancy; it’s layered and boring on purpose.</p>
+            <p class="mt-2 text-sm italic text-slate-600 dark:text-slate-300">If a request can reference it, your code must prove ownership before returning it.</p>
+
+            <h2 class="text-xl font-semibold">How we end up with leaky authorization</h2>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Security incidents in CRUD apps rarely begin with a super-hacker. They start with a reasonable feature request and a deadline. We add an endpoint, check a role in the controller, and ship. Months later a support ticket reveals a user can pass a different ID and suddenly see someone else’s data. Nothing was “hacked”—we simply trusted the request and forgot that the web layer is only one guard on the door.</p>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">The client is not a source of truth. Controllers are not the only place attackers can slip through. The mistake is assuming that “we checked once” means “we’re safe everywhere.” In practice, authorization needs to be reinforced at each layer that touches a decision: the route, the method, and the data.</p>
+
+            <h2 class="text-xl font-semibold">What defense in depth looks like in a Spring app</h2>
+            <p class="mt-3 text-sm text-slate-600 dark:text-slate-300">Think of your application as a set of three checkpoints. At the <strong>HTTP boundary</strong>, you keep public things public and everything else authenticated, with the most specific paths first. At the <strong>service boundary</strong>, you enforce who may call which business operation, not just which URL they hit. And at the <strong>data boundary</strong>, you don’t fetch broadly and filter in memory—you ask the database for exactly “this thing owned by this principal,” so there’s nothing to leak in the first place.</p>
+
+            <h2 class="text-xl font-semibold">Shaping the perimeter: HTTP security (Spring Security 6)</h2>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">A clear perimeter doesn’t mean complicated rules; it means precise ones. Specific matchers first, public endpoints explicit, everything else authenticated and stateless for APIs. The configuration below expresses exactly that intent.</p>
+            <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100 not-prose"><code class="language-java">@Bean
+SecurityFilterChain security(HttpSecurity http) throws Exception {
+  return http
+    .csrf(csrf -&gt; csrf.disable()) // JWT-based APIs are stateless
+    .sessionManagement(sm -&gt; sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+    .authorizeHttpRequests(reg -&gt; reg
+      .requestMatchers("/api/admin/**").hasRole("ADMIN")
+      .requestMatchers("/api/public/**", "/actuator/health").permitAll()
+      .anyRequest().authenticated())
+    .oauth2ResourceServer(oauth -&gt; oauth.jwt())
+    .build();
+}</code></pre>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">The usual misconfigurations aren’t sneaky—they’re subtle: a too-broad <code>permitAll("/**")</code>, a misplaced matcher that opens a hole, or enabling sessions without meaning to. Keep the rule order intentional and defaults safe.</p>
+
+            <h2 class="text-xl font-semibold">Ownership is a query, not a post‑it note</h2>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">“We’ll fetch the order and then check if it’s yours” sounds fine until one forgotten branch forgets the check. A safer habit is to encode ownership into the query itself. That way, if the data layer doesn’t return it, the service layer has nothing to leak.</p>
+            <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100 not-prose"><code class="language-java">@Configuration
+@EnableMethodSecurity
+class MethodSecurityConfig { }
+
+@Service
+class OrderService {
+  private final OrderRepository repo;
+  OrderService(OrderRepository repo) { this.repo = repo; }
+
+  @PreAuthorize("hasRole('USER') and #userId == authentication.principal.id")
+  public Order findOwnedOrder(Long userId, Long orderId) {
+    return repo.findByIdAndUserId(orderId, userId)
+        .orElseThrow(() -&gt; new AccessDeniedException("Not yours"));
+  }
+}</code></pre>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Notice the double lock: a method-level guard that aligns with the caller’s identity and a repository query that encodes the same rule. Either one helps; together they make bypasses unlikely.</p>
+
+            <h2 class="text-xl font-semibold">Tokens don’t explain themselves</h2>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">JWTs carry claims, but Spring needs to be told how to turn those into authorities. Different providers use different fields and prefixes. Small mismatches—like expecting <code>ROLE_</code> where none exists—lead to surprising “why is this forbidden?” bugs.</p>
+            <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100 not-prose"><code class="language-java">@Bean
+JwtAuthenticationConverter jwtAuthConverter() {
+  var c = new JwtGrantedAuthoritiesConverter();
+  c.setAuthorityPrefix(""); // keep provider's prefix
+  c.setAuthoritiesClaimName("scope");
+  var conv = new JwtAuthenticationConverter();
+  conv.setJwtGrantedAuthoritiesConverter(c);
+  return conv;
+}</code></pre>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Align your checks with reality: if your tokens expose <code>scope=admin</code>, prefer <code>hasAuthority("admin")</code> or add a prefix deliberately. Make your intent explicit and your diagnostics obvious.</p>
+
+            <h2 class="text-xl font-semibold">A few recurring pitfalls</h2>
+            <p class="mt-3 text-sm text-slate-600 dark:text-slate-300"><strong>Actuator sprawl</strong> in production exposes more than health and info. <strong>Mock‑only tests</strong> hide real token parsing and authority mapping issues. <strong>Secrets in config</strong> linger in repos and logs—use a vault or KMS and environment variables. And if you mix session CSRF with API clients by accident, you’ll chase 403s until you standardize on a stateless approach for APIs.</p>
+
+            <h2 class="text-xl font-semibold">Prove it in tests</h2>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">It’s tempting to sprinkle <code>@WithMockUser</code> everywhere and call it a day. Keep a few end‑to‑end tests that parse real JWTs, exercise your security chain, and hit the database with ownership constraints. They catch the gaps that unit tests politely ignore.</p>
+            <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100 not-prose"><code class="language-java">@AutoConfigureMockMvc
+@SpringBootTest
+class SecurityIT {
+  @Autowired MockMvc mvc;
+
+  @Test void rejectsUnauthorized() throws Exception {
+    mvc.perform(get("/api/orders")).andExpect(status().isUnauthorized());
+  }
+
+  @Test void allowsAdminToAdminArea() throws Exception {
+    mvc.perform(get("/api/admin/stats").header("Authorization", "Bearer "+adminJwt()))
+       .andExpect(status().isOk());
+  }
+}</code></pre>
+
+            <h2 class="text-xl font-semibold">Closing thoughts</h2>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Authorization is less a feature than a habit. When the route, the method, and the data layer all tell the same story about who may see what, accidental leaks become rare—and incident reviews become boring. That’s the goal.</p>
+          </article>
+        </div>
+      </div>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 WASSIM LAGNAOUI. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      // theme + mobile menu
+      document.getElementById('themeToggle').addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+      const menuBtn=document.getElementById('menuToggle');
+      const mobileNav=document.getElementById('mobileNav');
+      if(menuBtn&&mobileNav){menuBtn.addEventListener('click',()=>mobileNav.classList.toggle('hidden'));}
+
+      // share links
+      (function(){
+        const url=encodeURIComponent(location.href);
+        const title=encodeURIComponent(document.title);
+        const x=document.querySelector('[data-share="x"]');
+        const li=document.querySelector('[data-share="linkedin"]');
+        if(x) x.href=`https://twitter.com/intent/tweet?text=${title}&url=${url}`;
+        if(li) li.href=`https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
+      })();
+
+      // copy buttons + language labels for code blocks
+      (function(){
+        document.querySelectorAll('pre:not([data-no-copy])').forEach((pre)=>{
+          pre.classList.add('relative');
+          const btn=document.createElement('button');
+          btn.type='button';
+          btn.className='absolute right-2 top-2 rounded-md border border-slate-700/40 bg-slate-800/70 px-2.5 py-1 text-xs text-slate-200 backdrop-blur hover:bg-slate-700/70 active:scale-95';
+          btn.textContent='Copy';
+          btn.addEventListener('click', async ()=>{
+            const code=pre.querySelector('code');
+            if(!code) return;
+            try{ await navigator.clipboard.writeText(code.innerText); btn.textContent='Copied!'; setTimeout(()=>btn.textContent='Copy',1500);}catch(e){ btn.textContent='Error'; setTimeout(()=>btn.textContent='Copy',1500);}
+          });
+          pre.appendChild(btn);
+        });
+        // language labels
+        document.querySelectorAll('pre > code[class*="language-"]').forEach((code)=>{
+          const pre=code.parentElement;
+          const m=(code.className.match(/language-([\w-]+)/)||[])[1];
+          if(!m) return;
+          if(!pre.querySelector('.code-lang')){
+            pre.classList.add('pt-8');
+            pre.style.position='relative';
+            const label=document.createElement('span');
+            label.className='code-lang absolute left-2 top-2 rounded bg-slate-800/70 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-slate-200';
+            label.textContent=m;
+            pre.appendChild(label);
+          }
+        });
+      })();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>
+
+<!-- Bump code block font size to improve readability -->
+<script>
+  (function(){
+    document.querySelectorAll('pre').forEach((pre)=>{
+      pre.className = pre.className.replace(/\btext-xs\b/g, 'text-sm');
+      if(!/\btext-sm\b/.test(pre.className)) pre.classList.add('text-sm');
+    });
+  })();
+</script>

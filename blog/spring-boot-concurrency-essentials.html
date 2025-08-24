@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Spring Boot Concurrency Essentials</title>
+    <meta name="description" content="An explanatory guide to concurrency in Spring Boot: async methods, executors, scheduling, thread pools, transactions, CompletableFuture, MVC vs WebFlux, synchronization, error handling, and Reactor." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E⚡%3C/text%3E%3C/svg%3E" />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{extend:{fontFamily:{sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"]}}}};
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <header class="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="./" class="text-indigo-600 dark:text-indigo-400">Blog</a>
+          <a href="../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
+        </nav>
+        <div class="flex items-center gap-2 md:gap-3">
+          <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+            <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+            <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
+          <button id="menuToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 md:hidden dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Open menu">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+          </button>
+        </div>
+      </div>
+      <nav id="mobileNav" class="mx-auto hidden max-w-7xl gap-6 px-6 pb-4 md:hidden">
+        <div class="grid grid-cols-2 gap-3 text-sm">
+          <a href="../#about" class="rounded-lg border border-slate-200 bg-white px-3 py-2 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800">About</a>
+          <a href="./" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-indigo-600 dark:border-slate-800 dark:bg-slate-900 dark:text-indigo-400">Blog</a>
+          <a href="../#skills" class="rounded-lg border border-slate-200 bg-white px-3 py-2 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800">Skills</a>
+          <a href="../projects/" class="rounded-lg border border-slate-200 bg-white px-3 py-2 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800">Projects</a>
+          <a href="../tutorials/" class="rounded-lg border border-slate-200 bg-white px-3 py-2 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800">Tutorials</a>
+          <a href="../course/" class="rounded-lg border border-slate-200 bg-white px-3 py-2 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800">Courses</a>
+        </div>
+      </nav>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="mx-auto max-w-4xl">
+        <a href="./" class="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          Back to Blog
+        </a>
+        <header class="mt-4">
+          <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl">Spring Boot Concurrency Essentials</h1>
+          <p class="mt-3 text-sm text-slate-600 dark:text-slate-300">A beginner-friendly guide to how Spring Boot runs work in parallel: what async methods and schedulers are, why thread pools matter, and how web stacks, transactions, and Reactor fit in.</p>
+          <div class="mt-6 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <span class="grid h-9 w-9 place-items-center rounded-full bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+              <div class="text-sm leading-tight">
+                <div class="font-medium">Wassim Lagnaoui</div>
+                <div class="text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+              </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700 dark:border-indigo-900/50 dark:bg-indigo-950/50 dark:text-indigo-300">Spring Boot</span>
+              <span class="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/50 dark:text-amber-300">Concurrency</span>
+              <div class="ml-2 flex items-center gap-2">
+                <a data-share="x" class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800" href="#" aria-label="Share on X">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2h3.308l-7.227 8.26L23 22h-6.8l-5.316-6.932L4.7 22H1.39l7.73-8.835L1 2h6.977l4.787 6.35L18.244 2zm-1.19 18h1.833L7.04 3.917H5.09L17.055 20z"/></svg>
+                </a>
+                <a data-share="linkedin" class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800" href="#" aria-label="Share on LinkedIn">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0V8zm7.5 0h4.8v2.2h.1c.7-1.3 2.4-2.7 5-2.7 5.3 0 6.3 3.5 6.3 8.1V24h-5V16.2c0-1.9 0-4.4-2.7-4.4-2.7 0-3.1 2.1-3.1 4.2V24h-5V8z"/></svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <section class="mt-8 space-y-8">
+          <h2 class="text-xl font-semibold">Introduction: what is concurrency?</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Concurrency is doing more than one thing at the same time by sharing time across threads. In a web app, it means one user’s slow task shouldn’t block everyone else. Threads, pools, and schedulers let work run in parallel or in the background so requests stay responsive.</p>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">This article focuses on how Spring Boot uses those building blocks: when <code>@Async</code> makes sense, how to size thread pools, what schedulers do, and why transactions don’t hop between threads. We keep the language simple and the examples practical.</p>
+
+          <h2 class="text-xl font-semibold">@Async and async configuration</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Async methods allow work to run in background threads instead of blocking the caller. Enabling async support wires Spring to intercept <code>@Async</code> methods and hand them to a thread pool.</p>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">In plain words: when a task takes time (like calling another service or sending email), marking a method with <code>@Async</code> lets your app keep responding while that task continues in the background.</p>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-700 dark:text-slate-300 space-y-1">
+            <li><span class="font-medium">Enabling:</span> <code>@EnableAsync</code> on a configuration class turns on async method execution.</li>
+            <li><span class="font-medium">Annotating:</span> <code>@Async</code> on public methods submits work to an executor; return types can be <code>void</code>, <code>Future</code>, or <code>CompletableFuture</code>.</li>
+            <li><span class="font-medium">Where it runs:</span> By default, a SimpleAsyncTaskExecutor is used; for control, define a <code>TaskExecutor</code> bean and reference it.</li>
+            <li><span class="font-medium">Beginner note:</span> <code>@Async</code> calls only take effect when invoked through a Spring proxy (i.e., from another bean, not <code>this.method()</code>).</li>
+          </ul>
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code class="language-java">@Configuration
+@EnableAsync
+public class AsyncConfig implements AsyncConfigurer {
+  @Bean(name = "ioExecutor")
+  public Executor ioExecutor() {
+    ThreadPoolTaskExecutor ex = new ThreadPoolTaskExecutor();
+    ex.setThreadNamePrefix("io-");
+    ex.setCorePoolSize(8);
+    ex.setMaxPoolSize(32);
+    ex.setQueueCapacity(200);
+    ex.initialize();
+    return ex;
+  }
+
+  @Override
+  public Executor getAsyncExecutor() { return ioExecutor(); }
+}
+
+@Service
+public class ReportService {
+  @Async("ioExecutor")
+  public CompletableFuture&lt;Report&gt; generateReport(Long id) {
+    // expensive IO work here
+    return CompletableFuture.completedFuture(new Report(id));
+  }
+}
+</code></pre>
+
+          <h2 class="text-xl font-semibold">TaskExecutor abstractions</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Spring’s <code>TaskExecutor</code> abstracts Java’s <code>Executor</code>/<code>ExecutorService</code>, letting beans submit tasks without depending on concrete pool types.</p>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Think of a TaskExecutor as a pool of workers. You hand it jobs, it finds a free worker thread to do them. This keeps your code simple and your app stable.</p>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-700 dark:text-slate-300 space-y-1">
+            <li><span class="font-medium">Common choices:</span> <code>ThreadPoolTaskExecutor</code> (most apps), <code>SimpleAsyncTaskExecutor</code> (unbounded threads; demo/dev), <code>ConcurrentTaskExecutor</code> (wrap an existing <code>ExecutorService</code>).</li>
+            <li><span class="font-medium">Why it matters:</span> You can size pools, name threads, and monitor queues—key for stability and debugging.</li>
+            <li><span class="font-medium">How to inject:</span> Define as a bean and inject by type or qualifier.</li>
+          </ul>
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code class="language-java">@Service
+class ImageService {
+  private final TaskExecutor thumbnailsExecutor;
+  ImageService(@Qualifier("ioExecutor") TaskExecutor ex) { this.thumbnailsExecutor = ex; }
+
+  public void generateThumbnails(List&lt;URI&gt; images) {
+    for (URI uri : images) {
+      thumbnailsExecutor.execute(() -&gt; {/* process */});
+    }
+  }
+}
+</code></pre>
+
+          <h2 class="text-xl font-semibold">Scheduling with @Scheduled</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Scheduled tasks run automatically on a timer. Spring drives them with a <code>TaskScheduler</code> backed by a scheduled executor.</p>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">In simple terms: you can tell Spring “run this method every 5 seconds” or “every night at 2 AM” to do cleanups, reports, or syncs.</p>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-700 dark:text-slate-300 space-y-1">
+            <li><span class="font-medium">Fixed rate:</span> Starts tasks on a steady cadence, regardless of how long the last run took.</li>
+            <li><span class="font-medium">Fixed delay:</span> Waits a delay after a run completes before starting the next.</li>
+            <li><span class="font-medium">Cron:</span> Uses a cron expression for calendar-like schedules.</li>
+          </ul>
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code class="language-java">@Configuration
+@EnableScheduling
+class SchedulingConfig {
+  @Bean
+  TaskScheduler scheduler() {
+    ThreadPoolTaskScheduler ts = new ThreadPoolTaskScheduler();
+    ts.setPoolSize(4);
+    ts.setThreadNamePrefix("sched-");
+    return ts;
+  }
+}
+
+@Service
+class CleanupService {
+  @Scheduled(fixedRate = 5_000)
+  void heartbeat() { /* runs every 5s */ }
+
+  @Scheduled(fixedDelay = 10_000, initialDelay = 2_000)
+  void cleanup() { /* runs 10s after previous completion */ }
+
+  @Scheduled(cron = "0 0 2 * * *")
+  void nightly() { /* runs at 02:00 daily */ }
+}
+</code></pre>
+
+          <h2 class="text-xl font-semibold">Thread pool configuration</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Thread pools control parallelism and protect the app from overload. Right-sizing avoids both starvation and resource exhaustion.</p>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Why it matters: too few threads can make users wait; too many threads can overwhelm the CPU and database. A balanced pool keeps your app responsive.</p>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-700 dark:text-slate-300 space-y-1">
+            <li><span class="font-medium">Key knobs:</span> <code>corePoolSize</code>, <code>maxPoolSize</code>, <code>queueCapacity</code>, and <code>keepAliveSeconds</code>.</li>
+            <li><span class="font-medium">Blocking tasks:</span> IO-heavy work usually needs more threads than CPU-heavy work; dedicate executors by workload type.</li>
+            <li><span class="font-medium">Defaults:</span> The default async executor may spawn unbounded threads; configuring a bounded pool is safer.</li>
+          </ul>
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code class="language-java">@Bean(name = "cpuExecutor")
+Executor cpuExecutor() {
+  ThreadPoolTaskExecutor ex = new ThreadPoolTaskExecutor();
+  ex.setThreadNamePrefix("cpu-");
+  ex.setCorePoolSize(Runtime.getRuntime().availableProcessors());
+  ex.setMaxPoolSize(Runtime.getRuntime().availableProcessors()*2);
+  ex.setQueueCapacity(1000);
+  ex.initialize();
+  return ex;
+}
+</code></pre>
+
+          <h2 class="text-xl font-semibold">Spring bean thread-safety basics</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Singleton beans are shared across threads. Keeping them stateless (no mutable fields) avoids race conditions. When state is needed, use safe scopes or synchronization.</p>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Beginner view: pretend many users call the same bean at once. If it stores changing data in fields, calls can step on each other. Passing data via method args is safer.</p>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-700 dark:text-slate-300 space-y-1">
+            <li><span class="font-medium">Default scope:</span> <code>singleton</code> means one instance per application context.</li>
+            <li><span class="font-medium">Stateless is simpler:</span> Prefer passing data via method parameters; avoid mutable shared fields.</li>
+            <li><span class="font-medium">Other scopes:</span> <code>prototype</code>, <code>request</code>, <code>session</code> can hold per-use or per-request state when necessary.</li>
+          </ul>
+
+          <h2 class="text-xl font-semibold">@Transactional and async execution</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Transactions are bound to the calling thread. Async methods run on another thread, so they do not automatically join the caller’s transaction.</p>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">In practice: saving an order and kicking off an async payment means the payment runs in its own transaction. If the payment fails later, the order save won’t roll back automatically.</p>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-700 dark:text-slate-300 space-y-1">
+            <li><span class="font-medium">Boundary:</span> <code>@Transactional</code> on a caller does not propagate into an <code>@Async</code> method.</li>
+            <li><span class="font-medium">Options:</span> Start a new transaction inside the async method, or move the work to synchronous code if atomicity is required.</li>
+            <li><span class="font-medium">Beginner note:</span> Logging MDC, security context, and locale also do not flow unless explicitly propagated.</li>
+          </ul>
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code class="language-java">@Service
+class OrderService {
+  private final PaymentService payments;
+  OrderService(PaymentService p){this.payments=p;}
+
+  @Transactional
+  public void placeOrder(Order o){
+    // save order within TX
+    // fire-and-forget async charge (new thread, separate TX)
+    payments.chargeAsync(o.getId());
+  }
+}
+
+@Service
+class PaymentService {
+  @Async
+  @Transactional // starts its own TX
+  public void chargeAsync(Long orderId){
+    // do charge, record payment
+  }
+}
+</code></pre>
+
+          <h2 class="text-xl font-semibold">CompletableFuture with Spring</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">CompletableFuture supports composing async tasks without blocking. Pipelines apply transformations as results arrive.</p>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Plain explanation: think of promises that complete later. You can say “when A and B are both done, combine them” without waiting and freezing a thread.</p>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-700 dark:text-slate-300 space-y-1">
+            <li><span class="font-medium">Composition:</span> <code>thenApply</code>/<code>thenCompose</code> transform or chain tasks; <code>allOf</code>/<code>anyOf</code> combine multiple futures.</li>
+            <li><span class="font-medium">Executors:</span> Use <code>thenApplyAsync(..., executor)</code> to control which pool runs stages.</li>
+            <li><span class="font-medium">Non-blocking:</span> Prefer callbacks over <code>get()</code>/<code>join()</code> to avoid tying up threads.</li>
+          </ul>
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code class="language-java">@Service
+class CatalogService {
+  private final Executor ioExecutor;
+  CatalogService(@Qualifier("ioExecutor") Executor ex){this.ioExecutor=ex;}
+
+  public CompletableFuture&lt;ProductView&gt; loadView(long id){
+    CompletableFuture&lt;Product&gt; p = CompletableFuture.supplyAsync(() -&gt; findProduct(id), ioExecutor);
+    CompletableFuture&lt;Price&gt; price = CompletableFuture.supplyAsync(() -&gt; findPrice(id), ioExecutor);
+    return CompletableFuture.allOf(p, price)
+      .thenApply(v -&gt; new ProductView(p.join(), price.join()));
+  }
+}
+</code></pre>
+
+          <h2 class="text-xl font-semibold">Web requests and concurrency models</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Spring MVC and Spring WebFlux handle concurrency differently, which affects scalability and coding style.</p>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Simple idea: MVC gives each request a worker thread (great for simple, blocking code). WebFlux uses a small set of event-loop threads and non-blocking calls (great for many concurrent IO calls).</p>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-700 dark:text-slate-300 space-y-1">
+            <li><span class="font-medium">Spring MVC:</span> Servlet-based, thread-per-request. Handlers run on a worker thread; blocking IO ties up that thread.</li>
+            <li><span class="font-medium">Spring WebFlux:</span> Reactive and event-loop based (Netty/servlet non-blocking). Handlers return <code>Mono</code>/<code>Flux</code>; non-blocking IO scales with fewer threads.</li>
+            <li><span class="font-medium">Choosing:</span> MVC fits traditional blocking stacks; WebFlux shines for many concurrent IO-bound calls.</li>
+          </ul>
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code class="language-java">// MVC controller (blocking)
+@RestController
+class MvcController {
+  @GetMapping("/hello")
+  String hello() { return "hello"; }
+}
+
+// WebFlux handler (non-blocking)
+@RestController
+class FluxController {
+  @GetMapping("/greet")
+  Mono&lt;String&gt; greet() { return Mono.just("hello"); }
+}
+</code></pre>
+
+          <h2 class="text-xl font-semibold">Synchronization and shared resources</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Shared state across threads needs coordination. Without it, race conditions corrupt data or cause intermittent bugs.</p>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Everyday example: two threads increment the same counter at the same time and one update gets lost. A lock makes them take turns so counts are correct.</p>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-700 dark:text-slate-300 space-y-1">
+            <li><span class="font-medium">In-memory locks:</span> <code>ReentrantLock</code> or synchronized blocks protect critical sections within a single JVM.</li>
+            <li><span class="font-medium">Database locks:</span> Row/table locks (e.g., <code>SELECT ... FOR UPDATE</code>) coordinate across app instances.</li>
+            <li><span class="font-medium">Distributed locks:</span> Redis/ZooKeeper/Consul based locks coordinate work in a cluster.</li>
+            <li><span class="font-medium">Schedulers:</span> When <code>@Scheduled</code> runs on many nodes, use leader election or distributed locks to avoid duplicate work.</li>
+          </ul>
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code class="language-java">@Service
+class CounterService {
+  private final ReentrantLock lock = new ReentrantLock();
+  private long value;
+  public void inc(){
+    lock.lock();
+    try { value++; } finally { lock.unlock(); }
+  }
+}
+</code></pre>
+
+          <h2 class="text-xl font-semibold">Using Java concurrency utilities in Spring</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Spring manages the lifecycle of executors and queues just like any other bean, which keeps threads from leaking and eases shutdown.</p>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Why use Spring-managed pools: when the app starts, the pool starts; when the app stops, the pool stops cleanly. You avoid orphan threads.</p>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-700 dark:text-slate-300 space-y-1">
+            <li><span class="font-medium">ExecutorService:</span> Define as a bean and shut down on context close.</li>
+            <li><span class="font-medium">ForkJoinPool:</span> Useful for divide-and-conquer tasks; prefer a custom pool over the global common pool.</li>
+            <li><span class="font-medium">Queues:</span> <code>BlockingQueue</code> can buffer work between producers and consumers.</li>
+          </ul>
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code class="language-java">@Configuration
+class PoolConfig {
+  @Bean(destroyMethod = "shutdown")
+  ExecutorService ioPool(){ return Executors.newFixedThreadPool(16, r -&gt; new Thread(r, "io-")); }
+}
+
+@Service
+class ImportService {
+  private final ExecutorService ioPool;
+  ImportService(ExecutorService ioPool){ this.ioPool = ioPool; }
+  public Future&lt;?&gt; submitImport(Runnable task){ return ioPool.submit(task); }
+}
+</code></pre>
+
+          <h2 class="text-xl font-semibold">Error handling in async methods</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Exceptions thrown on background threads don’t reach the caller automatically. Handling depends on the async style used.</p>
+          <p class="mt-2 text-sm text-slate-300 dark:text-slate-100">Beginner takeaway: if you fire-and-forget a method, add a global handler to log failures; if you use futures, attach <code>exceptionally</code> to define fallbacks.</p>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-700 dark:text-slate-300 space-y-1">
+            <li><span class="font-medium">@Async void:</span> Hook <code>AsyncUncaughtExceptionHandler</code> to log/notify.</li>
+            <li><span class="font-medium">Future/CompletableFuture:</span> Propagate via <code>get()</code>/<code>join()</code> or handle with <code>exceptionally</code>/<code>handle</code>.</li>
+            <li><span class="font-medium">Global config:</span> Implement <code>AsyncConfigurer</code> to set executor and exception handler in one place.</li>
+          </ul>
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code class="language-java">@Configuration
+@EnableAsync
+class AsyncErrorConfig implements AsyncConfigurer {
+  @Override
+  public Executor getAsyncExecutor() { return new SimpleAsyncTaskExecutor("async-"); }
+
+  @Override
+  public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
+    return (ex, method, params) -&gt; {
+      // log, metrics, alerting
+    };
+  }
+}
+
+// CompletableFuture handling
+service.generateReport(42L)
+  .exceptionally(ex -&gt; { /* fallback */ return Report.empty(); });
+</code></pre>
+
+          <h2 class="text-xl font-semibold">Reactive concurrency with Project Reactor (optional)</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Reactor offers non-blocking types—<code>Mono</code> and <code>Flux</code>—and schedulers to control where work runs. It enables high concurrency with fewer threads.</p>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">If you’re new: this is a different style where you return a pipeline (not a value). It shines for apps that call many slow services and need to scale with minimal threads.</p>
+          <ul class="mt-3 list-disc pl-5 text-sm text-slate-700 dark:text-slate-300 space-y-1">
+            <li><span class="font-medium">Types:</span> <code>Mono&lt;T&gt;</code> for 0..1 values, <code>Flux&lt;T&gt;</code> for 0..N.</li>
+            <li><span class="font-medium">Schedulers:</span> <code>boundedElastic</code> for blocking IO, <code>parallel</code> for CPU work, <code>immediate</code> for current thread.</li>
+            <li><span class="font-medium">Backpressure:</span> Operators like <code>onBackpressureBuffer</code> handle fast producers and slow consumers.</li>
+          </ul>
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code class="language-java">Mono.fromCallable(() -&gt; blockingCall())
+  .subscribeOn(Schedulers.boundedElastic())
+  .map(this::transform)
+  .publishOn(Schedulers.parallel())
+  .subscribe(result -&gt; {/* use result */});
+</code></pre>
+        </section>
+      </div>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 WASSIM LAGNAOUI. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      // theme toggle
+      document.getElementById('themeToggle').addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+      // mobile menu
+      (function(){
+        const b=document.getElementById('menuToggle');
+        const n=document.getElementById('mobileNav');
+        if(b&&n){b.addEventListener('click',()=>n.classList.toggle('hidden'));}
+      })();
+      // share links
+      (function(){
+        const url=encodeURIComponent(location.href);
+        const title=encodeURIComponent(document.title);
+        const x=document.querySelector('[data-share="x"]');
+        const li=document.querySelector('[data-share="linkedin"]');
+        if(x) x.href=`https://twitter.com/intent/tweet?text=${title}&url=${url}`;
+        if(li) li.href=`https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
+      })();
+      // copy buttons + language labels; bump code blocks to text-sm
+      (function(){
+        document.querySelectorAll('pre').forEach((pre)=>{
+          pre.className = pre.className.replace(/\btext-xs\b/g,'text-sm');
+          if(!/\btext-sm\b/.test(pre.className)) pre.classList.add('text-sm');
+          pre.classList.add('relative');
+          const btn=document.createElement('button');
+          btn.type='button';
+          btn.className='absolute right-2 top-2 rounded-md border border-slate-700/40 bg-slate-800/70 px-2.5 py-1 text-xs text-slate-200 backdrop-blur hover:bg-slate-700/70 active:scale-95';
+          btn.textContent='Copy';
+          btn.addEventListener('click', async ()=>{
+            const code=pre.querySelector('code');
+            if(!code) return;
+            try{await navigator.clipboard.writeText(code.innerText); btn.textContent='Copied!'; setTimeout(()=>btn.textContent='Copy',1500);}catch{btn.textContent='Error'; setTimeout(()=>btn.textContent='Copy',1500)}
+          });
+          pre.appendChild(btn);
+        });
+        document.querySelectorAll('pre > code[class*="language-"]').forEach((code)=>{
+          const pre=code.parentElement;
+          const m=(code.className.match(/language-([\w-]+)/)||[])[1];
+          if(!m || pre.querySelector('.code-lang')) return;
+          pre.classList.add('pt-8'); pre.style.position='relative';
+          const label=document.createElement('span');
+          label.className='code-lang absolute left-2 top-2 rounded bg-slate-800/70 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-slate-200';
+          label.textContent=m; pre.appendChild(label);
+        });
+      })();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>

@@ -7,7 +7,7 @@
     <meta name="description" content="Design robust, evolvable Spring Boot REST APIs with validation, error handling, versioning, security, and documentation." />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E🧩%3C/text%3E%3C/svg%3E" />
     <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <script>
       tailwind.config = { darkMode:'class', theme:{extend:{fontFamily:{sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"]}}}};
     </script>
@@ -15,7 +15,7 @@
   </head>
   <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
     <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10">
-      <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div>
+      <!-- remove gradient for cleaner look -->
     </div>
 
     <header class="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
@@ -39,18 +39,59 @@
           <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
           <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
+        <button id="menuToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 md:hidden dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Open menu">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
       </div>
+      <nav id="mobileNav" class="mx-auto hidden max-w-7xl gap-6 px-6 pb-4 md:hidden">
+        <div class="grid grid-cols-2 gap-3 text-sm">
+          <a href="../#about" class="rounded-lg border border-slate-200 bg-white px-3 py-2 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800">About</a>
+          <a href="./" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-indigo-600 dark:border-slate-800 dark:bg-slate-900 dark:text-indigo-400">Blog</a>
+          <a href="../#skills" class="rounded-lg border border-slate-200 bg-white px-3 py-2 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800">Skills</a>
+          <a href="../projects/" class="rounded-lg border border-slate-200 bg-white px-3 py-2 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800">Projects</a>
+          <a href="../tutorials/" class="rounded-lg border border-slate-200 bg-white px-3 py-2 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800">Tutorials</a>
+          <a href="../course/" class="rounded-lg border border-slate-200 bg-white px-3 py-2 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:hover:bg-slate-800">Courses</a>
+        </div>
+      </nav>
     </header>
 
     <main class="mx-auto max-w-7xl px-6 py-10">
-      <header class="max-w-3xl">
-        <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Spring Boot REST API Best Practices</h1>
-        <p class="mt-2 text-slate-600 dark:text-slate-300">A practical guide to robust, evolvable Spring Boot REST APIs: resource modeling, validation, error handling, versioning, security, and documentation.</p>
-        <a href="./" class="mt-4 inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Blog</a>
-      </header>
+      <div class="mx-auto max-w-4xl">
+        <a href="./" class="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          Back to Blog
+        </a>
+        <header class="mt-4">
+          <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl">Spring Boot REST API Best Practices</h1>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">A practical guide to robust, evolvable Spring Boot REST APIs: resource modeling, validation, error handling, versioning, security, and documentation.</p>
+          <div class="mt-6 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <span class="grid h-9 w-9 place-items-center rounded-full bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+              <div class="text-sm leading-tight">
+                <div class="font-medium">Wassim Lagnaoui</div>
+                <div class="text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+              </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700 dark:border-indigo-900/50 dark:bg-indigo-950/50 dark:text-indigo-300">Spring Boot</span>
+              <span class="rounded-full border border-fuchsia-200 bg-fuchsia-50 px-3 py-1 text-xs font-medium text-fuchsia-700 dark:border-fuchsia-900/50 dark:bg-fuchsia-950/50 dark:text-fuchsia-300">REST API</span>
+              <div class="ml-2 flex items-center gap-2">
+                <a data-share="x" class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800" href="#" aria-label="Share on X">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2h3.308l-7.227 8.26L23 22h-6.8l-5.316-6.932L4.7 22H1.39l7.73-8.835L1 2h6.977l4.787 6.35L18.244 2zm-1.19 18h1.833L7.04 3.917H5.09L17.055 20z"/></svg>
+                </a>
+                <a data-share="linkedin" class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800" href="#" aria-label="Share on LinkedIn">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5C4.98 4.88 3.87 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5zM0 8h5v16H0V8zm7.5 0h4.8v2.2h.1c.7-1.3 2.4-2.7 5-2.7 5.3 0 6.3 3.5 6.3 8.1V24h-5V16.2c0-1.9 0-4.4-2.7-4.4-2.7 0-3.1 2.1-3.1 4.2V24h-5V8z"/></svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </header>
 
-      <section class="mt-8 space-y-8">
-        <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
+        <section class="mt-8 space-y-8">
+          <h2 class="text-xl font-semibold">Introduction: why REST API “best practices” matter</h2>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">A good API is a conversation that’s easy to follow. The paths make sense, the errors are clear, and changes don’t surprise people. In practice, that means using predictable URLs, validating input up front, returning consistent errors, and having a plan for versioning and security.</p>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">This isn’t about perfection or over‑engineering. It’s about small habits that make teams faster and integrations calmer. The sections below walk through the pieces you’ll use most often, with straightforward examples.</p>
+
           <h2 class="text-xl font-semibold">Resource modeling and URLs</h2>
           <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Resource-oriented URLs describe things rather than actions. Using plural nouns for collections and stable IDs for items helps consumers predict paths, while shallow hierarchies convey natural containment without over-coupling.</p>
           <ul class="mt-3 list-disc pl-5 text-sm text-slate-600 dark:text-slate-300 space-y-1">
@@ -60,7 +101,7 @@
             <li>Domain actions can be expressed as sub-resources (e.g., <code>POST /orders/{id}/cancellation</code>) rather than verb-like paths.</li>
             <li>Lowercase, hyphen-separated segments and extension-less paths keep names consistent and easy to scan.</li>
           </ul>
-          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code>// Good
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code>// Good
 GET /api/v1/orders
 GET /api/v1/orders/{id}
 GET /api/v1/orders/{id}/items
@@ -68,9 +109,7 @@ GET /api/v1/orders/{id}/items
 // Avoid verbs and RPC-ish names
 POST /api/v1/createOrder  // avoid
 </code></pre>
-        </article>
 
-        <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
           <h2 class="text-xl font-semibold">DTOs and validation</h2>
           <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Using DTOs, which are consumer-focused data shapes decoupled from persistence entities, is preferable and recommended because it stabilizes the API contract and prevents leaking internals. Validating inputs at the edge helps fail fast with clear, field-level feedback.</p>
           <ul class="mt-3 list-disc pl-5 text-sm text-slate-600 dark:text-slate-300 space-y-1">
@@ -80,7 +119,7 @@ POST /api/v1/createOrder  // avoid
             <li>Validation errors are translated into a consistent API error shape, avoiding raw stack traces and ambiguous 500s.</li>
             <li>Explicit mapping (e.g., MapStruct or manual mappers) provides control over which fields are exposed and how they’re named.</li>
           </ul>
-          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code class="language-java">public record CreateOrderItemDTO(
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code class="language-java">public record CreateOrderItemDTO(
   @NotNull Long menuItemId,
   @Positive int quantity
 ) {}
@@ -102,9 +141,7 @@ public class OrderController {
   }
 }
 </code></pre>
-        </article>
 
-        <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
           <h2 class="text-xl font-semibold">Consistent error handling (Problem Details)</h2>
           <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">A predictable error format enables clients to automate handling and display. RFC 7807 (Problem Details) describes fields such as <code>type</code>, <code>title</code>, <code>status</code>, <code>detail</code>, and <code>instance</code> for interoperable errors.</p>
           <ul class="mt-3 list-disc pl-5 text-sm text-slate-600 dark:text-slate-300 space-y-1">
@@ -113,7 +150,7 @@ public class OrderController {
             <li>Stack traces or internal class names are not exposed; a correlation/trace ID helps support investigations.</li>
             <li>Setting <code>Content-Type: application/problem+json</code> and a consistent schema keeps errors uniform across endpoints.</li>
           </ul>
-          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code class="language-java">@ControllerAdvice
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code class="language-java">@ControllerAdvice
 public class ApiExceptionHandler {
   @ExceptionHandler(MethodArgumentNotValidException.class)
   ResponseEntity&lt;Map&lt;String,Object&gt;&gt; handleValidation(MethodArgumentNotValidException ex) {
@@ -133,9 +170,7 @@ public class ApiExceptionHandler {
   }
 }
 </code></pre>
-        </article>
 
-        <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
           <h2 class="text-xl font-semibold">Versioning strategy</h2>
           <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Clear version boundaries help manage breaking changes, while a documented deprecation policy sets expectations for removals and migration.</p>
           <ul class="mt-3 list-disc pl-5 text-sm text-slate-600 dark:text-slate-300 space-y-1">
@@ -144,7 +179,7 @@ public class ApiExceptionHandler {
             <li>Deprecations can be documented in OpenAPI and release notes; the <code>Sunset</code> header communicates timelines.</li>
             <li>Within a version, changes remain additive to preserve backward compatibility.</li>
           </ul>
-          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code>// URI versioning
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code>// URI versioning
 GET /api/v1/orders
 GET /api/v2/orders  // breaking changes live here
 
@@ -152,9 +187,7 @@ GET /api/v2/orders  // breaking changes live here
 GET /api/orders
 Accept: application/vnd.example.order+json;version=2
 </code></pre>
-        </article>
 
-        <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
           <h2 class="text-xl font-semibold">Pagination, filtering, sorting</h2>
           <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Consistent query parameters and clear metadata make list endpoints predictable and performant, especially at scale.</p>
           <ul class="mt-3 list-disc pl-5 text-sm text-slate-600 dark:text-slate-300 space-y-1">
@@ -163,7 +196,7 @@ Accept: application/vnd.example.order+json;version=2
             <li>Filtering via query params (e.g., <code>status=READY</code>, ranges like <code>createdAfter=...</code>) narrows result sets efficiently.</li>
             <li>Whitelisting sortable/filterable fields avoids injection risks and unbounded database work.</li>
           </ul>
-          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code>// Requests
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code>// Requests
 GET /api/v1/orders?page=0&size=20&sort=createdAt,desc&status=READY
 
 // Response shape (example)
@@ -176,9 +209,7 @@ GET /api/v1/orders?page=0&size=20&sort=createdAt,desc&status=READY
   "links": {"next": "/api/v1/orders?page=1&size=20"}
 }
 </code></pre>
-        </article>
 
-        <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
           <h2 class="text-xl font-semibold">Security and auth</h2>
           <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Every endpoint benefits from authentication and authorization, which reduce risk exposure and limit access to appropriate identities.</p>
           <ul class="mt-3 list-disc pl-5 text-sm text-slate-600 dark:text-slate-300 space-y-1">
@@ -187,7 +218,7 @@ GET /api/v1/orders?page=0&size=20&sort=createdAt,desc&status=READY
             <li>Stateless auth suits APIs; when sessions are used, CSRF protections are applied.</li>
             <li>Secrets and tokens are never logged; keys are rotated and stored in secure systems (vault/KMS).</li>
           </ul>
-          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code class="language-java">@RestController
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code class="language-java">@RestController
 @RequestMapping("/api/v1/admin")
 @PreAuthorize("hasRole('ADMIN')")
 class AdminController {
@@ -205,9 +236,7 @@ class AdminController {
             .build();
 }
 </code></pre>
-        </article>
 
-        <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
           <h2 class="text-xl font-semibold">Idempotency and safety</h2>
           <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Designing for retries reduces user-facing errors. Safe methods do not change state, and idempotent operations return the same outcome when repeated.</p>
           <ul class="mt-3 list-disc pl-5 text-sm text-slate-600 dark:text-slate-300 space-y-1">
@@ -215,13 +244,11 @@ class AdminController {
             <li>Deduplication is achieved by storing the idempotency key and response for a defined window.</li>
             <li>Idempotency should hold across network retries and timeouts to prevent duplicated side effects (e.g., double charges).</li>
           </ul>
-          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code>// Client sends a unique key per logical create attempt
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code>// Client sends a unique key per logical create attempt
 POST /api/v1/payments
 Idempotency-Key: 3a7b...  // repeat with same key returns the same result
 </code></pre>
-        </article>
 
-        <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
           <h2 class="text-xl font-semibold">Documentation (OpenAPI/Swagger)</h2>
           <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">A self-describing API keeps the contract in sync with the implementation and helps consumers explore and integrate faster.</p>
           <ul class="mt-3 list-disc pl-5 text-sm text-slate-600 dark:text-slate-300 space-y-1">
@@ -229,13 +256,11 @@ Idempotency-Key: 3a7b...  // repeat with same key returns the same result
             <li>Error schemas and response codes clarify failure modes; required scopes and headers are documented alongside endpoints.</li>
             <li>Documentation generation can be automated in CI and published via Swagger UI in appropriate environments.</li>
           </ul>
-          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code>// build.gradle snippet
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code>// build.gradle snippet
 implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0"
 // UI at /swagger-ui.html or /swagger-ui/index.html
 </code></pre>
-        </article>
 
-        <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
           <h2 class="text-xl font-semibold">Stability and backward compatibility</h2>
           <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Backward compatibility allows evolution without breaking consumers. Additive changes are favored, while removals are planned and communicated.</p>
           <ul class="mt-3 list-disc pl-5 text-sm text-slate-600 dark:text-slate-300 space-y-1">
@@ -243,9 +268,7 @@ implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0"
             <li>Deprecations are marked in OpenAPI and release notes, with clear timelines toward removal.</li>
             <li>Clients are typically tolerant in reading (ignore unknown fields) and strict in writing (omit unstable fields).</li>
           </ul>
-        </article>
 
-        <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-sm dark:border-slate-700/60 dark:bg-slate-900/60">
           <h2 class="text-xl font-semibold">Testing and performance</h2>
           <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Correctness and performance are supported by layered tests and measurement, from fast unit tests to end-to-end checks.</p>
           <ul class="mt-3 list-disc pl-5 text-sm text-slate-600 dark:text-slate-300 space-y-1">
@@ -254,7 +277,7 @@ implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0"
             <li>Contract tests or schema validation against OpenAPI detect breaking changes before release.</li>
             <li>Latencies and throughput are measured against budgets; profiling identifies hotspots prior to optimization.</li>
           </ul>
-          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-xs text-slate-100"><code class="language-java">@WebMvcTest(OrderController.class)
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code class="language-java">@WebMvcTest(OrderController.class)
 class OrderControllerTest {
   @Autowired MockMvc mvc;
   @MockBean OrderService service;
@@ -263,13 +286,13 @@ class OrderControllerTest {
     when(service.create(any())).thenReturn(new OrderResponseDTO(1L, BigDecimal.TEN));
     mvc.perform(post("/api/v1/orders")
          .contentType(MediaType.APPLICATION_JSON)
-         .content("{\"items\":[{\"menuItemId\":1,\"quantity\":2}]}"))
+         .content("{\"items\":[{\"menuItemId\":1,\"quantity\":2}]}") )
        .andExpect(status().isCreated());
   }
 }
 </code></pre>
-        </article>
-      </section>
+        </section>
+      </div>
     </main>
 
     <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
@@ -279,10 +302,53 @@ class OrderControllerTest {
     </footer>
 
     <script>
+      // theme toggle
       document.getElementById('themeToggle').addEventListener('click', function(){
         const r=document.documentElement; const d=r.classList.toggle('dark');
         try{localStorage.setItem('theme', d?'dark':'light');}catch{}
       });
+      // mobile menu
+      (function(){
+        const b=document.getElementById('menuToggle');
+        const n=document.getElementById('mobileNav');
+        if(b&&n){b.addEventListener('click',()=>n.classList.toggle('hidden'));}
+      })();
+      // share links
+      (function(){
+        const url=encodeURIComponent(location.href);
+        const title=encodeURIComponent(document.title);
+        const x=document.querySelector('[data-share="x"]');
+        const li=document.querySelector('[data-share="linkedin"]');
+        if(x) x.href=`https://twitter.com/intent/tweet?text=${title}&url=${url}`;
+        if(li) li.href=`https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
+      })();
+      // copy buttons + language labels; bump code blocks to text-sm
+      (function(){
+        document.querySelectorAll('pre').forEach((pre)=>{
+          pre.className = pre.className.replace(/\btext-xs\b/g,'text-sm');
+          if(!/\btext-sm\b/.test(pre.className)) pre.classList.add('text-sm');
+          pre.classList.add('relative');
+          const btn=document.createElement('button');
+          btn.type='button';
+          btn.className='absolute right-2 top-2 rounded-md border border-slate-700/40 bg-slate-800/70 px-2.5 py-1 text-xs text-slate-200 backdrop-blur hover:bg-slate-700/70 active:scale-95';
+          btn.textContent='Copy';
+          btn.addEventListener('click', async ()=>{
+            const code=pre.querySelector('code');
+            if(!code) return;
+            try{await navigator.clipboard.writeText(code.innerText); btn.textContent='Copied!'; setTimeout(()=>btn.textContent='Copy',1500);}catch{btn.textContent='Error'; setTimeout(()=>btn.textContent='Copy',1500)}
+          });
+          pre.appendChild(btn);
+        });
+        document.querySelectorAll('pre > code[class*="language-"]').forEach((code)=>{
+          const pre=code.parentElement;
+          const m=(code.className.match(/language-([\w-]+)/)||[])[1];
+          if(!m || pre.querySelector('.code-lang')) return;
+          pre.classList.add('pt-8'); pre.style.position='relative';
+          const label=document.createElement('span');
+          label.className='code-lang absolute left-2 top-2 rounded bg-slate-800/70 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-slate-200';
+          label.textContent=m; pre.appendChild(label);
+        });
+      })();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
