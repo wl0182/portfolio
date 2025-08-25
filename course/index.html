@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Course — Java & Spring Boot Concepts</title>
-    <meta name="description" content="Concise explanations of Java and Spring Boot concepts with code snippets by Wesson Lagnaoui.">
+    <title>Level Up Your Java Dev Stack — Courses</title>
+    <meta name="description" content="Concise explanations of Java and Spring Boot concepts with code snippets by Wassim Lagnaoui.">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E🎓%3C/text%3E%3C/svg%3E" />
     <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches; if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -51,46 +51,42 @@
     </header>
 
     <main class="mx-auto max-w-7xl px-6 py-10">
-      <header class="max-w-3xl">
-        <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Course: Java & Spring Boot Concepts</h1>
-        <p class="mt-2 text-slate-600 dark:text-slate-300">Concise explanations with minimal, practical code snippets.</p>
+      <header class="mx-auto max-w-3xl text-center">
+        <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Level Up Your Java Dev Stack</h1>
+        <p class="mt-2 text-slate-600 dark:text-slate-300">Hands‑on, no‑fluff courses to master Spring Boot, React, databases, and CI/CD.</p>
       </header>
 
       <section class="mt-10 grid gap-6 lg:grid-cols-2">
-        <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md dark:border-slate-700/60 dark:bg-slate-900/60">
-          <h2 class="text-xl font-semibold">Java Core: Streams & Optionals</h2>
-          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Write expressive, null‑safe code for collections.</p>
-          <p class="mt-3 text-sm text-slate-500 dark:text-slate-400">Work in progress</p>
-        </article>
+        <a class="group block rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 transition hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-700/60 dark:bg-slate-900/60" href="../tutorials/">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-semibold">Build a Full Stack Application</h2>
+            <span class="text-xs text-slate-500">12‑part series</span>
+          </div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Step‑by‑step guide using Spring Boot, React, PostgreSQL, JWT, Docker, and CI/CD.</p>
+        </a>
+
+        <a class="group block rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 transition hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-700/60 dark:bg-slate-900/60" href="./">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-semibold">Java & Spring Boot Concepts</h2>
+            <span class="text-xs text-slate-500">Mini‑course</span>
+          </div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Concise explanations with practical snippets: Streams, JPA, Security, Testing.</p>
+        </a>
+
+        <div class="group rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 dark:border-slate-700/60 dark:bg-slate-900/60">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-semibold">Coming Soon: Docker & CI/CD Playbook</h2>
+            <span class="text-xs text-slate-500">Planned</span>
+          </div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Create lean images, compose services, and automate builds and releases.</p>
+        </div>
 
         <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md dark:border-slate-700/60 dark:bg-slate-900/60">
-          <h2 class="text-xl font-semibold">Spring Boot: REST Controller</h2>
-          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Create clean, DTO‑driven endpoints.</p>
-          <p class="mt-3 text-sm text-slate-500 dark:text-slate-400">Work in progress</p>
-        </article>
-
-        <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md dark:border-slate-700/60 dark:bg-slate-900/60">
-          <h2 class="text-xl font-semibold">Data Access: Spring Data JPA</h2>
-          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Leverage repositories and projections.</p>
-          <p class="mt-3 text-sm text-slate-500 dark:text-slate-400">Work in progress</p>
-        </article>
-
-        <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md dark:border-slate-700/60 dark:bg-slate-900/60">
-          <h2 class="text-xl font-semibold">Security: JWT with Spring Security</h2>
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl font-semibold">Coming Soon: JWT with Spring Security</h2>
+            <span class="text-xs text-slate-500">Planned</span>
+          </div>
           <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Protect endpoints with stateless auth.</p>
-          <p class="mt-3 text-sm text-slate-500 dark:text-slate-400">Work in progress</p>
-        </article>
-
-        <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md dark:border-slate-700/60 dark:bg-slate-900/60">
-          <h2 class="text-xl font-semibold">Testing: JUnit 5 & Mockito</h2>
-          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Isolate business logic with mocks.</p>
-          <p class="mt-3 text-sm text-slate-500 dark:text-slate-400">Work in progress</p>
-        </article>
-
-        <article class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md dark:border-slate-700/60 dark:bg-slate-900/60">
-          <h2 class="text-xl font-semibold">Configuration: Profiles & YAML</h2>
-          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Separate configs per environment.</p>
-          <p class="mt-3 text-sm text-slate-500 dark:text-slate-400">Work in progress</p>
         </article>
       </section>
     </main>
