@@ -16,7 +16,7 @@
   <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
     <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
 
-    <header class="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+    <header class="z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
       <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
         <a href="../../../" class="group inline-flex items-center gap-3">
           <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
@@ -41,29 +41,50 @@
     </header>
 
     <main class="mx-auto max-w-7xl px-6 py-10">
-      <div class="mb-6">
-        <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Concepts</a>
-      </div>
-      <header class="mx-auto max-w-3xl text-center">
-        <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 05: Collections & Generics</h1>
-        <p class="mt-2 text-slate-600 dark:text-slate-300">Work with groups of data using Lists, Sets, and Maps, iterate safely with for-each, and add type safety with generics.</p>
-      </header>
+      <div class="lg:flex lg:gap-8">
+        <aside class="hidden lg:block lg:w-72">
+          <!-- Lesson Navigation -->
 
-      <section id="introduction" class="prose prose-slate mt-6 max-w-none dark:prose-invert">
-        <h2>Introduction</h2>
-        <p>So far you've worked with single objects, but real programs need to handle groups of data. Collections are Java's way of storing multiple items together, like a shopping cart holding multiple products or a contact list storing many phone numbers. Java provides three main types: Lists (ordered collections that allow duplicates), Sets (collections that ensure uniqueness), and Maps (key-value pairs for quick lookups). Generics add type safety by letting you specify what type of objects a collection can hold, preventing errors and eliminating the need for casting. The for-each loop makes it easy to process every item in a collection without worrying about indexes or boundaries. These tools are essential for building real applications that manage multiple pieces of data efficiently.</p>
-      </section>
 
-      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="lists">
-        <h2>Lists</h2>
-        <h3>Definition</h3>
-        <p>A List is an ordered collection that maintains the sequence of elements as you add them and allows duplicate values. You can access elements by their position (index) and the list will remember the exact order you put things in. Lists are perfect when the order matters or when you need to allow the same item to appear multiple times.</p>
+          <!-- Table of Contents -->
+          <nav class="sticky top-8 rounded-xl border border-slate-200/60 bg-white/60 p-4 shadow-sm backdrop-blur dark:border-slate-800/60 dark:bg-slate-900/40" aria-label="Table of contents">
+            <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">On this page</h2>
+            <ol class="space-y-1 text-sm">
+              <li><a href="#introduction" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Introduction</a></li>
+              <li><a href="#lists" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Lists</a></li>
+              <li><a href="#sets" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Sets</a></li>
+              <li><a href="#maps" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Maps</a></li>
+              <li><a href="#generics" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Generics</a></li>
+              <li><a href="#iteration" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">For-each Iteration</a></li>
+              <li><a href="#summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Summary</a></li>
+            </ol>
+          </nav>
+        </aside>
 
-        <h3>Analogy</h3>
-        <p>Think of a List like a shopping list you write on paper. You jot down items in the order you think of them: "milk, bread, eggs, milk" (yes, you might write milk twice if you really need it). Each item has a position - milk is first, bread is second, and so on. You can look at the third item on your list, add new items to the end, or even insert something in the middle. The list keeps everything in the exact order you wrote it, and if you write the same item twice, it appears twice on the list.</p>
+        <div class="min-w-0 flex-1">
+          <div class="mb-6">
+            <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Concepts</a>
+          </div>
+          <header class="mx-auto max-w-3xl text-center">
+            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 05: Collections & Generics</h1>
+            <p class="mt-2 text-slate-600 dark:text-slate-300">Work with groups of data using Lists, Sets, and Maps, iterate safely with for-each, and add type safety with generics.</p>
+          </header>
 
-        <h3>Example</h3>
-        <pre><code class="language-java">import java.util.ArrayList;
+          <section id="introduction" class="prose prose-slate mt-6 max-w-none dark:prose-invert">
+            <h2>Introduction</h2>
+            <p>So far you've worked with single objects, but real programs need to handle groups of data. Collections are Java's way of storing multiple items together, like a shopping cart holding multiple products or a contact list storing many phone numbers. Java provides three main types: Lists (ordered collections that allow duplicates), Sets (collections that ensure uniqueness), and Maps (key-value pairs for quick lookups). Generics add type safety by letting you specify what type of objects a collection can hold, preventing errors and eliminating the need for casting. The for-each loop makes it easy to process every item in a collection without worrying about indexes or boundaries. These tools are essential for building real applications that manage multiple pieces of data efficiently.</p>
+          </section>
+
+          <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="lists">
+            <h2>Lists</h2>
+            <h3>Definition</h3>
+            <p>A List is an ordered collection that maintains the sequence of elements as you add them and allows duplicate values. You can access elements by their position (index) and the list will remember the exact order you put things in. Lists are perfect when the order matters or when you need to allow the same item to appear multiple times.</p>
+
+            <h3>Analogy</h3>
+            <p>Think of a List like a shopping list you write on paper. You jot down items in the order you think of them: "milk, bread, eggs, milk" (yes, you might write milk twice if you really need it). Each item has a position - milk is first, bread is second, and so on. You can look at the third item on your list, add new items to the end, or even insert something in the middle. The list keeps everything in the exact order you wrote it, and if you write the same item twice, it appears twice on the list.</p>
+
+            <h3>Example</h3>
+            <pre><code class="language-java">import java.util.ArrayList;
 import java.util.List;
 
 // Creating a shopping list using ArrayList
@@ -102,20 +123,20 @@ public class ShoppingListDemo {
   }
 }
 </code></pre>
-      </section>
+          </section>
 
-      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
-      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="sets">
-        <h2>Sets</h2>
-        <h3>Definition</h3>
-        <p>A Set is a collection that automatically ensures all elements are unique - it won't allow duplicates. When you try to add an item that's already in the set, it simply ignores the duplicate. Sets are perfect when you need to track unique items, like a list of unique website visitors or a collection of distinct product categories.</p>
+          <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="sets">
+            <h2>Sets</h2>
+            <h3>Definition</h3>
+            <p>A Set is a collection that automatically ensures all elements are unique - it won't allow duplicates. When you try to add an item that's already in the set, it simply ignores the duplicate. Sets are perfect when you need to track unique items, like a list of unique website visitors or a collection of distinct product categories.</p>
 
-        <h3>Analogy</h3>
-        <p>A Set is like your collection of shoes in your closet. You might have many pairs, but you never keep two identical pairs of the exact same shoe. If someone gives you a pair of sneakers identical to one you already own, you don't put both in your closet - you keep just one. Your shoe collection naturally contains only unique items. When friends ask what shoes you have, you can quickly tell them if you own a specific type, but you can't point to "the first shoe" or "the third shoe" because they're not arranged in any particular order - they're just your unique collection.</p>
+            <h3>Analogy</h3>
+            <p>A Set is like your collection of shoes in your closet. You might have many pairs, but you never keep two identical pairs of the exact same shoe. If someone gives you a pair of sneakers identical to one you already own, you don't put both in your closet - you keep just one. Your shoe collection naturally contains only unique items. When friends ask what shoes you have, you can quickly tell them if you own a specific type, but you can't point to "the first shoe" or "the third shoe" because they're not arranged in any particular order - they're just your unique collection.</p>
 
-        <h3>Example</h3>
-        <pre><code class="language-java">import java.util.HashSet;
+            <h3>Example</h3>
+            <pre><code class="language-java">import java.util.HashSet;
 import java.util.Set;
 
 // Managing unique website visitors
@@ -155,20 +176,20 @@ public class VisitorTrackingDemo {
   }
 }
 </code></pre>
-      </section>
+          </section>
 
-      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
-      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="maps">
-        <h2>Maps</h2>
-        <h3>Definition</h3>
-        <p>A Map stores pairs of keys and values, where each key is unique and maps to exactly one value. It's like a lookup table where you can quickly find a value by providing its key. Maps are perfect for associations like username to email address, product ID to price, or country to capital city.</p>
+          <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="maps">
+            <h2>Maps</h2>
+            <h3>Definition</h3>
+            <p>A Map stores pairs of keys and values, where each key is unique and maps to exactly one value. It's like a lookup table where you can quickly find a value by providing its key. Maps are perfect for associations like username to email address, product ID to price, or country to capital city.</p>
 
-        <h3>Analogy</h3>
-        <p>A Map is exactly like a phone book or dictionary. In a phone book, you look up a person's name (the key) to find their phone number (the value). Each person's name appears only once, but you can quickly flip to any name and get their number. In a dictionary, you look up a word (key) to find its definition (value). The phone book doesn't store names in the order you added them - it organizes them for fast lookup. When you need to find someone's number, you don't flip through every page; you jump directly to their name section and find them instantly.</p>
+            <h3>Analogy</h3>
+            <p>A Map is exactly like a phone book or dictionary. In a phone book, you look up a person's name (the key) to find their phone number (the value). Each person's name appears only once, but you can quickly flip to any name and get their number. In a dictionary, you look up a word (key) to find its definition (value). The phone book doesn't store names in the order you added them - it organizes them for fast lookup. When you need to find someone's number, you don't flip through every page; you jump directly to their name section and find them instantly.</p>
 
-        <h3>Example</h3>
-        <pre><code class="language-java">import java.util.HashMap;
+            <h3>Example</h3>
+            <pre><code class="language-java">import java.util.HashMap;
 import java.util.Map;
 
 // Product catalog with prices
@@ -221,20 +242,20 @@ public class ProductCatalogDemo {
   }
 }
 </code></pre>
-      </section>
+          </section>
 
-      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
-      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="generics">
-        <h2>Generics</h2>
-        <h3>Definition</h3>
-        <p>Generics allow you to specify what type of objects a collection can hold by using angle brackets with the type name, like List&lt;String&gt; or Map&lt;String, Integer&gt;. This provides compile-time type safety, meaning the compiler will catch type mismatches before your program runs. Generics eliminate the need for casting and make your code more readable and reliable.</p>
+          <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="generics">
+            <h2>Generics</h2>
+            <h3>Definition</h3>
+            <p>Generics allow you to specify what type of objects a collection can hold by using angle brackets with the type name, like List&lt;String&gt; or Map&lt;String, Integer&gt;. This provides compile-time type safety, meaning the compiler will catch type mismatches before your program runs. Generics eliminate the need for casting and make your code more readable and reliable.</p>
 
-        <h3>Analogy</h3>
-        <p>Generics are like labeled storage containers in a warehouse. Instead of having generic boxes where you might accidentally put books in a box meant for tools, you have clearly labeled containers: "Books Only," "Tools Only," "Electronics Only." When you label a container upfront, everyone knows what belongs inside, and the warehouse manager (compiler) can catch mistakes before items get stored in the wrong place. You never have to guess what's in a container or worry about finding a wrench when you expected a book - the label guarantees the contents.</p>
+            <h3>Analogy</h3>
+            <p>Generics are like labeled storage containers in a warehouse. Instead of having generic boxes where you might accidentally put books in a box meant for tools, you have clearly labeled containers: "Books Only," "Tools Only," "Electronics Only." When you label a container upfront, everyone knows what belongs inside, and the warehouse manager (compiler) can catch mistakes before items get stored in the wrong place. You never have to guess what's in a container or worry about finding a wrench when you expected a book - the label guarantees the contents.</p>
 
-        <h3>Example</h3>
-        <pre><code class="language-java">import java.util.*;
+            <h3>Example</h3>
+            <pre><code class="language-java">import java.util.*;
 
 // Demonstrating type safety with generics
 public class GenericsDemo {
@@ -278,7 +299,7 @@ public class GenericsDemo {
     }
 
     // Generics catch errors at compile time
-    processStringList(names);                // works - names is List<String>
+    processStringList(names);                // works - names is List&lt;String&gt;
     // processStringList(oldList);           // compile error - oldList is raw type
   }
 
@@ -290,20 +311,20 @@ public class GenericsDemo {
   }
 }
 </code></pre>
-      </section>
+          </section>
 
-      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
-      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="iteration">
-        <h2>For-each Iteration</h2>
-        <h3>Definition</h3>
-        <p>The for-each loop (also called enhanced for loop) provides a simple way to iterate through all elements in a collection without dealing with indexes or iterator objects. It automatically handles the details of traversing the collection and gives you each element one by one. Use it when you need to process every element but don't need to know the position or modify the collection during iteration.</p>
+          <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="iteration">
+            <h2>For-each Iteration</h2>
+            <h3>Definition</h3>
+            <p>The for-each loop (also called enhanced for loop) provides a simple way to iterate through all elements in a collection without dealing with indexes or iterator objects. It automatically handles the details of traversing the collection and gives you each element one by one. Use it when you need to process every element but don't need to know the position or modify the collection during iteration.</p>
 
-        <h3>Analogy</h3>
-        <p>For-each iteration is like having items delivered to you one at a time from a conveyor belt. You don't need to worry about reaching for the next item, counting positions, or figuring out when the belt is empty. The belt automatically brings each item to you, and when you're done processing one item, the next one appears. You focus on handling each item as it arrives, and the system takes care of the delivery mechanism. It's much simpler than walking along the belt yourself and keeping track of where you are.</p>
+            <h3>Analogy</h3>
+            <p>For-each iteration is like having items delivered to you one at a time from a conveyor belt. You don't need to worry about reaching for the next item, counting positions, or figuring out when the belt is empty. The belt automatically brings each item to you, and when you're done processing one item, the next one appears. You focus on handling each item as it arrives, and the system takes care of the delivery mechanism. It's much simpler than walking along the belt yourself and keeping track of where you are.</p>
 
-        <h3>Example</h3>
-        <pre><code class="language-java">import java.util.*;
+            <h3>Example</h3>
+            <pre><code class="language-java">import java.util.*;
 
 // Different ways to iterate through collections
 public class IterationDemo {
@@ -359,19 +380,21 @@ public class IterationDemo {
   }
 }
 </code></pre>
-      </section>
+          </section>
 
-      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
-      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="summary">
-        <h2>Summary</h2>
-        <p>Collections are essential tools for managing groups of data in Java applications. Lists maintain order and allow duplicates, perfect for sequences like shopping carts or task lists. Sets ensure uniqueness, ideal for tracking distinct items like user IDs or categories. Maps provide fast key-value lookups, excellent for associations like user profiles or product catalogs. Generics add type safety, preventing errors and making code more readable by specifying exactly what types your collections hold. The for-each loop simplifies iteration, letting you process each element without worrying about indexes or boundaries. Together, these concepts form the foundation for handling multiple pieces of data efficiently and safely in your programs.</p>
-      </section>
+          <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="summary">
+            <h2>Summary</h2>
+            <p>Collections are essential tools for managing groups of data in Java applications. Lists maintain order and allow duplicates, perfect for sequences like shopping carts or task lists. Sets ensure uniqueness, ideal for tracking distinct items like user IDs or categories. Maps provide fast key-value lookups, excellent for associations like user profiles or product catalogs. Generics add type safety, preventing errors and making code more readable by specifying exactly what types your collections hold. The for-each loop simplifies iteration, letting you process each element without worrying about indexes or boundaries. Together, these concepts form the foundation for handling multiple pieces of data efficiently and safely in your programs.</p>
+          </section>
 
-      <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
-        <a href="lesson-04.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
-        <a href="lesson-06.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
-      </nav>
+          <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+            <a href="lesson-04.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
+            <a href="lesson-06.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
+          </nav>
+        </div>
+      </div>
     </main>
 
     <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">

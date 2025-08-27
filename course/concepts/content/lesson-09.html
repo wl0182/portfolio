@@ -1,0 +1,693 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 09 - Threads & Concurrency</title>
+    <meta name="description" content="Java threads and concurrency: thread basics, creating threads, thread lifecycle, synchronization, race conditions, thread safety, deadlocks, and practical multi-threading scenarios with simple definitions, analogies, focused snippets, and visual explanations." />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="lg:flex lg:gap-8">
+        <aside class="hidden lg:block lg:w-72">
+          <nav class="sticky top-8 rounded-xl border border-slate-200/60 bg-white/60 p-4 shadow-sm backdrop-blur dark:border-slate-800/60 dark:bg-slate-900/40" aria-label="Table of contents">
+            <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">On this page</h2>
+            <ol class="space-y-1 text-sm">
+              <li><a href="#introduction" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Introduction</a></li>
+              <li><a href="#understanding-threads" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Understanding Threads</a></li>
+              <li><a href="#creating-threads" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Creating Threads</a></li>
+              <li><a href="#thread-lifecycle" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Thread Lifecycle</a></li>
+              <li><a href="#concurrency-basics" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Concurrency Basics</a></li>
+              <li><a href="#race-conditions" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Race Conditions</a></li>
+              <li><a href="#synchronization" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Synchronization</a></li>
+              <li><a href="#thread-safety" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Thread Safety</a></li>
+              <li><a href="#deadlocks" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Deadlocks</a></li>
+              <li><a href="#executor-service" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">ExecutorService</a></li>
+              <li><a href="#common-pitfalls" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Common Pitfalls</a></li>
+              <li><a href="#practical-scenarios" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Practical Scenarios</a></li>
+              <li><a href="#summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Summary</a></li>
+              <li><a href="#programming-challenge" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Programming Challenge</a></li>
+            </ol>
+          </nav>
+        </aside>
+        <div class="min-w-0 flex-1">
+          <div class="mb-6">
+            <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Concepts</a>
+          </div>
+          <header class="mx-auto max-w-3xl text-center">
+            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 09: Threads & Concurrency</h1>
+            <p class="mt-2 text-slate-600 dark:text-slate-300">Master multi-threading in Java: understand threads, handle concurrency safely, avoid common pitfalls, and build responsive applications that can do multiple things simultaneously.</p>
+          </header>
+
+          <section id="introduction" class="prose prose-slate mt-6 max-w-none dark:prose-invert">
+            <h2>Introduction</h2>
+            <p>Imagine trying to cook a complex meal where you need to boil pasta, sauté vegetables, and prepare sauce all at the same time. If you did each task one after another, dinner would take forever and the first dish would be cold before the last was ready. Instead, you multitask - starting the pasta water while chopping vegetables, then stirring the sauce while the pasta cooks. This is exactly what threads allow your Java programs to do: perform multiple tasks simultaneously instead of waiting for each one to finish. Threads are lightweight processes that share the same memory space but can run independently, making your applications faster and more responsive. However, just like coordinating multiple cooking tasks can lead to burnt food or kitchen chaos without proper planning, managing multiple threads requires careful attention to synchronization and thread safety. This lesson will teach you how to create and manage threads, understand the challenges of concurrent programming, and write safe multi-threaded code that performs well without breaking.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="understanding-threads" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Understanding Threads</h2>
+            <h3>Definition</h3>
+            <p>A thread is the smallest unit of execution within a process that can run independently while sharing the same memory space with other threads. In Java, every application starts with a main thread that executes your main method, but you can create additional threads to perform tasks concurrently. Threads allow your program to do multiple things at once - like downloading a file while updating the user interface, or processing multiple user requests simultaneously in a web server. Each thread has its own stack for local variables and method calls, but all threads in a process share the same heap memory where objects are stored.</p>
+
+            <h3>Analogy</h3>
+            <p>Think of threads like workers in a busy restaurant kitchen. The kitchen (your Java program) has multiple chefs (threads) working simultaneously. Each chef has their own workspace and tools (thread stack), but they all share the same ingredients, ovens, and storage areas (shared heap memory). The head chef coordinates everyone to ensure orders are completed efficiently without chefs interfering with each other's work. One chef might be grilling meat while another prepares salads and a third plates desserts. If they don't coordinate properly - like two chefs trying to use the same pan at once - chaos ensues. But when they work together smoothly, the restaurant serves customers much faster than if one chef did everything sequentially.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Single vs Multi-threaded execution:</strong></p>
+            <pre><code class="language-java">// Single-threaded: tasks run one after another
+doTask1(); // takes 2 seconds
+doTask2(); // takes 3 seconds
+doTask3(); // takes 1 second
+// Total time: 6 seconds
+</code></pre>
+
+            <p><strong>Multi-threaded: tasks run simultaneously:</strong></p>
+            <pre><code class="language-java">Thread t1 = new Thread(() -> doTask1());
+Thread t2 = new Thread(() -> doTask2());
+Thread t3 = new Thread(() -> doTask3());
+// All start at once, total time: 3 seconds (longest task)
+</code></pre>
+
+            <p><strong>Checking if code runs on main thread:</strong></p>
+            <pre><code class="language-java">System.out.println("Current thread: " + Thread.currentThread().getName());
+// Output: Current thread: main
+</code></pre>
+
+            <p><strong>Getting thread information:</strong></p>
+            <pre><code class="language-java">Thread current = Thread.currentThread();
+System.out.println("Thread ID: " + current.getId());
+System.out.println("Thread priority: " + current.getPriority());
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="creating-threads" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Creating Threads</h2>
+            <h3>Definition</h3>
+            <p>Java provides several ways to create and start threads: extending the Thread class, implementing the Runnable interface, or using lambda expressions for simple tasks. The Runnable approach is preferred because it separates the task (what to do) from the thread management (how to do it), and Java only supports single inheritance so implementing Runnable keeps your class free to extend other classes. Once you create a thread, you must call start() to begin execution - calling run() directly executes the code in the current thread instead of creating a new one.</p>
+
+            <h3>Analogy</h3>
+            <p>Creating threads is like hiring employees for different jobs in your company. You can either hire someone for a specific role (extend Thread class - they can only do that one job) or hire versatile people who can take on various responsibilities (implement Runnable - they can do their job while also handling other duties). Writing a job description (Runnable) separately from hiring the person (Thread) gives you more flexibility. You can reuse the same job description for multiple employees, or assign additional responsibilities to someone later. Once you've hired someone and given them a job description, you need to officially start their employment (call start()) rather than just telling them what their job is (call run()).</p>
+
+            <h3>Examples</h3>
+            <p><strong>Creating thread with lambda (most common):</strong></p>
+            <pre><code class="language-java">Thread worker = new Thread(() -> {
+    System.out.println("Working on background task...");
+});
+worker.start(); // Starts new thread
+</code></pre>
+
+            <p><strong>Implementing Runnable interface:</strong></p>
+            <pre><code class="language-java">class DataProcessor implements Runnable {
+    public void run() {
+        System.out.println("Processing data in background...");
+    }
+}
+new Thread(new DataProcessor()).start();
+</code></pre>
+
+            <p><strong>Extending Thread class:</strong></p>
+            <pre><code class="language-java">class BackgroundTask extends Thread {
+    public void run() {
+        System.out.println("Background task running...");
+    }
+}
+new BackgroundTask().start();
+</code></pre>
+
+            <p><strong>Thread with parameters:</strong></p>
+            <pre><code class="language-java">Thread calculator = new Thread(() -> {
+    int result = 10 * 20;
+    System.out.println("Calculation result: " + result);
+});
+calculator.start();
+</code></pre>
+
+            <p><strong>Named threads for debugging:</strong></p>
+            <pre><code class="language-java">Thread namedThread = new Thread(() -> {
+    System.out.println("Running in: " + Thread.currentThread().getName());
+}, "DataProcessor-1");
+namedThread.start();
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="thread-lifecycle" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Thread Lifecycle</h2>
+            <h3>Definition</h3>
+            <p>Threads go through several states during their lifetime: NEW (created but not started), RUNNABLE (ready to run or currently running), BLOCKED (waiting for a lock), WAITING (waiting indefinitely for another thread), TIMED_WAITING (waiting for a specific time), and TERMINATED (finished execution). Understanding these states helps you debug threading issues and write better concurrent code. Threads transition between states based on method calls like start(), join(), sleep(), and wait(), or when they acquire/release locks.</p>
+
+            <h3>Analogy</h3>
+            <p>Think of a thread's lifecycle like a customer's journey through a busy restaurant. When first created (NEW), the customer is waiting outside, not yet seated. Once they enter and are seated (RUNNABLE), they're ready to order and eat, though they might have to wait for the server's attention. Sometimes they're blocked waiting for a table to become available (BLOCKED), or waiting for their food to arrive (WAITING). They might also wait for a specific time, like waiting 15 minutes for their reserved table (TIMED_WAITING). Finally, when they finish their meal and leave (TERMINATED), their restaurant experience is complete. Throughout this journey, the customer transitions between different states based on circumstances and actions.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Thread states in action:</strong></p>
+            <pre><code class="language-java">Thread t = new Thread(() -> {
+    try { Thread.sleep(1000); } catch (InterruptedException e) {}
+});
+System.out.println("State: " + t.getState()); // NEW
+t.start();
+System.out.println("State: " + t.getState()); // RUNNABLE
+</code></pre>
+
+            <p><strong>Waiting for thread to complete:</strong></p>
+            <pre><code class="language-java">Thread worker = new Thread(() -> {
+    // Some work here
+});
+worker.start();
+worker.join(); // Wait for worker to finish
+System.out.println("Worker completed");
+</code></pre>
+
+            <p><strong>Thread sleeping (TIMED_WAITING):</strong></p>
+            <pre><code class="language-java">Thread.sleep(2000); // Sleep for 2 seconds
+System.out.println("Woke up after 2 seconds");
+</code></pre>
+
+            <p><strong>Checking if thread is alive:</strong></p>
+            <pre><code class="language-java">Thread t = new Thread(() -> {
+    try { Thread.sleep(1000); } catch (InterruptedException e) {}
+});
+System.out.println("Alive: " + t.isAlive()); // false
+t.start();
+System.out.println("Alive: " + t.isAlive()); // true
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="concurrency-basics" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Concurrency Basics</h2>
+            <h3>Definition</h3>
+            <p>Concurrency is the ability to run multiple tasks at the same time, either truly in parallel (on multiple CPU cores) or by rapidly switching between tasks (time-slicing). In Java, concurrency allows your application to remain responsive while performing background work, handle multiple user requests simultaneously, or process large datasets faster by dividing the work among threads. However, concurrent programming introduces complexity because threads can interfere with each other when accessing shared resources, leading to unpredictable behavior if not handled properly.</p>
+
+            <h3>Analogy</h3>
+            <p>Concurrency is like managing a busy coffee shop during morning rush hour. You have multiple baristas (threads) working simultaneously to serve customers faster. One barista takes orders while another prepares drinks, and a third handles the cash register. This concurrent operation serves more customers than having one person do everything sequentially. However, coordination is crucial - if two baristas try to use the same espresso machine at once, or if the cashier and order-taker don't communicate about customizations, confusion and mistakes happen. The coffee shop needs systems (like order tickets and calling out names) to ensure smooth coordination, just like concurrent programs need synchronization mechanisms to prevent threads from interfering with each other.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Sequential vs concurrent processing:</strong></p>
+            <pre><code class="language-java">// Sequential: process items one by one
+for (int i = 0; i < 1000; i++) {
+    processItem(i); // Takes 1000 units of time
+}
+</code></pre>
+
+            <p><strong>Concurrent: process items in parallel:</strong></p>
+            <pre><code class="language-java">// Split work among 4 threads
+for (int t = 0; t < 4; t++) {
+    final int threadId = t;
+    new Thread(() -> {
+        for (int i = threadId * 250; i < (threadId + 1) * 250; i++) {
+            processItem(i); // Takes ~250 units of time total
+        }
+    }).start();
+}
+</code></pre>
+
+            <p><strong>Background task while UI stays responsive:</strong></p>
+            <pre><code class="language-java">// Start background calculation
+new Thread(() -> {
+    performLongCalculation();
+}).start();
+
+// UI remains responsive for user interactions
+handleUserInput();
+</code></pre>
+
+            <p><strong>Multiple concurrent downloads:</strong></p>
+            <pre><code class="language-java">String[] urls = {"url1", "url2", "url3"};
+for (String url : urls) {
+    new Thread(() -> downloadFile(url)).start();
+}
+// All downloads happen simultaneously
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="race-conditions" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Race Conditions</h2>
+            <h3>Definition</h3>
+            <p>A race condition occurs when multiple threads access shared data simultaneously and the outcome depends on the timing of their execution. This happens because operations that appear atomic (like incrementing a counter) actually consist of multiple steps: read the current value, add one, write the new value. If two threads perform these steps at overlapping times, they might both read the same initial value and write the same result, effectively losing one increment. Race conditions lead to unpredictable behavior, data corruption, and bugs that are difficult to reproduce because they depend on precise timing.</p>
+
+            <h3>Analogy</h3>
+            <p>Imagine two roommates sharing a joint bank account, each trying to deposit $100 at the same time using different ATMs. Both ATMs read the current balance of $500 simultaneously. Each adds $100 to what they read ($500), and both write back $600 as the new balance. Instead of the correct final balance of $700, the account shows only $600 - one deposit was lost! This happens because the "deposit" operation isn't atomic; it requires reading, calculating, and writing back. In the brief moment between reading and writing, the other person's transaction interfered. Banks prevent this with sophisticated locking mechanisms, and your concurrent programs need similar protection for shared data.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Race condition example (problematic):</strong></p>
+            <pre><code class="language-java">int counter = 0;
+// Two threads both do this:
+counter++; // Read, increment, write - not atomic!
+// Final result is unpredictable
+</code></pre>
+
+            <p><strong>Demonstrating the race condition:</strong></p>
+            <pre><code class="language-java">class Counter {
+    private int count = 0;
+    public void increment() { count++; }
+    public int getCount() { return count; }
+}
+// Result may be less than 2000 due to race condition
+</code></pre>
+
+            <p><strong>Lost update example:</strong></p>
+            <pre><code class="language-java">// Thread 1: balance = balance + 100
+// Thread 2: balance = balance - 50
+// Both read 1000, final result unpredictable
+</code></pre>
+
+            <p><strong>Inconsistent state example:</strong></p>
+            <pre><code class="language-java">class BankAccount {
+    private int balance = 1000;
+    private int transactions = 0;
+
+    public void deposit(int amount) {
+        balance += amount;    // Step 1
+        transactions++;      // Step 2 - another thread might see inconsistent state
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="synchronization" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Synchronization</h2>
+            <h3>Definition</h3>
+            <p>Synchronization is the mechanism that ensures only one thread can access a shared resource at a time, preventing race conditions and maintaining data consistency. Java provides the synchronized keyword to create critical sections - blocks of code that only one thread can execute simultaneously. When a thread enters a synchronized block or method, it acquires a lock on the specified object. Other threads trying to enter synchronized code on the same object must wait until the lock is released. This serializes access to shared data, trading some performance for correctness and predictability.</p>
+
+            <h3>Analogy</h3>
+            <p>Synchronization is like having a single key for a shared office supply cabinet in a busy workplace. When someone needs supplies, they must first obtain the key, unlock the cabinet, take what they need, update the inventory list, and then return the key for the next person. Only one person can access the cabinet at a time, preventing chaos like multiple people trying to update the same inventory sheet or taking the last item without others knowing. While this approach is slower than everyone having their own key, it ensures accurate inventory and prevents conflicts. The key represents the lock, and the rule about using the key represents the synchronization mechanism that prevents concurrent access problems.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Synchronized method:</strong></p>
+            <pre><code class="language-java">class SafeCounter {
+    private int count = 0;
+
+    public synchronized void increment() {
+        count++; // Now thread-safe
+    }
+}
+</code></pre>
+
+            <p><strong>Synchronized block:</strong></p>
+            <pre><code class="language-java">private final Object lock = new Object();
+
+public void updateBalance(int amount) {
+    synchronized(lock) {
+        balance += amount;
+        transactions++;
+    } // Lock released automatically
+}
+</code></pre>
+
+            <p><strong>Synchronizing on specific object:</strong></p>
+            <pre><code class="language-java">private final List<String> items = new ArrayList<>();
+
+public void addItem(String item) {
+    synchronized(items) {
+        items.add(item);
+    }
+}
+</code></pre>
+
+            <p><strong>Class-level synchronization:</strong></p>
+            <pre><code class="language-java">public static synchronized void updateGlobalCounter() {
+    globalCounter++; // Synchronized across all instances
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="thread-safety" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Thread Safety</h2>
+            <h3>Definition</h3>
+            <p>Thread safety means that a class or method behaves correctly when accessed by multiple threads simultaneously, regardless of the scheduling or interleaving of thread execution. Thread-safe code maintains its invariants and produces correct results even under concurrent access. This can be achieved through synchronization, using atomic operations, designing immutable objects, or using thread-safe data structures provided by Java's concurrent collections. Thread safety is about ensuring that shared mutable state is properly protected, while immutable objects are inherently thread-safe because they cannot be modified.</p>
+
+            <h3>Analogy</h3>
+            <p>Thread safety is like designing a public library that can handle many visitors simultaneously without chaos. The library has several safety mechanisms: some books are reference-only and can't be changed (immutable objects), checkout counters have specific procedures to prevent double-booking (synchronized methods), the card catalog system uses atomic updates that can't be interrupted mid-process (atomic operations), and some special collections are kept in locked cases with controlled access (concurrent collections). A well-designed library ensures that multiple people can use it at the same time without books getting lost, records becoming corrupted, or people interfering with each other's research. The library's rules and systems make it "thread-safe" for concurrent use.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Thread-safe with synchronization:</strong></p>
+            <pre><code class="language-java">class ThreadSafeBank {
+    private int balance = 0;
+
+    public synchronized void deposit(int amount) {
+        balance += amount;
+    }
+}
+</code></pre>
+
+            <p><strong>Using atomic variables:</strong></p>
+            <pre><code class="language-java">private AtomicInteger atomicCounter = new AtomicInteger(0);
+
+public void increment() {
+    atomicCounter.incrementAndGet(); // Thread-safe atomic operation
+}
+</code></pre>
+
+            <p><strong>Using concurrent collections:</strong></p>
+            <pre><code class="language-java">// Thread-safe alternative to HashMap
+private ConcurrentHashMap<String, Integer> userScores = new ConcurrentHashMap<>();
+
+public void updateScore(String user, int score) {
+    userScores.put(user, score); // Thread-safe
+}
+</code></pre>
+
+            <p><strong>Immutable objects (inherently thread-safe):</strong></p>
+            <pre><code class="language-java">public final class ImmutablePoint {
+    private final int x, y;
+    public ImmutablePoint(int x, int y) { this.x = x; this.y = y; }
+    public int getX() { return x; }
+    public int getY() { return y; }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="deadlocks" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Deadlocks</h2>
+            <h3>Definition</h3>
+            <p>A deadlock occurs when two or more threads are blocked forever, each waiting for the other to release a resource. This typically happens when threads acquire multiple locks in different orders - Thread A holds Lock 1 and waits for Lock 2, while Thread B holds Lock 2 and waits for Lock 1. Since neither can proceed, both threads are stuck indefinitely. Deadlocks can also occur with more than two threads in circular waiting patterns. They represent one of the most serious threading problems because the application appears to freeze without any obvious error message.</p>
+
+            <h3>Analogy</h3>
+            <p>Imagine two drivers approaching a narrow bridge from opposite directions, each needing to use the entire width. Driver A enters the bridge first but needs the exit area that Driver B is blocking. Driver B also entered from the other side but needs the entrance area that Driver A is blocking. Neither can move forward, backward, or around the other. They're both stuck forever unless one of them backs up, but in a deadlock scenario, that backing up never happens automatically. This is exactly what happens when threads acquire resources (bridges) in conflicting orders and then wait for each other to release what they need. The solution is having traffic rules (ordering protocols) that prevent such situations.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Classic deadlock scenario:</strong></p>
+            <pre><code class="language-java">Object lock1 = new Object();
+Object lock2 = new Object();
+
+// Thread 1:
+synchronized(lock1) {
+    synchronized(lock2) { /* work */ }
+}
+
+// Thread 2:
+synchronized(lock2) {
+    synchronized(lock1) { /* work */ } // DEADLOCK!
+}
+</code></pre>
+
+            <p><strong>Avoiding deadlock with lock ordering:</strong></p>
+            <pre><code class="language-java">// Always acquire locks in same order
+private void transfer(Account from, Account to, int amount) {
+    Account firstLock = from.getId() < to.getId() ? from : to;
+    Account secondLock = from.getId() < to.getId() ? to : from;
+
+    synchronized(firstLock) {
+        synchronized(secondLock) {
+            from.withdraw(amount);
+            to.deposit(amount);
+        }
+    }
+}
+</code></pre>
+
+            <p><strong>Using timeout to avoid deadlock:</strong></p>
+            <pre><code class="language-java">ReentrantLock lock1 = new ReentrantLock();
+ReentrantLock lock2 = new ReentrantLock();
+
+if (lock1.tryLock(1, TimeUnit.SECONDS)) {
+    try {
+        if (lock2.tryLock(1, TimeUnit.SECONDS)) {
+            // Do work safely
+        }
+    } finally { lock1.unlock(); }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="executor-service" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>ExecutorService</h2>
+            <h3>Definition</h3>
+            <p>ExecutorService is a higher-level abstraction for managing threads that provides better control over thread lifecycle, task submission, and resource management. Instead of creating threads manually, you submit tasks to an ExecutorService which uses a pool of reusable threads to execute them. This approach is more efficient because creating threads is expensive, and thread pools prevent resource exhaustion by limiting the number of concurrent threads. ExecutorService also provides features like scheduled execution, task cancellation, and clean shutdown procedures.</p>
+
+            <h3>Analogy</h3>
+            <p>ExecutorService is like having a professional cleaning company instead of hiring individual cleaners for each room in a large building. The company maintains a team of trained cleaners (thread pool) who can be assigned to different tasks as needed. When you need a room cleaned, you don't hire a new person; you submit a cleaning request to the company, and they assign an available cleaner from their team. This is more efficient than hiring and training a new cleaner for each room, and the company can manage workload distribution, ensure quality standards, and handle scheduling. Similarly, ExecutorService manages a pool of threads efficiently, assigns tasks to available threads, and handles the complexity of thread management for you.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Creating and using thread pool:</strong></p>
+            <pre><code class="language-java">ExecutorService executor = Executors.newFixedThreadPool(4);
+
+// Submit tasks to the pool
+executor.submit(() -> processData("file1.txt"));
+executor.submit(() -> processData("file2.txt"));
+
+executor.shutdown(); // Stop accepting new tasks
+</code></pre>
+
+            <p><strong>Getting results from tasks:</strong></p>
+            <pre><code class="language-java">Future<Integer> result = executor.submit(() -> {
+    return calculateSum(numbers);
+});
+
+int sum = result.get(); // Wait for result
+System.out.println("Sum: " + sum);
+</code></pre>
+
+            <p><strong>Processing multiple tasks concurrently:</strong></p>
+            <pre><code class="language-java">List<Future<String>> futures = new ArrayList<>();
+
+for (String url : urls) {
+    Future<String> future = executor.submit(() -> downloadContent(url));
+    futures.add(future);
+}
+
+// Collect all results
+for (Future<String> future : futures) {
+    String content = future.get();
+    processContent(content);
+}
+</code></pre>
+
+            <p><strong>Scheduled execution:</strong></p>
+            <pre><code class="language-java">ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
+
+// Run task every 30 seconds
+scheduler.scheduleAtFixedRate(() -> {
+    cleanupOldData();
+}, 0, 30, TimeUnit.SECONDS);
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="common-pitfalls" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Common Pitfalls</h2>
+            <h3>Definition</h3>
+            <p>Multi-threaded programming introduces several common mistakes that can lead to bugs, performance problems, or application failures. These include calling run() instead of start(), not properly synchronizing shared data, creating too many threads, forgetting to handle InterruptedException, using non-thread-safe collections in concurrent contexts, and improper exception handling in threads. Understanding these pitfalls helps you write more robust concurrent code and debug threading issues more effectively.</p>
+
+            <h3>Analogy</h3>
+            <p>Common threading pitfalls are like typical mistakes new drivers make when learning to navigate busy intersections. They might forget to signal (not handling interruptions properly), try to change lanes without checking mirrors (not synchronizing access to shared resources), get confused about right-of-way rules (improper lock ordering leading to deadlocks), or panic when something unexpected happens (poor exception handling). Just as defensive driving courses teach you to recognize and avoid these dangerous situations, understanding common threading mistakes helps you write safer concurrent code. Experienced programmers, like experienced drivers, develop habits and patterns that naturally avoid these hazards.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Wrong: calling run() instead of start():</strong></p>
+            <pre><code class="language-java">Thread t = new Thread(() -> doWork());
+t.run(); // Wrong! Executes in current thread
+
+t.start(); // Correct! Creates new thread
+</code></pre>
+
+            <p><strong>Wrong: using non-thread-safe collections:</strong></p>
+            <pre><code class="language-java">List<String> list = new ArrayList<>(); // Not thread-safe
+// Multiple threads adding/removing = problems
+
+// Correct alternatives:
+List<String> safeList = Collections.synchronizedList(new ArrayList<>());
+ConcurrentLinkedQueue<String> queue = new ConcurrentLinkedQueue<>();
+</code></pre>
+
+            <p><strong>Wrong: not handling InterruptedException:</strong></p>
+            <pre><code class="language-java">try {
+    Thread.sleep(1000);
+} catch (InterruptedException e) {
+    // Wrong: ignoring the interruption
+}
+
+// Correct: restore interrupt status
+} catch (InterruptedException e) {
+    Thread.currentThread().interrupt();
+    return;
+}
+</code></pre>
+
+            <p><strong>Wrong: creating too many threads:</strong></p>
+            <pre><code class="language-java">// Don't do this for many tasks:
+for (int i = 0; i < 10000; i++) {
+    new Thread(() -> processItem()).start();
+}
+
+// Use thread pool instead:
+ExecutorService pool = Executors.newFixedThreadPool(10);
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="practical-scenarios" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Practical Scenarios</h2>
+            <h3>Definition</h3>
+            <p>Real-world applications use threads for various scenarios: background data processing while maintaining responsive user interfaces, parallel processing of large datasets to improve performance, handling multiple client requests simultaneously in servers, periodic maintenance tasks like cleanup and monitoring, and I/O operations that would otherwise block the main application flow. Understanding these common patterns helps you recognize when and how to apply threading effectively in your own projects.</p>
+
+            <h3>Analogy</h3>
+            <p>Practical threading scenarios are like different departments in a modern hospital working simultaneously. The emergency room handles urgent cases immediately (responsive UI thread), while the lab processes multiple blood tests concurrently (parallel data processing). The pharmacy fills prescriptions in the background (background tasks), maintenance staff clean rooms on a schedule (periodic tasks), and multiple nurses handle different patients at the same time (concurrent request handling). Each department operates independently but coordinates when necessary, ensuring the hospital runs efficiently without any single bottleneck stopping the entire operation. This coordinated multitasking is exactly how well-designed concurrent applications operate.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Background file download:</strong></p>
+            <pre><code class="language-java">new Thread(() -> {
+    downloadLargeFile("http://example.com/data.zip");
+    SwingUtilities.invokeLater(() -> updateUI("Download complete"));
+}).start();
+</code></pre>
+
+            <p><strong>Parallel data processing:</strong></p>
+            <pre><code class="language-java">List<Integer> numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8);
+numbers.parallelStream()
+       .map(n -> n * n)
+       .forEach(System.out::println);
+</code></pre>
+
+            <p><strong>Web server handling multiple requests:</strong></p>
+            <pre><code class="language-java">ExecutorService requestHandler = Executors.newCachedThreadPool();
+
+while (serverRunning) {
+    Socket client = serverSocket.accept();
+    requestHandler.submit(() -> handleClientRequest(client));
+}
+</code></pre>
+
+            <p><strong>Periodic cleanup task:</strong></p>
+            <pre><code class="language-java">ScheduledExecutorService cleanup = Executors.newSingleThreadScheduledExecutor();
+cleanup.scheduleAtFixedRate(() -> {
+    deleteOldLogFiles();
+    clearTempCache();
+}, 1, 24, TimeUnit.HOURS);
+</code></pre>
+
+            <p><strong>Producer-consumer pattern:</strong></p>
+            <pre><code class="language-java">BlockingQueue<String> queue = new LinkedBlockingQueue<>();
+
+// Producer thread
+new Thread(() -> {
+    queue.offer("item1");
+    queue.offer("item2");
+}).start();
+
+// Consumer thread
+new Thread(() -> {
+    String item = queue.take();
+    processItem(item);
+}).start();
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Summary</h2>
+            <p>You've now mastered the fundamentals of Java threads and concurrency, from creating and managing threads to understanding the challenges and solutions of concurrent programming. Threads allow your applications to perform multiple tasks simultaneously, making them more responsive and efficient, but they require careful handling to avoid race conditions, deadlocks, and other concurrency issues. You've learned to use synchronization to protect shared data, leverage thread-safe collections and atomic operations, and apply ExecutorService for better thread management. These concurrency skills are essential for building modern applications that can handle multiple users, process data efficiently, and maintain responsiveness under load. Next, you'll explore advanced algorithms and data structures, where understanding performance characteristics and choosing the right approach becomes crucial for handling large-scale problems effectively.</p>
+          </section>
+
+          <section id="programming-challenge" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Programming Challenge</h2>
+            <div class="rounded-lg border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800">
+              <h3 class="mt-0">Challenge: Multi-threaded Download Manager</h3>
+              <p><strong>Task:</strong> Create a download manager that can download multiple files concurrently while providing progress updates and handling errors gracefully.</p>
+
+              <p><strong>Requirements:</strong></p>
+              <ol>
+                <li>Create a <code>DownloadTask</code> class that simulates downloading a file with random duration (1-5 seconds)</li>
+                <li>Implement a <code>DownloadManager</code> that can handle up to 3 concurrent downloads</li>
+                <li>Use proper synchronization to track total downloads completed and total bytes downloaded</li>
+                <li>Include a progress reporter that prints status every second</li>
+                <li>Handle thread interruption properly for graceful shutdown</li>
+                <li>Demonstrate thread safety by avoiding race conditions in shared counters</li>
+                <li>Use ExecutorService for efficient thread management</li>
+              </ol>
+
+              <p><strong>Features to implement:</strong></p>
+              <ul>
+                <li>Thread-safe progress tracking</li>
+                <li>Proper exception handling in worker threads</li>
+                <li>Clean shutdown mechanism</li>
+                <li>Concurrent download with size limits</li>
+                <li>Real-time status reporting</li>
+              </ul>
+
+              <p><strong>Learning Goals:</strong> Practice thread pools, synchronization, atomic operations, exception handling in concurrent contexts, and building a realistic multi-threaded application with proper coordination between threads.</p>
+            </div>
+          </section>
+
+          <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+            <a href="lesson-08.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
+            <a href="lesson-10.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
+          </nav>
+        </div>
+      </div>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('themeToggle').addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>

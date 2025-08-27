@@ -1,0 +1,725 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 10 - Java Core Advanced Algorithms and Data Structures</title>
+    <meta name="description" content="Java advanced algorithms and data structures: recursion, sorting algorithms, searching algorithms, Big O notation, and choosing the right data structure for optimal performance." />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="lg:flex lg:gap-8">
+        <aside class="hidden lg:block lg:w-72">
+          <nav class="sticky top-8 rounded-xl border border-slate-200/60 bg-white/60 p-4 shadow-sm backdrop-blur dark:border-slate-800/60 dark:bg-slate-900/40" aria-label="Table of contents">
+            <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">On this page</h2>
+            <ol class="space-y-1 text-sm">
+              <li><a href="#introduction" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Introduction</a></li>
+              <li><a href="#understanding-recursion" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Understanding Recursion</a></li>
+              <li><a href="#recursive-problem-solving" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Recursive Problem Solving</a></li>
+              <li><a href="#big-o-notation" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Big O Notation</a></li>
+              <li><a href="#sorting-algorithms" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Sorting Algorithms</a></li>
+              <li><a href="#searching-algorithms" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Searching Algorithms</a></li>
+              <li><a href="#data-structure-analysis" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Data Structure Analysis</a></li>
+              <li><a href="#choosing-data-structures" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Choosing Data Structures</a></li>
+              <li><a href="#performance-optimization" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Performance Optimization</a></li>
+              <li><a href="#practical-applications" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Practical Applications</a></li>
+              <li><a href="#algorithm-design-patterns" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Algorithm Design Patterns</a></li>
+              <li><a href="#summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Summary</a></li>
+              <li><a href="#programming-challenge" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Programming Challenge</a></li>
+            </ol>
+          </nav>
+        </aside>
+        <div class="min-w-0 flex-1">
+          <div class="mb-6">
+            <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Concepts</a>
+          </div>
+          <header class="mx-auto max-w-3xl text-center">
+            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 10: Java Core Advanced Algorithms and Data Structures</h1>
+            <p class="mt-2 text-slate-600 dark:text-slate-300">Master advanced algorithms and data structures: understand recursion, analyze algorithm efficiency with Big O notation, implement sorting and searching algorithms, and choose optimal data structures for real-world performance.</p>
+          </header>
+
+          <section id="introduction" class="prose prose-slate mt-6 max-w-none dark:prose-invert">
+            <h2>Introduction</h2>
+            <p>Imagine you're the architect of a massive library system serving millions of users. How quickly can you find a specific book among millions? How efficiently can you sort new arrivals? How do you decide between storing books on shelves versus in digital catalogs? These questions are at the heart of advanced algorithms and data structures - the tools that make software fast, efficient, and scalable. Understanding recursion helps you solve complex problems by breaking them into smaller, manageable pieces. Big O notation gives you a scientific way to predict and compare algorithm performance before you even run the code. Sorting and searching algorithms are the workhorses that power everything from database queries to search engines. Most importantly, knowing when to use arrays versus lists, hash maps versus trees, or stacks versus queues can mean the difference between an application that responds instantly and one that frustrates users with delays. This lesson equips you with the analytical skills and algorithmic toolkit needed to build high-performance applications that scale gracefully as data grows.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="understanding-recursion" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Understanding Recursion</h2>
+            <h3>Definition</h3>
+            <p>Recursion is a programming technique where a method calls itself to solve a problem by breaking it down into smaller, similar subproblems. Every recursive solution needs a base case (stopping condition) to prevent infinite loops and a recursive case that moves toward the base case. Recursion is particularly powerful for problems that have a naturally recursive structure, like tree traversals, mathematical calculations, or divide-and-conquer algorithms. While recursion can make complex problems more intuitive to solve, it uses more memory than iterative solutions due to the call stack.</p>
+
+            <h3>Analogy</h3>
+            <p>Think of recursion like Russian nesting dolls (matryoshkas). To find the smallest doll inside, you open the current doll and look inside. If there's another doll, you repeat the same process - open it and look inside. You keep doing this until you find a doll that doesn't contain another doll (the base case). Each time you open a doll, you're essentially doing the same task (opening and looking inside) but on a smaller version of the problem. Similarly, recursive functions solve big problems by applying the same logic to progressively smaller versions of the problem until they reach a simple case they can handle directly. Just like you need to know when to stop opening dolls, recursive functions need a clear stopping condition to avoid going on forever.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Simple factorial calculation:</strong></p>
+            <pre><code class="language-java">public int factorial(int n) {
+    if (n <= 1) return 1;        // Base case: stop recursion
+    return n * factorial(n - 1); // Recursive case: call self with smaller n
+}
+</code></pre>
+
+            <p><strong>Fibonacci sequence:</strong></p>
+            <pre><code class="language-java">public int fibonacci(int n) {
+    if (n <= 1) return n;                    // Base cases: 0 or 1
+    return fibonacci(n-1) + fibonacci(n-2);  // Sum of two previous numbers
+}
+</code></pre>
+
+            <p><strong>Sum of array elements:</strong></p>
+            <pre><code class="language-java">public int sum(int[] arr, int index) {
+    if (index >= arr.length) return 0;       // Base case: past end of array
+    return arr[index] + sum(arr, index + 1); // Add current + sum of rest
+}
+</code></pre>
+
+            <p><strong>String reversal:</strong></p>
+            <pre><code class="language-java">public String reverse(String str) {
+    if (str.length() <= 1) return str;       // Base case: single char or empty
+    return reverse(str.substring(1)) + str.charAt(0); // Reverse rest + first char
+}
+</code></pre>
+
+            <p><strong>Tree depth calculation:</strong></p>
+            <pre><code class="language-java">public int depth(TreeNode node) {
+    if (node == null) return 0;              // Base case: no node
+    return 1 + Math.max(depth(node.left), depth(node.right)); // 1 + max of subtrees
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="recursive-problem-solving" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Recursive Problem Solving</h2>
+            <h3>Definition</h3>
+            <p>Recursive problem solving follows a systematic approach: identify the base case (simplest version of the problem), define the recursive relationship (how to reduce the problem), and ensure progress toward the base case. Good recursive solutions are elegant and mirror the problem's natural structure, but they can be memory-intensive and sometimes slower than iterative approaches. Understanding when recursion fits naturally versus when iteration is better is crucial for effective problem solving.</p>
+
+            <h3>Analogy</h3>
+            <p>Recursive problem solving is like cleaning a messy house by applying the same strategy at every level. Your overall strategy is: "If the space is already clean, you're done (base case). Otherwise, clean one room thoroughly, then apply the same cleaning strategy to the rest of the house (recursive case)." This approach works whether you're cleaning a studio apartment or a mansion because you're consistently applying the same logical process. Each time you finish a room, you're making progress toward a completely clean house. The beauty is that you don't need to think about the entire house at once - you just focus on the current room and trust that the same strategy will handle the rest. This mirrors how recursive algorithms break complex problems into manageable pieces using the same logical approach at each level.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Binary search using recursion:</strong></p>
+            <pre><code class="language-java">public int binarySearch(int[] arr, int target, int left, int right) {
+    if (left > right) return -1;     // Base case: not found
+    int mid = left + (right - left) / 2;
+    if (arr[mid] == target) return mid;
+    return target < arr[mid] ? binarySearch(arr, target, left, mid-1)
+                             : binarySearch(arr, target, mid+1, right);
+}
+</code></pre>
+
+            <p><strong>Directory size calculation:</strong></p>
+            <pre><code class="language-java">public long getDirectorySize(File dir) {
+    if (dir.isFile()) return dir.length();  // Base case: single file
+    long totalSize = 0;
+    for (File file : dir.listFiles()) {
+        totalSize += getDirectorySize(file); // Recursive: add all content sizes
+    }
+    return totalSize;
+}
+</code></pre>
+
+            <p><strong>Palindrome checking:</strong></p>
+            <pre><code class="language-java">public boolean isPalindrome(String s, int start, int end) {
+    if (start >= end) return true;           // Base case: single char or empty
+    if (s.charAt(start) != s.charAt(end)) return false;
+    return isPalindrome(s, start + 1, end - 1); // Check inner substring
+}
+</code></pre>
+
+            <p><strong>Power calculation (efficient):</strong></p>
+            <pre><code class="language-java">public long power(int base, int exp) {
+    if (exp == 0) return 1;                  // Base case: anything^0 = 1
+    long half = power(base, exp / 2);
+    return exp % 2 == 0 ? half * half : half * half * base;
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="big-o-notation" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Big O Notation</h2>
+            <h3>Definition</h3>
+            <p>Big O notation describes how an algorithm's performance scales with input size, focusing on the worst-case scenario. It ignores constants and lower-order terms to reveal the fundamental growth pattern. Common complexities include O(1) constant time, O(log n) logarithmic, O(n) linear, O(n log n) linearithmic, O(n²) quadratic, and O(2ⁿ) exponential. Understanding Big O helps you predict performance, compare algorithms, and choose the right approach before implementation. It's essential for building scalable applications that perform well as data grows.</p>
+
+            <h3>Analogy</h3>
+            <p>Think of Big O notation like describing how different transportation methods scale with distance. Walking (O(n)) takes time proportional to distance - twice the distance takes roughly twice the time. Flying (O(log n)) is like logarithmic time - you can travel much farther with only slightly more time due to efficient infrastructure, though there's setup overhead. A bicycle (O(1)) represents constant time - if you're just going around the block, it takes the same time regardless of which specific house you visit. A school bus route (O(n²)) represents quadratic time - as you add more students spread across town, the route becomes disproportionately longer because you have to consider every combination of pickup points. Understanding these patterns helps you choose the right "transportation method" (algorithm) based on how far you need to go (input size) and how often you'll make the trip (frequency of operations).</p>
+
+            <h3>Examples</h3>
+            <p><strong>O(1) - Constant time operations:</strong></p>
+            <pre><code class="language-java">// Array access and HashMap get operations
+int value = array[5];                    // Always takes same time
+String name = map.get("user123");       // Hash lookup is constant time
+stack.push(item);                       // Adding to top of stack
+</code></pre>
+
+            <p><strong>O(log n) - Logarithmic time operations:</strong></p>
+            <pre><code class="language-java">// Binary search in sorted array
+int index = Collections.binarySearch(sortedList, target);
+// TreeMap operations (balanced tree)
+TreeMap<String, Integer> treeMap = new TreeMap<>();
+treeMap.get("key");                      // Tree traversal depth is log n
+</code></pre>
+
+            <p><strong>O(n) - Linear time operations:</strong></p>
+            <pre><code class="language-java">// Single loop through all elements
+for (int num : numbers) { sum += num; }  // Time grows with array size
+// Linear search in unsorted array
+for (int i = 0; i < array.length; i++) {
+    if (array[i] == target) return i;
+}
+</code></pre>
+
+            <p><strong>O(n log n) - Efficient sorting algorithms:</strong></p>
+            <pre><code class="language-java">// Merge sort and quick sort average case
+Arrays.sort(numbers);                    // Java uses dual-pivot quicksort
+Collections.sort(list);                  // TimSort algorithm
+// Custom merge sort implementation
+mergeSort(array, 0, array.length - 1);
+</code></pre>
+
+            <p><strong>O(n²) - Quadratic time operations:</strong></p>
+            <pre><code class="language-java">// Nested loops comparing all pairs
+for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+        if (array[i] > array[j]) count++;   // Bubble sort pattern
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="sorting-algorithms" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Sorting Algorithms</h2>
+            <h3>Definition</h3>
+            <p>Sorting algorithms arrange elements in a specific order (ascending or descending) and vary dramatically in efficiency and approach. Simple algorithms like bubble sort (O(n²)) are easy to understand but inefficient for large datasets. Advanced algorithms like merge sort and quick sort achieve O(n log n) performance through divide-and-conquer strategies. Specialized algorithms like counting sort can be linear O(n) for specific data types. The choice depends on data size, memory constraints, stability requirements, and whether data is partially sorted. Modern programming languages typically use hybrid algorithms that adapt to different scenarios.</p>
+
+            <h3>Analogy</h3>
+            <p>Imagine organizing a deck of playing cards using different strategies. Bubble sort is like comparing adjacent cards and swapping them if they're out of order, repeatedly going through the deck until no swaps are needed - simple but slow for large decks. Selection sort is like finding the smallest card in the unsorted portion and moving it to the sorted pile, one by one. Merge sort is like dividing the deck into smaller piles, sorting each pile perfectly, then carefully merging them back together - more work upfront but much faster overall. Quick sort is like picking a "pivot" card, putting all smaller cards to the left and larger cards to the right, then repeating this process on each side - very fast on average but can be slow in worst cases. Just like choosing a card-sorting strategy depends on how many cards you have and how much time you want to spend, choosing a sorting algorithm depends on your data size and performance requirements.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Bubble Sort (O(n²) - educational purposes):</strong></p>
+            <pre><code class="language-java">public void bubbleSort(int[] arr) {
+    for (int i = 0; i < arr.length - 1; i++) {
+        for (int j = 0; j < arr.length - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                // Swap adjacent elements if they're in wrong order
+                int temp = arr[j]; arr[j] = arr[j + 1]; arr[j + 1] = temp;
+            }
+        }
+    }
+}
+</code></pre>
+
+            <p><strong>Selection Sort (O(n²) - simple implementation):</strong></p>
+            <pre><code class="language-java">public void selectionSort(int[] arr) {
+    for (int i = 0; i < arr.length - 1; i++) {
+        int minIndex = i;
+        for (int j = i + 1; j < arr.length; j++) {
+            if (arr[j] < arr[minIndex]) minIndex = j;  // Find minimum
+        }
+        // Swap minimum with current position
+        int temp = arr[i]; arr[i] = arr[minIndex]; arr[minIndex] = temp;
+    }
+}
+</code></pre>
+
+            <p><strong>Quick Sort (O(n log n) average case):</strong></p>
+            <pre><code class="language-java">public void quickSort(int[] arr, int low, int high) {
+    if (low < high) {
+        int pivotIndex = partition(arr, low, high); // Partition around pivot
+        quickSort(arr, low, pivotIndex - 1);       // Sort left side
+        quickSort(arr, pivotIndex + 1, high);      // Sort right side
+    }
+}
+</code></pre>
+
+            <p><strong>Merge Sort (O(n log n) guaranteed):</strong></p>
+            <pre><code class="language-java">public void mergeSort(int[] arr, int left, int right) {
+    if (left < right) {
+        int mid = left + (right - left) / 2;       // Find middle point
+        mergeSort(arr, left, mid);                 // Sort first half
+        mergeSort(arr, mid + 1, right);            // Sort second half
+        merge(arr, left, mid, right);              // Merge sorted halves
+    }
+}
+</code></pre>
+
+            <p><strong>Using Java's built-in sorting:</strong></p>
+            <pre><code class="language-java">// Primitive arrays - uses dual-pivot quicksort
+Arrays.sort(intArray);
+// Object arrays and collections - uses TimSort (hybrid merge sort)
+Collections.sort(stringList);
+// Custom comparator for complex sorting
+list.sort((a, b) -> a.getName().compareTo(b.getName()));
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="searching-algorithms" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Searching Algorithms</h2>
+            <h3>Definition</h3>
+            <p>Searching algorithms find specific elements within data structures and differ greatly in efficiency based on data organization. Linear search (O(n)) checks every element sequentially and works on any data but is slow for large datasets. Binary search (O(log n)) is extremely fast but requires sorted data, repeatedly dividing the search space in half. Hash-based searching (O(1) average) provides near-instant lookup but requires good hash functions and handles collisions. Tree-based searching (O(log n)) maintains sorted order while allowing efficient insertion and deletion. The choice depends on whether data is sorted, how often you search versus modify, and memory constraints.</p>
+
+            <h3>Analogy</h3>
+            <p>Searching algorithms are like different strategies for finding a specific book in a library. Linear search is like walking through every aisle and checking every book until you find the one you want - it always works but takes forever in a large library. Binary search is like using the library's call number system: you go to the middle of the relevant section, see if your book's number is higher or lower, then eliminate half the books and repeat until you find it - incredibly fast but only works if books are properly organized. Hash-based search is like having a magical catalog where you say the book title and it instantly tells you the exact shelf location - nearly instant but requires the library to maintain that special catalog system. Each approach has its place depending on how the library is organized and how often books are moved around versus how often people need to find specific titles.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Linear Search (O(n) - works on any array):</strong></p>
+            <pre><code class="language-java">public int linearSearch(int[] arr, int target) {
+    for (int i = 0; i < arr.length; i++) {
+        if (arr[i] == target) return i;      // Found at index i
+    }
+    return -1;                               // Not found
+}
+</code></pre>
+
+            <p><strong>Binary Search (O(log n) - requires sorted array):</strong></p>
+            <pre><code class="language-java">public int binarySearch(int[] arr, int target) {
+    int left = 0, right = arr.length - 1;
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        if (arr[mid] == target) return mid;  // Found
+        if (arr[mid] < target) left = mid + 1;   // Search right half
+        else right = mid - 1;                    // Search left half
+    }
+    return -1;                               // Not found
+}
+</code></pre>
+
+            <p><strong>Hash-based search using HashMap (O(1) average):</strong></p>
+            <pre><code class="language-java">Map<String, Integer> userAges = new HashMap<>();
+userAges.put("Alice", 25);
+userAges.put("Bob", 30);
+// Instant lookup regardless of map size
+Integer age = userAges.get("Alice");         // O(1) average case
+boolean hasUser = userAges.containsKey("Charlie"); // O(1) average case
+</code></pre>
+
+            <p><strong>Tree-based search using TreeMap (O(log n)):</strong></p>
+            <pre><code class="language-java">TreeMap<String, String> phoneBook = new TreeMap<>();
+phoneBook.put("Alice Johnson", "555-1234");
+phoneBook.put("Bob Smith", "555-5678");
+// Efficient search in sorted order
+String phone = phoneBook.get("Alice Johnson");  // O(log n)
+String firstEntry = phoneBook.firstKey();       // O(log n)
+</code></pre>
+
+            <p><strong>Using Collections.binarySearch for sorted lists:</strong></p>
+            <pre><code class="language-java">List<Integer> sortedNumbers = Arrays.asList(1, 3, 5, 7, 9, 11, 13);
+int index = Collections.binarySearch(sortedNumbers, 7);  // Returns index 3
+int notFoundIndex = Collections.binarySearch(sortedNumbers, 6); // Returns negative
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="data-structure-analysis" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Data Structure Analysis</h2>
+            <h3>Definition</h3>
+            <p>Data structure analysis examines the time and space complexity of operations like insertion, deletion, search, and access for different data structures. Arrays provide O(1) access but O(n) insertion/deletion. Linked lists offer O(1) insertion/deletion at known positions but O(n) search. Hash tables give O(1) average operations but can degrade to O(n) with poor hashing. Trees balance multiple operations at O(log n) but require more memory. Understanding these trade-offs helps you choose the right structure for your specific use case and performance requirements.</p>
+
+            <h3>Analogy</h3>
+            <p>Analyzing data structures is like comparing different storage systems in a warehouse. Arrays are like numbered parking spaces - you can instantly go to space #42 (O(1) access), but if you need to insert a new space in the middle, you have to renumber and move everything after it (O(n) insertion). Linked lists are like a treasure hunt where each item has a note pointing to the next location - adding a new item is easy if you're already at the right spot (O(1) insertion), but finding a specific item means following the chain from the beginning (O(n) search). Hash tables are like having a smart dispatcher who instantly knows where everything is stored based on a description (O(1) average), but if the dispatcher gets overloaded or the system breaks down, you're back to searching manually (O(n) worst case). Trees are like a well-organized file cabinet with systematic subdivisions - everything takes a reasonable amount of time (O(log n)) but requires more organizational overhead.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Array operations complexity:</strong></p>
+            <pre><code class="language-java">int[] numbers = new int[100];
+numbers[42] = 123;                       // O(1) - direct access by index
+int value = numbers[42];                 // O(1) - direct access
+// Insertion requires shifting elements    O(n) - worst case
+// Search requires checking each element  O(n) - linear search
+</code></pre>
+
+            <p><strong>ArrayList vs LinkedList comparison:</strong></p>
+            <pre><code class="language-java">List<String> arrayList = new ArrayList<>();
+List<String> linkedList = new LinkedList<>();
+
+arrayList.get(100);                     // O(1) - array index access
+linkedList.get(100);                    // O(n) - must traverse links
+
+arrayList.add(0, "first");              // O(n) - shift all elements right
+linkedList.add(0, "first");             // O(1) - just update head pointer
+</code></pre>
+
+            <p><strong>HashMap vs TreeMap trade-offs:</strong></p>
+            <pre><code class="language-java">Map<String, Integer> hashMap = new HashMap<>();
+Map<String, Integer> treeMap = new TreeMap<>();
+
+hashMap.put("key", 42);                 // O(1) average, O(n) worst case
+treeMap.put("key", 42);                 // O(log n) guaranteed
+
+hashMap.get("key");                     // O(1) average, O(n) worst case
+treeMap.get("key");                     // O(log n) guaranteed
+
+// TreeMap maintains sorted order, HashMap doesn't
+treeMap.firstKey();                     // O(log n) - get minimum key
+</code></pre>
+
+            <p><strong>Stack vs Queue operations:</strong></p>
+            <pre><code class="language-java">Stack<Integer> stack = new Stack<>();
+Queue<Integer> queue = new LinkedList<>();
+
+stack.push(42);                         // O(1) - add to top
+stack.pop();                            // O(1) - remove from top
+
+queue.offer(42);                        // O(1) - add to back
+queue.poll();                           // O(1) - remove from front
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="choosing-data-structures" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Choosing Data Structures</h2>
+            <h3>Definition</h3>
+            <p>Choosing the right data structure requires analyzing your access patterns, performance requirements, memory constraints, and the frequency of different operations. Consider whether you need fast access, frequent insertions/deletions, sorted order, or unique keys. Arrays excel when you need random access and know the size. Lists work well for frequent insertions and unknown sizes. Maps are ideal for key-value lookups. Sets handle uniqueness requirements. Stacks and queues manage ordered processing. The decision involves trade-offs between time complexity, space complexity, and code complexity.</p>
+
+            <h3>Analogy</h3>
+            <p>Choosing data structures is like selecting the right tool for different household tasks. You wouldn't use a hammer to cut bread or a knife to drive nails - each tool excels at specific jobs. A toolbox (array) is perfect when you know exactly what tools you have and need quick access to specific ones by position. A tool belt (list) works better when you're adding and removing tools frequently as you work. A labeled storage system (map) is ideal when you want to find tools by name rather than remembering their position. A pegboard (set) ensures you don't accidentally have duplicate tools while keeping everything organized. A conveyor belt (queue) handles tasks in order, while a stack of papers (stack) lets you work on the most recent item first. The best choice depends on how you'll use the tools, how often you'll reorganize them, and how quickly you need access.</p>
+
+            <h3>Examples</h3>
+            <p><strong>When to use ArrayList vs LinkedList:</strong></p>
+            <pre><code class="language-java">// Use ArrayList for: frequent random access, known size
+List<String> userList = new ArrayList<>();     // Fast get(index), slow insert(0)
+userList.get(42);                              // O(1) access by index
+
+// Use LinkedList for: frequent insertions at beginning/middle
+List<String> messageQueue = new LinkedList<>(); // Slow get(index), fast add(0)
+messageQueue.add(0, "urgent message");         // O(1) insertion at beginning
+</code></pre>
+
+            <p><strong>When to use HashMap vs TreeMap:</strong></p>
+            <pre><code class="language-java">// Use HashMap for: fastest lookups, no ordering needed
+Map<String, User> userCache = new HashMap<>();  // O(1) average access
+userCache.get("user123");                       // Instant lookup
+
+// Use TreeMap for: sorted order, range queries
+Map<String, User> userDirectory = new TreeMap<>(); // O(log n) but sorted
+userDirectory.subMap("Alice", "Charlie");          // Get users in range
+</code></pre>
+
+            <p><strong>When to use different collection types:</strong></p>
+            <pre><code class="language-java">// Use Set for uniqueness, no duplicates
+Set<String> uniqueEmails = new HashSet<>();    // Automatically prevents duplicates
+uniqueEmails.add("user@email.com");            // Returns false if already exists
+
+// Use Stack for LIFO (Last In, First Out) processing
+Stack<String> undoStack = new Stack<>();       // Undo operations
+undoStack.push("delete file"); undoStack.pop(); // Most recent action first
+
+// Use Queue for FIFO (First In, First Out) processing
+Queue<Order> orderQueue = new LinkedList<>();  // Process orders in order received
+orderQueue.offer(newOrder); orderQueue.poll(); // First ordered, first processed
+</code></pre>
+
+            <p><strong>Performance-critical scenarios:</strong></p>
+            <pre><code class="language-java">// Gaming: need fast access to player positions
+Player[] players = new Player[MAX_PLAYERS];    // O(1) access by player ID
+
+// Chat app: need fast user lookups by username
+Map<String, User> activeUsers = new ConcurrentHashMap<>(); // Thread-safe O(1)
+
+// Task scheduler: need ordered task execution
+PriorityQueue<Task> taskQueue = new PriorityQueue<>();     // Auto-sorted by priority
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="performance-optimization" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Performance Optimization</h2>
+            <h3>Definition</h3>
+            <p>Performance optimization involves selecting algorithms and data structures that minimize time and space complexity for your specific use case. Key strategies include choosing the right algorithm for your data size, preprocessing data when possible, using caching for repeated computations, and avoiding premature optimization. Profiling helps identify actual bottlenecks rather than assumed ones. Consider trade-offs between memory usage and speed, and remember that the most elegant solution isn't always the fastest. Optimization should be guided by real performance requirements and measured improvements.</p>
+
+            <h3>Analogy</h3>
+            <p>Performance optimization is like planning the most efficient route for a delivery truck company. You wouldn't use the same strategy for delivering a single package across town as you would for delivering hundreds of packages across multiple cities. For small deliveries (small datasets), the simplest route (algorithm) might be perfectly fine, even if it's not theoretically optimal. For large-scale operations (big data), you invest time in route planning (preprocessing), use GPS systems (efficient data structures), and cache common routes (memoization). You measure actual delivery times (profiling) rather than just estimating, and you balance fuel costs (memory) against delivery speed (time complexity). Sometimes the "fastest" route on paper isn't practical due to traffic conditions (real-world constraints), so you optimize for the specific conditions you actually face rather than theoretical perfect scenarios.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Preprocessing for faster repeated operations:</strong></p>
+            <pre><code class="language-java">// Instead of searching array repeatedly
+Set<String> allowedUsers = new HashSet<>(Arrays.asList(userArray)); // O(n) once
+boolean isAllowed = allowedUsers.contains(username);  // O(1) vs O(n) each time
+
+// Precompute expensive calculations
+Map<Integer, Long> fibonacciCache = new HashMap<>();  // Memoization
+public long fibonacci(int n) {
+    return fibonacciCache.computeIfAbsent(n, k -> k <= 1 ? k : fibonacci(k-1) + fibonacci(k-2));
+}
+</code></pre>
+
+            <p><strong>Choosing algorithms based on data characteristics:</strong></p>
+            <pre><code class="language-java">// For mostly sorted data, use insertion sort (O(n) best case)
+if (data.length < 50 || isMostlySorted(data)) {
+    insertionSort(data);                         // Fast for small/sorted data
+} else {
+    Arrays.sort(data);                          // Use Java's optimized sort
+}
+</code></pre>
+
+            <p><strong>Memory vs speed trade-offs:</strong></p>
+            <pre><code class="language-java">// Space-efficient but slower: compute on demand
+public int getSquare(int n) { return n * n; }   // O(1) space, O(1) time per call
+
+// Memory-intensive but faster: precompute and cache
+int[] squareCache = new int[MAX_VALUE];          // O(n) space, O(1) time per lookup
+for (int i = 0; i < MAX_VALUE; i++) squareCache[i] = i * i;
+</code></pre>
+
+            <p><strong>Optimizing common operations:</strong></p>
+            <pre><code class="language-java">// Use StringBuilder for string concatenation in loops
+StringBuilder result = new StringBuilder();      // Avoids O(n²) string concatenation
+for (String item : items) {
+    result.append(item).append(" ");            // O(1) amortized vs O(n) for +=
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="practical-applications" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Practical Applications</h2>
+            <h3>Definition</h3>
+            <p>Real-world applications demonstrate how algorithm and data structure choices directly impact user experience and system scalability. Search engines use sophisticated indexing and ranking algorithms, social media platforms employ graph algorithms for friend suggestions, e-commerce sites rely on recommendation algorithms and efficient product catalogs, and games require fast collision detection and pathfinding. Understanding these applications helps you recognize patterns and apply similar solutions to your own projects. The key is matching algorithmic solutions to specific problem domains and performance requirements.</p>
+
+            <h3>Analogy</h3>
+            <p>Practical applications of algorithms are like seeing how architectural principles apply to different building types. The same fundamental concepts (load-bearing structures, efficient space usage, traffic flow) appear in houses, skyscrapers, and bridges, but the specific implementation varies dramatically based on purpose and scale. A small house might use simple wooden beams (basic algorithms), while a skyscraper requires sophisticated steel framework and elevator systems (advanced data structures). A bridge needs to handle specific load patterns and weather conditions (domain-specific optimizations). Similarly, a simple to-do app might use basic arrays and linear search, while a global messaging platform requires distributed hash tables, graph algorithms for social networks, and real-time search capabilities. The art is recognizing which architectural patterns fit your specific "building" requirements and constraints.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Social media friend suggestions (graph algorithms):</strong></p>
+            <pre><code class="language-java">// Find mutual friends using Set intersection
+Set<User> mutualFriends = new HashSet<>(user1.getFriends());
+mutualFriends.retainAll(user2.getFriends());    // O(n) intersection
+int mutualCount = mutualFriends.size();         // Friendship strength metric
+</code></pre>
+
+            <p><strong>E-commerce product recommendations (collaborative filtering):</strong></p>
+            <pre><code class="language-java">// Find users with similar purchase history
+Map<User, Set<Product>> userPurchases = getUserPurchaseHistory();
+double similarity = calculateCosineSimilarity(currentUser, otherUser);
+if (similarity > THRESHOLD) {
+    recommendProducts(otherUser.getPurchases());  // Suggest similar user's items
+}
+</code></pre>
+
+            <p><strong>Game pathfinding (A* algorithm concept):</strong></p>
+            <pre><code class="language-java">// Priority queue for exploring game map efficiently
+PriorityQueue<Node> openSet = new PriorityQueue<>(compareByFScore);
+Node current = openSet.poll();                  // Always explore most promising path
+for (Node neighbor : current.getNeighbors()) {
+    if (neighbor.distanceFromStart < bestKnown) exploreNode(neighbor);
+}
+</code></pre>
+
+            <p><strong>Real-time chat message ordering:</strong></p>
+            <pre><code class="language-java">// Use timestamp-based TreeMap for chronological order
+Map<Long, Message> messageHistory = new TreeMap<>(); // Auto-sorted by timestamp
+messageHistory.put(System.currentTimeMillis(), newMessage);
+// Recent messages retrieval
+NavigableMap<Long, Message> recentMessages = messageHistory.tailMap(cutoffTime);
+</code></pre>
+
+            <p><strong>Web caching strategy (LRU cache):</strong></p>
+            <pre><code class="language-java">// LinkedHashMap provides LRU ordering automatically
+Map<String, WebPage> cache = new LinkedHashMap<String, WebPage>(16, 0.75f, true) {
+    protected boolean removeEldestEntry(Map.Entry<String, WebPage> eldest) {
+        return size() > MAX_CACHE_SIZE;          // Remove oldest when full
+    }
+};
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="algorithm-design-patterns" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Algorithm Design Patterns</h2>
+            <h3>Definition</h3>
+            <p>Algorithm design patterns are proven approaches to solving common computational problems. Divide and conquer breaks problems into smaller subproblems (merge sort, quick sort). Dynamic programming solves overlapping subproblems by storing results (Fibonacci with memoization). Greedy algorithms make locally optimal choices (shortest path algorithms). Two-pointer techniques efficiently process arrays or strings. Sliding window approaches handle substring or subarray problems. Understanding these patterns helps you recognize problem types and apply appropriate solutions quickly and correctly.</p>
+
+            <h3>Analogy</h3>
+            <p>Algorithm design patterns are like tried-and-true strategies that master chefs use to handle different cooking challenges. Divide and conquer is like preparing a complex meal by breaking it into manageable parts - prep all vegetables first, then proteins, then combine everything systematically. Dynamic programming is like a chef who writes down successful recipe modifications and reuses them instead of re-experimenting every time - once you perfect a sauce technique, you apply it to multiple dishes. Greedy algorithms are like making the best choice at each step when you're short on time - choosing the fastest-cooking ingredients available at each stage. Two-pointer techniques are like using both hands efficiently - one stirring while the other adds ingredients. These patterns represent wisdom gained from thousands of chefs solving similar problems, so you don't have to reinvent techniques that already work well.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Divide and Conquer pattern:</strong></p>
+            <pre><code class="language-java">// Merge sort divides array in half recursively
+public void mergeSort(int[] arr, int left, int right) {
+    if (left < right) {
+        int mid = (left + right) / 2;            // Divide
+        mergeSort(arr, left, mid);               // Conquer left half
+        mergeSort(arr, mid + 1, right);          // Conquer right half
+        merge(arr, left, mid, right);            // Combine results
+    }
+}
+</code></pre>
+
+            <p><strong>Dynamic Programming pattern (memoization):</strong></p>
+            <pre><code class="language-java">// Store computed results to avoid recalculation
+Map<Integer, Integer> memo = new HashMap<>();
+public int climbStairs(int n) {
+    if (n <= 2) return n;
+    if (memo.containsKey(n)) return memo.get(n); // Use cached result
+    int result = climbStairs(n-1) + climbStairs(n-2);
+    memo.put(n, result);                         // Cache for future use
+    return result;
+}
+</code></pre>
+
+            <p><strong>Two-pointer technique:</strong></p>
+            <pre><code class="language-java">// Find pair that sums to target in sorted array
+public boolean hasTwoSum(int[] arr, int target) {
+    int left = 0, right = arr.length - 1;
+    while (left < right) {
+        int sum = arr[left] + arr[right];
+        if (sum == target) return true;          // Found pair
+        else if (sum < target) left++;           // Need larger sum
+        else right--;                            // Need smaller sum
+    }
+    return false;
+}
+</code></pre>
+
+            <p><strong>Sliding Window pattern:</strong></p>
+            <pre><code class="language-java">// Find maximum sum of subarray of size k
+public int maxSumSubarray(int[] arr, int k) {
+    int windowSum = 0, maxSum = 0;
+    // Calculate sum of first window
+    for (int i = 0; i < k; i++) windowSum += arr[i];
+    maxSum = windowSum;
+    // Slide window: remove first, add next
+    for (int i = k; i < arr.length; i++) {
+        windowSum = windowSum - arr[i-k] + arr[i];
+        maxSum = Math.max(maxSum, windowSum);
+    }
+    return maxSum;
+}
+</code></pre>
+
+            <p><strong>Greedy Algorithm pattern:</strong></p>
+            <pre><code class="language-java">// Activity selection: choose maximum non-overlapping activities
+public List<Activity> selectActivities(List<Activity> activities) {
+    activities.sort((a, b) -> a.endTime - b.endTime); // Sort by end time
+    List<Activity> selected = new ArrayList<>();
+    int lastEndTime = 0;
+    for (Activity activity : activities) {
+        if (activity.startTime >= lastEndTime) {     // No overlap
+            selected.add(activity);                  // Greedy choice
+            lastEndTime = activity.endTime;
+        }
+    }
+    return selected;
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Summary</h2>
+            <p>You've now mastered the essential tools for writing efficient, scalable Java applications. Recursion gives you an elegant way to solve complex problems by breaking them into smaller pieces, while Big O notation provides the analytical framework to predict and compare algorithm performance. You've learned how different sorting and searching algorithms excel in different scenarios, and how to choose the right data structure based on your specific access patterns and performance requirements. Most importantly, you understand that algorithm and data structure choice directly impacts user experience - the difference between an app that responds instantly and one that frustrates users with delays. These skills form the foundation for tackling advanced programming challenges and building systems that scale gracefully as they grow. Next, you'll apply these performance principles when diving into Spring Boot, where efficient data access and optimal algorithm choices become crucial for building high-performance web applications.</p>
+          </section>
+
+          <section id="programming-challenge" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Programming Challenge</h2>
+            <div class="rounded-lg border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800">
+              <h3 class="mt-0">Challenge: Smart Library Management System</h3>
+              <p><strong>Task:</strong> Build an efficient library management system that demonstrates optimal algorithm and data structure choices for different operations.</p>
+
+              <p><strong>Requirements:</strong></p>
+              <ol>
+                <li>Create a <code>Book</code> class with: ISBN, title, author, year, and availability status</li>
+                <li>Implement <code>LibrarySystem</code> with these features:</li>
+                <ul>
+                  <li>Add books efficiently (avoid duplicates by ISBN)</li>
+                  <li>Search books by title (partial matches allowed) with optimal performance</li>
+                  <li>Find books by author with fast lookup</li>
+                  <li>Get all books sorted by year (ascending/descending)</li>
+                  <li>Recommend books based on author similarity (users who borrowed book X also borrowed...)</li>
+                  <li>Process book returns in order they were requested (queue system)</li>
+                </ul>
+                <li>Choose and justify the best data structure for each operation</li>
+                <li>Implement at least one recursive algorithm (e.g., category tree traversal)</li>
+                <li>Analyze and document the Big O complexity of each major operation</li>
+                <li>Include a performance comparison: test with 1,000 vs 100,000 books</li>
+              </ol>
+
+              <p><strong>Bonus challenges:</strong></p>
+              <ul>
+                <li>Implement autocomplete for book titles using a trie data structure</li>
+                <li>Add book rating system with efficient "top-rated books" queries</li>
+                <li>Create a waiting list system for popular books using appropriate data structures</li>
+                <li>Implement a simple caching mechanism for frequently searched books</li>
+              </ul>
+
+              <p><strong>Learning Goals:</strong> Practice choosing optimal data structures for different access patterns, implement efficient algorithms, analyze performance with Big O notation, and build a realistic system that demonstrates advanced algorithmic thinking and performance optimization.</p>
+            </div>
+          </section>
+
+          <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+            <a href="lesson-09.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
+            <a href="lesson-11.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
+          </nav>
+        </div>
+      </div>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('themeToggle').addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 12 - Spring Boot Web Development Basics</title>
+    <meta name="description" content="Spring Boot web development: REST controllers, request handling, validation, error handling, and building robust web APIs with practical examples and best practices." />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="lg:flex lg:gap-8">
+        <aside class="hidden lg:block lg:w-72">
+          <nav class="sticky top-8 rounded-xl border border-slate-200/60 bg-white/60 p-4 shadow-sm backdrop-blur dark:border-slate-800/60 dark:bg-slate-900/40" aria-label="Table of contents">
+            <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">On this page</h2>
+            <ol class="space-y-1 text-sm">
+              <li><a href="#introduction" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Introduction</a></li>
+              <li><a href="#rest-controller-basics" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">REST Controller Basics</a></li>
+              <li><a href="#http-methods-mapping" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">HTTP Methods Mapping</a></li>
+              <li><a href="#request-data-handling" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Request Data Handling</a></li>
+              <li><a href="#response-handling" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Response Handling</a></li>
+              <li><a href="#data-validation" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Data Validation</a></li>
+              <li><a href="#error-handling" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Error Handling</a></li>
+              <li><a href="#content-negotiation" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Content Negotiation</a></li>
+              <li><a href="#cors-configuration" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">CORS Configuration</a></li>
+              <li><a href="#testing-web-apis" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Testing Web APIs</a></li>
+              <li><a href="#best-practices" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Web API Best Practices</a></li>
+              <li><a href="#summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Summary</a></li>
+              <li><a href="#programming-challenge" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Programming Challenge</a></li>
+            </ol>
+          </nav>
+        </aside>
+        <div class="min-w-0 flex-1">
+          <div class="mb-6">
+            <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Concepts</a>
+          </div>
+          <header class="mx-auto max-w-3xl text-center">
+            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 12: Spring Boot Web Development Basics</h1>
+            <p class="mt-2 text-slate-600 dark:text-slate-300">Master Spring Boot web development: build robust REST APIs with proper request handling, validation, error management, and professional web service patterns.</p>
+          </header>
+
+          <section id="introduction" class="prose prose-slate mt-6 max-w-none dark:prose-invert">
+            <h2>Introduction</h2>
+            <p>Modern applications live on the web, serving millions of users through REST APIs that handle everything from simple data retrieval to complex business transactions. Spring Boot makes web development surprisingly straightforward, providing powerful annotations and conventions that transform plain Java classes into sophisticated web services. You can create endpoints that handle different HTTP methods, validate incoming data, manage errors gracefully, and return responses in various formats - all with minimal configuration. Whether you're building a mobile app backend, microservices for enterprise systems, or APIs for single-page applications, Spring Boot's web capabilities give you the tools to create professional, scalable web services. This lesson teaches you to build robust REST controllers that handle real-world scenarios including data validation, error handling, and content negotiation, setting the foundation for production-ready web applications.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="rest-controller-basics" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>REST Controller Basics</h2>
+            <h3>Definition</h3>
+            <p>A REST controller in Spring Boot is a class that handles HTTP requests and returns responses, typically in JSON format. The @RestController annotation combines @Controller and @ResponseBody, automatically converting method return values to JSON. Controllers define endpoints (URLs) that clients can call to interact with your application's data and functionality. Each method in a controller can handle different HTTP operations and URL patterns.</p>
+
+            <h3>Analogy</h3>
+            <p>Think of a REST controller like a restaurant's ordering system. When customers (clients) want to interact with the restaurant, they don't go directly to the kitchen or storage room. Instead, they communicate through waiters (controller methods) who understand different types of requests: "I'd like to see the menu" (GET request), "I want to place an order" (POST request), "Can you change my order?" (PUT request), or "Cancel my dessert" (DELETE request). Each waiter specializes in handling specific types of requests and knows exactly how to communicate with the kitchen (business logic) and return the appropriate response to the customer. The waiter translates between the customer's natural language requests and the kitchen's operational procedures, just like a REST controller translates between HTTP requests and your application's business logic.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Basic REST controller structure:</strong></p>
+            <pre><code class="language-java">@RestController
+@RequestMapping("/api/users")
+public class UserController {
+    // Controller methods will be defined here
+}
+</code></pre>
+
+            <p><strong>Simple GET endpoint:</strong></p>
+            <pre><code class="language-java">@GetMapping("/hello")
+public String sayHello() {
+    return "Hello from Spring Boot!";
+}
+</code></pre>
+
+            <p><strong>Returning JSON objects:</strong></p>
+            <pre><code class="language-java">@GetMapping("/profile")
+public User getUserProfile() {
+    return new User("Alice", "alice@example.com", 25);
+}
+</code></pre>
+
+            <p><strong>Multiple endpoints in one controller:</strong></p>
+            <pre><code class="language-java">@RestController
+@RequestMapping("/api/books")
+public class BookController {
+    @GetMapping
+    public List<Book> getAllBooks() { return bookService.findAll(); }
+
+    @GetMapping("/{id}")
+    public Book getBook(@PathVariable Long id) { return bookService.findById(id); }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="http-methods-mapping" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>HTTP Methods Mapping</h2>
+            <h3>Definition</h3>
+            <p>Different HTTP methods represent different types of operations: GET for retrieving data, POST for creating new resources, PUT for updating existing resources, DELETE for removing resources, and PATCH for partial updates. Spring Boot provides specific annotations (@GetMapping, @PostMapping, @PutMapping, @DeleteMapping) that map these HTTP methods to controller methods. This creates a clear, standardized way for clients to interact with your API.</p>
+
+            <h3>Analogy</h3>
+            <p>HTTP methods are like different types of interactions you have with a library system. When you want to browse available books, you use a catalog search (GET) - you're just looking, not changing anything. When you want to add a new book to your personal reading list, you submit a form (POST) to create a new entry. If you need to update your entire profile information, you fill out a complete update form (PUT) that replaces all your details. When you want to remove a book from your list, you use the delete function (DELETE). And if you just want to change your phone number without updating everything else, you use a quick edit feature (PATCH) for partial updates. Each interaction type serves a specific purpose and follows established conventions that everyone understands.</p>
+
+            <h3>Examples</h3>
+            <p><strong>GET - Retrieve data:</strong></p>
+            <pre><code class="language-java">@GetMapping("/products")
+public List<Product> getAllProducts() {
+    return productService.findAll();
+}
+</code></pre>
+
+            <p><strong>POST - Create new resource:</strong></p>
+            <pre><code class="language-java">@PostMapping("/products")
+public Product createProduct(@RequestBody Product product) {
+    return productService.save(product);
+}
+</code></pre>
+
+            <p><strong>PUT - Update existing resource:</strong></p>
+            <pre><code class="language-java">@PutMapping("/products/{id}")
+public Product updateProduct(@PathVariable Long id, @RequestBody Product product) {
+    return productService.update(id, product);
+}
+</code></pre>
+
+            <p><strong>DELETE - Remove resource:</strong></p>
+            <pre><code class="language-java">@DeleteMapping("/products/{id}")
+public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+    productService.delete(id);
+    return ResponseEntity.noContent().build();
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="request-data-handling" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Request Data Handling</h2>
+            <h3>Definition</h3>
+            <p>Spring Boot provides various annotations to extract data from different parts of HTTP requests: @PathVariable for URL segments, @RequestParam for query parameters, @RequestBody for JSON payloads, and @RequestHeader for HTTP headers. These annotations automatically convert incoming data to Java objects and handle type conversion. Understanding how to capture and process request data is essential for building flexible APIs that can handle different client needs.</p>
+
+            <h3>Analogy</h3>
+            <p>Handling request data is like processing different types of mail delivery at a busy office. Sometimes the important information is written directly on the envelope (path variables) - like "Deliver to Building 3, Floor 2, Room 15" where each part tells you where to go. Other times, you get additional instructions on sticky notes (query parameters) like "urgent" or "fragile." The main content might be inside the package (request body) containing documents, forms, or products. And sometimes special handling instructions are written in the delivery service's tracking information (headers) indicating priority level or delivery method. Your job as the mail processor (controller method) is to examine all these different sources of information and route everything to the right destination with the appropriate handling.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Path variables - data from URL:</strong></p>
+            <pre><code class="language-java">@GetMapping("/users/{userId}/orders/{orderId}")
+public Order getOrder(@PathVariable Long userId, @PathVariable Long orderId) {
+    return orderService.findByUserAndId(userId, orderId);
+}
+</code></pre>
+
+            <p><strong>Query parameters - URL parameters:</strong></p>
+            <pre><code class="language-java">@GetMapping("/products")
+public List<Product> searchProducts(@RequestParam String category,
+                                   @RequestParam(defaultValue = "0") int page) {
+    return productService.findByCategory(category, page);
+}
+</code></pre>
+
+            <p><strong>Request body - JSON data:</strong></p>
+            <pre><code class="language-java">@PostMapping("/orders")
+public Order createOrder(@RequestBody CreateOrderRequest request) {
+    return orderService.create(request);
+}
+</code></pre>
+
+            <p><strong>Request headers - HTTP header data:</strong></p>
+            <pre><code class="language-java">@GetMapping("/profile")
+public User getProfile(@RequestHeader("Authorization") String token) {
+    User user = authService.getUserFromToken(token);
+    return userService.getProfile(user.getId());
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="response-handling" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Response Handling</h2>
+            <h3>Definition</h3>
+            <p>Spring Boot automatically converts method return values to appropriate response formats (usually JSON) and sets HTTP status codes. You can customize responses using ResponseEntity to control status codes, headers, and body content. Different return types serve different purposes: simple objects for success cases, ResponseEntity for complete control, and specific status codes for different scenarios like created resources, not found errors, or no content responses.</p>
+
+            <h3>Analogy</h3>
+            <p>Response handling is like a customer service representative responding to different types of inquiries. For simple questions, they provide straightforward answers (returning objects directly). For complex situations, they craft carefully worded responses that include not just the answer, but also the appropriate tone, urgency level, and follow-up instructions (ResponseEntity with custom headers and status codes). When someone asks for something that doesn't exist, they politely explain the situation (404 Not Found). When a request is successfully processed, they confirm completion with enthusiasm (201 Created). And when everything goes as expected, they provide exactly what was requested with professional efficiency (200 OK). The representative knows how to match their response style to the situation, just like Spring Boot controllers match response format to the request outcome.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Simple object return (200 OK by default):</strong></p>
+            <pre><code class="language-java">@GetMapping("/user/{id}")
+public User getUser(@PathVariable Long id) {
+    return userService.findById(id);  // Returns 200 OK with JSON
+}
+</code></pre>
+
+            <p><strong>Custom status codes with ResponseEntity:</strong></p>
+            <pre><code class="language-java">@PostMapping("/users")
+public ResponseEntity<User> createUser(@RequestBody User user) {
+    User savedUser = userService.save(user);
+    return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
+}
+</code></pre>
+
+            <p><strong>No content response:</strong></p>
+            <pre><code class="language-java">@DeleteMapping("/users/{id}")
+public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    userService.delete(id);
+    return ResponseEntity.noContent().build();  // Returns 204 No Content
+}
+</code></pre>
+
+            <p><strong>Custom headers in response:</strong></p>
+            <pre><code class="language-java">@PostMapping("/upload")
+public ResponseEntity<String> uploadFile(@RequestParam MultipartFile file) {
+    String fileId = fileService.save(file);
+    return ResponseEntity.ok()
+        .header("X-File-ID", fileId)
+        .body("File uploaded successfully");
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="data-validation" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Data Validation</h2>
+            <h3>Definition</h3>
+            <p>Data validation ensures that incoming request data meets your application's requirements before processing. Spring Boot integrates with Bean Validation (JSR-303) using annotations like @Valid, @NotNull, @NotBlank, @Email, and @Size to automatically validate request bodies and parameters. When validation fails, Spring Boot automatically returns detailed error responses with specific field-level error messages, helping clients understand exactly what needs to be corrected.</p>
+
+            <h3>Analogy</h3>
+            <p>Data validation is like security checkpoints at an airport or event venue. Before allowing people to enter, security personnel check that everyone has proper identification (required fields), that tickets are valid and not expired (format validation), that carry-on items meet size restrictions (length limits), and that prohibited items aren't present (business rule validation). If someone doesn't meet the requirements, security politely but firmly explains exactly what's wrong and what needs to be corrected before they can proceed. They don't just say "access denied" - they provide specific, actionable feedback like "your ID is expired" or "liquids must be in containers smaller than 100ml." This systematic checking prevents problems later and ensures everyone entering meets the established safety and security standards.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Basic validation annotations on model:</strong></p>
+            <pre><code class="language-java">public class CreateUserRequest {
+    @NotBlank(message = "Name is required")
+    private String name;
+
+    @Email(message = "Invalid email format")
+    @NotBlank(message = "Email is required")
+    private String email;
+}
+</code></pre>
+
+            <p><strong>Validating request body:</strong></p>
+            <pre><code class="language-java">@PostMapping("/users")
+public ResponseEntity<User> createUser(@Valid @RequestBody CreateUserRequest request) {
+    User user = userService.create(request);
+    return ResponseEntity.status(HttpStatus.CREATED).body(user);
+}
+</code></pre>
+
+            <p><strong>Validating path variables and parameters:</strong></p>
+            <pre><code class="language-java">@GetMapping("/users/{id}")
+public User getUser(@PathVariable @Min(1) Long id) {
+    return userService.findById(id);
+}
+
+@GetMapping("/users")
+public List<User> getUsers(@RequestParam @Size(min = 3) String search) {
+    return userService.searchByName(search);
+}
+</code></pre>
+
+            <p><strong>Custom validation messages:</strong></p>
+            <pre><code class="language-java">public class Product {
+    @NotNull(message = "Product name cannot be empty")
+    @Size(min = 2, max = 100, message = "Product name must be 2-100 characters")
+    private String name;
+
+    @DecimalMin(value = "0.01", message = "Price must be at least 0.01")
+    private BigDecimal price;
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="error-handling" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Error Handling</h2>
+            <h3>Definition</h3>
+            <p>Proper error handling provides meaningful responses when things go wrong, using @ControllerAdvice to handle exceptions globally across all controllers. You can create custom exception classes for specific business errors and return appropriate HTTP status codes with helpful error messages. Spring Boot automatically handles validation errors, but you can customize error responses to provide consistent formatting and better user experience across your entire API.</p>
+
+            <h3>Analogy</h3>
+            <p>Error handling in web APIs is like having a well-trained customer service department that handles all problems consistently across different store locations. When issues occur - whether it's an out-of-stock item (resource not found), invalid payment information (validation error), or system maintenance (server error) - customers always receive professional, helpful responses that explain what happened and what they can do next. Instead of each store manager handling problems differently, there's a centralized customer service protocol that ensures everyone gets the same quality of support. The service representatives use clear, understandable language instead of technical jargon, provide specific error codes for tracking, and always suggest concrete next steps. This creates a reliable, professional experience regardless of what type of problem occurs or which part of the business the customer was interacting with.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Global exception handler:</strong></p>
+            <pre><code class="language-java">@ControllerAdvice
+public class GlobalExceptionHandler {
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException ex) {
+        return ResponseEntity.notFound().build();
+    }
+}
+</code></pre>
+
+            <p><strong>Custom exception class:</strong></p>
+            <pre><code class="language-java">public class UserNotFoundException extends RuntimeException {
+    public UserNotFoundException(Long id) {
+        super("User with ID " + id + " not found");
+    }
+}
+</code></pre>
+
+            <p><strong>Validation error handling:</strong></p>
+            <pre><code class="language-java">@ExceptionHandler(MethodArgumentNotValidException.class)
+public ResponseEntity<Map<String, String>> handleValidationErrors(
+        MethodArgumentNotValidException ex) {
+    Map<String, String> errors = new HashMap<>();
+    ex.getBindingResult().getFieldErrors().forEach(error ->
+        errors.put(error.getField(), error.getDefaultMessage()));
+    return ResponseEntity.badRequest().body(errors);
+}
+</code></pre>
+
+            <p><strong>Standard error response format:</strong></p>
+            <pre><code class="language-java">public class ErrorResponse {
+    private String message;
+    private int status;
+    private long timestamp;
+
+    public ErrorResponse(String message, int status) {
+        this.message = message;
+        this.status = status;
+        this.timestamp = System.currentTimeMillis();
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="content-negotiation" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Content Negotiation</h2>
+            <h3>Definition</h3>
+            <p>Content negotiation allows your API to return data in different formats (JSON, XML, plain text) based on client requests, typically using the Accept header. Spring Boot automatically handles JSON conversion by default, but you can configure additional formats and use the produces attribute in mapping annotations to specify supported response formats. This flexibility allows the same endpoint to serve different types of clients with their preferred data formats.</p>
+
+            <h3>Analogy</h3>
+            <p>Content negotiation is like a multilingual tourist information center that can provide the same information in different languages and formats based on what visitors need. Some tourists prefer detailed written guides in English, others want simple maps in Spanish, and some need audio instructions in French. The information desk staff listens to what each visitor requests (Accept header) and provides exactly the same helpful information about local attractions, just packaged in the format that works best for that person. A business traveler might want a concise PDF they can quickly scan, while a family might prefer a colorful brochure with pictures. The core information never changes - only the presentation format adapts to serve each visitor's specific needs and preferences most effectively.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Specifying response format:</strong></p>
+            <pre><code class="language-java">@GetMapping(value = "/users/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+public User getUserAsJson(@PathVariable Long id) {
+    return userService.findById(id);
+}
+</code></pre>
+
+            <p><strong>Multiple content types support:</strong></p>
+            <pre><code class="language-java">@GetMapping(value = "/report",
+           produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
+public Report getReport() {
+    return reportService.generateReport();
+}
+</code></pre>
+
+            <p><strong>Accepting different input formats:</strong></p>
+            <pre><code class="language-java">@PostMapping(value = "/users",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+public User createUser(@RequestBody User user) {
+    return userService.save(user);
+}
+</code></pre>
+
+            <p><strong>Custom response format based on request:</strong></p>
+            <pre><code class="language-java">@GetMapping("/data")
+public ResponseEntity<?> getData(@RequestHeader("Accept") String acceptHeader) {
+    if (acceptHeader.contains("xml")) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_XML).body(dataAsXml);
+    }
+    return ResponseEntity.ok().body(dataAsJson);
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="cors-configuration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>CORS Configuration</h2>
+            <h3>Definition</h3>
+            <p>Cross-Origin Resource Sharing (CORS) is a security mechanism that controls which domains can access your API from web browsers. By default, browsers block requests from different origins (different domain, port, or protocol) for security reasons. Spring Boot provides @CrossOrigin annotations and global CORS configuration to explicitly allow specific origins, methods, and headers, enabling your API to work with frontend applications hosted on different domains.</p>
+
+            <h3>Analogy</h3>
+            <p>CORS configuration is like setting up visitor access policies for a secure office building. By default, the building's security system (browser) only allows employees (same-origin requests) to access resources freely. However, you might need to allow business partners from other companies (different origins) to access specific meeting rooms or services. You create a visitor access list that specifies exactly which companies can visit, which floors they can access, what times they're allowed, and what type of identification they need to bring. This controlled access system maintains security while enabling necessary business collaboration. Without proper visitor policies, legitimate business partners would be turned away at the door, but with overly permissive policies, unauthorized people might gain access to sensitive areas.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Allow specific origin on controller:</strong></p>
+            <pre><code class="language-java">@RestController
+@CrossOrigin(origins = "http://localhost:3000")
+public class ApiController {
+    // All endpoints allow localhost:3000
+}
+</code></pre>
+
+            <p><strong>Method-level CORS configuration:</strong></p>
+            <pre><code class="language-java">@GetMapping("/data")
+@CrossOrigin(origins = {"http://localhost:3000", "https://myapp.com"})
+public List<Data> getData() {
+    return dataService.findAll();
+}
+</code></pre>
+
+            <p><strong>Global CORS configuration:</strong></p>
+            <pre><code class="language-java">@Configuration
+public class CorsConfig implements WebMvcConfigurer {
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/api/**")
+                .allowedOrigins("http://localhost:3000")
+                .allowedMethods("GET", "POST", "PUT", "DELETE");
+    }
+}
+</code></pre>
+
+            <p><strong>Permissive CORS for development:</strong></p>
+            <pre><code class="language-java">@CrossOrigin(origins = "*", allowedHeaders = "*")
+@RestController
+public class DevController {
+    // Only use "*" for development, never in production
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="testing-web-apis" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Testing Web APIs</h2>
+            <h3>Definition</h3>
+            <p>Spring Boot provides excellent testing support for web APIs using @WebMvcTest for controller-only tests and MockMvc for simulating HTTP requests. You can test different scenarios including successful operations, validation failures, error conditions, and edge cases without starting a full server. Testing ensures your API behaves correctly, handles errors gracefully, and maintains consistent behavior as your application evolves.</p>
+
+            <h3>Analogy</h3>
+            <p>Testing web APIs is like conducting fire drills and safety inspections in a building. You simulate various scenarios - normal operations (regular visitors), emergency situations (server errors), overcrowding (high load), and security breaches (invalid input) - to make sure all safety systems work correctly. During these drills, you don't need to create real emergencies; instead, you use simulation equipment that mimics real conditions. You test that fire alarms sound properly, emergency exits function, sprinkler systems activate, and staff respond appropriately. Similarly, API testing uses mock objects and simulated requests to verify that your controllers handle different situations correctly without needing real databases or external services. This systematic testing ensures your API will perform reliably when real users depend on it.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Basic controller test setup:</strong></p>
+            <pre><code class="language-java">@WebMvcTest(UserController.class)
+class UserControllerTest {
+    @Autowired MockMvc mockMvc;
+    @MockBean UserService userService;
+}
+</code></pre>
+
+            <p><strong>Testing GET endpoint:</strong></p>
+            <pre><code class="language-java">@Test
+void shouldReturnUser() throws Exception {
+    when(userService.findById(1L)).thenReturn(new User("Alice"));
+
+    mockMvc.perform(get("/api/users/1"))
+           .andExpect(status().isOk())
+           .andExpect(jsonPath("$.name").value("Alice"));
+}
+</code></pre>
+
+            <p><strong>Testing POST with validation:</strong></p>
+            <pre><code class="language-java">@Test
+void shouldCreateUser() throws Exception {
+    mockMvc.perform(post("/api/users")
+           .contentType(MediaType.APPLICATION_JSON)
+           .content("{\"name\":\"Bob\",\"email\":\"bob@example.com\"}"))
+           .andExpect(status().isCreated());
+}
+</code></pre>
+
+            <p><strong>Testing error scenarios:</strong></p>
+            <pre><code class="language-java">@Test
+void shouldReturn404WhenUserNotFound() throws Exception {
+    when(userService.findById(999L)).thenThrow(new UserNotFoundException(999L));
+
+    mockMvc.perform(get("/api/users/999"))
+           .andExpect(status().isNotFound());
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="best-practices" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Web API Best Practices</h2>
+            <h3>Definition</h3>
+            <p>Professional web APIs follow consistent patterns: use appropriate HTTP methods and status codes, implement proper validation and error handling, return meaningful error messages, use consistent URL naming conventions, handle edge cases gracefully, and provide clear API documentation. These practices make your APIs easier to understand, integrate with, and maintain over time.</p>
+
+            <h3>Analogy</h3>
+            <p>Web API best practices are like establishing professional standards for a customer service department across a large company. Every interaction should follow the same high-quality protocols: use clear, consistent language that customers understand; provide helpful, specific responses rather than vague errors; follow the same procedures whether handling simple requests or complex problems; maintain professional courtesy even when declining requests; and ensure that any customer can get the same quality of service regardless of which representative they speak with. These standards create predictable, reliable experiences that build trust and make it easy for customers to understand how to interact with your business effectively. Just as good customer service practices lead to satisfied customers and successful business relationships, good API practices lead to satisfied developers and successful integrations.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Consistent URL naming:</strong></p>
+            <pre><code class="language-java">// Good: RESTful resource naming
+@RequestMapping("/api/users")     // Collection
+@GetMapping("/{id}")              // Individual resource
+@PostMapping                      // Create new resource
+@PutMapping("/{id}")             // Update existing resource
+</code></pre>
+
+            <p><strong>Appropriate HTTP status codes:</strong></p>
+            <pre><code class="language-java">@PostMapping
+public ResponseEntity<User> createUser(@RequestBody User user) {
+    if (userService.emailExists(user.getEmail())) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).build(); // 409
+    }
+    User created = userService.save(user);
+    return ResponseEntity.status(HttpStatus.CREATED).body(created); // 201
+}
+</code></pre>
+
+            <p><strong>Meaningful error responses:</strong></p>
+            <pre><code class="language-java">public class ApiError {
+    private String message;
+    private String errorCode;
+    private List<String> details;
+    private LocalDateTime timestamp;
+
+    // Provides context and actionable information
+}
+</code></pre>
+
+            <p><strong>Input sanitization and validation:</strong></p>
+            <pre><code class="language-java">@GetMapping("/search")
+public List<Product> searchProducts(@RequestParam @Size(max=100) String query) {
+    String sanitized = query.trim().toLowerCase();
+    return productService.search(sanitized);
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Summary</h2>
+            <p>You've now mastered the fundamentals of Spring Boot web development, from creating REST controllers to handling complex validation and error scenarios. You understand how to map HTTP methods to controller methods, extract data from requests in various formats, customize responses with appropriate status codes, and validate incoming data to ensure quality. Error handling techniques and CORS configuration prepare your APIs for real-world deployment, while testing practices ensure reliability and maintainability. These skills enable you to build professional, robust web services that can handle production workloads and provide excellent developer experience for API consumers. Next, you'll learn how to integrate databases with Spring Data JPA, adding persistent data storage to your web applications and completing the foundation for full-stack development.</p>
+          </section>
+
+          <section id="programming-challenge" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Programming Challenge</h2>
+            <div class="rounded-lg border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800">
+              <h3 class="mt-0">Challenge: Complete Blog Post Management API</h3>
+              <p><strong>Task:</strong> Build a comprehensive REST API for managing blog posts with proper validation, error handling, and testing.</p>
+
+              <p><strong>Requirements:</strong></p>
+              <ol>
+                <li>Create a <code>BlogPost</code> model with validation:</li>
+                <ul>
+                  <li>Title (required, 5-100 characters)</li>
+                  <li>Content (required, minimum 50 characters)</li>
+                  <li>Author email (required, valid email format)</li>
+                  <li>Tags (optional, max 5 tags)</li>
+                  <li>Creation and update timestamps</li>
+                </ul>
+                <li>Implement <code>BlogController</code> with endpoints:</li>
+                <ul>
+                  <li><code>GET /api/posts</code> - Get all posts (with optional tag filter)</li>
+                  <li><code>GET /api/posts/{id}</code> - Get specific post</li>
+                  <li><code>POST /api/posts</code> - Create new post</li>
+                  <li><code>PUT /api/posts/{id}</code> - Update existing post</li>
+                  <li><code>DELETE /api/posts/{id}</code> - Delete post</li>
+                  <li><code>GET /api/posts/search</code> - Search posts by title or content</li>
+                </ul>
+                <li>Implement proper error handling:</li>
+                <ul>
+                  <li>Custom exception for post not found</li>
+                  <li>Global exception handler with meaningful error responses</li>
+                  <li>Validation error handling with field-specific messages</li>
+                </ul>
+                <li>Add CORS configuration for frontend integration</li>
+                <li>Write comprehensive tests for all endpoints</li>
+                <li>Use appropriate HTTP status codes and response formats</li>
+              </ol>
+
+              <p><strong>Bonus features:</strong></p>
+              <ul>
+                <li>Implement pagination for the posts list</li>
+                <li>Add sorting options (by date, title, author)</li>
+                <li>Create a simple statistics endpoint showing post counts</li>
+                <li>Add rate limiting headers to responses</li>
+                <li>Implement content negotiation for JSON/XML responses</li>
+              </ul>
+
+              <p><strong>Learning Goals:</strong> Practice building complete REST APIs with proper validation, error handling, testing, and professional API design patterns while integrating multiple Spring Boot web development concepts.</p>
+            </div>
+          </section>
+
+          <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+            <a href="lesson-11.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
+            <a href="lesson-13.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
+          </nav>
+        </div>
+      </div>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('themeToggle').addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>
