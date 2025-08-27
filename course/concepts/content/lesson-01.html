@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 01 - Java Basics</title>
+    <meta name="description" content="Variables, data types, operators, conditionals, and loops with simple definitions, analogies, commented examples, and quick visual sketches." />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="mb-6">
+        <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Concepts</a>
+      </div>
+      <header class="mx-auto max-w-3xl text-center">
+        <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 01: Java Basics</h1>
+        <p class="mt-2 text-slate-600 dark:text-slate-300">Variables, data types, operators, conditionals, and loops. Each concept includes a simple definition, an everyday analogy, a focused commented snippet, and a quick visual sketch.</p>
+      </header>
+
+      <section id="introduction" class="prose prose-slate mt-6 max-w-none dark:prose-invert">
+        <h2>Introduction</h2>
+        <p>Java is a programming language that helps you build applications by writing instructions for the computer to follow. Before you can create complex programs, you need to understand the basic building blocks that make up any Java program. Variables let you store information, data types tell you what kind of information you can store, and operators help you work with that information. Control structures like if-else statements and loops give you the power to make decisions and repeat actions. Think of these basics as learning the alphabet before writing sentences - once you master these fundamentals, you'll be able to express any idea in code. These concepts are the foundation you'll use throughout your Java journey, from simple programs to advanced web applications.</p>
+      </section>
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="variables">
+        <h2>Variables</h2>
+        <h3>Definition</h3>
+        <p>A variable is a named container that stores a value in your program's memory. Every variable in Java has a specific type that determines what kind of data it can hold. You can think of variables as labeled boxes where you put information that you want to use later in your program.</p>
+
+        <h3>Analogy</h3>
+        <p>Imagine your desk has several labeled drawers: one marked "Pens," another "Paper," and another "Calculator." Each drawer can only hold items that match its label - you wouldn't put paper in the pen drawer. Variables work the same way in programming. When you create a variable called "age," it's like labeling a drawer specifically for storing numbers that represent someone's age. You can put a number in that drawer, take it out to use it, or replace it with a different number, but you can't suddenly put text in a drawer meant for numbers. The label (variable name) helps you remember what's inside, and the type ensures you only store the right kind of information.</p>
+
+        <h3>Example</h3>
+        <pre><code class="language-java">// Declare an integer variable to store someone's age
+int age = 25;                    // Create a box labeled "age" and put 25 in it
+
+// Declare a text variable to store someone's name
+String name = "Alice";           // Create a box labeled "name" and put "Alice" in it
+
+// Declare a decimal variable to store a price
+double price = 19.99;            // Create a box labeled "price" and put 19.99 in it
+
+// Use the variables in your program
+System.out.println(name + " is " + age + " years old");  // Print: Alice is 25 years old
+System.out.println("Price: $" + price);                  // Print: Price: $19.99
+
+// Change the value in a variable
+age = 26;                        // Replace 25 with 26 in the "age" box
+System.out.println(name + " is now " + age);             // Print: Alice is now 26
+</code></pre>
+      </section>
+
+      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="data-types">
+        <h2>Data Types</h2>
+        <h3>Definition</h3>
+        <p>Data types specify what kind of information a variable can store and how much memory it needs. Java has two main categories: primitive types (like int, double, boolean) that store simple values directly, and reference types (like String) that store references to more complex objects. Understanding data types helps you choose the right container for your data.</p>
+
+        <h3>Analogy</h3>
+        <p>Think of data types like different types of containers in a kitchen. You have small spice jars for holding small amounts of seasonings (like boolean for true/false), medium containers for storing flour or sugar (like int for whole numbers), large containers for liquids like milk or juice (like double for decimal numbers), and special containers like recipe boxes that hold complete instructions (like String for text). Each container is designed for a specific purpose - you wouldn't store soup in a spice jar or try to fit a whole cookbook in a small container. Similarly, each data type in Java is optimized for storing specific kinds of information efficiently and safely.</p>
+
+        <h3>Example</h3>
+        <pre><code class="language-java">// Primitive data types - store simple values directly
+int studentCount = 30;           // Whole number (no decimals)
+double temperature = 98.6;       // Decimal number (can have fractions)
+boolean isOnline = true;         // True or false value only
+char grade = 'A';                // Single character
+
+// Reference type - stores reference to an object
+String courseName = "Java Programming";  // Text (sequence of characters)
+
+// Using different data types
+System.out.println("Course: " + courseName);           // Text output
+System.out.println("Students: " + studentCount);       // Number output
+System.out.println("Temperature: " + temperature + "°F"); // Decimal output
+System.out.println("Online status: " + isOnline);      // Boolean output
+System.out.println("Grade: " + grade);                 // Character output
+
+// Data types prevent mistakes
+// studentCount = "thirty";     // This would cause an error - can't put text in number container
+// isOnline = 42;              // This would cause an error - can't put number in true/false container
+</code></pre>
+      </section>
+
+      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="operators">
+        <h2>Operators</h2>
+        <h3>Definition</h3>
+        <p>Operators are symbols that perform operations on values and variables. Arithmetic operators (+, -, *, /, %) do math calculations, comparison operators (==, !=, <, >, <=, >=) compare values, and logical operators (&&, ||, !) work with true/false conditions. Operators are the tools that let you manipulate and work with your data.</p>
+
+        <h3>Analogy</h3>
+        <p>Think of operators like tools in a workshop. Arithmetic operators are like basic tools - a hammer (+) joins things together, a saw (-) separates them, and a measuring tape (==) checks if two things are the same size. Comparison operators are like a scale that tells you which item is heavier, lighter, or if they weigh the same. Logical operators are like decision-making tools - they help you combine multiple yes/no questions to make a final decision. Just like how you use different tools for different jobs in a workshop, you use different operators depending on what you want to do with your data. Some tools work on numbers (like addition), others work on true/false values (like logical AND), and some can work on both (like equality comparison).</p>
+
+        <h3>Example</h3>
+        <pre><code class="language-java">// Arithmetic operators - do math calculations
+int a = 10;
+int b = 3;
+int sum = a + b;                // Addition: 10 + 3 = 13
+int difference = a - b;         // Subtraction: 10 - 3 = 7
+int product = a * b;            // Multiplication: 10 * 3 = 30
+int quotient = a / b;           // Division: 10 / 3 = 3 (integer division)
+int remainder = a % b;          // Modulus (remainder): 10 % 3 = 1
+
+System.out.println("Sum: " + sum);             // Prints: Sum: 13
+System.out.println("Remainder: " + remainder); // Prints: Remainder: 1
+
+// Comparison operators - compare values
+boolean isEqual = (a == b);     // Check if equal: 10 == 3 is false
+boolean isGreater = (a > b);    // Check if greater: 10 > 3 is true
+boolean isLessEqual = (a <= b); // Check if less or equal: 10 <= 3 is false
+
+System.out.println("10 equals 3: " + isEqual);    // Prints: 10 equals 3: false
+System.out.println("10 greater than 3: " + isGreater); // Prints: 10 greater than 3: true
+
+// Logical operators - combine true/false conditions
+boolean hasLicense = true;
+boolean hasInsurance = false;
+boolean canDrive = hasLicense && hasInsurance;  // AND: both must be true
+boolean needsEither = hasLicense || hasInsurance; // OR: at least one must be true
+boolean noLicense = !hasLicense;                // NOT: opposite of hasLicense
+
+System.out.println("Can drive: " + canDrive);     // Prints: Can drive: false
+System.out.println("Has at least one: " + needsEither); // Prints: Has at least one: true
+</code></pre>
+      </section>
+
+      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="conditionals">
+        <h2>Conditionals (if/else)</h2>
+        <h3>Definition</h3>
+        <p>Conditionals allow your program to make decisions and execute different code based on whether certain conditions are true or false. The if statement checks a condition, and if it's true, executes one block of code; otherwise, it can execute a different block with else. This gives your programs the ability to respond differently to different situations.</p>
+
+        <h3>Analogy</h3>
+        <p>Imagine you're getting dressed in the morning and you look outside to check the weather. If it's raining, you grab an umbrella and wear a raincoat. If it's sunny, you wear sunglasses and light clothes. If it's cold, you put on a warm jacket. You're constantly making decisions based on conditions - "if this, then do that." Your brain processes these conditions automatically: IF (it's raining) THEN (take umbrella) ELSE IF (it's sunny) THEN (wear sunglasses) ELSE (wear regular clothes). Conditionals in programming work exactly the same way - they let your program look at the current situation (check a condition) and decide what action to take based on what it finds.</p>
+
+        <h3>Example</h3>
+        <pre><code class="language-java">// Simple if-else statement
+int temperature = 75;
+
+if (temperature > 80) {                    // Check if temperature is hot
+    System.out.println("It's hot! Wear shorts.");
+} else if (temperature > 60) {             // Check if temperature is mild
+    System.out.println("Nice weather! Wear a t-shirt.");
+} else {                                   // If neither condition is true
+    System.out.println("It's cold! Wear a jacket.");
+}
+
+// Multiple conditions example
+int age = 17;
+boolean hasPermit = true;
+
+if (age >= 18) {                           // Check if old enough to drive alone
+    System.out.println("You can drive independently.");
+} else if (age >= 16 && hasPermit) {       // Check if old enough AND has permit
+    System.out.println("You can drive with supervision.");
+} else {                                   // If too young
+    System.out.println("You need to wait to drive.");
+}
+
+// Checking multiple conditions
+int score = 85;
+
+if (score >= 90) {                         // Excellent grade
+    System.out.println("Grade: A - Excellent work!");
+} else if (score >= 80) {                  // Good grade
+    System.out.println("Grade: B - Good job!");
+} else if (score >= 70) {                  // Passing grade
+    System.out.println("Grade: C - You passed!");
+} else {                                   // Needs improvement
+    System.out.println("Grade: F - Please study more.");
+}
+</code></pre>
+      </section>
+
+      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="loops">
+        <h2>Loops</h2>
+        <h3>Definition</h3>
+        <p>Loops are structures that repeat a block of code multiple times. The for loop is used when you know how many times you want to repeat something, the while loop continues as long as a condition is true, and the for-each loop goes through each item in a collection. Loops save you from writing the same code over and over again.</p>
+
+        <h3>Analogy</h3>
+        <p>Think of loops like repetitive tasks you do every day. When you brush your teeth, you move the brush back and forth many times - that's like a for loop where you repeat an action a specific number of times. When you keep stirring soup until it's hot enough, you're doing a while loop - you continue the action as long as a condition is true (soup is not hot enough). When you go through your mail piece by piece, reading each letter or bill, that's like a for-each loop - you perform the same action (reading) on each item in a collection (the mail pile). Loops in programming work the same way, letting your program repeat actions efficiently without you having to write the same instructions multiple times.</p>
+
+        <h3>Example</h3>
+        <pre><code class="language-java">// For loop - repeat a specific number of times
+System.out.println("Counting to 5:");
+for (int i = 1; i <= 5; i++) {            // Start at 1, continue while i <= 5, add 1 each time
+    System.out.println("Count: " + i);    // Print the current number
+}
+
+// While loop - repeat as long as condition is true
+int countdown = 3;
+System.out.println("Rocket launch countdown:");
+while (countdown > 0) {                   // Continue as long as countdown is greater than 0
+    System.out.println(countdown);        // Print current countdown number
+    countdown--;                          // Subtract 1 (same as countdown = countdown - 1)
+}
+System.out.println("Blast off!");
+
+// For-each loop - go through each item in a collection
+String[] fruits = {"apple", "banana", "orange", "grape"};  // Array of fruits
+System.out.println("Fruits in our basket:");
+for (String fruit : fruits) {             // For each fruit in the fruits array
+    System.out.println("- " + fruit);     // Print the current fruit with a bullet point
+}
+
+// Practical example - calculating total
+int[] prices = {10, 25, 15, 30};          // Array of prices
+int total = 0;                            // Start with total of 0
+System.out.println("Calculating total price:");
+for (int price : prices) {                // For each price in the prices array
+    total = total + price;                // Add current price to total
+    System.out.println("Added $" + price + ", total now: $" + total);
+}
+System.out.println("Final total: $" + total);
+</code></pre>
+      </section>
+
+      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="summary">
+        <h2>Summary</h2>
+        <p>You've now learned the fundamental building blocks of Java programming. Variables let you store and organize data, data types ensure you use the right container for each kind of information, and operators give you the tools to work with that data. Conditionals allow your programs to make smart decisions, and loops let you repeat actions efficiently without writing redundant code. These concepts work together to form the foundation of every Java program you'll ever write. As you move forward, you'll see how these basics combine to create more complex functionality, from simple calculations to sophisticated applications. Next, we'll explore how to organize your code into reusable pieces called methods.</p>
+      </section>
+
+      <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+        <span class="inline-flex items-center rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium opacity-50 dark:border-slate-700" aria-disabled="true">Previous</span>
+        <a href="lesson-02.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
+      </nav>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('themeToggle').addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>

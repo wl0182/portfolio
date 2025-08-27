@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Java & Spring Boot Concepts - Mini-course</title>
+    <meta name="description" content="Concise explanations with practical snippets: Streams, JPA, Security, Testing." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E%F0%9F%93%98%3C/text%3E%3C/svg%3E" />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../../tutorials/tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <header class="max-w-3xl">
+        <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Java & Spring Boot Concepts</h1>
+        <p class="mt-2 text-slate-600 dark:text-slate-300">Mini-course: concise explanations with practical snippets: Streams, JPA, Security, Testing.</p>
+        <a href="../" class="mt-4 inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Courses</a>
+      </header>
+
+      <section class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <a class="group block rounded-xl border border-slate-200/60 bg-white/70 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow dark:border-slate-700/60 dark:bg-slate-900/60" href="./content/lesson-01.html">
+          <div class="flex items-center justify-between"><h2 class="font-semibold">01. Java Basics</h2><span class="text-xs text-slate-500">Foundation</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Variables, data types, operators, if/else, switch, loops.</p>
+        </a>
+        <a class="group block rounded-xl border border-slate-200/60 bg-white/70 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow dark:border-slate-700/60 dark:bg-slate-900/60" href="./content/lesson-02.html">
+          <div class="flex items-center justify-between"><h2 class="font-semibold">02. Methods & Functions</h2><span class="text-xs text-slate-500">Foundation</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Method syntax, parameters, return types, overloading.</p>
+        </a>
+        <a class="group block rounded-xl border border-slate-200/60 bg-white/70 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow dark:border-slate-700/60 dark:bg-slate-900/60" href="./content/lesson-03.html">
+          <div class="flex items-center justify-between"><h2 class="font-semibold">03. Object‑Oriented Programming (OOP)</h2><span class="text-xs text-slate-500">Foundation</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Classes, objects, fields, constructors, this keyword.</p>
+        </a>
+        <a class="group block rounded-xl border border-slate-200/60 bg-white/70 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow dark:border-slate-700/60 dark:bg-slate-900/60" href="./content/lesson-04.html">
+          <div class="flex items-center justify-between"><h2 class="font-semibold">04. OOP Deep Dive</h2><span class="text-xs text-slate-500">Foundation</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Encapsulation, inheritance, polymorphism, interfaces.</p>
+        </a>
+        <a class="group block rounded-xl border border-slate-200/60 bg-white/70 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow dark:border-slate-700/60 dark:bg-slate-900/60" href="./content/lesson-05.html">
+          <div class="flex items-center justify-between"><h2 class="font-semibold">05. Collections & Generics</h2><span class="text-xs text-slate-500">Foundation</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Lists, Sets, Maps, for‑each, and generics (List&lt;String&gt;).</p>
+        </a>
+        <a class="group block rounded-xl border border-slate-200/60 bg-white/70 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow dark:border-slate-700/60 dark:bg-slate-900/60" href="./content/lesson-06.html">
+          <div class="flex items-center justify-between"><h2 class="font-semibold">06. Java Streams & Lambdas (Essentials)</h2><span class="text-xs text-slate-500">Foundation</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Functional style: filtering, mapping, reducing.</p>
+        </a>
+        <a class="group block rounded-xl border border-slate-200/60 bg-white/70 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow dark:border-slate-700/60 dark:bg-slate-900/60" href="./content/lesson-07.html">
+          <div class="flex items-center justify-between"><h2 class="font-semibold">07. Introduction to Spring & Spring Boot</h2><span class="text-xs text-slate-500">Spring</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Why Spring Boot, Initializr setup, first REST controller.</p>
+        </a>
+        <a class="group block rounded-xl border border-slate-200/60 bg-white/70 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow dark:border-slate-700/60 dark:bg-slate-900/60" href="./content/lesson-08.html">
+          <div class="flex items-center justify-between"><h2 class="font-semibold">08. REST APIs</h2><span class="text-xs text-slate-500">Spring</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">@RestController, @GetMapping/@PostMapping, path & query params.</p>
+        </a>
+        <a class="group block rounded-xl border border-slate-200/60 bg-white/70 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow dark:border-slate-700/60 dark:bg-slate-900/60" href="./content/lesson-09.html">
+          <div class="flex items-center justify-between"><h2 class="font-semibold">09. Dependency Injection (DI) & Beans</h2><span class="text-xs text-slate-500">Spring</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">@Component, @Service, @Repository, @Autowired.</p>
+        </a>
+        <a class="group block rounded-xl border border-slate-200/60 bg-white/70 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow dark:border-slate-700/60 dark:bg-slate-900/60" href="./content/lesson-10.html">
+          <div class="flex items-center justify-between"><h2 class="font-semibold">10. Data Access with Spring Data JPA</h2><span class="text-xs text-slate-500">Data</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Entities, repositories, basic CRUD (save/find/delete).</p>
+        </a>
+        <a class="group block rounded-xl border border-slate-200/60 bg-white/70 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow dark:border-slate-700/60 dark:bg-slate-900/60" href="./content/lesson-11.html">
+          <div class="flex items-center justify-between"><h2 class="font-semibold">11. Exception Handling</h2><span class="text-xs text-slate-500">Web</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">@ExceptionHandler and @ControllerAdvice.</p>
+        </a>
+        <a class="group block rounded-xl border border-slate-200/60 bg-white/70 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow dark:border-slate-700/60 dark:bg-slate-900/60" href="./content/lesson-12.html">
+          <div class="flex items-center justify-between"><h2 class="font-semibold">12. Validation</h2><span class="text-xs text-slate-500">Web</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">@Valid and Bean Validation constraints.</p>
+        </a>
+        <a class="group block rounded-xl border border-slate-200/60 bg-white/70 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow dark:border-slate-700/60 dark:bg-slate-900/60" href="./content/lesson-13.html">
+          <div class="flex items-center justify-between"><h2 class="font-semibold">13. DTO (Data Transfer Objects)</h2><span class="text-xs text-slate-500">API</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Why DTOs, mapping, request/response shapes.</p>
+        </a>
+        <a class="group block rounded-xl border border-slate-200/60 bg-white/70 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow dark:border-slate-700/60 dark:bg-slate-900/60" href="./content/lesson-14.html">
+          <div class="flex items-center justify-between"><h2 class="font-semibold">14. Spring Boot Security (Basics)</h2><span class="text-xs text-slate-500">Security</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Secure endpoints, username/password auth.</p>
+        </a>
+        <a class="group block rounded-xl border border-slate-200/60 bg-white/70 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow dark:border-slate-700/60 dark:bg-slate-900/60" href="./content/lesson-15.html">
+          <div class="flex items-center justify-between"><h2 class="font-semibold">15. Testing in Spring Boot</h2><span class="text-xs text-slate-500">Testing</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">JUnit, Mockito, and controller tests.</p>
+        </a>
+        <a class="group block rounded-xl border border-slate-200/60 bg-white/70 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow dark:border-slate-700/60 dark:bg-slate-900/60" href="./content/lesson-16.html">
+          <div class="flex items-center justify-between"><h2 class="font-semibold">16. Application Properties, Profiles, Build & Run</h2><span class="text-xs text-slate-500">Config</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">application.yml, profiles, env/CLI overrides, build & run.</p>
+        </a>
+        <a class="group block rounded-xl border border-slate-200/60 bg-white/70 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow dark:border-slate-700/60 dark:bg-slate-900/60" href="./content/lesson-17.html">
+          <div class="flex items-center justify-between"><h2 class="font-semibold">17. Advanced JPA (Relationships, JPQL)</h2><span class="text-xs text-slate-500">Data</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">One‑to‑many, many‑to‑many, JPQL, fetch joins.</p>
+        </a>
+        <a class="group block rounded-xl border border-slate-200/60 bg-white/70 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow dark:border-slate-700/60 dark:bg-slate-900/60" href="./content/lesson-18.html">
+          <div class="flex items-center justify-between"><h2 class="font-semibold">18. Caching with Spring Cache</h2><span class="text-xs text-slate-500">Performance</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">@EnableCaching, @Cacheable, @CacheEvict.</p>
+        </a>
+        <a class="group block rounded-xl border border-slate-200/60 bg-white/70 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow dark:border-slate-700/60 dark:bg-slate-900/60" href="./content/lesson-19.html">
+          <div class="flex items-center justify-between"><h2 class="font-semibold">19. Coming Soon</h2><span class="text-xs text-slate-500">Planned</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">New advanced topic.</p>
+        </a>
+        <a class="group block rounded-xl border border-slate-200/60 bg-white/70 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow dark:border-slate-700/60 dark:bg-slate-900/60" href="./content/lesson-20.html">
+          <div class="flex items-center justify-between"><h2 class="font-semibold">20. Coming Soon</h2><span class="text-xs text-slate-500">Planned</span></div>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">New advanced topic.</p>
+        </a>
+      </section>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('themeToggle').addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>

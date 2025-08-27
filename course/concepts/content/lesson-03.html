@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 03 - Object Oriented Programming (OOP)</title>
+    <meta name="description" content="OOP essentials: classes, objects, fields, constructors, and the this keyword. Simple definitions, analogies, commented examples, and quick sketches." />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0  0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="mb-6">
+        <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Concepts</a>
+      </div>
+      <header class="mx-auto max-w-3xl text-center">
+        <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 03: Object Oriented Programming (OOP)</h1>
+        <p class="mt-2 text-slate-600 dark:text-slate-300">Model real things with classes and build usable instances as objects. Learn fields, constructors, and how this clarifies intent.</p>
+      </header>
+
+      <section id="introduction" class="prose prose-slate mt-6 max-w-none dark:prose-invert">
+        <h2>Introduction</h2>
+        <p>Imagine you're designing a video game and you need to create different types of characters: warriors, mages, and archers. Instead of writing separate code for each character that duplicates common features like health, name, and level, you can create a blueprint that defines what all characters have in common, then create specific instances for each player. Object-oriented programming (OOP) works exactly this way - it lets you model real-world concepts by creating blueprints called classes and building actual working copies called objects. A class is like an architectural blueprint that shows what rooms a house will have and where they'll be located, while an object is the actual house built from that blueprint where people can live. OOP helps you organize your code around things rather than just actions, making it easier to understand, maintain, and extend. This approach mirrors how we naturally think about the world - in terms of things (objects) that have characteristics (fields) and can perform actions (methods). Once you understand OOP, you'll be able to model complex real-world systems in your programs.</p>
+      </section>
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="classes">
+        <h2>Classes</h2>
+        <h3>Definition</h3>
+        <p>A class is a blueprint or template that defines the structure and behavior of objects. It specifies what data (fields) objects of that type will have and what actions (methods) they can perform. Classes don't store actual data themselves - they're just the plans for creating objects that do store data. Think of a class as the mold used to create multiple identical-shaped objects.</p>
+
+        <h3>Analogy</h3>
+        <p>A class is like a cookie cutter in your kitchen. The cookie cutter itself isn't a cookie - it's just a shaped tool that defines what cookies made with it will look like. When you press the cookie cutter into dough, you create actual cookies that have the shape defined by the cutter. You can use the same cookie cutter to make dozens of cookies, and while each cookie is a separate, individual item you can eat, they all share the same basic shape and characteristics defined by the cutter. Similarly, a class defines the "shape" (what fields and methods it has) but doesn't hold any actual data. When you use the class to create objects, each object gets its own copy of the data but follows the same structure defined by the class.</p>
+
+        <h3>Example</h3>
+        <pre><code class="language-java">// Class definition - the blueprint
+public class Student {                       // class keyword starts the blueprint
+    // Fields (data/attributes) - what every Student object will have
+    String name;                             // student's name
+    int age;                                 // student's age
+    String major;                            // student's field of study
+    double gpa;                              // grade point average
+
+    // Methods (behaviors) - what every Student object can do
+    void study() {                           // action: studying
+        System.out.println(name + " is studying " + major);
+    }
+
+    void displayInfo() {                     // action: show information
+        System.out.println("Name: " + name);
+        System.out.println("Age: " + age);
+        System.out.println("Major: " + major);
+        System.out.println("GPA: " + gpa);
+    }
+
+    void updateGPA(double newGPA) {          // action: change GPA
+        gpa = newGPA;                        // modify the field
+        System.out.println(name + "'s GPA updated to " + gpa);
+    }
+}
+
+// Using the class - this is just the blueprint, no actual students exist yet
+public class StudentDemo {
+    public static void main(String[] args) {
+        // The class Student exists, but no actual student data is stored yet
+        // We need to create objects (instances) to hold real student information
+        System.out.println("Student class defined, ready to create actual students...");
+    }
+}
+</code></pre>
+      </section>
+
+      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="objects">
+        <h2>Objects</h2>
+        <h3>Definition</h3>
+        <p>An object is a specific instance created from a class blueprint. While the class defines the structure, objects contain actual data and can perform actions. Each object has its own copy of the fields defined in the class, so changing one object's data doesn't affect other objects. You create objects using the `new` keyword followed by the class name.</p>
+
+        <h3>Analogy</h3>
+        <p>If a class is like a house blueprint, then an object is an actual house built from that blueprint. The blueprint shows where the kitchen, bedrooms, and bathrooms will be, but you can't live in a blueprint - you need an actual house. Once built, each house has its own address, its own furniture, and its own family living inside. You can build multiple houses from the same blueprint, but each house is completely separate - painting one house blue doesn't change the color of the others. When the Smith family moves their furniture around, it doesn't affect the furniture in the Jones family's house next door, even though both houses were built from the same blueprint. Each house (object) has the same room layout (class structure) but contains different belongings (data values).</p>
+
+        <h3>Example</h3>
+        <pre><code class="language-java">// Creating and using objects from the Student class
+public class StudentObjectsDemo {
+    public static void main(String[] args) {
+        // Create first student object - Alice
+        Student alice = new Student();       // 'new Student()' creates an object
+        alice.name = "Alice Johnson";        // set Alice's name
+        alice.age = 20;                      // set Alice's age
+        alice.major = "Computer Science";    // set Alice's major
+        alice.gpa = 3.8;                     // set Alice's GPA
+
+        // Create second student object - Bob
+        Student bob = new Student();         // create another separate object
+        bob.name = "Bob Smith";              // Bob has his own name
+        bob.age = 22;                        // Bob has his own age
+        bob.major = "Mathematics";           // Bob has his own major
+        bob.gpa = 3.6;                       // Bob has his own GPA
+
+        // Create third student object - Carol
+        Student carol = new Student();       // create third separate object
+        carol.name = "Carol Davis";          // Carol has her own data
+        carol.age = 19;                      // completely independent from Alice and Bob
+        carol.major = "Physics";
+        carol.gpa = 3.9;
+
+        // Each object can perform actions independently
+        alice.displayInfo();                 // shows Alice's information
+        System.out.println("---");
+        bob.displayInfo();                   // shows Bob's information
+        System.out.println("---");
+        carol.displayInfo();                 // shows Carol's information
+
+        // Objects can perform actions that affect only themselves
+        alice.study();                       // only Alice studies
+        bob.updateGPA(3.7);                  // only Bob's GPA changes
+        carol.study();                       // only Carol studies
+
+        // Verify that changing one object doesn't affect others
+        System.out.println("\nAfter individual actions:");
+        System.out.println("Alice's GPA: " + alice.gpa);  // still 3.8
+        System.out.println("Bob's GPA: " + bob.gpa);      // changed to 3.7
+        System.out.println("Carol's GPA: " + carol.gpa);  // still 3.9
+    }
+}
+</code></pre>
+      </section>
+
+      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="fields">
+        <h2>Fields</h2>
+        <h3>Definition</h3>
+        <p>Fields (also called instance variables or attributes) are variables that belong to a class and store data for each object. Every object created from the class gets its own copy of these fields. Fields define what information an object can remember, like a person's name, age, or address. Fields represent the state or characteristics of an object.</p>
+
+        <h3>Analogy</h3>
+        <p>Fields are like the information written on a driver's license. Every driver's license has the same categories of information - name, address, birthdate, license number, and photo - but each person's license contains their own unique values for these categories. Your license has your name and address, while your friend's license has their name and address. The license format (class) is the same for everyone, but the actual information (field values) is different for each person (object). When you move to a new address, only your license gets updated - everyone else's license stays the same. The categories of information (fields) are defined by the Department of Motor Vehicles (the class), but each individual license holder (object) has their own specific values stored in those categories.</p>
+
+        <h3>Example</h3>
+        <pre><code class="language-java">// Class demonstrating different types of fields
+public class BankAccount {
+    // Fields - data that each BankAccount object will store
+    String accountNumber;                    // text field - account ID
+    String ownerName;                        // text field - who owns account
+    double balance;                          // number field - current money amount
+    boolean isActive;                        // true/false field - account status
+    int transactionCount;                    // whole number field - number of transactions
+
+    // Method to show all field values for this specific object
+    void displayAccountInfo() {
+        System.out.println("=== Account Information ===");
+        System.out.println("Account Number: " + accountNumber);
+        System.out.println("Owner: " + ownerName);
+        System.out.println("Balance: $" + balance);
+        System.out.println("Active: " + isActive);
+        System.out.println("Transactions: " + transactionCount);
+        System.out.println();
+    }
+
+    // Method to modify field values
+    void deposit(double amount) {
+        balance = balance + amount;              // change balance field
+        transactionCount = transactionCount + 1; // change transaction count field
+        System.out.println("Deposited $" + amount + " to account " + accountNumber);
+    }
+}
+
+public class FieldsDemo {
+    public static void main(String[] args) {
+        // Create first account object with its own field values
+        BankAccount account1 = new BankAccount();
+        account1.accountNumber = "ACC001";       // set account1's account number
+        account1.ownerName = "John Doe";         // set account1's owner name
+        account1.balance = 1500.50;              // set account1's balance
+        account1.isActive = true;                // set account1's status
+        account1.transactionCount = 5;           // set account1's transaction count
+
+        // Create second account object with different field values
+        BankAccount account2 = new BankAccount();
+        account2.accountNumber = "ACC002";       // account2 has different account number
+        account2.ownerName = "Jane Smith";       // account2 has different owner
+        account2.balance = 2300.75;              // account2 has different balance
+        account2.isActive = false;               // account2 has different status
+        account2.transactionCount = 12;          // account2 has different transaction count
+
+        // Display both accounts - each has its own field values
+        account1.displayAccountInfo();           // shows account1's specific data
+        account2.displayAccountInfo();           // shows account2's specific data
+
+        // Modify one account's fields - doesn't affect the other
+        account1.deposit(200.00);                // only changes account1's balance and count
+
+        // Show that only account1 changed
+        System.out.println("After deposit to account1:");
+        System.out.println("Account1 balance: $" + account1.balance);     // changed
+        System.out.println("Account1 transactions: " + account1.transactionCount); // changed
+        System.out.println("Account2 balance: $" + account2.balance);     // unchanged
+        System.out.println("Account2 transactions: " + account2.transactionCount); // unchanged
+    }
+}
+</code></pre>
+      </section>
+
+      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="constructors">
+        <h2>Constructors</h2>
+        <h3>Definition</h3>
+        <p>A constructor is a special method that runs automatically when you create a new object. It has the same name as the class and no return type. Constructors are used to initialize an object's fields with starting values, ensuring that objects begin in a valid, usable state. You can have multiple constructors with different parameters to provide flexibility in how objects are created.</p>
+
+        <h3>Analogy</h3>
+        <p>A constructor is like the setup process when you first get a new smartphone. Before you can really use the phone, it automatically walks you through essential setup steps: choosing your language, connecting to WiFi, signing into your account, and setting up basic preferences. You can't skip this setup - it happens automatically when you first turn on the phone. The phone manufacturer (class) designed this setup process (constructor) to ensure every phone starts in a working state with the necessary basic configuration. Some phones might have a quick setup for basic users and an advanced setup for power users - these are like having multiple constructors that let you initialize the phone in different ways depending on your needs.</p>
+
+        <h3>Example</h3>
+        <pre><code class="language-java">// Class with multiple constructors
+public class Car {
+    // Fields that every car has
+    String make;                             // car manufacturer
+    String model;                            // car model
+    int year;                                // year manufactured
+    String color;                            // car color
+    double mileage;                          // miles driven
+
+    // Default constructor - creates car with basic values
+    public Car() {                           // no parameters
+        make = "Unknown";                    // set default make
+        model = "Unknown";                   // set default model
+        year = 2025;                         // set default year
+        color = "White";                     // set default color
+        mileage = 0.0;                       // set default mileage
+        System.out.println("Created a default car");
+    }
+
+    // Constructor with basic information
+    public Car(String carMake, String carModel, int carYear) {
+        make = carMake;                      // set provided make
+        model = carModel;                    // set provided model
+        year = carYear;                      // set provided year
+        color = "White";                     // default color
+        mileage = 0.0;                       // default mileage
+        System.out.println("Created " + year + " " + make + " " + model);
+    }
+
+    // Constructor with full information
+    public Car(String carMake, String carModel, int carYear, String carColor, double carMileage) {
+        make = carMake;                      // set all provided values
+        model = carModel;
+        year = carYear;
+        color = carColor;
+        mileage = carMileage;
+        System.out.println("Created " + year + " " + color + " " + make + " " + model + " with " + mileage + " miles");
+    }
+
+    // Method to display car information
+    void displayCarInfo() {
+        System.out.println(year + " " + color + " " + make + " " + model + " - " + mileage + " miles");
+    }
+}
+
+public class ConstructorDemo {
+    public static void main(String[] args) {
+        // Using different constructors to create cars
+
+        // Default constructor - minimal setup
+        Car car1 = new Car();                // calls default constructor
+        car1.displayCarInfo();
+
+        // Constructor with basic info
+        Car car2 = new Car("Toyota", "Camry", 2023); // calls 3-parameter constructor
+        car2.displayCarInfo();
+
+        // Constructor with full info
+        Car car3 = new Car("Honda", "Civic", 2022, "Blue", 15000.5); // calls 5-parameter constructor
+        car3.displayCarInfo();
+
+        // Each car was properly initialized by its constructor
+        System.out.println("\nAll cars were created with valid starting values:");
+        System.out.println("Car1 make: " + car1.make);      // "Unknown" from default constructor
+        System.out.println("Car2 color: " + car2.color);    // "White" from 3-parameter constructor
+        System.out.println("Car3 mileage: " + car3.mileage); // 15000.5 from 5-parameter constructor
+    }
+}
+</code></pre>
+      </section>
+
+      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="this-keyword">
+        <h2>The this Keyword</h2>
+        <h3>Definition</h3>
+        <p>The `this` keyword refers to the current object - the specific instance of the class that is currently executing the method. It's used to distinguish between instance variables (fields) and parameters or local variables that have the same name. The `this` keyword helps clarify which variable you're referring to and can also be used to call other constructors within the same class.</p>
+
+        <h3>Analogy</h3>
+        <p>The `this` keyword is like saying "my" when you're talking about yourself in a conversation. Imagine you're at a party where several people have the same name. When someone asks "What's your phone number?", you naturally say "MY phone number is..." to make it clear you're talking about your own number, not someone else's who happens to share your name. In a classroom, if the teacher asks "What's your grade?", you'd say "MY grade is an A" to distinguish your grade from other students' grades. The word "my" (like `this`) points specifically to your own information, not someone else's. In Java, when multiple variables have the same name, `this` acts like "my" to specify that you're referring to the current object's version of that variable.</p>
+
+        <h3>Example</h3>
+        <pre><code class="language-java">// Class demonstrating the 'this' keyword
+public class Person {
+    // Fields (instance variables)
+    String name;                             // person's name
+    int age;                                 // person's age
+    String city;                             // person's city
+
+    // Constructor with parameters that match field names
+    public Person(String name, int age, String city) {
+        // Without 'this', Java wouldn't know which 'name' you mean:
+        // name = name;  // This would assign parameter to itself - doesn't work!
+
+        // Using 'this' to clarify - 'this.name' means the object's field
+        this.name = name;                    // this object's name field = parameter value
+        this.age = age;                      // this object's age field = parameter value
+        this.city = city;                    // this object's city field = parameter value
+
+        System.out.println("Created person: " + this.name);
+    }
+
+    // Method where 'this' helps with clarity
+    public void updateAge(int age) {         // parameter has same name as field
+        System.out.println("Updating age for " + this.name); // clearly refers to object's name field
+        this.age = age;                      // this object's age field = new parameter value
+        System.out.println(this.name + " is now " + this.age + " years old");
+    }
+
+    // Method demonstrating calling another method on the same object
+    public void introduce() {
+        System.out.println("Hi, I'm " + this.name);        // this object's name
+        this.showDetails();                  // call another method on this same object
+    }
+
+    public void showDetails() {
+        // 'this' is optional when there's no naming conflict, but makes intent clear
+        System.out.println("Name: " + this.name);          // this object's fields
+        System.out.println("Age: " + this.age);
+        System.out.println("City: " + this.city);
+    }
+
+    // Method that compares this object with another object
+    public boolean isOlderThan(Person otherPerson) {
+        return this.age > otherPerson.age;   // compare this object's age with other object's age
+    }
+}
+
+public class ThisKeywordDemo {
+    public static void main(String[] args) {
+        // Create two person objects
+        Person alice = new Person("Alice", 25, "New York");    // 'this' refers to alice object in constructor
+        Person bob = new Person("Bob", 30, "Los Angeles");     // 'this' refers to bob object in constructor
+
+        // Each object's methods use 'this' to refer to themselves
+        alice.introduce();                   // 'this' in introduce() refers to alice
+        System.out.println("---");
+        bob.introduce();                     // 'this' in introduce() refers to bob
+
+        // Update age - 'this' ensures we update the correct object
+        alice.updateAge(26);                 // 'this' in updateAge() refers to alice
+        bob.updateAge(31);                   // 'this' in updateAge() refers to bob
+
+        // Compare objects - 'this' refers to the object calling the method
+        if (alice.isOlderThan(bob)) {        // 'this' in isOlderThan() refers to alice
+            System.out.println("Alice is older than Bob");
+        } else {
+            System.out.println("Bob is older than Alice");
+        }
+    }
+}
+</code></pre>
+      </section>
+
+      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="summary">
+        <h2>Summary</h2>
+        <p>Object-oriented programming provides a natural way to model real-world concepts in your code by organizing information and behavior together. Classes serve as blueprints that define what data objects will store and what actions they can perform, while objects are the actual instances that hold specific values and can execute those actions. Fields store the state and characteristics of each object, constructors ensure objects start with valid initial values, and the `this` keyword helps you clearly refer to the current object when needed. These concepts work together to create code that is more organized, reusable, and easier to understand because it mirrors how we naturally think about things in the real world. In the next lesson, we'll dive deeper into advanced OOP concepts like encapsulation, inheritance, and polymorphism, which will give you even more powerful tools for designing robust and flexible programs.</p>
+      </section>
+      <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+        <a href="lesson-02.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
+        <a href="lesson-04.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
+      </nav>
+    </main>
+
+    <script>
+      document.getElementById('themeToggle').addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 02 - Methods & Functions</title>
+    <meta name="description" content="Methods, parameters, return values, overloading, scope. Simple definitions, analogies, commented examples, and quick ASCII sketches." />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="mb-6">
+        <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Concepts</a>
+      </div>
+      <header class="mx-auto max-w-3xl text-center">
+        <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 02: Methods & Functions</h1>
+        <p class="mt-2 text-slate-600 dark:text-slate-300">Write reusable logic with clean inputs and outputs. Concepts include method syntax, parameters, return values, overloading, and scope.</p>
+      </header>
+
+      <section id="introduction" class="prose prose-slate mt-6 max-w-none dark:prose-invert">
+        <h2>Introduction</h2>
+        <p>Imagine you're cooking and you need to chop vegetables multiple times throughout the recipe. Instead of writing out "cut the onion into small pieces" every single time, you could create a reusable instruction called "chop vegetables" that you can use whenever needed. Methods in Java work exactly the same way - they're reusable blocks of code that perform specific tasks. A method takes inputs (called parameters), does some work with those inputs, and can give you back a result (called a return value). This saves you from writing the same code over and over again, makes your programs easier to read and understand, and helps you fix bugs in one place instead of many. Learning methods is like learning to create your own custom tools that you can use whenever you need them. Once you master methods, you'll be able to break down complex problems into smaller, manageable pieces.</p>
+      </section>
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="method-syntax">
+        <h2>Method Syntax</h2>
+        <h3>Definition</h3>
+        <p>A method in Java is defined with a specific structure: an access modifier (like public or private), a return type, a method name, parameters in parentheses, and a body enclosed in curly braces. The method signature includes the name and parameter types, which must be unique within a class. Understanding this syntax is essential because it tells Java exactly what your method does and how to use it.</p>
+
+        <h3>Analogy</h3>
+        <p>Think of a method like a recipe card in a cookbook. Every recipe card follows the same format: it has a title at the top (the method name), a list of ingredients needed (the parameters), instructions on what to do (the method body), and tells you what you'll get at the end (the return type). Just like how "Chocolate Chip Cookies" is different from "Oatmeal Cookies" even though both are cookie recipes, methods with different names or different ingredients (parameters) are considered different methods. The recipe card format is standardized so anyone can pick it up and understand exactly what ingredients they need, what steps to follow, and what delicious result they'll get. When you want to make cookies, you don't need to remember every single step - you just refer to the recipe card and follow the instructions.</p>
+
+        <h3>Example</h3>
+        <pre><code class="language-java">// Basic method syntax components
+public class MethodSyntaxDemo {
+
+    // Method with no parameters and no return value
+    public static void sayHello() {              // public static = access modifiers
+        System.out.println("Hello, World!");    // void = returns nothing
+    }                                            // sayHello = method name
+                                                 // () = no parameters
+
+    // Method with parameters and return value
+    public static int addNumbers(int a, int b) { // int = return type
+        int sum = a + b;                         // int a, int b = parameters
+        return sum;                              // return statement gives back result
+    }
+
+    // Method with multiple parameters
+    public static String createGreeting(String name, int age) {
+        String message = "Hello " + name + ", you are " + age + " years old";
+        return message;                          // return the constructed string
+    }
+
+    // Using the methods
+    public static void main(String[] args) {
+        sayHello();                              // call method with no parameters
+
+        int result = addNumbers(5, 3);           // call method with parameters
+        System.out.println("Sum is: " + result); // use the returned value
+
+        String greeting = createGreeting("Alice", 25); // call with different parameter types
+        System.out.println(greeting);            // print the returned greeting
+    }
+}
+</code></pre>
+      </section>
+
+      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="return-types">
+        <h2>Return Types</h2>
+        <h3>Definition</h3>
+        <p>A return type specifies what kind of value a method will give back to the code that called it. Methods can return primitive types (int, double, boolean), objects (String, custom classes), or nothing at all (void). When a method has a return type other than void, it must use the return statement to provide a value of that exact type.</p>
+
+        <h3>Analogy</h3>
+        <p>Think of return types like different types of vending machines. A soda machine (returns String) gives you back a drink, a change machine (returns int) gives you back coins, and a ticket validator (returns boolean) just stamps your ticket and gives you nothing back - it just does its job. When you approach any machine, you know exactly what type of thing you'll get back. A soda machine will never give you coins, and a change machine will never give you a drink. In programming, if a method promises to return an integer, it must always return an integer - never a string or nothing at all. The return type is like a contract that guarantees what kind of result you'll receive, so you can plan accordingly in your code.</p>
+
+        <h3>Example</h3>
+        <pre><code class="language-java">// Different return types demonstration
+public class ReturnTypesDemo {
+
+    // Method that returns nothing (void)
+    public static void printWelcome() {          // void = no return value
+        System.out.println("Welcome to our store!");
+        // No return statement needed for void methods
+    }
+
+    // Method that returns an integer
+    public static int calculateAge(int birthYear) { // int = returns whole number
+        int currentYear = 2025;
+        int age = currentYear - birthYear;
+        return age;                              // must return an int value
+    }
+
+    // Method that returns a double
+    public static double calculateTip(double billAmount, double tipPercent) {
+        double tipAmount = billAmount * (tipPercent / 100); // double = decimal number
+        return tipAmount;                        // must return a double value
+    }
+
+    // Method that returns a boolean
+    public static boolean isEligibleToVote(int age) { // boolean = true or false
+        if (age >= 18) {
+            return true;                         // return true if eligible
+        } else {
+            return false;                        // return false if not eligible
+        }
+    }
+
+    // Method that returns a String
+    public static String formatFullName(String first, String last) {
+        String fullName = first + " " + last;   // String = text
+        return fullName;                         // must return a String value
+    }
+
+    // Using methods with different return types
+    public static void main(String[] args) {
+        printWelcome();                          // void method - no value returned
+
+        int personAge = calculateAge(1995);      // int returned - store in int variable
+        System.out.println("Age: " + personAge);
+
+        double tip = calculateTip(50.0, 18.0);   // double returned - store in double variable
+        System.out.println("Tip amount: $" + tip);
+
+        boolean canVote = isEligibleToVote(personAge); // boolean returned
+        System.out.println("Can vote: " + canVote);
+
+        String name = formatFullName("John", "Doe"); // String returned
+        System.out.println("Full name: " + name);
+    }
+}
+</code></pre>
+      </section>
+
+      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="parameters">
+        <h2>Parameters</h2>
+        <h3>Definition</h3>
+        <p>Parameters are inputs that you pass to a method when you call it. Each parameter has a type and a name, and you can have zero, one, or many parameters. Parameters allow the same method to work with different values, making your code flexible and reusable. The values you pass in are called arguments, and they must match the parameter types in order.</p>
+
+        <h3>Analogy</h3>
+        <p>Parameters are like the ingredients you hand to a chef when placing an order. When you order a sandwich, you don't just say "make me a sandwich" - you specify what you want: "turkey sandwich with mayo on wheat bread." The chef (method) needs these specific ingredients (parameters) to make exactly what you want. The same sandwich-making process can create thousands of different sandwiches depending on the ingredients you provide. The chef knows how to make sandwiches, but they need you to tell them which bread, which meat, and which condiments to use. Without these ingredients, the chef can't do their job. The order matters too - if you say "wheat, turkey, mayo" the chef understands that wheat is the bread, turkey is the meat, and mayo is the condiment, in that specific order.</p>
+
+        <h3>Example</h3>
+        <pre><code class="language-java">// Methods with different parameter configurations
+public class ParametersDemo {
+
+    // Method with no parameters
+    public static void showMenu() {              // empty parentheses = no parameters needed
+        System.out.println("Today's Special: Pizza");
+        System.out.println("Price: $12.99");
+    }
+
+    // Method with one parameter
+    public static void greetCustomer(String customerName) { // one String parameter
+        System.out.println("Welcome, " + customerName + "!");
+        System.out.println("How can we help you today?");
+    }
+
+    // Method with multiple parameters of same type
+    public static int multiply(int number1, int number2) { // two int parameters
+        int result = number1 * number2;          // use both parameters in calculation
+        return result;
+    }
+
+    // Method with multiple parameters of different types
+    public static String formatOrderSummary(String item, int quantity, double price) {
+        double total = quantity * price;         // use all three parameters
+        String summary = quantity + "x " + item + " = $" + total;
+        return summary;                          // combine parameters in result
+    }
+
+    // Method with many parameters
+    public static void createCustomerProfile(String firstName, String lastName,
+                                           int age, String email, String phone) {
+        System.out.println("Creating profile for:");
+        System.out.println("Name: " + firstName + " " + lastName); // use multiple parameters
+        System.out.println("Age: " + age);
+        System.out.println("Email: " + email);
+        System.out.println("Phone: " + phone);
+    }
+
+    // Calling methods with parameters
+    public static void main(String[] args) {
+        showMenu();                              // no arguments needed
+
+        greetCustomer("Alice");                  // pass one argument
+
+        int product = multiply(6, 7);            // pass two int arguments
+        System.out.println("6 x 7 = " + product);
+
+        String order = formatOrderSummary("Pizza", 2, 12.99); // three arguments
+        System.out.println(order);
+
+        // Arguments must match parameter types and order
+        createCustomerProfile("John", "Smith", 30, "john@email.com", "555-1234");
+
+        // This would cause compilation error - wrong types or order:
+        // multiply("hello", "world");           // strings instead of integers
+        // greetCustomer(25);                   // integer instead of string
+    }
+}
+</code></pre>
+      </section>
+
+      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="method-overloading">
+        <h2>Method Overloading</h2>
+        <h3>Definition</h3>
+        <p>Method overloading allows you to create multiple methods with the same name but different parameter lists (different number of parameters or different parameter types). Java determines which method to call based on the arguments you provide. This makes your code more flexible and intuitive to use.</p>
+
+        <h3>Analogy</h3>
+        <p>Method overloading is like having multiple ways to order food at a restaurant. You might say "I'll have a pizza" (simple order), or "I'll have a pizza with pepperoni" (adding one specification), or "I'll have a large pizza with pepperoni and mushrooms" (even more specific). The kitchen staff knows which pizza to make based on how much detail you provide. The word "pizza" stays the same, but the kitchen responds differently depending on the additional information you give them. Whether you say just "pizza" or provide a detailed description, the staff understands what you want and prepares it accordingly. The restaurant doesn't need different names for each variation - they use the context of your full order to determine exactly what to prepare.</p>
+
+        <h3>Example</h3>
+        <pre><code class="language-java">// Method overloading demonstration
+public class MethodOverloadingDemo {
+
+    // Basic print method - no parameters
+    public static void print() {                 // version 1: no parameters
+        System.out.println("Hello, World!");
+    }
+
+    // Overloaded print method - one String parameter
+    public static void print(String message) {   // version 2: one String
+        System.out.println(message);
+    }
+
+    // Overloaded print method - String and int parameters
+    public static void print(String message, int times) { // version 3: String + int
+        for (int i = 0; i < times; i++) {        // repeat the message
+            System.out.println(message);
+        }
+    }
+
+    // Calculate area methods - same name, different shapes
+    public static double calculateArea(double radius) { // circle area
+        return Math.PI * radius * radius;        // πr²
+    }
+
+    public static double calculateArea(double length, double width) { // rectangle area
+        return length * width;                   // length × width
+    }
+
+    public static double calculateArea(double base, double height, boolean isTriangle) {
+        if (isTriangle) {                        // triangle area
+            return 0.5 * base * height;          // ½ × base × height
+        } else {
+            return base * height;                // rectangle (alternative)
+        }
+    }
+
+    // Convert temperature methods
+    public static double convertTemperature(double celsius) { // Celsius to Fahrenheit
+        return (celsius * 9.0 / 5.0) + 32;
+    }
+
+    public static double convertTemperature(double temperature, String fromUnit) {
+        if (fromUnit.equals("C")) {              // Celsius to Fahrenheit
+            return (temperature * 9.0 / 5.0) + 32;
+        } else if (fromUnit.equals("F")) {       // Fahrenheit to Celsius
+            return (temperature - 32) * 5.0 / 9.0;
+        }
+        return temperature;                      // no conversion needed
+    }
+
+    // Using overloaded methods
+    public static void main(String[] args) {
+        // Java automatically chooses the right method based on arguments
+        print();                                 // calls version 1 (no parameters)
+        print("Welcome!");                       // calls version 2 (one String)
+        print("Java is fun!", 3);               // calls version 3 (String + int)
+
+        // Calculate different areas
+        double circleArea = calculateArea(5.0);  // calls circle version (one parameter)
+        double rectArea = calculateArea(4.0, 6.0); // calls rectangle version (two parameters)
+        double triangleArea = calculateArea(3.0, 4.0, true); // calls triangle version
+
+        System.out.println("Circle area: " + circleArea);
+        System.out.println("Rectangle area: " + rectArea);
+        System.out.println("Triangle area: " + triangleArea);
+
+        // Convert temperatures
+        double tempF = convertTemperature(25.0); // calls simple version (Celsius to F)
+        double tempC = convertTemperature(77.0, "F"); // calls advanced version (F to C)
+
+        System.out.println("25°C = " + tempF + "°F");
+        System.out.println("77°F = " + tempC + "°C");
+    }
+}
+</code></pre>
+      </section>
+
+      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="summary">
+        <h2>Summary</h2>
+        <p>Methods are the building blocks that help you organize your code into reusable, manageable pieces. You've learned how to define methods with proper syntax, specify return types to control what values methods give back, and use parameters to make methods flexible and work with different inputs. Method overloading allows you to create multiple versions of the same method that handle different scenarios, making your code more intuitive and user-friendly. These concepts are fundamental to writing clean, maintainable Java code that doesn't repeat itself. In the next lesson, we'll explore object-oriented programming, where methods become even more powerful as they work together with data inside classes to model real-world concepts.</p>
+      </section>
+      <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+        <a href="lesson-01.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
+        <a href="lesson-03.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
+      </nav>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('themeToggle').addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>
