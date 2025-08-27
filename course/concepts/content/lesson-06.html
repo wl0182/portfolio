@@ -1,0 +1,698 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 06 - Java Streams & Lambdas (Essentials)</title>
+    <meta name="description" content="Functional programming in Java: lambda expressions, method references, and stream operations like filter, map, and reduce." />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="mb-6">
+        <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Concepts</a>
+      </div>
+      <header class="mx-auto max-w-3xl text-center">
+        <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 06: Java Streams & Lambdas (Essentials)</h1>
+        <p class="mt-2 text-slate-600 dark:text-slate-300">Transform how you process data with functional programming: use lambda expressions and stream operations to write cleaner, more expressive code.</p>
+      </header>
+
+      <section id="introduction" class="prose prose-slate mt-6 max-w-none dark:prose-invert">
+        <h2>Introduction</h2>
+        <p>Imagine you have a list of 1000 students and you need to find all computer science majors with a GPA above 3.5, then get their names in alphabetical order. With traditional loops, you'd write multiple for-loops, if-statements, and sorting logic spread across many lines of code. Java Streams and Lambda expressions let you express this same complex data processing in just a few readable lines that read almost like English. Streams provide a modern, functional approach to processing collections of data, while lambda expressions give you a concise way to define small functions inline without creating separate methods. This functional programming style makes your code more readable, less error-prone, and often more efficient. Instead of focusing on how to loop through data step-by-step, you describe what transformations you want to apply to your data. Once you master streams and lambdas, you'll find yourself writing cleaner, more expressive code that's easier to understand and maintain.</p>
+      </section>
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="lambda-expressions">
+        <h2>Lambda Expressions</h2>
+
+        <h3>Definition</h3>
+        <p>A lambda expression is a concise way to represent a function without formally declaring it as a method. It's essentially an anonymous function that you can pass around as a parameter to other methods. Lambda expressions consist of parameters, an arrow operator (->), and a body that contains the logic. They allow you to write functional-style code that's more readable and expressive than traditional anonymous classes.</p>
+
+        <h3>Analogy</h3>
+        <p>A lambda expression is like giving someone quick verbal instructions instead of writing a formal manual. Imagine you're at a coffee shop and need to tell the barista how to make your custom drink. Instead of writing out a detailed recipe with numbered steps, title, and formal instructions (like a traditional method), you simply say "take the espresso, add steamed milk, and sprinkle cinnamon on top." The barista understands exactly what to do from these concise instructions. Similarly, when you need a simple function to transform or filter data, instead of creating a full method with a name, return type, and formal declaration, you can use a lambda expression to provide quick, inline instructions. Just like the barista follows your verbal instructions immediately without needing to reference a written manual, Java can execute lambda expressions directly where they're needed without requiring a separate method definition.</p>
+
+        <h3>Examples</h3>
+
+        <h4>Basic Lambda Syntax</h4>
+        <p>This example shows the basic syntax of lambda expressions with different parameter combinations:</p>
+
+        <p><strong>Lambda with single parameter:</strong></p>
+        <pre><code class="language-java">// Takes a string, returns its length (parentheses optional for single parameter)
+Function&lt;String, Integer&gt; getLength = name -> name.length();
+System.out.println(getLength.apply("Java")); // prints: 4
+</code></pre>
+
+        <p><strong>Lambda with multiple parameters:</strong></p>
+        <pre><code class="language-java">// Takes two integers, returns their sum
+BinaryOperator&lt;Integer&gt; add = (a, b) -> a + b;
+System.out.println(add.apply(5, 3)); // prints: 8
+</code></pre>
+
+        <h4>Lambda vs Traditional Approach</h4>
+        <p>This example compares lambda expressions with the traditional anonymous class approach:</p>
+
+        <p><strong>Traditional anonymous class (verbose):</strong></p>
+        <pre><code class="language-java">List&lt;String&gt; names = Arrays.asList("Alice", "Bob", "Charlie");
+
+// Old way - lots of boilerplate code
+Collections.sort(names, new Comparator&lt;String&gt;() {
+    @Override
+    public int compare(String a, String b) {
+        return a.length() - b.length(); // compare by length
+    }
+});
+</code></pre>
+
+        <p><strong>Modern lambda expression (concise):</strong></p>
+        <pre><code class="language-java">List&lt;String&gt; names = Arrays.asList("Alice", "Bob", "Charlie");
+
+// New way - much shorter and cleaner
+Collections.sort(names, (a, b) -> a.length() - b.length());
+System.out.println(names); // [Bob, Alice, Charlie]
+</code></pre>
+
+        <h4>Lambda with Custom Objects</h4>
+        <p>This example demonstrates how to use lambdas with custom objects:</p>
+
+        <p><strong>Extract student names:</strong></p>
+        <pre><code class="language-java">// Lambda to get name from student object
+Function&lt;Student, String&gt; getName = student -> student.name;
+System.out.println("First student: " + getName.apply(students.get(0)));
+</code></pre>
+
+        <p><strong>Check if student has high GPA:</strong></p>
+        <pre><code class="language-java">// Lambda to test if GPA is high enough
+Predicate&lt;Student&gt; hasHighGPA = student -> student.gpa >= 3.5;
+System.out.println("Alice has high GPA: " + hasHighGPA.test(alice));
+</code></pre>
+
+        <p><strong>Sort students by age:</strong></p>
+        <pre><code class="language-java">// Lambda to compare students by age
+students.sort((s1, s2) -> s1.age - s2.age);
+System.out.println("Sorted by age: " + students);
+</code></pre>
+      </section>
+
+      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="streams-introduction">
+        <h2>Streams Introduction</h2>
+
+        <h3>Definition</h3>
+        <p>A Stream is a sequence of data elements that can be processed using functional-style operations. Streams don't store data themselves - they process data from a source like a collection, array, or file. You can chain multiple operations together to transform, filter, or aggregate data in a single fluent expression. Streams are lazy, meaning they only process data when a terminal operation is called, making them efficient for large datasets.</p>
+
+        <h3>Analogy</h3>
+        <p>A Stream is like an assembly line in a factory where products move through different workstations for processing. The conveyor belt doesn't store the products - it just moves them from one processing station to the next. At each station, workers might inspect products (filter), modify them (map), or count them (reduce). You can set up multiple stations in sequence: first station removes defective items, second station paints them blue, third station adds labels, and finally someone counts the finished products. The assembly line only starts moving when you actually need the final products - this is like how streams are "lazy" and don't process anything until you ask for results. Just like you can design an assembly line by specifying what happens at each station without actually running it, you can design a stream pipeline by chaining operations together without actually processing the data until you need the final result.</p>
+
+        <h3>Examples</h3>
+
+        <h4>Creating Streams</h4>
+        <p>This example shows different ways to create streams from various data sources:</p>
+
+        <p><strong>Create stream from a list:</strong></p>
+        <pre><code class="language-java">List&lt;String&gt; fruits = Arrays.asList("apple", "banana", "cherry");
+Stream&lt;String&gt; fruitStream = fruits.stream(); // convert list to stream
+System.out.println("Fruits: " + fruits);
+</code></pre>
+
+        <p><strong>Create stream from individual values:</strong></p>
+        <pre><code class="language-java">Stream&lt;Integer&gt; numberStream = Stream.of(1, 2, 3, 4, 5); // create from values
+System.out.println("Created number stream with 5 elements");
+</code></pre>
+
+        <h4>Traditional vs Stream Approach</h4>
+        <p>This example compares the traditional imperative approach with the modern stream approach:</p>
+
+        <p><strong>Traditional approach (imperative):</strong></p>
+        <pre><code class="language-java">List&lt;Integer&gt; numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+
+// Find even numbers and double them - the old way
+List&lt;Integer&gt; result1 = new ArrayList&lt;&gt;(); // create empty list
+for (Integer num : numbers) { // loop through each number
+    if (num % 2 == 0) { // check if even
+        result1.add(num * 2); // double it and add to result
+    }
+}
+System.out.println("Traditional result: " + result1);
+</code></pre>
+
+        <p><strong>Stream approach (declarative):</strong></p>
+        <pre><code class="language-java">List&lt;Integer&gt; numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+
+// Same logic in one readable line
+List&lt;Integer&gt; result2 = numbers.stream() // create stream from list
+    .filter(num -> num % 2 == 0) // keep only even numbers
+    .map(num -> num * 2) // double each number
+    .collect(Collectors.toList()); // collect into new list
+System.out.println("Stream result: " + result2); // [4, 8, 12, 16, 20]
+</code></pre>
+      </section>
+
+      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="filter-operation">
+        <h2>Filter Operation</h2>
+
+        <h3>Definition</h3>
+        <p>The filter operation allows you to select only the elements from a stream that match a given condition (predicate). It takes a lambda expression that returns true or false for each element, keeping only those elements where the condition evaluates to true. Filter is an intermediate operation, meaning it returns a new stream and can be chained with other operations. The original data remains unchanged.</p>
+
+        <h3>Analogy</h3>
+        <p>The filter operation is like a security checkpoint at an airport where only certain people are allowed through. The security guard (your lambda expression) checks each person (data element) against specific criteria - maybe checking if they have a valid boarding pass and ID. People who meet the criteria pass through to the departure gate, while those who don't are turned away. The security checkpoint doesn't change the people in any way - it simply decides who gets to continue and who doesn't. Similarly, the filter operation examines each element in your data stream and only lets through those that satisfy your specified condition. The original data remains unchanged; you just get a new stream containing only the elements that "passed the test."</p>
+
+        <h3>Examples</h3>
+
+        <h4>Basic Filtering</h4>
+        <p>This example shows simple filtering operations on different types of data:</p>
+
+        <p><strong>Filter even numbers:</strong></p>
+        <pre><code class="language-java">List&lt;Integer&gt; numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+
+List&lt;Integer&gt; evenNumbers = numbers.stream()
+    .filter(num -> num % 2 == 0) // keep only even numbers
+    .collect(Collectors.toList());
+System.out.println("Even numbers: " + evenNumbers); // [2, 4, 6, 8, 10]
+</code></pre>
+
+        <p><strong>Filter numbers greater than 5:</strong></p>
+        <pre><code class="language-java">List&lt;Integer&gt; largeNumbers = numbers.stream()
+    .filter(num -> num > 5) // keep only numbers > 5
+    .collect(Collectors.toList());
+System.out.println("Numbers > 5: " + largeNumbers); // [6, 7, 8, 9, 10]
+</code></pre>
+
+        <p><strong>Filter long words:</strong></p>
+        <pre><code class="language-java">List&lt;String&gt; words = Arrays.asList("cat", "elephant", "dog", "butterfly", "ant");
+
+List&lt;String&gt; longWords = words.stream()
+    .filter(word -> word.length() > 3) // keep words longer than 3 chars
+    .collect(Collectors.toList());
+System.out.println("Long words: " + longWords); // [elephant, butterfly]
+</code></pre>
+
+        <p><strong>Filter words containing specific letter:</strong></p>
+        <pre><code class="language-java">List&lt;String&gt; wordsWithT = words.stream()
+    .filter(word -> word.contains("t")) // keep words containing 't'
+    .collect(Collectors.toList());
+System.out.println("Words with 't': " + wordsWithT); // [cat, elephant, butterfly, ant]
+</code></pre>
+
+        <h4>Filtering Custom Objects</h4>
+        <p>This example demonstrates filtering collections of custom objects based on their properties:</p>
+
+        <p><strong>Filter expensive products:</strong></p>
+        <pre><code class="language-java">List&lt;Product&gt; products = Arrays.asList(
+    new Product("Laptop", 999.99, "Electronics"),
+    new Product("Book", 15.99, "Education"),
+    new Product("Coffee", 4.99, "Food")
+);
+
+List&lt;Product&gt; expensiveProducts = products.stream()
+    .filter(product -> product.price > 50) // keep expensive products
+    .collect(Collectors.toList());
+System.out.println("Expensive products: " + expensiveProducts);
+</code></pre>
+
+        <p><strong>Filter by category:</strong></p>
+        <pre><code class="language-java">List&lt;Product&gt; electronics = products.stream()
+    .filter(product -> product.category.equals("Electronics")) // keep only electronics
+    .collect(Collectors.toList());
+System.out.println("Electronics: " + electronics);
+</code></pre>
+
+        <p><strong>Filter by name starting with letter:</strong></p>
+        <pre><code class="language-java">List&lt;Product&gt; productsStartingWithC = products.stream()
+    .filter(product -> product.name.startsWith("C")) // keep names starting with 'C'
+    .collect(Collectors.toList());
+System.out.println("Products starting with 'C': " + productsStartingWithC);
+</code></pre>
+
+        <h4>Multiple Filter Conditions</h4>
+        <p>This example shows how to combine multiple filter conditions:</p>
+
+        <p><strong>Chain multiple filters:</strong></p>
+        <pre><code class="language-java">List&lt;Employee&gt; result1 = employees.stream()
+    .filter(emp -> emp.department.equals("Engineering")) // first filter: engineering dept
+    .filter(emp -> emp.salary > 70000) // second filter: high salary
+    .filter(emp -> emp.age < 30) // third filter: young age
+    .collect(Collectors.toList());
+System.out.println("Young high-paid engineers: " + result1);
+</code></pre>
+
+        <p><strong>Combine conditions with logical operators:</strong></p>
+        <pre><code class="language-java">List&lt;Employee&gt; result2 = employees.stream()
+    .filter(emp -> emp.department.equals("Engineering") && // all conditions in one filter
+                  emp.salary > 70000 &&
+                  emp.age < 30)
+    .collect(Collectors.toList());
+System.out.println("Same result, different approach: " + result2);
+</code></pre>
+
+        <p><strong>Complex condition with OR logic:</strong></p>
+        <pre><code class="language-java">List&lt;Employee&gt; result3 = employees.stream()
+    .filter(emp -> emp.salary > 80000 || // high salary OR
+                  (emp.age > 30 && emp.department.equals("Marketing"))) // senior marketing
+    .collect(Collectors.toList());
+System.out.println("High earners or senior marketing: " + result3);
+</code></pre>
+      </section>
+
+      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="map-operation">
+        <h2>Map Operation</h2>
+
+        <h3>Definition</h3>
+        <p>The map operation transforms each element in a stream by applying a function to it, producing a new stream with the transformed elements. It's a one-to-one transformation where each input element becomes exactly one output element, though the type can change. Map is an intermediate operation that doesn't change the size of the stream but can change the type and content of elements. The original data remains unchanged.</p>
+
+        <h3>Analogy</h3>
+        <p>The map operation is like a photo editing filter that you apply to every picture in your album. Imagine you have a folder with 100 photos and you want to convert them all to black and white. You run each photo through the same black-and-white filter, and you end up with 100 transformed photos - same number of pictures, but each one has been changed in the same way. The original photos aren't modified; you get a new set of processed photos. Similarly, when you map a stream of student objects to their names, you're applying a "get name" transformation to each student object, resulting in a stream of strings. You still have the same number of elements (one name for each student), but the type and content have been transformed from Student objects to String values.</p>
+
+        <h3>Examples</h3>
+
+        <h4>Basic Data Transformation</h4>
+        <p>This example shows simple transformations on different types of data:</p>
+
+        <p><strong>Square each number:</strong></p>
+        <pre><code class="language-java">List&lt;Integer&gt; numbers = Arrays.asList(1, 2, 3, 4, 5);
+List&lt;Integer&gt; squares = numbers.stream()
+    .map(num -> num * num) // square each number
+    .collect(Collectors.toList());
+System.out.println("Squares: " + squares); // [1, 4, 9, 16, 25]
+</code></pre>
+
+        <p><strong>Convert strings to uppercase:</strong></p>
+        <pre><code class="language-java">List&lt;String&gt; words = Arrays.asList("hello", "world", "java");
+List&lt;String&gt; upperWords = words.stream()
+    .map(word -> word.toUpperCase()) // convert to uppercase
+    .collect(Collectors.toList());
+System.out.println("Uppercase: " + upperWords); // [HELLO, WORLD, JAVA]
+</code></pre>
+
+        <p><strong>Get length of each word:</strong></p>
+        <pre><code class="language-java">List&lt;Integer&gt; lengths = words.stream()
+    .map(word -> word.length()) // get length of each word
+    .collect(Collectors.toList());
+System.out.println("Word lengths: " + lengths); // [5, 5, 4]
+</code></pre>
+
+        <h4>Object Property Extraction</h4>
+        <p>This example demonstrates extracting specific properties from objects:</p>
+
+        <p><strong>Extract first names from Person objects:</strong></p>
+        <pre><code class="language-java">List&lt;String&gt; firstNames = people.stream()
+    .map(person -> person.firstName) // extract first name
+    .collect(Collectors.toList());
+System.out.println("First names: " + firstNames); // [John, Jane, Bob]
+</code></pre>
+
+        <p><strong>Extract ages from Person objects:</strong></p>
+        <pre><code class="language-java">List&lt;Integer&gt; ages = people.stream()
+    .map(person -> person.age) // extract age
+    .collect(Collectors.toList());
+System.out.println("Ages: " + ages); // [25, 30, 35]
+</code></pre>
+
+        <p><strong>Create full names by combining first and last:</strong></p>
+        <pre><code class="language-java">List&lt;String&gt; fullNames = people.stream()
+    .map(person -> person.firstName + " " + person.lastName) // combine names
+    .collect(Collectors.toList());
+System.out.println("Full names: " + fullNames); // [John Doe, Jane Smith, Bob Johnson]
+</code></pre>
+
+        <p><strong>Generate email addresses from names:</strong></p>
+        <pre><code class="language-java">List&lt;String&gt; emails = people.stream()
+    .map(person -> person.firstName.toLowerCase() + "." +
+                  person.lastName.toLowerCase() + "@company.com") // create email format
+    .collect(Collectors.toList());
+</code></pre>
+
+        <h4>Type Conversion and Complex Transformations</h4>
+        <p>This example shows how to convert between different types:</p>
+
+        <p><strong>Convert strings to integers:</strong></p>
+        <pre><code class="language-java">List&lt;String&gt; numberStrings = Arrays.asList("1", "2", "3", "4", "5");
+List&lt;Integer&gt; numbers = numberStrings.stream()
+    .map(str -> Integer.parseInt(str)) // convert string to integer
+    .collect(Collectors.toList());
+System.out.println("Converted numbers: " + numbers); // [1, 2, 3, 4, 5]
+</code></pre>
+
+        <p><strong>Calculate total value for each order:</strong></p>
+        <pre><code class="language-java">List&lt;Double&gt; totalValues = orders.stream()
+    .map(order -> order.getTotalValue()) // calculate total for each order
+    .collect(Collectors.toList());
+System.out.println("Order total values: " + totalValues);
+</code></pre>
+
+        <p><strong>Create formatted summary strings:</strong></p>
+        <pre><code class="language-java">List&lt;String&gt; orderSummaries = orders.stream()
+    .map(order -> order.product + ": $" + String.format("%.2f", order.getTotalValue()))
+    .collect(Collectors.toList());
+</code></pre>
+
+        <p><strong>Chain multiple transformations together:</strong></p>
+        <pre><code class="language-java">List&lt;String&gt; expensiveItems = orders.stream()
+    .map(order -> order.getTotalValue()) // first: get total value
+    .filter(total -> total > 100) // then: filter expensive ones
+    .map(total -> "Expensive: $" + String.format("%.2f", total)) // format as string
+    .collect(Collectors.toList());
+</code></pre>
+      </section>
+
+      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="reduce-operation">
+        <h2>Reduce Operation</h2>
+
+        <h3>Definition</h3>
+        <p>The reduce operation combines all elements in a stream into a single result by repeatedly applying a combining function. It takes two parameters at a time, combines them according to your specified logic, and uses the result to combine with the next element, continuing until all elements are processed. Reduce is a terminal operation that produces a single value from many values, such as finding a sum, maximum, minimum, or concatenating strings.</p>
+
+        <h3>Analogy</h3>
+        <p>The reduce operation is like making a smoothie from multiple fruits. You start with a collection of different fruits - apples, bananas, strawberries, and oranges. To make a smoothie, you put the first two fruits in a blender and blend them together. Then you take that blended result and add the third fruit, blend again. You continue this process, always taking the current blended mixture and adding the next fruit, until you've processed all the fruits and end up with one final smoothie. The "blending function" defines how to combine two items (in programming, this is your lambda expression), and you apply this same combining logic repeatedly until you reduce your entire collection down to a single result. Just like the smoothie combines the flavors and nutrients of all the individual fruits, the reduce operation combines all your data elements using your specified combining logic.</p>
+
+        <h3>Examples</h3>
+
+        <h4>Basic Mathematical Reductions</h4>
+        <p>This example shows common mathematical operations using reduce:</p>
+
+        <p><strong>Sum all numbers:</strong></p>
+        <pre><code class="language-java">List&lt;Integer&gt; numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+int sum = numbers.stream()
+    .reduce(0, (a, b) -> a + b); // start with 0, add each number
+System.out.println("Sum: " + sum); // 55
+</code></pre>
+
+        <p><strong>Find maximum number:</strong></p>
+        <pre><code class="language-java">Optional&lt;Integer&gt; max = numbers.stream()
+    .reduce((a, b) -> a > b ? a : b); // compare and keep larger
+System.out.println("Max: " + max.orElse(-1)); // 10
+</code></pre>
+
+        <p><strong>Find minimum number:</strong></p>
+        <pre><code class="language-java">Optional&lt;Integer&gt; min = numbers.stream()
+    .reduce((a, b) -> a < b ? a : b); // compare and keep smaller
+System.out.println("Min: " + min.orElse(-1)); // 1
+</code></pre>
+
+        <p><strong>Multiply all numbers together:</strong></p>
+        <pre><code class="language-java">int product = numbers.stream()
+    .reduce(1, (a, b) -> a * b); // start with 1, multiply each
+System.out.println("Product: " + product); // 3628800
+</code></pre>
+
+        <p><strong>Count elements (alternative to count() method):</strong></p>
+        <pre><code class="language-java">int count = numbers.stream()
+    .reduce(0, (total, num) -> total + 1); // start with 0, add 1 for each element
+System.out.println("Count: " + count); // 10
+</code></pre>
+
+        <h4>String Operations with Reduce</h4>
+        <p>This example demonstrates how to use reduce with strings:</p>
+
+        <p><strong>Concatenate all words into a sentence:</strong></p>
+        <pre><code class="language-java">List&lt;String&gt; words = Arrays.asList("Java", "is", "awesome", "for", "programming");
+String sentence = words.stream()
+    .reduce("", (result, word) -> result + " " + word); // start empty, add each word
+System.out.println("Sentence:" + sentence); // " Java is awesome for programming"
+</code></pre>
+
+        <p><strong>Concatenate with proper formatting:</strong></p>
+        <pre><code class="language-java">String properSentence = words.stream()
+    .reduce("", (result, word) ->
+        result.isEmpty() ? word : result + " " + word); // don't add space before first word
+System.out.println("Proper sentence: " + properSentence); // "Java is awesome for programming"
+</code></pre>
+
+        <p><strong>Find longest word:</strong></p>
+        <pre><code class="language-java">Optional&lt;String&gt; longestWord = words.stream()
+    .reduce((word1, word2) ->
+        word1.length() >= word2.length() ? word1 : word2); // keep longer word
+System.out.println("Longest word: " + longestWord.orElse("none")); // "programming"
+</code></pre>
+
+        <p><strong>Create acronym from first letters:</strong></p>
+        <pre><code class="language-java">String acronym = words.stream()
+    .map(word -> word.substring(0, 1).toUpperCase()) // get first letter, uppercase
+    .reduce("", (result, letter) -> result + letter); // concatenate all letters
+System.out.println("Acronym: " + acronym); // "JIAFP"
+</code></pre>
+
+        <p><strong>Build a formatted report:</strong></p>
+        <pre><code class="language-java">String report = words.stream()
+    .reduce("Word Report:\n", (result, word) ->
+        result + "- " + word + " (" + word.length() + " chars)\n");
+System.out.println(report);
+</code></pre>
+
+        <h4>Complex Object Reductions</h4>
+        <p>This example shows how to use reduce with custom objects:</p>
+
+        <p><strong>Calculate total revenue from sales:</strong></p>
+        <pre><code class="language-java">double totalRevenue = sales.stream()
+    .map(sale -> sale.getTotalValue()) // transform to total values
+    .reduce(0.0, (sum, value) -> sum + value); // sum all values
+System.out.println("Total revenue: $" + String.format("%.2f", totalRevenue));
+</code></pre>
+
+        <p><strong>Find highest value sale:</strong></p>
+        <pre><code class="language-java">Optional&lt;Sale&gt; highestSale = sales.stream()
+    .reduce((sale1, sale2) ->
+        sale1.getTotalValue() > sale2.getTotalValue() ? sale1 : sale2);
+System.out.println("Highest sale: " + highestSale.orElse(null));
+</code></pre>
+
+        <p><strong>Count total items sold:</strong></p>
+        <pre><code class="language-java">int totalItems = sales.stream()
+    .map(sale -> sale.quantity) // extract quantities
+    .reduce(0, (total, qty) -> total + qty); // sum all quantities
+System.out.println("Total items sold: " + totalItems);
+</code></pre>
+
+        <p><strong>Build formatted sales summary:</strong></p>
+        <pre><code class="language-java">String salesSummary = sales.stream()
+    .map(sale -> sale.product + ": $" + String.format("%.2f", sale.getTotalValue()))
+    .reduce("Sales Summary:\n", (summary, line) ->
+        summary + "- " + line + "\n"); // build formatted report
+System.out.println(salesSummary);
+</code></pre>
+      </section>
+
+      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="method-references">
+        <h2>Method References</h2>
+
+        <h3>Definition</h3>
+        <p>Method references are a shorthand notation for lambda expressions that call a specific method. When your lambda expression does nothing but call an existing method, you can replace it with a method reference using the `::` operator. There are four types: static method references (Class::method), instance method references on specific objects (object::method), instance method references on arbitrary objects (Class::method), and constructor references (Class::new).</p>
+
+        <h3>Analogy</h3>
+        <p>Method references are like using speed dial on your phone instead of typing out the full number every time. Imagine you frequently call your best friend, and instead of dialing their full 10-digit number each time, you program speed dial #1 to automatically call them. When you press "1" and call, the phone knows exactly which number to dial - you don't need to specify the digits again. Similarly, when you have a lambda expression that simply calls an existing method like `name -> name.toUpperCase()`, you can use the method reference shorthand `String::toUpperCase`. Both do exactly the same thing, but the method reference is more concise, just like speed dial is more convenient than typing the full number. The `::` operator is like the speed dial button that connects directly to the method you want to call.</p>
+
+        <h3>Examples</h3>
+
+        <h4>Static Method References</h4>
+        <p>This example shows how to use method references for static methods:</p>
+
+        <p><strong>Parse strings to integers using lambda:</strong></p>
+        <pre><code class="language-java">List&lt;String&gt; numberStrings = Arrays.asList("1", "2", "3", "4", "5");
+List&lt;Integer&gt; numbersLambda = numberStrings.stream()
+    .map(str -> Integer.parseInt(str)) // lambda calls static method
+    .collect(Collectors.toList());
+System.out.println("With lambda: " + numbersLambda);
+</code></pre>
+
+        <p><strong>Same operation using method reference:</strong></p>
+        <pre><code class="language-java">List&lt;Integer&gt; numbersMethodRef = numberStrings.stream()
+    .map(Integer::parseInt) // method reference to static method
+    .collect(Collectors.toList());
+System.out.println("With method reference: " + numbersMethodRef);
+</code></pre>
+
+        <p><strong>Convert numbers to strings with lambda:</strong></p>
+        <pre><code class="language-java">List&lt;Integer&gt; numbers = Arrays.asList(1, 2, 3, 4, 5);
+List&lt;String&gt; stringsLambda = numbers.stream()
+    .map(num -> String.valueOf(num)) // lambda calls static method
+    .collect(Collectors.toList());
+</code></pre>
+
+        <p><strong>Same using method reference:</strong></p>
+        <pre><code class="language-java">List&lt;String&gt; stringsMethodRef = numbers.stream()
+    .map(String::valueOf) // method reference to static method
+    .collect(Collectors.toList());
+System.out.println("Method ref conversion: " + stringsMethodRef);
+</code></pre>
+
+        <h4>Instance Method References</h4>
+        <p>This example demonstrates instance method references on both specific objects and arbitrary objects:</p>
+
+        <p><strong>Convert to uppercase with lambda:</strong></p>
+        <pre><code class="language-java">List&lt;String&gt; words = Arrays.asList("hello", "world", "java", "stream");
+List&lt;String&gt; upperLambda = words.stream()
+    .map(word -> word.toUpperCase()) // lambda calls instance method
+    .collect(Collectors.toList());
+</code></pre>
+
+        <p><strong>Same with method reference:</strong></p>
+        <pre><code class="language-java">List&lt;String&gt; upperMethodRef = words.stream()
+    .map(String::toUpperCase) // method reference to instance method
+    .collect(Collectors.toList());
+System.out.println("Method ref uppercase: " + upperMethodRef);
+</code></pre>
+
+        <p><strong>Get string lengths with lambda:</strong></p>
+        <pre><code class="language-java">List&lt;Integer&gt; lengthsLambda = words.stream()
+    .map(word -> word.length()) // lambda calls instance method
+    .collect(Collectors.toList());
+</code></pre>
+
+        <p><strong>Same with method reference:</strong></p>
+        <pre><code class="language-java">List&lt;Integer&gt; lengthsMethodRef = words.stream()
+    .map(String::length) // method reference to instance method
+    .collect(Collectors.toList());
+System.out.println("Method ref lengths: " + lengthsMethodRef);
+</code></pre>
+
+        <p><strong>Print with specific object method reference:</strong></p>
+        <pre><code class="language-java">PrintStream printer = System.out; // specific object reference
+// Lambda version
+words.stream().forEach(word -> printer.println(word)); // lambda calls instance method
+// Method reference version
+words.stream().forEach(printer::println); // method reference to specific object
+</code></pre>
+
+        <h4>Constructor References</h4>
+        <p>This example shows constructor references and getter method references:</p>
+
+        <p><strong>Create Person objects with lambda:</strong></p>
+        <pre><code class="language-java">List&lt;String&gt; names = Arrays.asList("Alice", "Bob", "Charlie");
+List&lt;Person&gt; personsLambda = names.stream()
+    .map(name -> new Person(name)) // lambda calls constructor
+    .collect(Collectors.toList());
+</code></pre>
+
+        <p><strong>Same with constructor reference:</strong></p>
+        <pre><code class="language-java">List&lt;Person&gt; personsMethodRef = names.stream()
+    .map(Person::new) // constructor reference
+    .collect(Collectors.toList());
+System.out.println("Constructor reference: " + personsMethodRef);
+</code></pre>
+
+        <p><strong>Extract names with lambda:</strong></p>
+        <pre><code class="language-java">List&lt;Person&gt; people = Arrays.asList(/* person objects */);
+List&lt;String&gt; extractedNamesLambda = people.stream()
+    .map(person -> person.getName()) // lambda calls getter
+    .collect(Collectors.toList());
+</code></pre>
+
+        <p><strong>Same with method reference:</strong></p>
+        <pre><code class="language-java">List&lt;String&gt; extractedNamesMethodRef = people.stream()
+    .map(Person::getName) // method reference to getter
+    .collect(Collectors.toList());
+System.out.println("Method ref name extraction: " + extractedNamesMethodRef);
+</code></pre>
+
+        <p><strong>Sort using static method reference:</strong></p>
+        <pre><code class="language-java">List&lt;Person&gt; sortedPeople = new ArrayList&lt;&gt;(people);
+sortedPeople.sort(Person::compareByAge); // static method reference for comparison
+System.out.println("Sorted by age: " + sortedPeople);
+</code></pre>
+
+        <p><strong>Array creation with constructor reference:</strong></p>
+        <pre><code class="language-java">// Lambda version
+String[] arrayLambda = names.stream()
+    .toArray(size -> new String[size]); // lambda creates array
+// Method reference version
+String[] arrayMethodRef = names.stream()
+    .toArray(String[]::new); // constructor reference for array
+</code></pre>
+      </section>
+
+      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="summary">
+        <h2>Summary</h2>
+        <p>Java Streams and Lambda expressions revolutionize how you work with collections and data processing by introducing functional programming concepts to Java. Lambda expressions provide a concise way to write inline functions, making your code more readable and expressive when working with operations like filtering, mapping, and reducing data. Streams offer a powerful pipeline approach where you can chain operations together to transform data in a declarative style - you describe what you want rather than how to achieve it step by step. The filter operation lets you select elements based on conditions, map transforms each element, and reduce combines all elements into a single result. Method references provide an even more concise syntax when your lambdas simply call existing methods. These concepts work together to make data processing code more maintainable, readable, and often more efficient than traditional imperative approaches.</p>
+      </section>
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="programming-challenge">
+        <h2>Programming Challenge</h2>
+        <div class="rounded-lg border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800">
+          <h3 class="mt-0">Challenge: Student Grade Processor</h3>
+          <p><strong>Task:</strong> Create a program that processes a list of students and their grades using streams and lambda expressions.</p>
+
+          <p><strong>Requirements:</strong></p>
+          <ol>
+            <li>Create a Student class with fields: name (String), subject (String), and grade (double)</li>
+            <li>Create a list of at least 8 students with different subjects (Math, Science, English, History) and grades</li>
+            <li>Use streams to accomplish the following:</li>
+            <ul>
+              <li>Find all students with grades above 85</li>
+              <li>Get a list of all unique subjects</li>
+              <li>Calculate the average grade for each subject</li>
+              <li>Find the student with the highest grade in each subject</li>
+              <li>Create a summary report showing: total students, average overall grade, and count by subject</li>
+            </ul>
+            <li>Use lambda expressions for all filtering and transformation operations</li>
+            <li>Use method references where appropriate</li>
+          </ol>
+
+          <p><strong>Bonus:</strong> Add a method to find the top 3 students overall and display them in a formatted table.</p>
+
+          <p><strong>Learning Goals:</strong> Practice chaining stream operations, using different types of lambda expressions, applying method references, and combining multiple functional programming concepts in a realistic scenario.</p>
+        </div>
+      </section>
+
+      <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+        <a href="lesson-05.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
+        <a href="lesson-07.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
+      </nav>
+    </main>
+
+    <script>
+      document.getElementById('themeToggle').addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>

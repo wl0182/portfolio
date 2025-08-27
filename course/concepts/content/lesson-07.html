@@ -1,0 +1,729 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 07 - Java Streams & Lambdas (Advanced)</title>
+    <meta name="description" content="Advanced stream operations: collectors, parallel streams, custom collectors, and advanced functional programming patterns." />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="mb-6">
+        <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Concepts</a>
+      </div>
+      <header class="mx-auto max-w-3xl text-center">
+        <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 07: Java Streams & Lambdas (Advanced)</h1>
+        <p class="mt-2 text-slate-600 dark:text-slate-300">Master advanced stream operations, collectors, parallel processing, and sophisticated functional programming patterns for professional Java development.</p>
+      </header>
+
+      <section id="introduction" class="prose prose-slate mt-6 max-w-none dark:prose-invert">
+        <h2>Introduction</h2>
+        <p>Now that you've mastered the essential stream operations like filter, map, and reduce, it's time to unlock the true power of Java's functional programming capabilities. Advanced streams and lambdas are like upgrading from a basic toolkit to a professional workshop - you can build far more sophisticated and efficient solutions. In this lesson, you'll learn how to use collectors to group and summarize data, leverage parallel streams for performance, create custom functional interfaces, and combine multiple operations into elegant data processing pipelines. These advanced techniques are what separate beginner programmers from professionals who can write clean, efficient, and maintainable code. By the end of this lesson, you'll be able to solve complex data processing problems with just a few lines of expressive, readable code that would have taken dozens of lines with traditional approaches.</p>
+      </section>
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="advanced-collectors">
+        <h2>Advanced Collectors</h2>
+
+        <h3>Definition</h3>
+        <p>Collectors are powerful tools that accumulate stream elements into various data structures and perform complex aggregations. They go beyond simple collect() operations to group data, partition elements, calculate statistics, and transform results into maps, lists, or custom formats. Collectors provide a declarative way to perform operations that would traditionally require multiple loops and intermediate collections.</p>
+
+        <h3>Analogy</h3>
+        <p>Advanced collectors are like a sophisticated sorting and filing system in a large office building. Imagine you're the manager of a company with thousands of employee records scattered across different departments. Instead of manually going through each record one by one, you have specialized assistants (collectors) who can automatically organize everything for you. One assistant groups employees by department, another calculates salary statistics for each team, a third creates phone directories sorted alphabetically, and yet another generates summary reports with counts and averages. Each assistant knows exactly how to take the messy pile of records and transform them into exactly the organized format you need. Similarly, collectors take your stream of data and automatically organize, group, summarize, and transform it into the exact structure you want, whether that's a map grouped by categories, statistical summaries, or complex nested data structures.</p>
+
+        <h3>Examples</h3>
+
+        <h4>Grouping Data</h4>
+        <p>This example shows how to group elements by different criteria:</p>
+
+        <p><strong>Group students by grade level:</strong></p>
+        <pre><code class="language-java">Map&lt;String, List&lt;Student&gt;&gt; studentsByGrade = students.stream()
+    .collect(Collectors.groupingBy(student -> student.grade));
+// Creates: {"A" -> [student1, student3], "B" -> [student2, student4]}
+</code></pre>
+
+        <p><strong>Group employees by department:</strong></p>
+        <pre><code class="language-java">Map&lt;String, List&lt;Employee&gt;&gt; empsByDept = employees.stream()
+    .collect(Collectors.groupingBy(emp -> emp.department));
+System.out.println("Engineering team: " + empsByDept.get("Engineering"));
+</code></pre>
+
+        <h4>Counting and Statistics</h4>
+        <p>This example demonstrates collecting statistical information:</p>
+
+        <p><strong>Count students in each grade:</strong></p>
+        <pre><code class="language-java">Map&lt;String, Long&gt; studentCountByGrade = students.stream()
+    .collect(Collectors.groupingBy(s -> s.grade, Collectors.counting()));
+System.out.println("A-grade students: " + studentCountByGrade.get("A"));
+</code></pre>
+
+        <p><strong>Calculate average salary by department:</strong></p>
+        <pre><code class="language-java">Map&lt;String, Double&gt; avgSalaryByDept = employees.stream()
+    .collect(Collectors.groupingBy(e -> e.department,
+             Collectors.averagingDouble(e -> e.salary)));
+</code></pre>
+
+        <h4>Advanced Transformations</h4>
+        <p>This example shows sophisticated data transformations:</p>
+
+        <p><strong>Collect names grouped by department:</strong></p>
+        <pre><code class="language-java">Map&lt;String, List&lt;String&gt;&gt; namesByDept = employees.stream()
+    .collect(Collectors.groupingBy(e -> e.department,
+             Collectors.mapping(e -> e.name, Collectors.toList())));
+</code></pre>
+
+        <p><strong>Partition employees by salary threshold:</strong></p>
+        <pre><code class="language-java">Map&lt;Boolean, List&lt;Employee&gt;&gt; partitioned = employees.stream()
+    .collect(Collectors.partitioningBy(e -> e.salary > 70000));
+System.out.println("High earners: " + partitioned.get(true).size());
+</code></pre>
+      </section>
+
+      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="parallel-streams">
+        <h2>Parallel Streams</h2>
+
+        <h3>Definition</h3>
+        <p>Parallel streams automatically divide your data processing across multiple CPU cores to improve performance on large datasets. They use the same API as regular streams but execute operations concurrently using the Fork-Join framework. Parallel streams can significantly speed up CPU-intensive operations but should be used carefully as they add overhead and complexity.</p>
+
+        <h3>Analogy</h3>
+        <p>Parallel streams are like having a team of workers instead of just one person doing a job. Imagine you need to sort through 10,000 customer surveys to find patterns and calculate statistics. With a regular stream, it's like having one employee work through the entire stack of papers from top to bottom - methodical but slow. With parallel streams, it's like having a team of 8 employees where you divide the stack into 8 smaller piles, and each person processes their pile simultaneously. At the end, you combine all their results together. This works great for tasks like counting, filtering, or mathematical calculations where each survey can be processed independently. However, just like managing a team of workers, there's some coordination overhead - you need to divide the work, manage the workers, and combine the results. For small tasks (like sorting 10 surveys), the coordination overhead isn't worth it and one person would actually be faster than organizing a whole team.</p>
+
+        <h3>Examples</h3>
+
+        <h4>Creating Parallel Streams</h4>
+        <p>This example shows different ways to create and use parallel streams:</p>
+
+        <p><strong>Convert regular stream to parallel:</strong></p>
+        <pre><code class="language-java">List&lt;Integer&gt; numbers = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
+List&lt;Integer&gt; doubled = numbers.stream()
+    .parallel() // convert to parallel stream
+    .map(n -> n * 2)
+    .collect(Collectors.toList());
+</code></pre>
+
+        <p><strong>Create parallel stream directly:</strong></p>
+        <pre><code class="language-java">List&lt;String&gt; words = Arrays.asList("hello", "world", "java", "parallel");
+long count = words.parallelStream() // create parallel stream directly
+    .filter(word -> word.length() > 4)
+    .count();
+</code></pre>
+
+        <p><strong>Check if stream is parallel:</strong></p>
+        <pre><code class="language-java">boolean isParallel = numbers.parallelStream().isParallel();
+System.out.println("Stream is parallel: " + isParallel); // true
+</code></pre>
+
+        <p><strong>Convert parallel back to sequential:</strong></p>
+        <pre><code class="language-java">List&lt;Integer&gt; result = numbers.parallelStream()
+    .filter(n -> n > 5)
+    .sequential() // convert back to sequential
+    .map(n -> n * 3)
+    .collect(Collectors.toList());
+</code></pre>
+
+        <h4>Performance Benefits</h4>
+        <p>This example demonstrates when parallel streams provide performance advantages:</p>
+
+        <p><strong>CPU-intensive calculations:</strong></p>
+        <pre><code class="language-java">// Expensive computation that benefits from parallelization
+List&lt;Double&gt; results = largeNumberList.parallelStream()
+    .map(n -> Math.pow(n, 3) + Math.sqrt(n)) // expensive math operations
+    .collect(Collectors.toList());
+</code></pre>
+
+        <p><strong>Large dataset filtering:</strong></p>
+        <pre><code class="language-java">List&lt;Employee&gt; highEarners = millionEmployees.parallelStream()
+    .filter(emp -> emp.salary > 100000)
+    .filter(emp -> emp.experience > 10)
+    .collect(Collectors.toList());
+</code></pre>
+
+        <p><strong>Complex aggregations on big data:</strong></p>
+        <pre><code class="language-java">Map&lt;String, Double&gt; avgByDept = bigEmployeeList.parallelStream()
+    .collect(Collectors.groupingBy(e -> e.department,
+             Collectors.averagingDouble(e -> e.salary)));
+</code></pre>
+
+        <p><strong>Statistical calculations:</strong></p>
+        <pre><code class="language-java">DoubleSummaryStatistics stats = hugeDataset.parallelStream()
+    .mapToDouble(data -> data.value)
+    .summaryStatistics();
+System.out.println("Average: " + stats.getAverage());
+</code></pre>
+
+        <h4>Thread Safety Considerations</h4>
+        <p>This example shows important thread safety considerations with parallel streams:</p>
+
+        <p><strong>Avoid shared mutable state:</strong></p>
+        <pre><code class="language-java">// BAD - not thread safe
+List&lt;String&gt; results = new ArrayList&lt;&gt;(); // shared mutable state
+numbers.parallelStream().forEach(n -> results.add(n.toString())); // unsafe!
+
+// GOOD - use collectors
+List&lt;String&gt; safeResults = numbers.parallelStream()
+    .map(Object::toString)
+    .collect(Collectors.toList()); // thread-safe
+</code></pre>
+
+        <p><strong>Use thread-safe operations:</strong></p>
+        <pre><code class="language-java">// Use concurrent collections for shared state
+ConcurrentMap&lt;String, Long&gt; wordCounts = words.parallelStream()
+    .collect(Collectors.toConcurrentMap(
+        word -> word,
+        word -> 1L,
+        Long::sum));
+</code></pre>
+
+        <p><strong>Avoid side effects in parallel operations:</strong></p>
+        <pre><code class="language-java">// BAD - side effects in parallel processing
+AtomicInteger counter = new AtomicInteger(0);
+numbers.parallelStream().forEach(n -> counter.incrementAndGet()); // problematic
+
+// GOOD - use appropriate terminal operations
+long count = numbers.parallelStream().count(); // proper way to count
+</code></pre>
+
+        <p><strong>When NOT to use parallel streams:</strong></p>
+        <pre><code class="language-java">// Small datasets - overhead not worth it
+List&lt;Integer&gt; small = Arrays.asList(1, 2, 3, 4, 5);
+small.stream().map(n -> n * 2); // better than parallel for small data
+
+// I/O operations - usually not CPU-bound
+files.stream().map(file -> readFile(file)); // sequential better for I/O
+</code></pre>
+      </section>
+
+      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="optional-class">
+        <h2>Optional Class</h2>
+
+        <h3>Definition</h3>
+        <p>Optional is a container class that may or may not contain a value, designed to prevent NullPointerException. It forces you to explicitly handle the case when a value might be absent, making your code more robust and self-documenting. Optional provides methods to check for presence, retrieve values safely, and chain operations without null checks.</p>
+
+        <h3>Analogy</h3>
+        <p>Optional is like a special safety box that might contain a valuable item or might be empty. Imagine you're working at a lost-and-found department where people come looking for their missing items. Instead of handing them the actual item directly (which might not exist and cause disappointment), you give them a special safety box. This box has a window that lets them check if their item is inside without opening it, and it only opens if there's actually something inside. If the box is empty, it has a mechanism that lets them specify what to do instead - maybe get a replacement item, fill out a form, or just walk away. They can also ask the box "if you have my item, please do something with it" without ever risking disappointment from an empty box. This way, people are never surprised by getting nothing when they expected something, and they always have a plan for what to do in both cases.</p>
+
+        <h3>Examples</h3>
+
+        <h4>Creating and Checking Optional</h4>
+        <p>This example shows different ways to create and work with Optional:</p>
+
+        <p><strong>Create Optional with value:</strong></p>
+        <pre><code class="language-java">Optional&lt;String&gt; name = Optional.of("John");
+System.out.println("Has value: " + name.isPresent()); // true
+System.out.println("Value: " + name.get()); // "John"
+</code></pre>
+
+        <p><strong>Create empty Optional:</strong></p>
+        <pre><code class="language-java">Optional&lt;String&gt; empty = Optional.empty();
+System.out.println("Is empty: " + empty.isEmpty()); // true
+System.out.println("Has value: " + empty.isPresent()); // false
+</code></pre>
+
+        <p><strong>Create Optional that might be null:</strong></p>
+        <pre><code class="language-java">String nullableValue = getName(); // might return null
+Optional&lt;String&gt; safeName = Optional.ofNullable(nullableValue);
+if (safeName.isPresent()) {
+    System.out.println("Name: " + safeName.get());
+}
+</code></pre>
+
+        <p><strong>Safe value retrieval with default:</strong></p>
+        <pre><code class="language-java">String name = optionalName.orElse("Unknown"); // use default if empty
+String name2 = optionalName.orElseGet(() -> "Generated-" + System.nanoTime());
+System.out.println("Name with default: " + name);
+</code></pre>
+
+        <h4>Optional with Streams</h4>
+        <p>This example demonstrates how Optional integrates with streams:</p>
+
+        <p><strong>Find first element safely:</strong></p>
+        <pre><code class="language-java">Optional&lt;Employee&gt; firstEngineer = employees.stream()
+    .filter(emp -> emp.department.equals("Engineering"))
+    .findFirst();
+firstEngineer.ifPresent(emp -> System.out.println("Found: " + emp.name));
+</code></pre>
+
+        <p><strong>Find any element that matches:</strong></p>
+        <pre><code class="language-java">Optional&lt;Product&gt; expensiveProduct = products.stream()
+    .filter(product -> product.price > 1000)
+    .findAny();
+System.out.println("Expensive product: " + expensiveProduct.orElse(null));
+</code></pre>
+
+        <p><strong>Maximum and minimum operations:</strong></p>
+        <pre><code class="language-java">Optional&lt;Integer&gt; max = numbers.stream()
+    .max(Integer::compareTo);
+max.ifPresent(value -> System.out.println("Maximum: " + value));
+
+Optional&lt;Employee&gt; highestPaid = employees.stream()
+    .max(Comparator.comparing(emp -> emp.salary));
+</code></pre>
+
+        <p><strong>Reduce operations return Optional:</strong></p>
+        <pre><code class="language-java">Optional&lt;String&gt; longest = words.stream()
+    .reduce((w1, w2) -> w1.length() > w2.length() ? w1 : w2);
+System.out.println("Longest word: " + longest.orElse("No words found"));
+</code></pre>
+
+        <h4>Functional Operations with Optional</h4>
+        <p>This example shows advanced Optional operations:</p>
+
+        <p><strong>Transform value with map:</strong></p>
+        <pre><code class="language-java">Optional&lt;String&gt; upperName = optionalName
+    .map(String::toUpperCase); // transform if present
+upperName.ifPresent(name -> System.out.println("Upper: " + name));
+</code></pre>
+
+        <p><strong>Chain Optional operations with flatMap:</strong></p>
+        <pre><code class="language-java">Optional&lt;String&gt; result = getEmployee(id)
+    .flatMap(emp -> getDepartment(emp.deptId))
+    .map(dept -> dept.name);
+result.ifPresent(name -> System.out.println("Department: " + name));
+</code></pre>
+
+        <p><strong>Filter Optional values:</strong></p>
+        <pre><code class="language-java">Optional&lt;Employee&gt; seniorEmployee = getEmployee(id)
+    .filter(emp -> emp.experience > 5); // filter if present
+seniorEmployee.ifPresent(emp -> System.out.println("Senior: " + emp.name));
+</code></pre>
+
+        <p><strong>Handle absence with orElseThrow:</strong></p>
+        <pre><code class="language-java">Employee emp = getEmployee(id)
+    .orElseThrow(() -> new RuntimeException("Employee not found: " + id));
+String name = optionalName
+    .orElseThrow(() -> new IllegalStateException("Name is required"));
+</code></pre>
+      </section>
+
+      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="custom-functional-interfaces">
+        <h2>Custom Functional Interfaces</h2>
+
+        <h3>Definition</h3>
+        <p>Custom functional interfaces are interfaces with exactly one abstract method that you create to represent specific business logic or operations in your application. They allow you to define your own lambda-compatible contracts that can be passed around as parameters, stored in variables, and used to create more expressive and type-safe code than generic Function or Predicate interfaces.</p>
+
+        <h3>Analogy</h3>
+        <p>Custom functional interfaces are like creating specialized job descriptions for very specific roles in your company. While you could hire "general workers" (like using Function&lt;T,R&gt;) for everything, sometimes you need someone with a very specific skill set. For example, instead of posting a job for a "general person who takes one thing and returns another thing," you might create a specific job description for a "PizzaRatingExpert" who takes a Pizza and returns a Rating from 1 to 5. This specialized job description makes it crystal clear what the role does, what inputs it expects, and what outputs it provides. Anyone reading your code immediately understands that this person rates pizzas, not that they perform some generic transformation. Similarly, custom functional interfaces make your code self-documenting and type-safe - instead of seeing Function&lt;Pizza, Integer&gt; and wondering what that integer represents, you see PizzaRater and immediately understand both the purpose and the expected behavior.</p>
+
+        <h3>Examples</h3>
+
+        <h4>Creating Custom Functional Interfaces</h4>
+        <p>This example shows how to define your own functional interfaces:</p>
+
+        <p><strong>Simple validator interface:</strong></p>
+        <pre><code class="language-java">@FunctionalInterface
+interface Validator&lt;T&gt; {
+    boolean isValid(T item);
+}
+
+Validator&lt;String&gt; emailValidator = email -> email.contains("@");
+System.out.println("Valid email: " + emailValidator.isValid("test@example.com"));
+</code></pre>
+
+        <p><strong>Business logic interface:</strong></p>
+        <pre><code class="language-java">@FunctionalInterface
+interface PriceCalculator {
+    double calculatePrice(Product product, Customer customer);
+}
+
+PriceCalculator discountCalculator = (product, customer) ->
+    customer.isPremium() ? product.price * 0.9 : product.price;
+</code></pre>
+
+        <p><strong>Data processor interface:</strong></p>
+        <pre><code class="language-java">@FunctionalInterface
+interface DataProcessor&lt;T, R&gt; {
+    R process(T input, String context);
+}
+
+DataProcessor&lt;String, Integer&gt; wordCounter = (text, language) ->
+    "english".equals(language) ? text.split(" ").length : text.length();
+</code></pre>
+
+        <p><strong>Event handler interface:</strong></p>
+        <pre><code class="language-java">@FunctionalInterface
+interface NotificationHandler {
+    void handleNotification(String message, Priority priority);
+}
+
+NotificationHandler emailHandler = (msg, priority) -> {
+    if (priority == Priority.HIGH) sendEmail(msg);
+    else logMessage(msg);
+};
+</code></pre>
+
+        <h4>Using Custom Interfaces in Methods</h4>
+        <p>This example demonstrates how to use custom functional interfaces as method parameters:</p>
+
+        <p><strong>Method accepting custom validator:</strong></p>
+        <pre><code class="language-java">// Method that uses the custom functional interface
+public List&lt;Employee&gt; filterEmployees(List&lt;Employee&gt; employees, Validator&lt;Employee&gt; validator) {
+    return employees.stream()
+        .filter(emp -> validator.isValid(emp))
+        .collect(Collectors.toList());
+}
+
+// Usage with lambda
+List&lt;Employee&gt; seniors = filterEmployees(employees, emp -> emp.experience > 5);
+</code></pre>
+
+        <p><strong>Method with custom calculator:</strong></p>
+        <pre><code class="language-java">public double calculateTotalCost(List&lt;Product&gt; products, Customer customer,
+                                  PriceCalculator calculator) {
+    return products.stream()
+        .mapToDouble(product -> calculator.calculatePrice(product, customer))
+        .sum();
+}
+
+double total = calculateTotalCost(products, customer, discountCalculator);
+</code></pre>
+
+        <p><strong>Method accepting custom processor:</strong></p>
+        <pre><code class="language-java">public &lt;T, R&gt; List&lt;R&gt; processData(List&lt;T&gt; data, String context,
+                                  DataProcessor&lt;T, R&gt; processor) {
+    return data.stream()
+        .map(item -> processor.process(item, context))
+        .collect(Collectors.toList());
+}
+
+List&lt;Integer&gt; wordCounts = processData(texts, "english", wordCounter);
+</code></pre>
+
+        <p><strong>Method with notification handling:</strong></p>
+        <pre><code class="language-java">public void sendNotifications(List&lt;String&gt; messages,
+                               NotificationHandler handler) {
+    messages.forEach(msg -> {
+        Priority priority = determinePriority(msg);
+        handler.handleNotification(msg, priority);
+    });
+}
+
+sendNotifications(alerts, emailHandler);
+</code></pre>
+
+        <h4>Functional Interface Composition</h4>
+        <p>This example shows how to combine and compose custom functional interfaces:</p>
+
+        <p><strong>Combining validators:</strong></p>
+        <pre><code class="language-java">// Utility method to combine validators
+static &lt;T&gt; Validator&lt;T&gt; and(Validator&lt;T&gt; first, Validator&lt;T&gt; second) {
+    return item -> first.isValid(item) && second.isValid(item);
+}
+
+Validator&lt;String&gt; lengthValidator = str -> str.length() > 5;
+Validator&lt;String&gt; contentValidator = str -> !str.contains("spam");
+Validator&lt;String&gt; combined = and(lengthValidator, contentValidator);
+</code></pre>
+
+        <p><strong>Chaining processors:</strong></p>
+        <pre><code class="language-java">// Chain processors together
+static &lt;T, R, S&gt; DataProcessor&lt;T, S&gt; compose(DataProcessor&lt;T, R&gt; first,
+                                           DataProcessor&lt;R, S&gt; second) {
+    return (input, context) -> second.process(first.process(input, context), context);
+}
+
+DataProcessor&lt;String, String&gt; cleaner = (text, ctx) -> text.trim().toLowerCase();
+DataProcessor&lt;String, Integer&gt; counter = (text, ctx) -> text.split(" ").length;
+DataProcessor&lt;String, Integer&gt; pipeline = compose(cleaner, counter);
+</code></pre>
+
+        <p><strong>Default methods in functional interfaces:</strong></p>
+        <pre><code class="language-java">@FunctionalInterface
+interface Calculator {
+    double calculate(double a, double b);
+
+    // Default method for chaining
+    default Calculator andThen(Calculator after) {
+        return (a, b) -> after.calculate(calculate(a, b), 0);
+    }
+}
+
+Calculator adder = (a, b) -> a + b;
+Calculator doubler = (result, ignored) -> result * 2;
+Calculator addAndDouble = adder.andThen(doubler);
+</code></pre>
+
+        <p><strong>Creating factory methods:</strong></p>
+        <pre><code class="language-java">// Factory methods for common validators
+static Validator&lt;String&gt; minLength(int min) {
+    return str -> str.length() >= min;
+}
+
+static Validator&lt;Integer&gt; inRange(int min, int max) {
+    return num -> num >= min && num <= max;
+}
+
+Validator&lt;String&gt; passwordValidator = minLength(8);
+Validator&lt;Integer&gt; ageValidator = inRange(0, 120);
+</code></pre>
+      </section>
+
+      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="stream-performance">
+        <h2>Stream Performance and Best Practices</h2>
+
+        <h3>Definition</h3>
+        <p>Stream performance optimization involves understanding when and how to use streams efficiently, avoiding common pitfalls, and choosing the right operations for your use case. Best practices include knowing when to use parallel streams, minimizing object creation, choosing appropriate data structures, and understanding the cost of different operations to write performant functional code.</p>
+
+        <h3>Analogy</h3>
+        <p>Stream performance optimization is like planning the most efficient route for a delivery truck. You could drive randomly from house to house delivering packages, but a smart driver plans their route to minimize travel time, fuel consumption, and wear on the vehicle. Similarly, with streams, you need to plan your data processing pipeline efficiently. Some operations are like highway driving (fast and efficient), while others are like stop-and-go city traffic (slower with more overhead). You want to group related stops together (batch operations), avoid unnecessary detours (don't create intermediate collections), and use the fastest roads available (choose efficient operations). Just like a delivery truck shouldn't use a highway for a two-block trip due to the on-ramp overhead, you shouldn't use parallel streams for small datasets because the coordination overhead costs more than the potential speed gain.</p>
+
+        <h3>Examples</h3>
+
+        <h4>Choosing the Right Operations</h4>
+        <p>This example shows how to select efficient stream operations:</p>
+
+        <p><strong>Use findFirst() instead of filter().get(0):</strong></p>
+        <pre><code class="language-java">// GOOD - stops at first match
+Optional&lt;Employee&gt; first = employees.stream()
+    .filter(emp -> emp.department.equals("Engineering"))
+    .findFirst();
+
+// BAD - processes entire stream then gets first
+Employee firstBad = employees.stream()
+    .filter(emp -> emp.department.equals("Engineering"))
+    .collect(Collectors.toList()).get(0); // inefficient!
+</code></pre>
+
+        <p><strong>Use anyMatch() instead of filter().count() > 0:</strong></p>
+        <pre><code class="language-java">// GOOD - short-circuits on first match
+boolean hasHighEarners = employees.stream()
+    .anyMatch(emp -> emp.salary > 100000);
+
+// BAD - counts all matches
+boolean hasHighEarnersBad = employees.stream()
+    .filter(emp -> emp.salary > 100000)
+    .count() > 0; // processes entire stream
+</code></pre>
+
+        <p><strong>Order operations by selectivity:</strong></p>
+        <pre><code class="language-java">// GOOD - most selective filter first
+List&lt;Employee&gt; result = employees.stream()
+    .filter(emp -> emp.salary > 90000)          // most selective first
+    .filter(emp -> emp.department.equals("Engineering"))
+    .filter(emp -> emp.experience > 2)
+    .collect(Collectors.toList());
+</code></pre>
+
+        <p><strong>Avoid unnecessary boxing/unboxing:</strong></p>
+        <pre><code class="language-java">// GOOD - use primitive streams
+int sum = numbers.stream()
+    .mapToInt(Integer::intValue)  // convert to IntStream
+    .filter(n -> n > 10)
+    .sum(); // primitive operations
+
+// BAD - boxing overhead
+int sumBad = numbers.stream()
+    .filter(n -> n > 10)
+    .reduce(0, Integer::sum); // boxing/unboxing overhead
+</code></pre>
+
+        <h4>Parallel Stream Guidelines</h4>
+        <p>This example shows when and how to use parallel streams effectively:</p>
+
+        <p><strong>Good candidates for parallel processing:</strong></p>
+        <pre><code class="language-java">// Large datasets with CPU-intensive operations
+List&lt;Double&gt; results = hugeMathDataset.parallelStream()
+    .map(n -> Math.pow(n, 3) + Math.log(n)) // expensive computation
+    .collect(Collectors.toList());
+
+// Independent operations on large collections
+Map&lt;String, Long&gt; wordCounts = millionWords.parallelStream()
+    .collect(Collectors.groupingBy(identity(), counting()));
+</code></pre>
+
+        <p><strong>Avoid parallel for small datasets:</strong></p>
+        <pre><code class="language-java">// BAD - overhead exceeds benefit for small data
+List&lt;Integer&gt; small = Arrays.asList(1, 2, 3, 4, 5);
+small.stream() // sequential is better
+    .map(n -> n * 2)
+    .collect(Collectors.toList());
+
+// Rule of thumb: use parallel for 10,000+ elements with CPU work
+</code></pre>
+
+        <p><strong>Avoid parallel with stateful operations:</strong></p>
+        <pre><code class="language-java">// BAD - sorted() is stateful and expensive in parallel
+List&lt;String&gt; sortedResult = largeList.parallelStream()
+    .sorted() // expensive with parallel
+    .collect(Collectors.toList());
+
+// BETTER - sort after collection or use sequential
+List&lt;String&gt; betterResult = largeList.parallelStream()
+    .filter(condition)
+    .collect(Collectors.toList())
+    .stream().sorted().collect(Collectors.toList());
+</code></pre>
+
+        <p><strong>Consider ForkJoinPool size:</strong></p>
+        <pre><code class="language-java">// Check available processors
+int processors = Runtime.getRuntime().availableProcessors();
+System.out.println("Available processors: " + processors);
+
+// Parallel streams use common ForkJoinPool by default
+// For CPU-bound tasks, default pool size (processor count) is usually good
+</code></pre>
+
+        <h4>Memory and Garbage Collection Optimization</h4>
+        <p>This example shows how to minimize memory overhead in streams:</p>
+
+        <p><strong>Avoid unnecessary intermediate collections:</strong></p>
+        <pre><code class="language-java">// GOOD - single stream pipeline
+List&lt;String&gt; result = employees.stream()
+    .filter(emp -> emp.isActive())
+    .map(emp -> emp.name.toUpperCase())
+    .sorted()
+    .collect(Collectors.toList());
+
+// BAD - creates unnecessary intermediate collections
+List&lt;Employee&gt; active = employees.stream()
+    .filter(emp -> emp.isActive())
+    .collect(Collectors.toList()); // unnecessary intermediate
+List&lt;String&gt; names = active.stream()
+    .map(emp -> emp.name.toUpperCase())
+    .collect(Collectors.toList()); // another unnecessary intermediate
+</code></pre>
+
+        <p><strong>Use specialized collectors:</strong></p>
+        <pre><code class="language-java">// GOOD - direct to specific collection type
+Set&lt;String&gt; uniqueNames = employees.stream()
+    .map(emp -> emp.name)
+    .collect(Collectors.toSet()); // direct to Set
+
+// Use specific collector for joining
+String nameList = employees.stream()
+    .map(emp -> emp.name)
+    .collect(Collectors.joining(", ")); // efficient string joining
+</code></pre>
+
+        <p><strong>Consider stream size for operation choice:</strong></p>
+        <pre><code class="language-java">// For very large streams, consider lazy evaluation
+Stream&lt;String&gt; lazyProcessing = Files.lines(hugePath)
+    .filter(line -> line.contains("ERROR"))
+    .map(String::trim); // lazy - only processes when consumed
+
+// Process in chunks for memory management
+Files.lines(hugePath)
+    .filter(line -> line.contains("ERROR"))
+    .limit(1000) // process in batches
+    .forEach(this::processLine);
+</code></pre>
+
+        <p><strong>Profile and measure performance:</strong></p>
+        <pre><code class="language-java">// Simple timing for performance comparison
+long start = System.currentTimeMillis();
+List&lt;String&gt; result = largeList.stream() // or parallelStream()
+    .filter(item -> item.length() > 5)
+    .map(String::toUpperCase)
+    .collect(Collectors.toList());
+long duration = System.currentTimeMillis() - start;
+System.out.println("Processing took: " + duration + "ms");
+</code></pre>
+      </section>
+
+      <hr class="my-8 border-slate-200/60 dark:border-slate-800/60" />
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="summary">
+        <h2>Summary</h2>
+        <p>Advanced Java Streams and Lambdas transform you from writing basic functional code to crafting sophisticated, professional-grade data processing solutions. You've learned how to use collectors for complex grouping and aggregation, leverage parallel streams for performance gains on large datasets, handle null safety with Optional, create custom functional interfaces for expressive business logic, and optimize stream performance through best practices. These advanced techniques enable you to write code that is not only more concise and readable than traditional approaches, but also more robust, maintainable, and efficient. With these skills, you can tackle complex data processing challenges with confidence and create elegant solutions that clearly express your intent while performing optimally.</p>
+      </section>
+
+      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert" id="programming-challenge">
+        <h2>Programming Challenge</h2>
+        <div class="rounded-lg border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800">
+          <h3 class="mt-0">Challenge: Employee Analytics System</h3>
+          <p><strong>Task:</strong> Build a comprehensive employee analytics system using advanced stream operations and functional programming techniques.</p>
+
+          <p><strong>Requirements:</strong></p>
+          <ol>
+            <li>Create an Employee class with fields: name, department, salary, experience, location, skills (List&lt;String&gt;)</li>
+            <li>Create a large dataset of at least 1000 employees across multiple departments and locations</li>
+            <li>Implement the following analytics using advanced streams:</li>
+            <ul>
+              <li>Department salary statistics (min, max, average, count) using collectors</li>
+              <li>Top 5 highest-paid employees per department</li>
+              <li>Skills analysis: most common skills across the company</li>
+              <li>Location-based analysis: average salary by location</li>
+              <li>Experience grouping: junior (&lt;3 years), mid (3-7 years), senior (7+ years)</li>
+            </ul>
+            <li>Create custom functional interfaces for:</li>
+            <ul>
+              <li>Employee validation (salary range, skill requirements)</li>
+              <li>Promotion eligibility calculation</li>
+              <li>Salary adjustment calculator</li>
+            </ul>
+            <li>Use Optional for safe operations like finding employees by criteria</li>
+            <li>Implement both sequential and parallel versions and measure performance differences</li>
+          </ol>
+
+          <p><strong>Bonus:</strong></p>
+          <ul>
+            <li>Create a method that generates promotion recommendations using multiple custom functional interfaces</li>
+            <li>Implement a reporting system that generates formatted output using collectors</li>
+            <li>Add performance benchmarking to compare sequential vs parallel processing</li>
+          </ul>
+
+          <p><strong>Learning Goals:</strong> Master advanced collectors, practice parallel stream optimization, create meaningful custom functional interfaces, properly use Optional, and understand performance trade-offs in functional programming.</p>
+        </div>
+      </section>
+
+      <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+        <a href="lesson-06.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
+        <a href="lesson-08.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
+      </nav>
+    </main>
+
+    <script>
+      document.getElementById('themeToggle').addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>
