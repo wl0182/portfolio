@@ -56,6 +56,8 @@
               <li><a href="#native-queries" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Native Queries</a></li>
               <li><a href="#pagination-sorting" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Pagination & Sorting</a></li>
               <li><a href="#lazy-eager-loading" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Lazy vs Eager Loading</a></li>
+              <li><a href="#transaction-management" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Transaction Management</a></li>
+              <li><a href="#connection-management" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Connection Management</a></li>
               <li><a href="#performance-optimization" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Performance Optimization</a></li>
               <li><a href="#summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Summary</a></li>
               <li><a href="#programming-challenge" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Programming Challenge</a></li>
@@ -424,6 +426,90 @@ Optional<Author> findAuthorWithBooks(@Param("id") Long id);
             <pre><code class="language-java">@EntityGraph(attributePaths = {"books", "profile"})
 @Query("SELECT a FROM Author a WHERE a.name = :name")
 List<Author> findAuthorWithBooksAndProfile(@Param("name") String name);
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="transaction-management" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Transaction Management</h2>
+            <h3>Definition</h3>
+            <p>Transaction management in JPA ensures a sequence of operations either complete successfully as a group or have no effect at all, maintaining data integrity. It involves defining boundaries for a transaction, typically at the service layer, and using annotations like @Transactional to manage the commit or rollback of changes. Proper transaction management is crucial for applications with complex data changes, ensuring that all parts of a operation succeed or fail together.</p>
+
+            <h3>Analogy</h3>
+            <p>Think of transaction management like a safety net for a high-wire performer. The performer (your application) carefully walks the tightrope (executes operations), knowing that if they stumble (an error occurs), the safety net (transaction management) will catch them, preventing a dangerous fall (data corruption). Just as the safety net ensures the performer can complete their act safely, transaction management ensures your application's operations complete successfully, preserving the integrity and consistency of your data.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Basic transaction management:</strong></p>
+            <pre><code class="language-java">@Service
+public class UserService {
+    @Autowired
+    private UserRepository userRepository;
+
+    @Transactional
+    public void registerUser(User user) {
+        userRepository.save(user);
+        // Other operations...
+    }
+}
+</code></pre>
+
+            <p><strong>Rollback on runtime exception:</strong></p>
+            <pre><code class="language-java">@Service
+public class OrderService {
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Transactional
+    public void processOrder(Order order) {
+        orderRepository.save(order);
+        if (order.getTotal() > 1000) {
+            throw new RuntimeException("Order too expensive");  // Triggers rollback
+        }
+    }
+}
+</code></pre>
+
+            <p><strong>Read-only transactions:</strong></p>
+            <pre><code class="language-java">@Transactional(readOnly = true)
+public List<User> getAllUsers() {
+    return userRepository.findAll();
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="connection-management" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Connection Management</h2>
+            <h3>Definition</h3>
+            <p>Connection management in JPA involves configuring and managing the database connections used by your application. This includes setting connection parameters, managing connection pools, and ensuring efficient use of database resources. Proper connection management is essential for application performance and stability, especially under load, as it affects how quickly and reliably your application can access the database.</p>
+
+            <h3>Analogy</h3>
+            <p>Think of connection management like managing the lanes in a busy highway interchange. Just as cars (database requests) need clear, well-managed lanes (connections) to travel smoothly without collisions or traffic jams, your application needs properly managed database connections to operate efficiently. Good connection management ensures that requests are processed quickly and resources are used effectively, just like a well-managed interchange keeps traffic flowing smoothly and safely.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Basic connection configuration:</strong></p>
+            <pre><code class="language-java">spring.datasource.url=jdbc:mysql://localhost:3306/mydb
+spring.datasource.username=root
+spring.datasource.password=secret
+</code></pre>
+
+            <p><strong>Connection pool settings:</strong></p>
+            <pre><code class="language-java">spring.datasource.hikari.maximum-pool-size=10
+spring.datasource.hikari.minimum-idle=2
+spring.datasource.hikari.idle-timeout=30000
+</code></pre>
+
+            <p><strong>Testing database connection:</strong></p>
+            <pre><code class="language-java">@PostConstruct
+public void init() {
+    try (Connection conn = dataSource.getConnection()) {
+        // Test the connection...
+    } catch (SQLException e) {
+        // Handle exception...
+    }
+}
 </code></pre>
           </section>
 
