@@ -1,0 +1,671 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 16 - Spring Boot Production Actuators and Monitoring</title>
+    <meta name="description" content="Spring Boot Actuator and monitoring: health checks, metrics, endpoints, application insights, and production monitoring with practical examples and best practices." />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="lg:flex lg:gap-8">
+        <aside class="hidden lg:block lg:w-72">
+          <nav class="sticky top-8 rounded-xl border border-slate-200/60 bg-white/60 p-4 shadow-sm backdrop-blur dark:border-slate-800/60 dark:bg-slate-900/40" aria-label="Table of contents">
+            <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">On this page</h2>
+            <ol class="space-y-1 text-sm">
+              <li><a href="#introduction" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Introduction</a></li>
+              <li><a href="#understanding-actuator" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Understanding Actuator</a></li>
+              <li><a href="#health-checks" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Health Checks</a></li>
+              <li><a href="#application-info" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Application Info</a></li>
+              <li><a href="#metrics-monitoring" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Metrics Monitoring</a></li>
+              <li><a href="#custom-endpoints" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Custom Endpoints</a></li>
+              <li><a href="#application-events" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Application Events</a></li>
+              <li><a href="#production-configuration" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Production Configuration</a></li>
+              <li><a href="#external-monitoring" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">External Monitoring</a></li>
+              <li><a href="#logging-auditing" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Logging & Auditing</a></li>
+              <li><a href="#monitoring-best-practices" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Monitoring Best Practices</a></li>
+              <li><a href="#summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Summary</a></li>
+              <li><a href="#programming-challenge" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Programming Challenge</a></li>
+            </ol>
+          </nav>
+        </aside>
+        <div class="min-w-0 flex-1">
+          <div class="mb-6">
+            <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Concepts</a>
+          </div>
+          <header class="mx-auto max-w-3xl text-center">
+            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 16: Spring Boot Production Actuators and Monitoring</h1>
+            <p class="mt-2 text-slate-600 dark:text-slate-300">Master Spring Boot Actuator for production monitoring: health checks, metrics, application insights, and comprehensive monitoring strategies for enterprise applications.</p>
+          </header>
+
+          <section id="introduction" class="prose prose-slate mt-6 max-w-none dark:prose-invert">
+            <h2>Introduction</h2>
+            <p>Deploying applications to production is just the beginning - you need visibility into how they're performing, whether they're healthy, and what's happening under the hood when issues arise. Spring Boot Actuator provides production-ready features that give you deep insights into your running applications without requiring external tools or complex setup. It offers health checks that tell you if your services are operational, metrics that reveal performance patterns, and endpoints that expose internal application state. Think of Actuator as your application's vital signs monitor, providing the same kind of detailed health information that doctors use to diagnose problems, but for your software. This lesson teaches you to implement comprehensive monitoring, create custom health indicators, track meaningful metrics, and set up production-ready observability that helps you maintain reliable, high-performing applications in real-world environments.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="understanding-actuator" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Understanding Actuator</h2>
+            <h3>Definition</h3>
+            <p>Spring Boot Actuator is a set of production-ready features that help you monitor and manage your application when it's running in production. It provides built-in endpoints for health checks, application metrics, environment details, and operational information. Actuator endpoints are automatically secured and can be customized or extended to meet specific monitoring requirements. These features give operations teams and developers the visibility they need to maintain healthy, performant applications in production environments.</p>
+
+            <h3>Analogy</h3>
+            <p>Think of Spring Boot Actuator like the comprehensive dashboard and diagnostic system in a modern car. Just as your car's dashboard shows you essential information like speed, fuel level, engine temperature, and oil pressure, Actuator provides a dashboard view of your application's vital signs. The car's diagnostic port allows mechanics to connect specialized tools to get detailed information about engine performance, sensor readings, and error codes - similarly, Actuator endpoints allow monitoring tools and operations teams to connect and get detailed insights into your application's performance, health status, and internal metrics. Just like how modern cars can report problems before they become serious failures, Actuator helps you identify potential issues in your application before they impact users, enabling proactive maintenance and rapid troubleshooting when problems do occur.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Adding Actuator dependency:</strong></p>
+            <pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+
+            <p><strong>Basic Actuator configuration:</strong></p>
+            <pre><code class="language-properties">management.endpoints.web.exposure.include=health,info,metrics
+management.endpoint.health.show-details=always
+management.endpoints.web.base-path=/actuator</code></pre>
+
+            <p><strong>Accessing health endpoint:</strong></p>
+            <pre><code class="language-bash"># GET /actuator/health
+{
+  "status": "UP",
+  "components": {
+    "db": {"status": "UP"},
+    "diskSpace": {"status": "UP"}
+  }
+}</code></pre>
+
+            <p><strong>Common Actuator endpoints:</strong></p>
+            <pre><code class="language-java">// /actuator/health - Application health status
+// /actuator/info - Application information
+// /actuator/metrics - Application metrics
+// /actuator/env - Environment properties</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="health-checks" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Health Checks</h2>
+            <h3>Definition</h3>
+            <p>Health checks provide a way to verify that your application and its dependencies are functioning correctly. Spring Boot Actuator includes built-in health indicators for databases, disk space, and other common components, and you can create custom health indicators for business-specific dependencies. Health checks return a status (UP, DOWN, OUT_OF_SERVICE) along with detailed information about what's being checked. Load balancers and monitoring systems use these endpoints to determine if an instance should receive traffic or needs attention.</p>
+
+            <h3>Analogy</h3>
+            <p>Health checks are like the routine medical checkups and vital sign monitoring that hospitals use to assess patient wellbeing. Just as doctors check pulse, blood pressure, temperature, and other indicators to get a complete picture of a patient's health, application health checks verify different components like database connectivity, disk space, memory usage, and external service availability. When a patient's vital signs show problems, medical staff can intervene before a serious condition develops. Similarly, when health checks detect issues with your application - like a database connection failure or low disk space - operations teams can respond quickly to prevent service disruptions. The health check system provides a standardized way to communicate "I'm healthy and ready to work" or "I have a problem that needs attention," just like how medical professionals use standardized vital sign measurements to quickly assess and communicate patient status.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Custom health indicator:</strong></p>
+            <pre><code class="language-java">@Component
+public class ExternalServiceHealthIndicator implements HealthIndicator {
+    public Health health() {
+        if (isExternalServiceReachable()) {
+            return Health.up().withDetail("service", "Available").build();
+        }
+        return Health.down().withDetail("service", "Unreachable").build();
+    }
+}</code></pre>
+
+            <p><strong>Database health check configuration:</strong></p>
+            <pre><code class="language-properties">management.health.db.enabled=true
+management.health.diskspace.enabled=true
+management.health.diskspace.threshold=10MB</code></pre>
+
+            <p><strong>Health check with multiple indicators:</strong></p>
+            <pre><code class="language-java">@Component
+public class OrderServiceHealth implements HealthIndicator {
+    public Health health() {
+        return Health.up()
+            .withDetail("orders.processed", orderService.getTodayCount())
+            .withDetail("queue.size", orderQueue.size())
+            .build();
+    }
+}</code></pre>
+
+            <p><strong>Conditional health indicator:</strong></p>
+            <pre><code class="language-java">@Component
+@ConditionalOnProperty("app.monitoring.external-service.enabled")
+public class ExternalApiHealth implements HealthIndicator {
+    public Health health() {
+        try {
+            externalApiClient.ping();
+            return Health.up().build();
+        } catch (Exception e) {
+            return Health.down(e).build();
+        }
+    }
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="application-info" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Application Info</h2>
+            <h3>Definition</h3>
+            <p>The info endpoint provides metadata about your application such as version numbers, build information, Git commit details, and custom application properties. This information helps operations teams understand exactly which version is deployed, when it was built, and what features it contains. You can customize the info endpoint to include business-specific information like environment names, deployment timestamps, or configuration summaries that help with troubleshooting and deployment tracking.</p>
+
+            <h3>Analogy</h3>
+            <p>The application info endpoint is like the detailed product label and manual that comes with any sophisticated device or appliance. Just as you can look at your smartphone's "About" section to see the model number, software version, serial number, and build date, the info endpoint tells you exactly what version of your application is running, when it was built, what Git commit it came from, and other identifying details. This information is invaluable when you're troubleshooting issues - just like how technical support always asks "what version are you running?" when you call for help. When you have multiple instances of your application running in different environments, the info endpoint helps you quickly verify that you're looking at the right version and understand the deployment history, preventing confusion and ensuring you're working with accurate information during incident response.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Basic application info configuration:</strong></p>
+            <pre><code class="language-properties">info.app.name=Order Management System
+info.app.description=Handles customer orders and inventory
+info.app.version=@project.version@
+info.app.encoding=@project.build.sourceEncoding@</code></pre>
+
+            <p><strong>Git information in info endpoint:</strong></p>
+            <pre><code class="language-properties">management.info.git.mode=full
+management.info.git.enabled=true</code></pre>
+
+            <p><strong>Custom info contributor:</strong></p>
+            <pre><code class="language-java">@Component
+public class CustomInfoContributor implements InfoContributor {
+    public void contribute(Info.Builder builder) {
+        builder.withDetail("environment", getEnvironmentName())
+               .withDetail("deployment-time", deploymentTime)
+               .withDetail("active-features", getActiveFeatures());
+    }
+}</code></pre>
+
+            <p><strong>Example info endpoint response:</strong></p>
+            <pre><code class="language-json">{
+  "app": {
+    "name": "Order Management System",
+    "version": "1.2.3"
+  },
+  "git": {
+    "commit": {
+      "id": "abc123",
+      "time": "2023-10-15T10:30:00Z"
+    }
+  }
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="metrics-monitoring" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Metrics Monitoring</h2>
+            <h3>Definition</h3>
+            <p>Spring Boot Actuator provides comprehensive metrics about your application's performance, including JVM statistics, HTTP request metrics, database connection pool stats, and custom business metrics. Built on Micrometer, it supports various monitoring systems like Prometheus, Grafana, and New Relic. Metrics help you understand application behavior over time, identify performance bottlenecks, track business KPIs, and set up alerting for abnormal conditions. Proper metrics collection is essential for maintaining healthy production applications.</p>
+
+            <h3>Analogy</h3>
+            <p>Application metrics are like the comprehensive fitness tracking and health monitoring that modern smartwatches provide. Just as your fitness tracker continuously monitors your heart rate, steps taken, calories burned, sleep patterns, and workout intensity over time, Spring Boot metrics continuously track your application's "vital signs" - request rates, response times, memory usage, CPU consumption, and database performance. The data helps you understand patterns: when your app is busiest (like knowing your most active hours), what activities stress it most (like tracking workout intensity), and how it's trending over time (like monitoring fitness improvements). When something unusual happens - like a sudden spike in response times or memory usage - you can investigate just like you would if your heart rate spiked unexpectedly. The metrics provide the historical context and real-time data needed to make informed decisions about your application's health and performance.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Built-in JVM metrics:</strong></p>
+            <pre><code class="language-bash"># GET /actuator/metrics/jvm.memory.used
+{
+  "name": "jvm.memory.used",
+  "measurements": [{"statistic": "VALUE", "value": 4.5E8}]
+}</code></pre>
+
+            <p><strong>HTTP request metrics:</strong></p>
+            <pre><code class="language-bash"># GET /actuator/metrics/http.server.requests
+# Shows request count, response times, status codes</code></pre>
+
+            <p><strong>Custom business metrics:</strong></p>
+            <pre><code class="language-java">@Service
+public class OrderService {
+    private final Counter orderCounter;
+    private final Timer orderProcessingTimer;
+
+    public OrderService(MeterRegistry meterRegistry) {
+        this.orderCounter = Counter.builder("orders.created").register(meterRegistry);
+        this.orderProcessingTimer = Timer.builder("orders.processing.time").register(meterRegistry);
+    }
+
+    public void processOrder(Order order) {
+        orderCounter.increment();
+        Timer.Sample sample = Timer.start();
+        // Process order...
+        sample.stop(orderProcessingTimer);
+    }
+}</code></pre>
+
+            <p><strong>Gauge for real-time values:</strong></p>
+            <pre><code class="language-java">@Component
+public class QueueMetrics {
+    public QueueMetrics(MeterRegistry registry, OrderQueue queue) {
+        Gauge.builder("queue.size")
+             .register(registry, queue, OrderQueue::size);
+    }
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="custom-endpoints" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Custom Endpoints</h2>
+            <h3>Definition</h3>
+            <p>Custom Actuator endpoints allow you to expose application-specific operational information and controls. You can create read-only endpoints for diagnostics, configuration summaries, or business metrics, as well as write endpoints for administrative operations like cache clearing or configuration reloading. Custom endpoints follow the same security and exposure patterns as built-in endpoints, ensuring consistent access control and discoverability. They're powerful tools for providing operations teams with application-specific insights and controls.</p>
+
+            <h3>Analogy</h3>
+            <p>Custom endpoints are like adding specialized diagnostic ports and control panels to a complex machine for specific operational needs. While a car comes with standard diagnostic ports that work with generic OBD scanners, a race car might have custom diagnostic endpoints that provide specialized telemetry like tire pressure sensors, fuel mixture readings, or aerodynamic data that regular diagnostic tools can't access. Similarly, while Spring Boot provides standard endpoints for general application health and metrics, your specific business application might need custom endpoints to check inventory levels, view recent transactions, or reset caches. These custom endpoints give operations teams exactly the insights and controls they need for your particular application domain, presented in the same standardized way as the built-in endpoints, making them easy to discover and use consistently across your monitoring infrastructure.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Read-only custom endpoint:</strong></p>
+            <pre><code class="language-java">@Endpoint(id = "orders")
+@Component
+public class OrdersEndpoint {
+    @ReadOperation
+    public Map<String, Object> getOrderStats() {
+        return Map.of(
+            "total", orderService.getTotalOrders(),
+            "pending", orderService.getPendingCount(),
+            "today", orderService.getTodayCount()
+        );
+    }
+}</code></pre>
+
+            <p><strong>Endpoint with write operation:</strong></p>
+            <pre><code class="language-java">@Endpoint(id = "cache")
+@Component
+public class CacheEndpoint {
+    @ReadOperation
+    public Map<String, Object> getCacheInfo() {
+        return Map.of("size", cacheManager.getCacheSize());
+    }
+
+    @WriteOperation
+    public void clearCache(@Selector String cacheName) {
+        cacheManager.clearCache(cacheName);
+    }
+}</code></pre>
+
+            <p><strong>Web-only endpoint:</strong></p>
+            <pre><code class="language-java">@WebEndpoint(id = "system-info")
+@Component
+public class SystemInfoEndpoint {
+    @ReadOperation
+    public WebEndpointResponse<Map<String, Object>> getSystemInfo() {
+        Map<String, Object> info = Map.of(
+            "server-time", Instant.now(),
+            "active-sessions", sessionManager.getActiveCount()
+        );
+        return new WebEndpointResponse<>(info, 200);
+    }
+}</code></pre>
+
+            <p><strong>Accessing custom endpoints:</strong></p>
+            <pre><code class="language-bash"># GET /actuator/orders
+# POST /actuator/cache/user-cache (to clear specific cache)
+# GET /actuator/system-info</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="application-events" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Application Events</h2>
+            <h3>Definition</h3>
+            <p>Spring Boot publishes application events during startup, shutdown, and other lifecycle phases that you can monitor and respond to. These events provide insights into application state changes and can trigger custom monitoring or cleanup logic. Common events include ApplicationReadyEvent (application fully started), ApplicationFailedEvent (startup failed), and ContextRefreshedEvent (application context initialized). Monitoring these events helps track application lifecycle and can trigger automated responses to state changes.</p>
+
+            <h3>Analogy</h3>
+            <p>Application events are like the automated announcements and status updates you hear in an airport or train station. Just as the transportation system announces "Flight 123 is now boarding," "Train service has been delayed," or "All passengers have boarded," your Spring Boot application broadcasts events like "Application startup complete," "Database connection established," or "Application shutting down gracefully." These announcements allow different parts of the system to coordinate their activities - just like how ground crew, passengers, and air traffic control all respond appropriately to flight status announcements, different components of your application can respond to lifecycle events by starting background tasks, cleaning up resources, or updating monitoring dashboards. The events provide a decoupled way for different parts of your system to stay informed about important state changes without having to constantly check or poll for updates.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Listening to application ready event:</strong></p>
+            <pre><code class="language-java">@Component
+public class ApplicationStartupListener {
+    @EventListener
+    public void onApplicationReady(ApplicationReadyEvent event) {
+        logger.info("Application started successfully at {}", Instant.now());
+        notificationService.sendStartupNotification();
+    }
+}</code></pre>
+
+            <p><strong>Monitoring application failures:</strong></p>
+            <pre><code class="language-java">@Component
+public class ApplicationFailureListener {
+    @EventListener
+    public void onApplicationFailed(ApplicationFailedEvent event) {
+        logger.error("Application failed to start", event.getException());
+        alertingService.sendFailureAlert(event.getException());
+    }
+}</code></pre>
+
+            <p><strong>Custom application events:</strong></p>
+            <pre><code class="language-java">public class OrderProcessedEvent extends ApplicationEvent {
+    private final Order order;
+
+    public OrderProcessedEvent(Object source, Order order) {
+        super(source);
+        this.order = order;
+    }
+}
+
+@EventListener
+public void onOrderProcessed(OrderProcessedEvent event) {
+    metricsService.recordOrderProcessed(event.getOrder());
+}</code></pre>
+
+            <p><strong>Shutdown event handling:</strong></p>
+            <pre><code class="language-java">@Component
+public class GracefulShutdownListener {
+    @EventListener
+    public void onContextClosed(ContextClosedEvent event) {
+        logger.info("Application shutting down, cleaning up resources");
+        cleanupService.performShutdownCleanup();
+    }
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="production-configuration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Production Configuration</h2>
+            <h3>Definition</h3>
+            <p>Production Actuator configuration involves securing endpoints, controlling what information is exposed, setting up appropriate access controls, and integrating with external monitoring systems. Not all endpoints should be publicly accessible - some contain sensitive information that should only be available to operations teams. Proper production configuration includes endpoint security, selective exposure, and integration with load balancers and monitoring tools while maintaining the observability needed for effective operations.</p>
+
+            <h3>Analogy</h3>
+            <p>Production configuration for monitoring is like setting up the security and access systems for a hospital's patient monitoring stations. While doctors and nurses need full access to patient vital signs, diagnostic equipment readings, and medical history (full monitoring access), visitors should only see basic "patient is stable" information (limited health check access). Security guards need access to different information like door access logs and security camera feeds (operational metrics), while hospital administrators need high-level statistics and capacity information (business metrics). Each role gets exactly the level of access they need to do their job effectively, with sensitive information protected but critical operational data readily available. The monitoring system needs to be always available and reliable because people's wellbeing depends on it, just like how your application monitoring must be robust and secure because business operations depend on your application's health.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Production security configuration:</strong></p>
+            <pre><code class="language-properties">management.endpoints.web.exposure.include=health,info,metrics
+management.endpoint.health.show-details=when-authorized
+management.endpoints.web.base-path=/management
+management.server.port=8081</code></pre>
+
+            <p><strong>Endpoint security with Spring Security:</strong></p>
+            <pre><code class="language-java">@Configuration
+public class ActuatorSecurityConfig {
+    @Bean
+    public SecurityFilterChain actuatorSecurity(HttpSecurity http) throws Exception {
+        return http.requestMatcher(EndpointRequest.toAnyEndpoint())
+                  .authorizeHttpRequests(auth -> auth
+                      .requestMatchers(EndpointRequest.to("health")).permitAll()
+                      .anyRequest().hasRole("ACTUATOR"))
+                  .build();
+    }
+}</code></pre>
+
+            <p><strong>Environment-specific configuration:</strong></p>
+            <pre><code class="language-yaml"># application-prod.yml
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: never
+      probes:
+        enabled: true</code></pre>
+
+            <p><strong>Load balancer health check:</strong></p>
+            <pre><code class="language-properties">management.endpoint.health.probes.enabled=true
+management.health.livenessstate.enabled=true
+management.health.readinessstate.enabled=true</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="external-monitoring" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>External Monitoring</h2>
+            <h3>Definition</h3>
+            <p>External monitoring systems like Prometheus, Grafana, New Relic, or DataDog can consume Actuator metrics and health information to provide comprehensive dashboards, alerting, and long-term trend analysis. Spring Boot's Micrometer integration makes it easy to export metrics to these systems without changing your application code. External monitoring provides centralized observability across multiple applications, historical data retention, and sophisticated alerting capabilities that help operations teams maintain healthy production environments.</p>
+
+            <h3>Analogy</h3>
+            <p>External monitoring systems are like a modern hospital's central monitoring station where specialists can observe all patients across multiple wards from a single location. Instead of doctors having to visit each room individually to check vital signs (checking each application separately), they can see real-time dashboards showing heart rates, blood pressure, and other critical metrics for all patients simultaneously (centralized application monitoring). The system can alert medical staff immediately if any patient's condition changes (automated alerting), track health trends over time (historical data), and even predict potential issues before they become critical (predictive monitoring). This centralized approach allows a small medical team to effectively monitor many patients, respond quickly to emergencies, and identify patterns that might not be obvious when looking at individual cases. Similarly, external monitoring lets your operations team efficiently oversee multiple applications, services, and environments from unified dashboards.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Prometheus metrics export:</strong></p>
+            <pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;io.micrometer&lt;/groupId&gt;
+    &lt;artifactId&gt;micrometer-registry-prometheus&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+
+            <p><strong>Prometheus configuration:</strong></p>
+            <pre><code class="language-properties">management.endpoints.web.exposure.include=prometheus
+management.metrics.export.prometheus.enabled=true</code></pre>
+
+            <p><strong>Custom metrics for external monitoring:</strong></p>
+            <pre><code class="language-java">@Component
+public class BusinessMetrics {
+    private final Counter userRegistrations;
+    private final Timer orderProcessingTime;
+
+    public BusinessMetrics(MeterRegistry registry) {
+        this.userRegistrations = Counter.builder("users.registrations")
+            .tag("environment", environment)
+            .register(registry);
+    }
+}</code></pre>
+
+            <p><strong>Alerting configuration example:</strong></p>
+            <pre><code class="language-yaml"># Prometheus alerting rule
+- alert: HighMemoryUsage
+  expr: jvm_memory_used_bytes / jvm_memory_max_bytes > 0.8
+  for: 5m
+  annotations:
+    summary: "High memory usage detected"</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="logging-auditing" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Logging & Auditing</h2>
+            <h3>Definition</h3>
+            <p>Comprehensive logging and auditing provide detailed records of application behavior, user actions, and system events that are essential for troubleshooting, security monitoring, and compliance. Spring Boot integrates with logging frameworks like Logback and Log4j, and Actuator provides endpoints to view and modify log levels at runtime. Proper logging includes structured formats, correlation IDs for tracing requests across services, and integration with log aggregation systems for centralized analysis and alerting.</p>
+
+            <h3>Analogy</h3>
+            <p>Application logging and auditing are like the comprehensive record-keeping system that a busy hospital maintains. Every patient interaction, medication administration, procedure performed, and staff action is carefully documented with timestamps, responsible parties, and detailed descriptions (structured logging). When a patient has an unexpected reaction, doctors can trace back through all the records to understand exactly what happened and when (troubleshooting with logs). For legal and compliance reasons, the hospital must maintain detailed audit trails showing who accessed patient records and what changes were made (security auditing). The records are standardized and stored in a central system where they can be searched and analyzed to identify patterns or investigate incidents (log aggregation). Just like how hospital records must be available immediately when needed but securely stored, your application logs need to be easily searchable for troubleshooting while being properly secured and retained for compliance requirements.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Structured logging configuration:</strong></p>
+            <pre><code class="language-properties">logging.level.com.myapp=DEBUG
+logging.pattern.console=%d{HH:mm:ss.SSS} [%thread] %-5level [%X{correlationId}] %logger{36} - %msg%n
+logging.file.name=logs/application.log</code></pre>
+
+            <p><strong>Audit logging for sensitive operations:</strong></p>
+            <pre><code class="language-java">@Component
+public class AuditLogger {
+    private final Logger auditLog = LoggerFactory.getLogger("AUDIT");
+
+    public void logUserAction(String user, String action, String resource) {
+        auditLog.info("User: {} performed {} on {}", user, action, resource);
+    }
+}</code></pre>
+
+            <p><strong>Runtime log level management:</strong></p>
+            <pre><code class="language-bash"># GET /actuator/loggers
+# GET /actuator/loggers/com.myapp.service
+# POST /actuator/loggers/com.myapp.service
+{"configuredLevel": "DEBUG"}</code></pre>
+
+            <p><strong>Correlation ID for request tracing:</strong></p>
+            <pre><code class="language-java">@Component
+public class CorrelationIdFilter implements Filter {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) {
+        String correlationId = UUID.randomUUID().toString();
+        MDC.put("correlationId", correlationId);
+        try {
+            chain.doFilter(request, response);
+        } finally {
+            MDC.clear();
+        }
+    }
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="monitoring-best-practices" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Monitoring Best Practices</h2>
+            <h3>Definition</h3>
+            <p>Effective monitoring requires a strategic approach that balances comprehensive observability with security, performance, and maintainability. Best practices include monitoring the right metrics (not everything), implementing proper security for sensitive endpoints, using standardized health checks, creating meaningful alerts that don't cause fatigue, and ensuring monitoring systems themselves are highly available. Good monitoring helps you understand normal application behavior so you can quickly identify and respond to anomalies.</p>
+
+            <h3>Analogy</h3>
+            <p>Monitoring best practices are like implementing an effective home security and automation system. You don't want to monitor every single movement in your house (too much noise), but you do want to track important events like doors opening, unusual motion patterns, or environmental changes that could indicate problems (meaningful metrics). Your security cameras should be positioned to capture useful information without invading privacy in private areas (secure endpoints with appropriate access). The system should alert you to real emergencies but not wake you up every time a leaf blows past a window (meaningful alerts without alert fatigue). Most importantly, your security system itself needs to be reliable and always operational because it's useless if it fails when you need it most (highly available monitoring infrastructure). The goal is to have confident awareness of what's happening without being overwhelmed by unnecessary information or compromising the security and privacy you're trying to protect.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Selective metric exposure:</strong></p>
+            <pre><code class="language-properties">management.metrics.tags.environment=production
+management.metrics.tags.service=order-service
+management.metrics.export.prometheus.step=10s
+management.metrics.distribution.percentiles.http.server.requests=0.5,0.95,0.99</code></pre>
+
+            <p><strong>Meaningful health indicators:</strong></p>
+            <pre><code class="language-java">@Component
+public class CriticalSystemHealth implements HealthIndicator {
+    public Health health() {
+        if (paymentService.isAvailable() && inventoryService.isAvailable()) {
+            return Health.up()
+                .withDetail("payment", "available")
+                .withDetail("inventory", "available")
+                .build();
+        }
+        return Health.down().withDetail("critical-services", "unavailable").build();
+    }
+}</code></pre>
+
+            <p><strong>Alert-worthy custom metrics:</strong></p>
+            <pre><code class="language-java">@Component
+public class BusinessMetrics {
+    private final Gauge errorRate;
+    private final Counter criticalErrors;
+
+    public BusinessMetrics(MeterRegistry registry) {
+        this.errorRate = Gauge.builder("business.error.rate")
+            .register(registry, this, BusinessMetrics::calculateErrorRate);
+        this.criticalErrors = Counter.builder("business.errors.critical")
+            .register(registry);
+    }
+}</code></pre>
+
+            <p><strong>Production monitoring checklist:</strong></p>
+            <pre><code class="language-yaml"># Essential monitoring points:
+# - Application health and readiness
+# - Response times and throughput
+# - Error rates and types
+# - Resource utilization (CPU, memory, disk)
+# - Business metrics and KPIs
+# - Security events and access patterns</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Summary</h2>
+            <p>You've now mastered Spring Boot Actuator and production monitoring, from implementing health checks and metrics to creating custom endpoints and integrating with external monitoring systems. Actuator provides the observability foundation needed to maintain healthy applications in production, while proper configuration ensures security and performance. Understanding how to monitor application health, track meaningful metrics, handle application events, and follow monitoring best practices prepares you to build and maintain enterprise-grade applications that perform reliably under real-world conditions. Next, you'll learn about caching strategies that can significantly improve application performance and reduce load on backend systems, building on the monitoring foundation to optimize and observe application behavior.</p>
+          </section>
+
+          <section id="programming-challenge" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Programming Challenge</h2>
+            <div class="rounded-lg border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800">
+              <h3 class="mt-0">Challenge: Comprehensive Monitoring Dashboard</h3>
+              <p><strong>Task:</strong> Build a Spring Boot application with comprehensive monitoring capabilities including custom health checks, business metrics, and production-ready observability features.</p>
+
+              <p><strong>Requirements:</strong></p>
+              <ol>
+                <li>Create a simple e-commerce order processing application:</li>
+                <ul>
+                  <li><code>Order</code>, <code>Product</code>, <code>Inventory</code> entities</li>
+                  <li>REST endpoints for creating and viewing orders</li>
+                  <li>Service layer with business logic</li>
+                </ul>
+                <li>Implement comprehensive health checks:</li>
+                <ul>
+                  <li>Database connectivity health indicator</li>
+                  <li>External payment service health check (simulated)</li>
+                  <li>Inventory service availability check</li>
+                  <li>Custom business health indicator (low stock alerts)</li>
+                </ul>
+                <li>Create business metrics:</li>
+                <ul>
+                  <li>Order processing counter and timer</li>
+                  <li>Inventory level gauges</li>
+                  <li>Revenue tracking</li>
+                  <li>Error rate monitoring</li>
+                </ul>
+                <li>Build custom Actuator endpoints:</li>
+                <ul>
+                  <li>Business dashboard endpoint with key stats</li>
+                  <li>Inventory management endpoint</li>
+                  <li>Cache management endpoint</li>
+                </ul>
+                <li>Implement production features:</li>
+                <ul>
+                  <li>Structured logging with correlation IDs</li>
+                  <li>Application event monitoring</li>
+                  <li>Audit logging for sensitive operations</li>
+                  <li>Proper security for actuator endpoints</li>
+                </ul>
+              </ol>
+
+              <p><strong>Bonus features:</strong></p>
+              <ul>
+                <li>Prometheus metrics export configuration</li>
+                <li>Custom alert conditions for critical business metrics</li>
+                <li>Performance monitoring for slow operations</li>
+                <li>Circuit breaker pattern with health indicators</li>
+                <li>Dynamic log level management for troubleshooting</li>
+              </ul>
+
+              <p><strong>Learning Goals:</strong> Practice implementing comprehensive monitoring strategies, creating meaningful health checks and metrics, building custom actuator endpoints, and configuring production-ready observability for a realistic business application.</p>
+            </div>
+          </section>
+
+          <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+            <a href="lesson-15.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
+            <a href="lesson-17.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
+          </nav>
+        </div>
+      </div>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('themeToggle').addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>

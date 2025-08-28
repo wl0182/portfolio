@@ -1,0 +1,591 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 19 - Spring Boot Advanced Topics and Microservices Introduction</title>
+    <meta name="description" content="Spring Boot advanced topics and microservices introduction: reactive programming, event-driven architecture, distributed systems, and microservices fundamentals with practical examples." />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="lg:flex lg:gap-8">
+        <aside class="hidden lg:block lg:w-72">
+          <nav class="sticky top-8 rounded-xl border border-slate-200/60 bg-white/60 p-4 shadow-sm backdrop-blur dark:border-slate-800/60 dark:bg-slate-900/40" aria-label="Table of contents">
+            <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">On this page</h2>
+            <ol class="space-y-1 text-sm">
+              <li><a href="#introduction" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Introduction</a></li>
+              <li><a href="#reactive-programming" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Reactive Programming</a></li>
+              <li><a href="#webflux-introduction" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">WebFlux Introduction</a></li>
+              <li><a href="#event-driven-architecture" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Event-Driven Architecture</a></li>
+              <li><a href="#custom-autoconfiguration" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Custom Auto-Configuration</a></li>
+              <li><a href="#understanding-microservices" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Understanding Microservices</a></li>
+              <li><a href="#monolith-vs-microservices" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Monolith vs Microservices</a></li>
+              <li><a href="#microservice-design-principles" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Microservice Design Principles</a></li>
+              <li><a href="#service-discovery" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Service Discovery</a></li>
+              <li><a href="#distributed-challenges" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Distributed Challenges</a></li>
+              <li><a href="#spring-cloud-introduction" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Spring Cloud Introduction</a></li>
+              <li><a href="#summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Summary</a></li>
+              <li><a href="#programming-challenge" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Programming Challenge</a></li>
+            </ol>
+          </nav>
+        </aside>
+        <div class="min-w-0 flex-1">
+          <div class="mb-6">
+            <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Concepts</a>
+          </div>
+          <header class="mx-auto max-w-3xl text-center">
+            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 19: Spring Boot Advanced Topics and Microservices Introduction</h1>
+            <p class="mt-2 text-slate-600 dark:text-slate-300">Explore advanced Spring Boot features and discover microservices architecture: reactive programming, event-driven design, and building scalable distributed systems.</p>
+          </header>
+
+          <section id="introduction" class="prose prose-slate mt-6 max-w-none dark:prose-invert">
+            <h2>Introduction</h2>
+            <p>As applications grow in complexity and scale, traditional monolithic architectures and blocking programming models can become limitations rather than foundations. Advanced Spring Boot features like reactive programming enable applications to handle thousands of concurrent requests efficiently without consuming excessive resources. Event-driven architectures allow systems to respond dynamically to changes and scale independently. Meanwhile, microservices represent a fundamental shift from building single large applications to creating ecosystems of small, focused services that work together to deliver complex functionality. This architectural approach enables teams to develop, deploy, and scale different parts of an application independently, leading to greater agility and resilience. This lesson introduces you to these advanced concepts, showing how reactive programming improves performance, how event-driven design increases flexibility, and how microservices architecture enables massive scalability while presenting new challenges that modern tools like Spring Cloud help solve.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="reactive-programming" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Reactive Programming</h2>
+            <h3>Definition</h3>
+            <p>Reactive programming is a paradigm that deals with asynchronous data streams and the propagation of changes. Instead of blocking threads while waiting for operations to complete, reactive programming uses non-blocking I/O and event-driven processing to handle multiple operations concurrently. This approach enables applications to remain responsive under high load and efficiently utilize system resources. Reactive programming is built around the concept of observables (data streams) and operators that transform and combine these streams.</p>
+
+            <h3>Analogy</h3>
+            <p>Think of reactive programming like a modern smart restaurant kitchen during peak hours. Instead of having each chef wait for ingredients to be delivered before starting the next dish (blocking approach), the kitchen operates with an event-driven system where chefs continuously work on multiple orders simultaneously. When ingredients arrive, they're automatically routed to the chef who needs them, when a cooking step completes, the dish automatically moves to the next station, and when garnishes are ready, they're immediately applied to waiting plates. The entire kitchen flows like a stream of coordinated events, with everyone responding to changes as they happen rather than waiting for previous tasks to complete. This allows the kitchen to serve many more customers with the same number of staff because no one is idle waiting for something else to finish. The kitchen is reactive - it responds immediately to events and keeps everything flowing smoothly.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Traditional blocking approach:</strong></p>
+            <pre><code class="language-java">public List<User> getUsers() {
+    List<User> users = userRepository.findAll();  // Blocks thread
+    return users.stream().filter(User::isActive).collect(toList());
+}
+</code></pre>
+
+            <p><strong>Reactive non-blocking approach:</strong></p>
+            <pre><code class="language-java">public Flux<User> getUsers() {
+    return userRepository.findAll()  // Returns immediately
+        .filter(User::isActive);     // Processes asynchronously
+}
+</code></pre>
+
+            <p><strong>Reactive stream transformations:</strong></p>
+            <pre><code class="language-java">Flux<String> names = userFlux
+    .map(User::getName)
+    .filter(name -> name.startsWith("A"));
+</code></pre>
+
+            <p><strong>Combining reactive streams:</strong></p>
+            <pre><code class="language-java">Mono<UserProfile> profile = Mono.zip(
+    userService.getUser(id),
+    orderService.getOrders(id),
+    (user, orders) -> new UserProfile(user, orders)
+);
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="webflux-introduction" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>WebFlux Introduction</h2>
+            <h3>Definition</h3>
+            <p>Spring WebFlux is Spring's reactive web framework that provides non-blocking, event-driven processing for web applications. Unlike traditional Spring MVC which uses blocking I/O, WebFlux can handle many more concurrent connections with fewer threads by using reactive streams and non-blocking operations. WebFlux supports both annotation-based programming (similar to Spring MVC) and functional programming styles, making it suitable for high-throughput applications and real-time data processing.</p>
+
+            <h3>Analogy</h3>
+            <p>WebFlux is like upgrading from a traditional call center where each operator can only handle one call at a time, to a modern AI-powered communication center where operators can juggle multiple conversations simultaneously. In the old system (Spring MVC), when a customer puts you on hold to look for information, the operator sits idle waiting. In the new system (WebFlux), when one conversation pauses, the operator immediately switches to help other customers, seamlessly switching back when the first customer returns. The operators never sit idle because they're always working on whichever conversation is ready to proceed. This allows the same number of operators to handle many more customers simultaneously, and customers get faster service because someone is always available to help when they're ready to continue their conversation.</p>
+
+            <h3>Examples</h3>
+            <p><strong>WebFlux reactive controller:</strong></p>
+            <pre><code class="language-java">@RestController
+public class ReactiveUserController {
+    @GetMapping("/users")
+    public Flux<User> getUsers() {
+        return userService.findAllReactive();
+    }
+}
+</code></pre>
+
+            <p><strong>Functional routing:</strong></p>
+            <pre><code class="language-java">@Bean
+public RouterFunction<ServerResponse> routes() {
+    return RouterFunctions.route()
+        .GET("/users", this::getAllUsers)
+        .POST("/users", this::createUser)
+        .build();
+}
+</code></pre>
+
+            <p><strong>Reactive repository:</strong></p>
+            <pre><code class="language-java">public interface ReactiveUserRepository extends ReactiveCrudRepository<User, String> {
+    Flux<User> findByStatus(String status);
+}
+</code></pre>
+
+            <p><strong>Streaming responses:</strong></p>
+            <pre><code class="language-java">@GetMapping(value = "/stream", produces = TEXT_EVENT_STREAM_VALUE)
+public Flux<String> stream() {
+    return Flux.interval(Duration.ofSeconds(1))
+        .map(seq -> "Message " + seq);
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="event-driven-architecture" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Event-Driven Architecture</h2>
+            <h3>Definition</h3>
+            <p>Event-driven architecture is a design pattern where applications communicate through the production and consumption of events rather than direct service calls. Events represent significant state changes or occurrences in the system, and different components can react to these events independently. This approach promotes loose coupling between services, enables better scalability, and allows systems to be more responsive to changes. Event-driven systems are particularly useful for microservices architectures where services need to coordinate without tight dependencies.</p>
+
+            <h3>Analogy</h3>
+            <p>Event-driven architecture is like how a modern smart city operates through its various automated systems. When a fire alarm goes off (event), it doesn't directly call the fire department - instead, it broadcasts an emergency signal that multiple systems can respond to: the fire department is automatically notified, nearby traffic lights change to clear emergency routes, building elevators go to ground floor positions, and security systems unlock emergency exits. Each system responds appropriately to the same event without needing to know about or directly communicate with the others. Similarly, when a user places an order in an e-commerce system, it generates an "order placed" event that triggers inventory updates, payment processing, shipping preparation, and customer notifications - all happening independently but coordinated through the shared event. This creates a resilient system where adding new capabilities (like fraud detection) just means subscribing to existing events rather than modifying existing services.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Publishing events with Spring:</strong></p>
+            <pre><code class="language-java">@Service
+public class OrderService {
+    @EventListener
+    public void handleOrder(OrderPlacedEvent event) {
+        applicationEventPublisher.publishEvent(event);
+    }
+}
+</code></pre>
+
+            <p><strong>Event listener:</strong></p>
+            <pre><code class="language-java">@EventListener
+public void onOrderPlaced(OrderPlacedEvent event) {
+    emailService.sendConfirmation(event.getOrder());
+}
+</code></pre>
+
+            <p><strong>Async event processing:</strong></p>
+            <pre><code class="language-java">@Async
+@EventListener
+public void processInventory(OrderPlacedEvent event) {
+    inventoryService.reserveItems(event.getItems());
+}
+</code></pre>
+
+            <p><strong>Custom event:</strong></p>
+            <pre><code class="language-java">public class OrderPlacedEvent extends ApplicationEvent {
+    private final Order order;
+    public OrderPlacedEvent(Object source, Order order) {
+        super(source); this.order = order;
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="custom-autoconfiguration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Custom Auto-Configuration</h2>
+            <h3>Definition</h3>
+            <p>Custom auto-configuration allows you to create reusable Spring Boot starters that automatically configure beans and dependencies when certain conditions are met. This enables you to package common functionality into libraries that integrate seamlessly with Spring Boot applications. Auto-configuration uses conditional annotations to determine when to activate, making your libraries smart enough to configure themselves appropriately based on the presence of classes, properties, or other beans in the application context.</p>
+
+            <h3>Analogy</h3>
+            <p>Custom auto-configuration is like creating smart modular furniture that automatically adapts to different living spaces. When you buy a smart entertainment center, it detects what devices you have (TV, gaming console, sound system) and automatically configures itself with the right connections, settings, and interfaces. If you add a new device later, the entertainment center detects it and reconfigures itself without you having to manually adjust settings. Similarly, a custom Spring Boot starter detects what's available in an application (databases, message queues, security frameworks) and automatically sets up the appropriate configurations, connections, and integrations. The furniture is smart enough to know "if there's a gaming console, enable game mode; if there's a sound system, configure surround sound; if there's no internet, switch to offline mode." This intelligence is built into the furniture (starter) so every home (application) gets the perfect setup without manual configuration.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Auto-configuration class:</strong></p>
+            <pre><code class="language-java">@Configuration
+@ConditionalOnClass(EmailService.class)
+@EnableConfigurationProperties(EmailProperties.class)
+public class EmailAutoConfiguration {
+    // Auto-configures email beans
+}
+</code></pre>
+
+            <p><strong>Conditional bean creation:</strong></p>
+            <pre><code class="language-java">@Bean
+@ConditionalOnMissingBean
+public EmailService emailService(EmailProperties properties) {
+    return new EmailService(properties);
+}
+</code></pre>
+
+            <p><strong>Configuration properties:</strong></p>
+            <pre><code class="language-java">@ConfigurationProperties("app.email")
+public class EmailProperties {
+    private String host = "localhost";
+    private int port = 587;
+}
+</code></pre>
+
+            <p><strong>Starter dependencies:</strong></p>
+            <pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;com.example&lt;/groupId&gt;
+    &lt;artifactId&gt;email-spring-boot-starter&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="understanding-microservices" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Understanding Microservices</h2>
+            <h3>Definition</h3>
+            <p>Microservices architecture structures applications as collections of small, independent services that communicate over well-defined APIs. Each microservice is responsible for a specific business capability, can be developed and deployed independently, and typically owns its data storage. This architectural style enables teams to work autonomously, choose appropriate technologies for each service, and scale different parts of the system independently based on demand. Microservices promote organizational scalability and technological diversity while requiring sophisticated coordination and operational practices.</p>
+
+            <h3>Analogy</h3>
+            <p>Microservices architecture is like transitioning from a traditional department store to a modern shopping mall with specialized boutique shops. In a department store (monolith), everything is under one roof with shared infrastructure, centralized management, and uniform policies, but changes require coordinating across the entire store, and if one section has problems, it can affect the whole operation. A shopping mall (microservices) has many independent stores, each specializing in what they do best - a bookstore, electronics shop, clothing boutique, and food court. Each store has its own management, inventory systems, operating hours, and customer service approach. They can renovate, change suppliers, or adjust pricing independently without affecting other stores. Customers can visit just the stores they need, and the mall can add new shops or remove failing ones without disrupting the entire complex. However, the mall needs shared infrastructure like parking, security, and directory systems, plus coordination for things like holiday hours and promotional events. This is more complex to manage than a single store, but it provides much more flexibility and resilience.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Microservice structure:</strong></p>
+            <pre><code class="language-java">@SpringBootApplication
+public class UserServiceApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(UserServiceApplication.class, args);
+    }
+}
+</code></pre>
+
+            <p><strong>Service-specific controller:</strong></p>
+            <pre><code class="language-java">@RestController
+@RequestMapping("/users")
+public class UserController {
+    // Only handles user-related operations
+}
+</code></pre>
+
+            <p><strong>Independent database:</strong></p>
+            <pre><code class="language-properties">spring.datasource.url=jdbc:mysql://user-db:3306/users
+spring.application.name=user-service
+</code></pre>
+
+            <p><strong>Service communication:</strong></p>
+            <pre><code class="language-java">@FeignClient(name = "order-service")
+public interface OrderServiceClient {
+    @GetMapping("/orders/user/{userId}")
+    List<Order> getUserOrders(@PathVariable Long userId);
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="monolith-vs-microservices" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Monolith vs Microservices</h2>
+            <h3>Definition</h3>
+            <p>Monolithic architecture builds applications as single deployable units where all components are interconnected and interdependent, while microservices architecture decomposes applications into small, independent services. Monoliths are simpler to develop, test, and deploy initially, but become harder to scale and modify as they grow. Microservices offer greater flexibility and scalability but introduce complexity in service coordination, data consistency, and operational overhead. The choice depends on team size, scalability requirements, and organizational maturity.</p>
+
+            <h3>Analogy</h3>
+            <p>The difference between monoliths and microservices is like comparing a Swiss Army knife to a professional toolbox. A Swiss Army knife (monolith) has everything you need in one compact, integrated unit - knife, scissors, screwdriver, and bottle opener all folded into a single tool. It's perfect for simple tasks, easy to carry, and you never lose pieces. However, each tool is smaller and less specialized than dedicated tools, and if one part breaks, the whole knife might be unusable. A professional toolbox (microservices) contains many specialized tools - each designed for specific tasks and potentially made by different manufacturers. You can replace individual tools, add new ones as needed, and use the best tool for each job. However, you need to organize the toolbox, might need multiple tools for complex tasks, and it requires more space and planning to transport. For simple home repairs, the Swiss Army knife is perfect, but for professional construction work, you need the specialized toolbox despite its complexity.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Monolithic application structure:</strong></p>
+            <pre><code class="language-java">// Single application with all features
+├── controllers/
+├── services/
+├── repositories/
+└── models/
+</code></pre>
+
+            <p><strong>Microservices structure:</strong></p>
+            <pre><code class="language-java">// Separate applications
+user-service/
+order-service/
+payment-service/
+notification-service/
+</code></pre>
+
+            <p><strong>Monolith deployment:</strong></p>
+            <pre><code class="language-bash">java -jar monolith-app.jar
+</code></pre>
+
+            <p><strong>Microservices deployment:</strong></p>
+            <pre><code class="language-bash">docker-compose up  # Deploys multiple services
+kubectl apply -f microservices.yaml
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="microservice-design-principles" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Microservice Design Principles</h2>
+            <h3>Definition</h3>
+            <p>Microservice design follows key principles: single responsibility (each service does one thing well), autonomous teams (services owned by independent teams), decentralized governance (teams choose their own technologies), fault isolation (failures don't cascade), and evolutionary design (services can evolve independently). These principles ensure that microservices deliver their promised benefits of scalability, flexibility, and team autonomy while avoiding the pitfalls of distributed system complexity.</p>
+
+            <h3>Analogy</h3>
+            <p>Microservice design principles are like the rules for organizing an effective food truck festival. Each truck (service) specializes in one type of cuisine and operates independently with its own menu, staff, and cooking equipment (single responsibility). Each truck owner makes their own decisions about ingredients, pricing, and operating hours without needing approval from festival organizers (decentralized governance). If one truck breaks down or runs out of food, customers can still eat at other trucks (fault isolation). Truck owners can experiment with new recipes, upgrade equipment, or change their concept without affecting other trucks (evolutionary design). The festival provides shared infrastructure like electricity and waste management, but each truck maintains its independence. This creates a diverse, resilient food scene where innovation thrives, popular concepts can expand, and poor performers can be replaced without disrupting the entire festival.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Single responsibility service:</strong></p>
+            <pre><code class="language-java">@RestController
+public class PaymentController {
+    // Only handles payment processing, nothing else
+    @PostMapping("/process")
+    public PaymentResult processPayment(@RequestBody PaymentRequest request) {
+        return paymentService.process(request);
+    }
+}
+</code></pre>
+
+            <p><strong>Independent data storage:</strong></p>
+            <pre><code class="language-properties"># Each service has its own database
+user-service.datasource.url=jdbc:mysql://user-db/users
+order-service.datasource.url=jdbc:postgres://order-db/orders
+</code></pre>
+
+            <p><strong>Technology diversity:</strong></p>
+            <pre><code class="language-java">// User service in Java
+// Notification service in Node.js
+// Analytics service in Python
+// Each team chooses the best tool
+</code></pre>
+
+            <p><strong>Fault isolation:</strong></p>
+            <pre><code class="language-java">@HystrixCommand(fallbackMethod = "fallbackRecommendation")
+public List<Product> getRecommendations(Long userId) {
+    return recommendationService.getRecommendations(userId);
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="service-discovery" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Service Discovery</h2>
+            <h3>Definition</h3>
+            <p>Service discovery is the mechanism by which services find and communicate with each other in a microservices architecture. Since services can be deployed on different servers and ports, and instances can start, stop, or move dynamically, services need a way to locate each other automatically. Service discovery systems maintain a registry of available services and their locations, enabling services to find dependencies without hardcoded addresses. This supports dynamic scaling, fault tolerance, and simplified configuration management.</p>
+
+            <h3>Analogy</h3>
+            <p>Service discovery is like the directory system in a large corporate campus with multiple buildings and departments that frequently reorganize. Instead of memorizing that the IT department is in Building 3, Floor 2, Room 205, you consult the dynamic directory system that always knows current locations. When the IT department moves to a new building or adds satellite offices, the directory updates automatically. Employees don't need to know physical addresses - they just look up "IT Support" and get directed to the right place. The directory system also knows if a department is temporarily unavailable (like during a move) and can redirect requests to backup locations. This allows the organization to reorganize, expand, or relocate departments without disrupting daily operations, because everyone always knows how to find the services they need through the central directory system.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Eureka service registration:</strong></p>
+            <pre><code class="language-properties">spring.application.name=user-service
+eureka.client.service-url.defaultZone=http://eureka-server:8761/eureka
+</code></pre>
+
+            <p><strong>Service discovery client:</strong></p>
+            <pre><code class="language-java">@Autowired
+private DiscoveryClient discoveryClient;
+
+List<ServiceInstance> instances = discoveryClient.getInstances("order-service");
+</code></pre>
+
+            <p><strong>Load balanced service call:</strong></p>
+            <pre><code class="language-java">@LoadBalanced
+@Bean
+public RestTemplate restTemplate() {
+    return new RestTemplate();
+}
+</code></pre>
+
+            <p><strong>Dynamic service lookup:</strong></p>
+            <pre><code class="language-java">String response = restTemplate.getForObject(
+    "http://order-service/orders/{id}", String.class, orderId);
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="distributed-challenges" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Distributed Challenges</h2>
+            <h3>Definition</h3>
+            <p>Microservices introduce distributed system challenges that don't exist in monolithic applications: network latency and failures, data consistency across services, distributed transactions, service versioning, monitoring and debugging across multiple services, and the complexity of testing distributed workflows. These challenges require new tools, patterns, and practices like circuit breakers, distributed tracing, eventual consistency, and comprehensive logging to build reliable distributed systems.</p>
+
+            <h3>Analogy</h3>
+            <p>Distributed system challenges are like the complexities that arise when transitioning from a single-location restaurant to a restaurant chain across multiple cities. In a single restaurant, if the kitchen runs out of ingredients, they can quickly check the walk-in cooler or send someone to the local market. Communication is instant, inventory is visible, and coordination is simple. With a restaurant chain, each location has its own inventory, staff, and local conditions. If one location runs out of a key ingredient, they can't just walk to another kitchen - they need to coordinate deliveries, check availability across locations, and potentially modify menus independently. A power outage in one city doesn't affect other locations, but it complicates coordination. Customer orders might involve multiple locations (like catering from several branches), requiring careful orchestration. The chain needs sophisticated systems for inventory management, quality consistency, staff training, and performance monitoring across all locations. While this distributed approach enables serving more customers and resilience against local problems, it requires much more sophisticated management and coordination systems than a single restaurant.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Network failure handling:</strong></p>
+            <pre><code class="language-java">@Retryable(value = {ConnectException.class}, maxAttempts = 3)
+public String callExternalService() {
+    return externalServiceClient.getData();
+}
+</code></pre>
+
+            <p><strong>Circuit breaker pattern:</strong></p>
+            <pre><code class="language-java">@HystrixCommand(fallbackMethod = "defaultResponse")
+public String riskyServiceCall() {
+    return externalService.call();
+}
+</code></pre>
+
+            <p><strong>Distributed tracing:</strong></p>
+            <pre><code class="language-java">@NewSpan("user-lookup")
+public User findUser(@SpanTag("userId") Long id) {
+    return userRepository.findById(id);
+}
+</code></pre>
+
+            <p><strong>Eventual consistency:</strong></p>
+            <pre><code class="language-java">// Order placed immediately, inventory updated asynchronously
+@EventListener
+public void onOrderPlaced(OrderPlacedEvent event) {
+    inventoryService.reserveAsync(event.getItems());
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="spring-cloud-introduction" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Spring Cloud Introduction</h2>
+            <h3>Definition</h3>
+            <p>Spring Cloud is a collection of tools and frameworks that simplify building distributed systems and microservices. It provides solutions for common distributed system patterns like service discovery (Eureka), circuit breakers (Hystrix), API gateways (Gateway), distributed configuration (Config Server), and distributed tracing (Sleuth). Spring Cloud integrates seamlessly with Spring Boot, providing production-ready solutions for the challenges of microservices architecture while maintaining the simplicity and conventions that make Spring Boot popular.</p>
+
+            <h3>Analogy</h3>
+            <p>Spring Cloud is like a comprehensive urban planning and infrastructure toolkit for building modern smart cities. Just as a city needs electricity grids, water systems, telecommunications, transportation networks, and emergency services to function properly, microservices need service discovery, communication protocols, monitoring systems, and coordination mechanisms. Spring Cloud provides pre-built, tested infrastructure components - like having standardized power grids, water treatment plants, and communication networks that you can deploy and connect rather than building from scratch. The toolkit includes blueprints for common city services: traffic management systems (API gateways), emergency response coordination (circuit breakers), city-wide communication networks (service discovery), and centralized utilities management (configuration servers). This allows city planners (developers) to focus on designing neighborhoods and buildings (business services) rather than figuring out how to distribute electricity or manage water pressure throughout the entire city.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Spring Cloud dependencies:</strong></p>
+            <pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-cloud-starter-netflix-eureka-client&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+
+            <p><strong>Eureka server setup:</strong></p>
+            <pre><code class="language-java">@SpringBootApplication
+@EnableEurekaServer
+public class EurekaServerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(EurekaServerApplication.class, args);
+    }
+}
+</code></pre>
+
+            <p><strong>Config server:</strong></p>
+            <pre><code class="language-java">@SpringBootApplication
+@EnableConfigServer
+public class ConfigServerApplication {
+    // Centralized configuration management
+}
+</code></pre>
+
+            <p><strong>API Gateway routing:</strong></p>
+            <pre><code class="language-yaml">spring:
+  cloud:
+    gateway:
+      routes:
+      - id: user-service
+        uri: lb://user-service
+        predicates:
+        - Path=/users/**</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Summary</h2>
+            <p>You've now explored advanced Spring Boot features and been introduced to the fundamental concepts of microservices architecture. Reactive programming and WebFlux enable applications to handle high concurrency efficiently, while event-driven architecture promotes loose coupling and system responsiveness. Custom auto-configuration allows you to create reusable, intelligent components that adapt to different environments. Microservices architecture offers powerful benefits for large-scale applications but introduces new challenges around service coordination, data consistency, and distributed system complexity. Spring Cloud provides a comprehensive toolkit for addressing these challenges with proven patterns and production-ready solutions. Understanding these advanced concepts prepares you for building modern, scalable applications that can grow with your organization's needs. In the next lesson, you'll dive deeper into microservices communication patterns and see how services coordinate to deliver complex business functionality across distributed systems.</p>
+          </section>
+
+          <section id="programming-challenge" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Programming Challenge</h2>
+            <div class="rounded-lg border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800">
+              <h3 class="mt-0">Challenge: Event-Driven Order Processing System</h3>
+              <p><strong>Task:</strong> Build a reactive, event-driven order processing system that demonstrates advanced Spring Boot features and introduces microservices concepts.</p>
+
+              <p><strong>Requirements:</strong></p>
+              <ol>
+                <li>Create reactive endpoints using WebFlux:</li>
+                <ul>
+                  <li>Reactive order creation endpoint that returns <code>Mono&lt;Order&gt;</code></li>
+                  <li>Streaming endpoint for real-time order status updates</li>
+                  <li>Non-blocking inventory check integration</li>
+                </ul>
+                <li>Implement event-driven architecture:</li>
+                <ul>
+                  <li>Create custom events: <code>OrderCreatedEvent</code>, <code>PaymentProcessedEvent</code>, <code>InventoryReservedEvent</code></li>
+                  <li>Event listeners that react to order lifecycle events</li>
+                  <li>Async event processing for non-critical operations</li>
+                </ul>
+                <li>Build custom auto-configuration:</li>
+                <ul>
+                  <li>Create an "order-processing-starter" with auto-configuration</li>
+                  <li>Conditional beans based on properties and available classes</li>
+                  <li>Configuration properties for customizing behavior</li>
+                </ul>
+                <li>Design for microservices readiness:</li>
+                <ul>
+                  <li>Separate concerns into distinct service boundaries</li>
+                  <li>API design that could be split into multiple services</li>
+                  <li>Health checks and metrics for service monitoring</li>
+                  <li>Configuration externalization for different environments</li>
+                </ul>
+                <li>Add distributed system patterns:</li>
+                <ul>
+                  <li>Circuit breaker for external service calls</li>
+                  <li>Retry logic with exponential backoff</li>
+                  <li>Correlation IDs for request tracing</li>
+                  <li>Graceful degradation when services are unavailable</li>
+                </ul>
+              </ol>
+
+              <p><strong>Bonus features:</strong></p>
+              <ul>
+                <li>Implement reactive database access with R2DBC</li>
+                <li>Add server-sent events for real-time updates</li>
+                <li>Create a simple service registry simulation</li>
+                <li>Implement saga pattern for distributed transactions</li>
+                <li>Add distributed tracing with correlation IDs</li>
+              </ul>
+
+              <p><strong>Learning Goals:</strong> Practice reactive programming, event-driven design, custom auto-configuration, and microservices patterns while building a realistic distributed system that demonstrates advanced Spring Boot capabilities and distributed system resilience patterns.</p>
+            </div>
+          </section>
+
+          <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+            <a href="lesson-18.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
+            <a href="lesson-20.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
+          </nav>
+        </div>
+      </div>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('themeToggle').addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>

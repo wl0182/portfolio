@@ -1,0 +1,782 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 20 - Spring Boot Microservices Communication</title>
+    <meta name="description" content="Spring Boot microservices communication: service-to-service communication, API gateways, message queues, load balancing, and building resilient distributed systems with practical examples." />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="lg:flex lg:gap-8">
+        <aside class="hidden lg:block lg:w-72">
+          <nav class="sticky top-8 rounded-xl border border-slate-200/60 bg-white/60 p-4 shadow-sm backdrop-blur dark:border-slate-800/60 dark:bg-slate-900/40" aria-label="Table of contents">
+            <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">On this page</h2>
+            <ol class="space-y-1 text-sm">
+              <li><a href="#introduction" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Introduction</a></li>
+              <li><a href="#synchronous-communication" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Synchronous Communication</a></li>
+              <li><a href="#service-clients" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Service Clients</a></li>
+              <li><a href="#load-balancing" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Load Balancing</a></li>
+              <li><a href="#circuit-breakers" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Circuit Breakers</a></li>
+              <li><a href="#api-gateways" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">API Gateways</a></li>
+              <li><a href="#asynchronous-messaging" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Asynchronous Messaging</a></li>
+              <li><a href="#message-queues" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Message Queues</a></li>
+              <li><a href="#event-streaming" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Event Streaming</a></li>
+              <li><a href="#distributed-tracing" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Distributed Tracing</a></li>
+              <li><a href="#service-mesh" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Service Mesh</a></li>
+              <li><a href="#communication-best-practices" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Communication Best Practices</a></li>
+              <li><a href="#summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Summary</a></li>
+              <li><a href="#programming-challenge" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Programming Challenge</a></li>
+            </ol>
+          </nav>
+        </aside>
+        <div class="min-w-0 flex-1">
+          <div class="mb-6">
+            <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Concepts</a>
+          </div>
+          <header class="mx-auto max-w-3xl text-center">
+            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 20: Spring Boot Microservices Communication</h1>
+            <p class="mt-2 text-slate-600 dark:text-slate-300">Master microservices communication patterns: synchronous and asynchronous messaging, API gateways, load balancing, and building resilient distributed systems.</p>
+          </header>
+
+          <section id="introduction" class="prose prose-slate mt-6 max-w-none dark:prose-invert">
+            <h2>Introduction</h2>
+            <p>When you split a monolithic application into microservices, you create a fundamental challenge: how do these independent services communicate and coordinate to deliver complex business functionality? Microservices communication is the backbone that connects your distributed system, enabling services to share data, trigger workflows, and respond to events across the network. Unlike method calls within a single application, microservices communication happens over networks with inherent latency, potential failures, and varying loads. You need robust patterns for both real-time synchronous communication (like REST API calls) and asynchronous messaging (like event-driven workflows) to build resilient systems. This lesson teaches you proven communication patterns, from simple HTTP calls to sophisticated message queues and event streaming, along with essential infrastructure like API gateways, load balancers, and circuit breakers that make distributed systems reliable and scalable.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="synchronous-communication" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Synchronous Communication</h2>
+            <h3>Definition</h3>
+            <p>Synchronous communication in microservices involves direct, blocking calls between services where the calling service waits for a response before continuing. This typically uses HTTP REST APIs where one service makes a request to another and waits for the result. Synchronous communication is straightforward to implement and debug, providing immediate consistency and clear request-response flows. However, it creates tight coupling between services and can lead to cascading failures if dependent services are unavailable.</p>
+
+            <h3>Analogy</h3>
+            <p>Synchronous communication is like making a phone call to get information - you dial a number, wait for someone to answer, ask your question, listen to their response, and then proceed based on what they told you. If the person you're calling doesn't answer or their line is busy, you're stuck waiting or have to try again later. This works well for urgent matters where you need an immediate answer, like calling a restaurant to check if they have availability tonight. However, if you're calling multiple places to compare prices, you're spending a lot of time waiting on hold and the entire process slows down if any one restaurant takes too long to respond. The phone conversation is synchronous because both parties are engaged simultaneously, and your plans depend on getting answers from each call before making your decision.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Simple REST API call between services:</strong></p>
+            <pre><code class="language-java">@RestController
+public class OrderController {
+    public OrderResponse createOrder(@RequestBody OrderRequest request) {
+        User user = userService.getUser(request.getUserId());
+        return orderService.createOrder(request, user);
+    }
+}
+</code></pre>
+
+            <p><strong>Service-to-service HTTP call:</strong></p>
+            <pre><code class="language-java">@Service
+public class UserService {
+    public User getUser(Long userId) {
+        return restTemplate.getForObject("http://user-service/users/{id}", User.class, userId);
+    }
+}
+</code></pre>
+
+            <p><strong>Blocking call with timeout:</strong></p>
+            <pre><code class="language-java">HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+factory.setConnectTimeout(5000);
+factory.setReadTimeout(5000);
+RestTemplate restTemplate = new RestTemplate(factory);
+</code></pre>
+
+            <p><strong>Error handling in synchronous calls:</strong></p>
+            <pre><code class="language-java">try {
+    Product product = restTemplate.getForObject("http://catalog-service/products/{id}", Product.class, productId);
+} catch (ResourceAccessException e) {
+    throw new ServiceUnavailableException("Catalog service is down");
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="service-clients" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Service Clients</h2>
+            <h3>Definition</h3>
+            <p>Service clients are abstractions that handle the complexity of calling other microservices, providing a clean interface for service-to-service communication. Spring Cloud OpenFeign creates declarative REST clients using interfaces and annotations, automatically handling serialization, error handling, and integration with service discovery. Service clients encapsulate communication details like URLs, timeouts, and retry logic, making inter-service calls feel like local method calls while providing flexibility for configuration and testing.</p>
+
+            <h3>Analogy</h3>
+            <p>Service clients are like having a personal assistant who specializes in making business calls on your behalf. Instead of you having to look up phone numbers, dial manually, navigate phone trees, and handle busy signals, you simply tell your assistant "get me the latest inventory numbers from the warehouse" and they handle all the details. Your assistant knows the right people to call, has all the contact information, understands the proper protocols for each organization, and can handle problems like busy lines or transfers. They present you with a simple interface - you make a request and get results - while they manage all the complexity of actually making the calls, dealing with different phone systems, and following up if needed. This allows you to focus on your core work instead of the mechanics of communication.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Feign client declaration:</strong></p>
+            <pre><code class="language-java">@FeignClient(name = "user-service")
+public interface UserServiceClient {
+    @GetMapping("/users/{id}")
+    User getUser(@PathVariable Long id);
+}
+</code></pre>
+
+            <p><strong>Using Feign client in service:</strong></p>
+            <pre><code class="language-java">@Service
+public class OrderService {
+    private final UserServiceClient userClient;
+
+    public Order createOrder(OrderRequest request) {
+        User user = userClient.getUser(request.getUserId());
+        return new Order(user, request.getItems());
+    }
+}
+</code></pre>
+
+            <p><strong>Feign client with configuration:</strong></p>
+            <pre><code class="language-java">@FeignClient(name = "payment-service", configuration = PaymentConfig.class)
+public interface PaymentServiceClient {
+    @PostMapping("/payments")
+    PaymentResult processPayment(@RequestBody PaymentRequest request);
+}
+</code></pre>
+
+            <p><strong>Custom error handling in Feign:</strong></p>
+            <pre><code class="language-java">@Component
+public class CustomErrorDecoder implements ErrorDecoder {
+    public Exception decode(String methodKey, Response response) {
+        if (response.status() == 404) {
+            return new UserNotFoundException();
+        }
+        return new ServiceException("Service call failed");
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="load-balancing" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Load Balancing</h2>
+            <h3>Definition</h3>
+            <p>Load balancing distributes incoming requests across multiple instances of a service to ensure no single instance becomes overwhelmed and to provide high availability. Spring Cloud LoadBalancer automatically distributes calls among available service instances discovered through service registry. Different load balancing algorithms include round-robin (distribute evenly), random selection, and weighted distribution based on instance capacity. Load balancing is essential for scalability and resilience in microservices architectures.</p>
+
+            <h3>Analogy</h3>
+            <p>Load balancing is like how a busy restaurant manages multiple servers during peak hours. Instead of having all customers line up for one waiter who would become overwhelmed, the host distributes customers among available servers based on their current workload. Some servers might be handling fewer tables (round-robin), while others might get assigned based on their experience level (weighted), or the host might randomly assign tables to keep things fair. If one server goes on break or gets overwhelmed, customers are automatically directed to other available servers. The host monitors which servers are available and ensures no single server gets all the difficult customers or large parties. This system ensures all customers get served promptly, servers don't burn out, and the restaurant can handle much more traffic than if they relied on just one person.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Load balanced RestTemplate:</strong></p>
+            <pre><code class="language-java">@Bean
+@LoadBalanced
+public RestTemplate restTemplate() {
+    return new RestTemplate();
+}
+</code></pre>
+
+            <p><strong>Service call with automatic load balancing:</strong></p>
+            <pre><code class="language-java">@Service
+public class OrderService {
+    public Product getProduct(Long productId) {
+        return restTemplate.getForObject("http://product-service/products/{id}", Product.class, productId);
+    }
+}
+</code></pre>
+
+            <p><strong>Custom load balancing configuration:</strong></p>
+            <pre><code class="language-java">@Bean
+public IRule loadBalancingRule() {
+    return new WeightedResponseTimeRule();  // Favor faster instances
+}
+</code></pre>
+
+            <p><strong>Feign with load balancing:</strong></p>
+            <pre><code class="language-java">@FeignClient(name = "inventory-service")
+public interface InventoryClient {
+    @GetMapping("/inventory/{productId}")
+    InventoryStatus checkInventory(@PathVariable Long productId);
+}
+// Automatically load balances across inventory-service instances
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="circuit-breakers" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Circuit Breakers</h2>
+            <h3>Definition</h3>
+            <p>Circuit breakers prevent cascading failures in distributed systems by automatically stopping calls to failing services and providing fallback responses. When a service starts failing, the circuit breaker "opens" and immediately returns cached responses or default values instead of attempting doomed calls. After a timeout period, it tries limited calls to test if the service has recovered. Circuit breakers protect system stability by failing fast and allowing failing services time to recover without being overwhelmed by requests.</p>
+
+            <h3>Analogy</h3>
+            <p>A circuit breaker works exactly like the electrical circuit breaker in your home. When there's an electrical problem like a short circuit or overload, the breaker immediately cuts power to prevent damage to appliances and avoid fires. Rather than continuing to send electricity through a dangerous circuit, it stops the flow entirely for safety. After some time, you can manually reset the breaker to test if the problem is fixed. If the issue persists, the breaker trips again immediately. In software, when a service starts failing (like returning errors or timing out), the circuit breaker stops sending requests to that service and instead returns a safe default response. This prevents your application from wasting time on doomed requests and gives the failing service a chance to recover without being bombarded with more traffic.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Circuit breaker with Resilience4j:</strong></p>
+            <pre><code class="language-java">@Component
+public class RecommendationService {
+    @CircuitBreaker(name = "recommendation", fallbackMethod = "fallbackRecommendation")
+    public List<Product> getRecommendations(Long userId) {
+        return externalRecommendationService.getRecommendations(userId);
+    }
+}
+</code></pre>
+
+            <p><strong>Fallback method implementation:</strong></p>
+            <pre><code class="language-java">public List<Product> fallbackRecommendation(Long userId, Exception ex) {
+    return List.of(new Product("Default Product", "Safe fallback recommendation"));
+}
+</code></pre>
+
+            <p><strong>Circuit breaker configuration:</strong></p>
+            <pre><code class="language-properties">resilience4j.circuitbreaker.instances.recommendation.failure-rate-threshold=50
+resilience4j.circuitbreaker.instances.recommendation.wait-duration-in-open-state=30s
+resilience4j.circuitbreaker.instances.recommendation.sliding-window-size=10
+</code></pre>
+
+            <p><strong>Circuit breaker with retry:</strong></p>
+            <pre><code class="language-java">@Retry(name = "payment")
+@CircuitBreaker(name = "payment", fallbackMethod = "fallbackPayment")
+public PaymentResult processPayment(PaymentRequest request) {
+    return paymentService.process(request);
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="api-gateways" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>API Gateways</h2>
+            <h3>Definition</h3>
+            <p>API gateways provide a single entry point for client applications to access multiple microservices, handling cross-cutting concerns like authentication, rate limiting, routing, and request/response transformation. Spring Cloud Gateway routes requests to appropriate services based on path patterns, handles load balancing, and can modify requests or responses as they pass through. API gateways simplify client interactions by presenting a unified API surface while enabling independent service evolution behind the scenes.</p>
+
+            <h3>Analogy</h3>
+            <p>An API gateway is like the reception desk at a large corporate building with many different departments. Instead of visitors having to know exactly which floor, room number, and department they need, they go to the reception desk with their request. The receptionist checks their credentials (authentication), directs them to the right department (routing), might limit how many people can visit certain departments at once (rate limiting), and could even translate requests if departments speak different languages (request transformation). The receptionist also maintains a directory of all departments and their current locations, so if a department moves to a different floor, visitors don't need to know - they still go to reception and get directed properly. This single point of entry makes the building much easier to navigate while allowing departments to reorganize internally without confusing visitors.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Basic Spring Cloud Gateway configuration:</strong></p>
+            <pre><code class="language-yaml">spring:
+  cloud:
+    gateway:
+      routes:
+      - id: user-service
+        uri: lb://user-service
+        predicates:
+        - Path=/api/users/**
+</code></pre>
+
+            <p><strong>Gateway with filters:</strong></p>
+            <pre><code class="language-yaml">spring:
+  cloud:
+    gateway:
+      routes:
+      - id: order-service
+        uri: lb://order-service
+        predicates:
+        - Path=/api/orders/**
+        filters:
+        - AddRequestHeader=X-Request-Source, gateway
+</code></pre>
+
+            <p><strong>Custom gateway filter:</strong></p>
+            <pre><code class="language-java">@Component
+public class AuthenticationFilter implements GatewayFilter {
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        String token = exchange.getRequest().getHeaders().getFirst("Authorization");
+        if (isValidToken(token)) {
+            return chain.filter(exchange);
+        }
+        exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+        return exchange.getResponse().setComplete();
+    }
+}
+</code></pre>
+
+            <p><strong>Rate limiting in gateway:</strong></p>
+            <pre><code class="language-yaml">spring:
+  cloud:
+    gateway:
+      routes:
+      - id: api-service
+        filters:
+        - name: RequestRateLimiter
+          args:
+            rate-limiter: "#{@redisRateLimiter}"
+            key-resolver: "#{@userKeyResolver}"
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="asynchronous-messaging" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Asynchronous Messaging</h2>
+            <h3>Definition</h3>
+            <p>Asynchronous messaging allows services to communicate without waiting for immediate responses, using message brokers to queue and deliver messages between producers and consumers. Services send messages to queues or topics and continue processing immediately, while other services process messages when ready. This pattern enables loose coupling, better scalability, and resilience since services don't need to be available simultaneously. Asynchronous messaging is ideal for event-driven architectures and long-running workflows.</p>
+
+            <h3>Analogy</h3>
+            <p>Asynchronous messaging is like using email instead of phone calls for business communication. When you need to send information to a colleague, you compose an email and send it immediately without waiting for them to be available to receive it. The email system (message broker) stores your message and delivers it when the recipient checks their inbox. Your colleague can read and respond when convenient, and you're not blocked waiting for an immediate response. This works especially well for non-urgent communications, complex information that needs time to process, or when coordinating across different time zones. Multiple people can receive the same message (like a mailing list), and the system ensures delivery even if someone's computer is temporarily offline. You can continue working immediately after sending, making the entire communication flow much more efficient than trying to coordinate simultaneous phone calls with multiple people.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Publishing messages with Spring Cloud Stream:</strong></p>
+            <pre><code class="language-java">@Service
+public class OrderEventPublisher {
+    private final StreamBridge streamBridge;
+
+    public void publishOrderCreated(Order order) {
+        streamBridge.send("order-events", new OrderCreatedEvent(order));
+    }
+}
+</code></pre>
+
+            <p><strong>Message consumer:</strong></p>
+            <pre><code class="language-java">@Component
+public class InventoryService {
+    @EventListener
+    public void handleOrderCreated(OrderCreatedEvent event) {
+        reserveInventory(event.getOrder().getItems());
+    }
+}
+</code></pre>
+
+            <p><strong>RabbitMQ message sending:</strong></p>
+            <pre><code class="language-java">@Service
+public class NotificationService {
+    private final RabbitTemplate rabbitTemplate;
+
+    public void sendWelcomeEmail(User user) {
+        rabbitTemplate.convertAndSend("email-queue", new EmailMessage(user.getEmail(), "Welcome!"));
+    }
+}
+</code></pre>
+
+            <p><strong>Message listener:</strong></p>
+            <pre><code class="language-java">@RabbitListener(queues = "email-queue")
+public void processEmailMessage(EmailMessage message) {
+    emailService.sendEmail(message.getTo(), message.getSubject(), message.getBody());
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="message-queues" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Message Queues</h2>
+            <h3>Definition</h3>
+            <p>Message queues provide reliable, ordered delivery of messages between services, ensuring that messages are not lost even if services are temporarily unavailable. Queues store messages until consumers are ready to process them, providing buffering during traffic spikes and enabling different processing speeds between producers and consumers. Message queues support various delivery patterns including point-to-point (one consumer per message) and publish-subscribe (multiple consumers for the same message).</p>
+
+            <h3>Analogy</h3>
+            <p>Message queues work like the order system in a busy fast-food restaurant during lunch rush. When customers place orders (messages), they're written on tickets and placed in an organized queue for the kitchen staff. The order-takers (producers) can continue taking new orders even if the kitchen is backed up, because the tickets wait safely in the queue. Kitchen staff (consumers) process orders in the correct sequence when they're ready, and if someone goes on break, other staff members can pick up where they left off. The ticket system ensures no orders are lost, even during the busiest periods, and customers can see their order number to know their position in line. Different stations might handle different parts of the order (drink station, grill, assembly), each working from their own specialized queue, but all coordinated to deliver complete meals efficiently.</p>
+
+            <h3>Examples</h3>
+            <p><strong>RabbitMQ queue configuration:</strong></p>
+            <pre><code class="language-java">@Configuration
+public class QueueConfig {
+    @Bean
+    public Queue orderProcessingQueue() {
+        return QueueBuilder.durable("order-processing").build();
+    }
+}
+</code></pre>
+
+            <p><strong>Sending messages to queue:</strong></p>
+            <pre><code class="language-java">@Service
+public class OrderService {
+    public void processOrder(Order order) {
+        orderRepository.save(order);
+        rabbitTemplate.convertAndSend("order-processing", order);
+    }
+}
+</code></pre>
+
+            <p><strong>Queue consumer with error handling:</strong></p>
+            <pre><code class="language-java">@RabbitListener(queues = "order-processing")
+public void handleOrderProcessing(Order order) {
+    try {
+        paymentService.processPayment(order);
+        inventoryService.reserveItems(order);
+    } catch (Exception e) {
+        rabbitTemplate.convertAndSend("order-failed", order);
+    }
+}
+</code></pre>
+
+            <p><strong>Dead letter queue configuration:</strong></p>
+            <pre><code class="language-java">@Bean
+public Queue orderQueue() {
+    return QueueBuilder.durable("orders")
+        .withArgument("x-dead-letter-exchange", "dlx")
+        .withArgument("x-dead-letter-routing-key", "failed-orders")
+        .build();
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="event-streaming" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Event Streaming</h2>
+            <h3>Definition</h3>
+            <p>Event streaming captures data changes as a continuous flow of events that multiple services can subscribe to and process independently. Unlike traditional message queues where messages are consumed once, event streams maintain a log of events that can be replayed and processed by multiple consumers at different times. Event streaming is ideal for building event-driven architectures, real-time analytics, and systems that need to maintain consistency across multiple data stores through event sourcing patterns.</p>
+
+            <h3>Analogy</h3>
+            <p>Event streaming is like a live news feed or social media timeline that multiple people can follow and react to simultaneously. When something newsworthy happens (an event), it gets published to the stream where anyone interested can see it. Unlike a private message that only one person receives, the news story stays in the timeline for everyone to read, comment on, and share at their own pace. Different people might react differently to the same news - some might share it, others might fact-check it, and some might use it for research. New followers can catch up by reading the timeline history, and the same news can trigger multiple different responses across various platforms and audiences. The stream maintains a permanent record of what happened when, allowing people to understand the sequence of events and their relationships to each other.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Kafka event streaming setup:</strong></p>
+            <pre><code class="language-java">@Component
+public class OrderEventStream {
+    @KafkaListener(topics = "order-events")
+    public void handleOrderEvent(OrderEvent event) {
+        logger.info("Received order event: {}", event.getType());
+    }
+}
+</code></pre>
+
+            <p><strong>Publishing events to stream:</strong></p>
+            <pre><code class="language-java">@Service
+public class OrderService {
+    private final KafkaTemplate<String, OrderEvent> kafkaTemplate;
+
+    public void publishOrderCreated(Order order) {
+        OrderEvent event = new OrderEvent("ORDER_CREATED", order);
+        kafkaTemplate.send("order-events", event);
+    }
+}
+</code></pre>
+
+            <p><strong>Multiple consumers for same stream:</strong></p>
+            <pre><code class="language-java">// Analytics service
+@KafkaListener(topics = "order-events", groupId = "analytics-group")
+public void trackOrderMetrics(OrderEvent event) {
+    metricsService.recordOrderEvent(event);
+}
+
+// Notification service
+@KafkaListener(topics = "order-events", groupId = "notification-group")
+public void sendNotification(OrderEvent event) {
+    if (event.getType().equals("ORDER_CREATED")) {
+        notificationService.sendOrderConfirmation(event.getOrder());
+    }
+}
+</code></pre>
+
+            <p><strong>Event sourcing with streams:</strong></p>
+            <pre><code class="language-java">@EventHandler
+public void on(OrderCreatedEvent event) {
+    this.orderId = event.getOrderId();
+    this.status = OrderStatus.CREATED;
+    this.items = event.getItems();
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="distributed-tracing" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Distributed Tracing</h2>
+            <h3>Definition</h3>
+            <p>Distributed tracing tracks requests as they flow through multiple microservices, providing visibility into the complete journey of each transaction across your distributed system. Tracing systems like Zipkin or Jaeger assign unique trace IDs to requests and track spans (individual service calls) within each trace. This enables developers to understand performance bottlenecks, debug issues across service boundaries, and analyze the behavior of complex distributed workflows that span multiple services and external dependencies.</p>
+
+            <h3>Analogy</h3>
+            <p>Distributed tracing is like following a package's journey through a complex shipping network using a tracking number. When you ship a package, it gets a unique tracking ID that follows it through every step: pickup from your location, sorting at local facility, transport to regional hub, routing through distribution centers, final delivery truck, and arrival at destination. At each step, the system records when the package arrived, how long it stayed, and where it went next. If the package is delayed, you can see exactly where the bottleneck occurred - maybe it sat too long at a particular distribution center, or the final delivery truck was overloaded. Similarly, distributed tracing follows a user request through multiple microservices, recording timing and dependencies at each step, so if a web page loads slowly, you can pinpoint whether the delay was in the user service, payment processing, or external API calls.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Adding tracing to Spring Boot:</strong></p>
+            <pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-cloud-starter-zipkin&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+
+            <p><strong>Custom span annotation:</strong></p>
+            <pre><code class="language-java">@Service
+public class PaymentService {
+    @NewSpan("payment-processing")
+    public PaymentResult processPayment(@SpanTag("amount") BigDecimal amount) {
+        return externalPaymentProvider.charge(amount);
+    }
+}
+</code></pre>
+
+            <p><strong>Manual span creation:</strong></p>
+            <pre><code class="language-java">@Autowired
+private Tracer tracer;
+
+public void complexOperation() {
+    Span span = tracer.nextSpan().name("complex-operation").start();
+    try (Tracer.SpanInScope ws = tracer.withSpanInScope(span)) {
+        // Your operation here
+        span.tag("operation.type", "data-processing");
+    } finally {
+        span.end();
+    }
+}
+</code></pre>
+
+            <p><strong>Trace correlation across services:</strong></p>
+            <pre><code class="language-java">@RestController
+public class OrderController {
+    public Order createOrder(@RequestBody OrderRequest request) {
+        // Trace ID automatically propagated through service calls
+        User user = userServiceClient.getUser(request.getUserId());
+        PaymentResult payment = paymentServiceClient.process(request.getPayment());
+        return orderService.create(user, payment, request.getItems());
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="service-mesh" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Service Mesh</h2>
+            <h3>Definition</h3>
+            <p>A service mesh is a dedicated infrastructure layer that handles service-to-service communication using a network of lightweight proxies deployed alongside each service. Service meshes like Istio or Linkerd provide features like traffic management, security, observability, and policy enforcement without requiring changes to application code. The mesh handles concerns like load balancing, circuit breaking, mutual TLS, and traffic routing at the infrastructure level, allowing developers to focus on business logic while getting enterprise-grade networking capabilities.</p>
+
+            <h3>Analogy</h3>
+            <p>A service mesh is like having a sophisticated traffic management system for a complex highway network connecting multiple cities. Instead of each driver having to figure out the best route, handle toll payments, and navigate traffic themselves, there's an intelligent infrastructure that guides every vehicle. Smart traffic lights coordinate flow, automated toll systems handle payments, GPS systems provide real-time routing, and traffic monitors ensure no single road gets overwhelmed. If an accident blocks one highway, the system automatically reroutes traffic through alternate paths. Emergency vehicles get priority lanes, and the system can enforce different rules for different types of vehicles. Drivers just focus on getting to their destination while the infrastructure handles all the complexity of traffic management, security (checking vehicle registration), and monitoring (tracking traffic patterns). The mesh ensures smooth, secure communication between all the cities without requiring each driver to become a traffic expert.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Istio service mesh configuration:</strong></p>
+            <pre><code class="language-yaml">apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: order-service
+spec:
+  hosts:
+  - order-service
+  http:
+  - route:
+    - destination:
+        host: order-service
+        subset: v1
+      weight: 90
+    - destination:
+        host: order-service
+        subset: v2
+      weight: 10
+</code></pre>
+
+            <p><strong>Traffic splitting for canary deployment:</strong></p>
+            <pre><code class="language-yaml">apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: order-service
+spec:
+  host: order-service
+  subsets:
+  - name: v1
+    labels:
+      version: v1
+  - name: v2
+    labels:
+      version: v2
+</code></pre>
+
+            <p><strong>Mutual TLS policy:</strong></p>
+            <pre><code class="language-yaml">apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default
+spec:
+  mtls:
+    mode: STRICT
+</code></pre>
+
+            <p><strong>Service mesh observability:</strong></p>
+            <pre><code class="language-java">// No code changes needed - mesh provides automatic:
+// - Request tracing
+// - Metrics collection
+// - Error tracking
+// - Traffic visualization
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="communication-best-practices" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Communication Best Practices</h2>
+            <h3>Definition</h3>
+            <p>Effective microservices communication requires following established patterns to ensure reliability, performance, and maintainability. Best practices include using asynchronous messaging for non-critical operations, implementing proper timeout and retry policies, designing for idempotency, using correlation IDs for request tracking, implementing graceful degradation when services are unavailable, and choosing appropriate consistency models for different business scenarios. Following these practices helps build resilient distributed systems that handle failures gracefully.</p>
+
+            <h3>Analogy</h3>
+            <p>Communication best practices for microservices are like the protocols and procedures that make international business relationships work smoothly. When companies in different countries want to collaborate, they don't just start calling each other randomly - they establish proper communication channels, agree on common languages and standards, set up backup communication methods for when primary channels fail, and create clear procedures for handling misunderstandings or delays. They use written contracts with clear terms (service contracts), establish regular check-ins (health checks), maintain detailed records of all transactions (audit logs), and have contingency plans when partners are unavailable (fallback strategies). Successful international business requires understanding cultural differences (service boundaries), using appropriate communication channels for different types of messages (sync vs async), and building trust through consistent, reliable interactions over time.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Idempotent operations:</strong></p>
+            <pre><code class="language-java">@PostMapping("/orders")
+public ResponseEntity<Order> createOrder(@RequestBody OrderRequest request,
+                                       @RequestHeader("Idempotency-Key") String key) {
+    Order existing = orderService.findByIdempotencyKey(key);
+    if (existing != null) {
+        return ResponseEntity.ok(existing);  // Return existing instead of creating duplicate
+    }
+    return ResponseEntity.status(HttpStatus.CREATED).body(orderService.create(request, key));
+}
+</code></pre>
+
+            <p><strong>Correlation ID tracking:</strong></p>
+            <pre><code class="language-java">@Component
+public class CorrelationIdFilter implements Filter {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) {
+        String correlationId = getOrGenerateCorrelationId(request);
+        MDC.put("correlationId", correlationId);
+        // Pass correlation ID to downstream services
+        chain.doFilter(request, response);
+    }
+}
+</code></pre>
+
+            <p><strong>Timeout and retry configuration:</strong></p>
+            <pre><code class="language-java">@Retryable(value = {TransientException.class}, maxAttempts = 3, backoff = @Backoff(delay = 1000))
+@TimeLimiter(name = "user-service", fallbackMethod = "fallbackUser")
+public CompletableFuture<User> getUser(Long userId) {
+    return CompletableFuture.completedFuture(userServiceClient.getUser(userId));
+}
+</code></pre>
+
+            <p><strong>Graceful degradation:</strong></p>
+            <pre><code class="language-java">@Service
+public class RecommendationService {
+    public List<Product> getRecommendations(Long userId) {
+        try {
+            return externalRecommendationService.getPersonalized(userId);
+        } catch (Exception e) {
+            logger.warn("Recommendation service unavailable, using popular products");
+            return productService.getPopularProducts();
+        }
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Summary</h2>
+            <p>You've now mastered the essential patterns and technologies for microservices communication, from simple synchronous REST calls to sophisticated asynchronous event streaming. Understanding when to use synchronous vs asynchronous communication, how to implement resilience patterns like circuit breakers and retries, and how to manage complexity through API gateways and service meshes enables you to build robust distributed systems. Communication is the backbone of microservices architecture - getting it right determines whether your system is resilient and scalable or fragile and unreliable. These patterns and tools provide the foundation for building production-ready microservices that can handle real-world complexity and scale. In the final lesson, you'll explore advanced microservices topics including distributed data management, deployment strategies, and organizational patterns that complete your journey to microservices mastery.</p>
+          </section>
+
+          <section id="programming-challenge" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Programming Challenge</h2>
+            <div class="rounded-lg border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800">
+              <h3 class="mt-0">Challenge: Complete E-commerce Microservices Communication System</h3>
+              <p><strong>Task:</strong> Build a comprehensive e-commerce system with multiple microservices demonstrating all major communication patterns and resilience techniques.</p>
+
+              <p><strong>Requirements:</strong></p>
+              <ol>
+                <li>Create multiple microservices:</li>
+                <ul>
+                  <li><code>user-service</code>: User management and authentication</li>
+                  <li><code>product-service</code>: Product catalog and inventory</li>
+                  <li><code>order-service</code>: Order processing and management</li>
+                  <li><code>payment-service</code>: Payment processing simulation</li>
+                  <li><code>notification-service</code>: Email and SMS notifications</li>
+                  <li><code>api-gateway</code>: Single entry point for clients</li>
+                </ul>
+                <li>Implement synchronous communication:</li>
+                <ul>
+                  <li>Feign clients for service-to-service calls</li>
+                  <li>Load balancing with Eureka service discovery</li>
+                  <li>Circuit breakers with fallback methods</li>
+                  <li>Timeout and retry configurations</li>
+                </ul>
+                <li>Add asynchronous messaging:</li>
+                <ul>
+                  <li>RabbitMQ message queues for notifications</li>
+                  <li>Event streaming with Kafka for order events</li>
+                  <li>Dead letter queues for failed message handling</li>
+                  <li>Multiple consumers for same events</li>
+                </ul>
+                <li>Build API Gateway features:</li>
+                <ul>
+                  <li>Route requests to appropriate services</li>
+                  <li>JWT authentication and authorization</li>
+                  <li>Rate limiting for API protection</li>
+                  <li>Request/response transformation</li>
+                </ul>
+                <li>Implement observability:</li>
+                <ul>
+                  <li>Distributed tracing with Zipkin</li>
+                  <li>Correlation IDs for request tracking</li>
+                  <li>Comprehensive logging and metrics</li>
+                  <li>Health checks for all services</li>
+                </ul>
+                <li>Add resilience patterns:</li>
+                <ul>
+                  <li>Bulkhead pattern for resource isolation</li>
+                  <li>Graceful degradation strategies</li>
+                  <li>Idempotent operation handling</li>
+                  <li>Saga pattern for distributed transactions</li>
+                </ul>
+              </ol>
+
+              <p><strong>Communication flows to implement:</strong></p>
+              <ul>
+                <li>Order creation: API Gateway → Order Service → User Service (sync) → Product Service (sync) → Payment Service (sync) → Notification Service (async)</li>
+                <li>Inventory updates: Product Service → Order Service (events)</li>
+                <li>User notifications: Multiple services → Notification Service (queues)</li>
+                <li>Analytics: All services → Analytics Service (event streaming)</li>
+              </ul>
+
+              <p><strong>Bonus features:</strong></p>
+              <ul>
+                <li>Implement CQRS pattern with event sourcing</li>
+                <li>Add service mesh configuration (Istio)</li>
+                <li>Create chaos engineering tests</li>
+                <li>Implement distributed caching strategy</li>
+                <li>Add comprehensive integration testing</li>
+              </ul>
+
+              <p><strong>Learning Goals:</strong> Practice building a complete microservices ecosystem with realistic communication patterns, implement all major resilience patterns, integrate multiple messaging technologies, and demonstrate mastery of distributed system design principles.</p>
+            </div>
+          </section>
+
+          <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+            <a href="lesson-19.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
+            <a href="lesson-21.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
+          </nav>
+        </div>
+      </div>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('themeToggle').addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 13 - Spring Boot Data Access with JPA and Hibernate part 1</title>
+    <meta name="description" content="Spring Boot JPA and Hibernate part 1: entity mapping, repositories, CRUD operations, and database integration with practical examples and best practices." />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="lg:flex lg:gap-8">
+        <aside class="hidden lg:block lg:w-72">
+          <nav class="sticky top-8 rounded-xl border border-slate-200/60 bg-white/60 p-4 shadow-sm backdrop-blur dark:border-slate-800/60 dark:bg-slate-900/40" aria-label="Table of contents">
+            <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">On this page</h2>
+            <ol class="space-y-1 text-sm">
+              <li><a href="#introduction" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Introduction</a></li>
+              <li><a href="#understanding-jpa" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Understanding JPA</a></li>
+              <li><a href="#hibernate-basics" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Hibernate Basics</a></li>
+              <li><a href="#entity-mapping" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Entity Mapping</a></li>
+              <li><a href="#primary-keys" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Primary Keys</a></li>
+              <li><a href="#database-configuration" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Database Configuration</a></li>
+              <li><a href="#spring-data-repositories" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Spring Data Repositories</a></li>
+              <li><a href="#crud-operations" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">CRUD Operations</a></li>
+              <li><a href="#query-methods" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Query Methods</a></li>
+              <li><a href="#testing-repositories" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Testing Repositories</a></li>
+              <li><a href="#summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Summary</a></li>
+              <li><a href="#programming-challenge" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Programming Challenge</a></li>
+            </ol>
+          </nav>
+        </aside>
+        <div class="min-w-0 flex-1">
+          <div class="mb-6">
+            <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Concepts</a>
+          </div>
+          <header class="mx-auto max-w-3xl text-center">
+            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 13: Spring Boot Data Access with JPA and Hibernate part 1</h1>
+            <p class="mt-2 text-slate-600 dark:text-slate-300">Master JPA and Hibernate fundamentals: entity mapping, repositories, CRUD operations, and seamless database integration in Spring Boot applications.</p>
+          </header>
+
+          <section id="introduction" class="prose prose-slate mt-6 max-w-none dark:prose-invert">
+            <h2>Introduction</h2>
+            <p>Real applications need to store and retrieve data permanently, not just keep it in memory where it disappears when the program stops. Spring Boot makes database integration incredibly simple through JPA (Java Persistence API) and Hibernate, which automatically translate your Java objects into database tables and vice versa. Instead of writing complex SQL statements and managing database connections manually, you can work with regular Java objects and let JPA handle all the database details behind the scenes. JPA provides a standard way to map Java classes to database tables, while Hibernate is the powerful implementation that makes it all work seamlessly. With Spring Data JPA, you can create repositories that provide ready-made methods for common database operations like saving, finding, and deleting records. This lesson introduces you to the fundamental concepts of entity mapping, repository creation, and basic CRUD operations that form the foundation of data persistence in Spring Boot applications.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="understanding-jpa" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Understanding JPA</h2>
+            <h3>Definition</h3>
+            <p>JPA (Java Persistence API) is a specification that defines how Java objects should be mapped to relational databases. It provides a standard set of annotations and interfaces that allow you to work with databases using object-oriented programming instead of writing SQL queries. JPA handles the translation between your Java objects and database tables automatically, managing the conversion of data types, relationships between objects, and the generation of appropriate SQL statements for different database operations.</p>
+
+            <h3>Analogy</h3>
+            <p>Think of JPA like a universal translator at an international conference. You have speakers who only know Java (your objects) and an audience that only understands SQL (the database). The translator (JPA) sits between them, automatically converting everything the Java speaker says into perfect SQL that the database understands, and then translating the database's responses back into Java objects that your application can work with. Just like how the translator handles all the complexity of different languages and cultural nuances, JPA handles all the complexity of different database systems, SQL dialects, and data type conversions. You focus on your business logic in Java, and JPA takes care of making sure everything gets stored and retrieved correctly from the database.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Adding JPA dependency to Spring Boot:</strong></p>
+            <pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+
+            <p><strong>Simple entity annotation:</strong></p>
+            <pre><code class="language-java">@Entity
+public class User {
+    @Id @GeneratedValue
+    private Long id;
+    private String name;
+}</code></pre>
+
+            <p><strong>JPA automatically creates table:</strong></p>
+            <pre><code class="language-sql">CREATE TABLE user (
+    id BIGINT PRIMARY KEY,
+    name VARCHAR(255)
+);</code></pre>
+
+            <p><strong>Working with objects, not SQL:</strong></p>
+            <pre><code class="language-java">User user = new User("Alice");
+userRepository.save(user);  // JPA generates INSERT statement
+User found = userRepository.findById(1L);  // JPA generates SELECT</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="hibernate-basics" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Hibernate Basics</h2>
+            <h3>Definition</h3>
+            <p>Hibernate is the most popular implementation of the JPA specification, providing the actual functionality that makes object-relational mapping work. It acts as the bridge between your Java application and the database, handling connection management, SQL generation, caching, and transaction management. Spring Boot includes Hibernate by default when you add the JPA starter, and it automatically configures Hibernate with sensible defaults while allowing you to customize settings as needed.</p>
+
+            <h3>Analogy</h3>
+            <p>If JPA is like the blueprint for building a universal translator, then Hibernate is the actual skilled translator who does the work. Imagine you have architectural plans (JPA specification) for building a bridge, but you need an experienced construction company (Hibernate) to actually build it. The construction company knows how to read the blueprints, has all the specialized equipment and expertise, handles all the permits and regulations, and deals with different types of terrain and weather conditions. Similarly, Hibernate knows how to implement the JPA specifications, has all the tools for database communication, handles different database vendors and their quirks, and optimizes performance through features like caching and lazy loading. You give Hibernate the JPA "blueprints" (your annotated entities), and it builds the entire data access infrastructure.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Hibernate auto-configuration in Spring Boot:</strong></p>
+            <pre><code class="language-java">// No configuration needed - Hibernate is automatically configured
+// when spring-boot-starter-data-jpa is added</code></pre>
+
+            <p><strong>Hibernate properties configuration:</strong></p>
+            <pre><code class="language-properties"># application.properties
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true</code></pre>
+
+            <p><strong>Hibernate generates SQL automatically:</strong></p>
+            <pre><code class="language-java">User user = userRepository.findByEmail("alice@example.com");
+// Hibernate generates: SELECT * FROM user WHERE email = 'alice@example.com'</code></pre>
+
+            <p><strong>Transaction management:</strong></p>
+            <pre><code class="language-java">@Transactional
+public void updateUserProfile(Long id, String newName) {
+    User user = userRepository.findById(id);
+    user.setName(newName);  // Hibernate automatically saves changes
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="entity-mapping" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Entity Mapping</h2>
+            <h3>Definition</h3>
+            <p>Entity mapping is the process of defining how Java classes correspond to database tables using JPA annotations. The @Entity annotation marks a class as a database entity, @Table specifies table details, @Column configures column properties, and various other annotations control how fields are mapped to database columns. Proper entity mapping ensures that your objects are stored correctly and efficiently in the database while maintaining data integrity and supporting the relationships between different entities.</p>
+
+            <h3>Analogy</h3>
+            <p>Entity mapping is like creating a detailed floor plan for converting an office building into apartments. You need to specify which rooms (Java fields) become which apartments (database columns), how big each apartment should be (column size), which features are required (not null constraints), and how the apartments connect to shared facilities like hallways and elevators (relationships). The @Entity annotation is like putting up a sign saying "This building contains apartments," while @Column annotations are like the detailed specifications for each apartment: "This room becomes a 2-bedroom unit with hardwood floors and cannot be left empty." Just as the floor plan ensures the conversion happens correctly and all apartments meet building codes, entity mapping ensures your objects are stored properly and meet database constraints.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Basic entity with column customization:</strong></p>
+            <pre><code class="language-java">@Entity
+@Table(name = "users")
+public class User {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "full_name", nullable = false, length = 100)
+    private String name;
+}</code></pre>
+
+            <p><strong>Entity with various field types:</strong></p>
+            <pre><code class="language-java">@Entity
+public class Product {
+    @Id @GeneratedValue
+    private Long id;
+
+    @Column(unique = true)
+    private String sku;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal price;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
+}</code></pre>
+
+            <p><strong>Enum mapping:</strong></p>
+            <pre><code class="language-java">@Entity
+public class Order {
+    @Id @GeneratedValue
+    private Long id;
+
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;  // Stores as text: "PENDING", "COMPLETED"
+}</code></pre>
+
+            <p><strong>Embedded objects:</strong></p>
+            <pre><code class="language-java">@Embeddable
+public class Address {
+    private String street;
+    private String city;
+    private String zipCode;
+}
+
+@Entity
+public class Customer {
+    @Id @GeneratedValue
+    private Long id;
+
+    @Embedded
+    private Address address;  // Flattened into customer table
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="primary-keys" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Primary Keys</h2>
+            <h3>Definition</h3>
+            <p>Primary keys uniquely identify each record in a database table and are essential for JPA entities. The @Id annotation marks a field as the primary key, while @GeneratedValue specifies how the key should be automatically generated. Different generation strategies include AUTO (database decides), IDENTITY (auto-increment), SEQUENCE (database sequence), and TABLE (separate table for key generation). Choosing the right primary key strategy depends on your database type, performance requirements, and whether you need the key value immediately after saving.</p>
+
+            <h3>Analogy</h3>
+            <p>Primary keys are like unique identification numbers that every citizen gets from the government. Just as no two people can have the same social security number, no two database records can have the same primary key. The government (database) has different systems for assigning these numbers: some countries use sequential numbering (IDENTITY strategy), others use complex algorithms that include regional codes (SEQUENCE strategy), and some maintain central registries (TABLE strategy). The key characteristic is that once assigned, these numbers never change and always uniquely identify that specific person, just like how primary keys permanently and uniquely identify database records. When you're born (entity is created), you automatically get assigned a unique number that follows you throughout your entire life in the system.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Auto-increment primary key (most common):</strong></p>
+            <pre><code class="language-java">@Entity
+public class User {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;  // Database auto-increments: 1, 2, 3, 4...
+}</code></pre>
+
+            <p><strong>UUID primary key:</strong></p>
+            <pre><code class="language-java">@Entity
+public class Session {
+    @Id @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;  // Generates: "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+}</code></pre>
+
+            <p><strong>Custom primary key:</strong></p>
+            <pre><code class="language-java">@Entity
+public class Product {
+    @Id
+    private String sku;  // Manually assigned: "LAPTOP-001", "MOUSE-002"
+
+    // Constructor and setters needed for manual assignment
+}</code></pre>
+
+            <p><strong>Sequence-based key:</strong></p>
+            <pre><code class="language-java">@Entity
+@SequenceGenerator(name = "user_seq", sequenceName = "user_sequence")
+public class User {
+    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "user_seq")
+    private Long id;
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="database-configuration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Database Configuration</h2>
+            <h3>Definition</h3>
+            <p>Spring Boot automatically configures database connections and JPA settings based on dependencies and properties you provide. You can use embedded databases like H2 for development and testing, or configure external databases like MySQL or PostgreSQL for production. Configuration involves setting up connection URLs, credentials, connection pooling, and JPA-specific settings like DDL generation and SQL logging. Spring Boot's auto-configuration means most settings work out of the box, but you can customize them through application properties.</p>
+
+            <h3>Analogy</h3>
+            <p>Database configuration is like setting up utilities for a new apartment. You need to specify which utility companies to use (database type), provide account information (connection credentials), set up service addresses (database URLs), and configure how much service you need (connection pool size). For a temporary setup, you might use portable generators and bottled water (H2 embedded database), but for permanent living, you connect to the city's power grid and water system (external databases like MySQL). Spring Boot is like a helpful building manager who already knows all the utility companies and can set up standard service automatically - you just need to tell them your apartment number (database URL) and account details (username/password), and they handle all the complex paperwork and connections.</p>
+
+            <h3>Examples</h3>
+            <p><strong>H2 embedded database (development):</strong></p>
+            <pre><code class="language-properties"># application.properties
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.h2.console.enabled=true</code></pre>
+
+            <p><strong>MySQL configuration:</strong></p>
+            <pre><code class="language-properties">spring.datasource.url=jdbc:mysql://localhost:3306/myapp
+spring.datasource.username=admin
+spring.datasource.password=secret
+spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect</code></pre>
+
+            <p><strong>JPA configuration options:</strong></p>
+            <pre><code class="language-properties">spring.jpa.hibernate.ddl-auto=update  # create, update, validate, none
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true</code></pre>
+
+            <p><strong>Connection pool configuration:</strong></p>
+            <pre><code class="language-properties">spring.datasource.hikari.maximum-pool-size=20
+spring.datasource.hikari.minimum-idle=5
+spring.datasource.hikari.connection-timeout=30000</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="spring-data-repositories" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Spring Data Repositories</h2>
+            <h3>Definition</h3>
+            <p>Spring Data repositories provide a high-level abstraction for data access, offering pre-built methods for common database operations without requiring you to write implementation code. By extending interfaces like JpaRepository or CrudRepository, you automatically get methods for saving, finding, updating, and deleting entities. Spring Data generates the actual implementation at runtime, handling all the complexity of SQL generation, transaction management, and result mapping. You can also define custom query methods using method naming conventions or custom queries.</p>
+
+            <h3>Analogy</h3>
+            <p>Spring Data repositories are like having a personal assistant who already knows how to handle all your common office tasks. When you hire this assistant (create a repository interface), they come with a predefined set of skills: filing documents (save), finding files (findById), organizing folders (findAll), updating records (save for updates), and disposing of old documents (delete). You don't need to train them on these basic tasks - they already know how to do them efficiently and correctly. If you need something special, you can give them specific instructions (custom query methods), and they'll figure out how to accomplish it. The assistant handles all the mundane details of where things are stored, how to organize them, and what procedures to follow, letting you focus on your actual work instead of data management logistics.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Basic repository interface:</strong></p>
+            <pre><code class="language-java">public interface UserRepository extends JpaRepository&lt;User, Long&gt; {
+    // Automatically provides: save, findById, findAll, delete, etc.
+}</code></pre>
+
+            <p><strong>Using repository in service:</strong></p>
+            <pre><code class="language-java">@Service
+public class UserService {
+    private final UserRepository userRepository;
+
+    public User createUser(String name) {
+        User user = new User(name);
+        return userRepository.save(user);  // Automatically generates INSERT
+    }
+}</code></pre>
+
+            <p><strong>Repository methods available:</strong></p>
+            <pre><code class="language-java">// All provided automatically by JpaRepository
+userRepository.save(user);           // Insert or update
+userRepository.findById(1L);         // Find by primary key
+userRepository.findAll();            // Get all records
+userRepository.deleteById(1L);       // Delete by primary key
+userRepository.count();              // Count total records</code></pre>
+
+            <p><strong>Repository with custom methods:</strong></p>
+            <pre><code class="language-java">public interface UserRepository extends JpaRepository&lt;User, Long&gt; {
+    List&lt;User&gt; findByName(String name);       // Custom finder method
+    boolean existsByEmail(String email);     // Check if exists
+    void deleteByName(String name);          // Custom delete method
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="crud-operations" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>CRUD Operations</h2>
+            <h3>Definition</h3>
+            <p>CRUD operations (Create, Read, Update, Delete) are the fundamental database operations that every data-driven application needs. Spring Data JPA makes these operations incredibly simple by providing ready-made methods that handle all the SQL generation and transaction management automatically. Create operations use the save() method, Read operations use findById() and findAll(), Update operations also use save() with existing entities, and Delete operations use delete() or deleteById(). These operations form the foundation of data persistence in your application.</p>
+
+            <h3>Analogy</h3>
+            <p>CRUD operations are like the basic actions you can perform with a filing cabinet in an office. Create is like adding a new file folder with documents - you organize the information and put it in the right place in the cabinet. Read is like looking up and retrieving files when you need to reference information. Update is like taking out an existing file, making changes to the documents inside, and putting it back in the same location. Delete is like removing a file folder completely when you no longer need it. Just as these filing operations keep your office organized and functional, CRUD operations keep your database organized and your application functional. The filing cabinet (database) stays consistent, you can always find what you're looking for, and you can modify information as your business needs change.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Create - Adding new records:</strong></p>
+            <pre><code class="language-java">User newUser = new User("Alice", "alice@example.com");
+User savedUser = userRepository.save(newUser);  // INSERT into database
+System.out.println("Created user with ID: " + savedUser.getId());</code></pre>
+
+            <p><strong>Read - Finding records:</strong></p>
+            <pre><code class="language-java">Optional&lt;User&gt; user = userRepository.findById(1L);  // SELECT by ID
+if (user.isPresent()) {
+    System.out.println("Found: " + user.get().getName());
+}
+
+List&lt;User&gt; allUsers = userRepository.findAll();  // SELECT all records</code></pre>
+
+            <p><strong>Update - Modifying existing records:</strong></p>
+            <pre><code class="language-java">User existingUser = userRepository.findById(1L).orElse(null);
+if (existingUser != null) {
+    existingUser.setName("Alice Smith");  // Modify the object
+    userRepository.save(existingUser);    // UPDATE in database
+}</code></pre>
+
+            <p><strong>Delete - Removing records:</strong></p>
+            <pre><code class="language-java">userRepository.deleteById(1L);  // DELETE by ID
+
+User userToDelete = userRepository.findById(2L).orElse(null);
+if (userToDelete != null) {
+    userRepository.delete(userToDelete);  // DELETE by entity
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="query-methods" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Query Methods</h2>
+            <h3>Definition</h3>
+            <p>Query methods in Spring Data JPA allow you to create custom database queries by simply defining method names that follow specific naming conventions. Spring Data automatically generates the appropriate SQL based on the method name, entity properties, and parameters. You can find records by any field using patterns like findBy, filter with conditions like And/Or, sort results with OrderBy, and limit results with keywords like First or Top. This approach eliminates the need to write SQL queries for most common search scenarios.</p>
+
+            <h3>Analogy</h3>
+            <p>Query methods are like having a librarian who understands natural language requests for finding books. Instead of having to learn the complex library catalog system, you can ask in plain English: "Find books by author Shakespeare," "Find books written after 2000 and about programming," or "Find the first 5 books ordered by publication date." The librarian (Spring Data) automatically translates your natural language request into the specific catalog search procedures needed to find exactly what you want. The librarian knows the library's organization system intimately and can efficiently locate items based on any combination of criteria you specify, whether it's author, subject, publication date, or any other attribute in the catalog system.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Simple property queries:</strong></p>
+            <pre><code class="language-java">public interface UserRepository extends JpaRepository&lt;User, Long&gt; {
+    List&lt;User&gt; findByName(String name);           // WHERE name = ?
+    List&lt;User&gt; findByEmail(String email);         // WHERE email = ?
+    List&lt;User&gt; findByAgeGreaterThan(int age);     // WHERE age > ?
+}</code></pre>
+
+            <p><strong>Complex queries with multiple conditions:</strong></p>
+            <pre><code class="language-java">List&lt;User&gt; findByNameAndEmail(String name, String email);  // WHERE name = ? AND email = ?
+List&lt;User&gt; findByAgeGreaterThanOrNameContaining(int age, String namePattern);
+List&lt;User&gt; findByCreatedDateBetween(LocalDate start, LocalDate end);</code></pre>
+
+            <p><strong>Sorting and limiting results:</strong></p>
+            <pre><code class="language-java">List&lt;User&gt; findByAgeGreaterThanOrderByNameAsc(int age);  // ORDER BY name ASC
+List&lt;User&gt; findFirst5ByOrderByCreatedDateDesc();         // LIMIT 5, newest first
+Optional&lt;User&gt; findTopByEmailContaining(String domain);  // LIMIT 1</code></pre>
+
+            <p><strong>Existence and counting queries:</strong></p>
+            <pre><code class="language-java">boolean existsByEmail(String email);        // Check if user exists
+long countByAgeGreaterThan(int age);        // Count matching users
+void deleteByName(String name);             // Delete matching users</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="testing-repositories" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Testing Repositories</h2>
+            <h3>Definition</h3>
+            <p>Testing repositories ensures your data access layer works correctly with real database operations. Spring Boot provides @DataJpaTest annotation that sets up an in-memory database, configures JPA, and provides TestEntityManager for test data setup. Repository tests verify that your custom query methods return correct results, entities are saved and retrieved properly, and relationships between entities work as expected. Testing with a real database context catches issues that unit tests with mocks might miss.</p>
+
+            <h3>Analogy</h3>
+            <p>Testing repositories is like conducting safety drills for a bank vault system. You create a complete replica of the vault (in-memory test database) with all the same security mechanisms and procedures, then practice different scenarios: storing valuable items (saving entities), retrieving specific items (query methods), updating inventory records (entity updates), and removing items (deletions). You test both normal operations and edge cases, like what happens when you try to store duplicate items or retrieve something that doesn't exist. These drills ensure that when the real vault is operational, all procedures work flawlessly and valuable items (your application data) remain safe and accessible. The test environment is isolated from the real vault, so you can safely test destructive operations without risking actual assets.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Basic repository test setup:</strong></p>
+            <pre><code class="language-java">@DataJpaTest
+class UserRepositoryTest {
+    @Autowired TestEntityManager entityManager;
+    @Autowired UserRepository userRepository;
+}</code></pre>
+
+            <p><strong>Testing save and find operations:</strong></p>
+            <pre><code class="language-java">@Test
+void shouldSaveAndFindUser() {
+    User user = new User("Alice", "alice@example.com");
+    User saved = userRepository.save(user);
+
+    Optional&lt;User&gt; found = userRepository.findById(saved.getId());
+    assertThat(found).isPresent();
+    assertThat(found.get().getName()).isEqualTo("Alice");
+}</code></pre>
+
+            <p><strong>Testing custom query methods:</strong></p>
+            <pre><code class="language-java">@Test
+void shouldFindUsersByName() {
+    entityManager.persistAndFlush(new User("Alice", "alice@test.com"));
+    entityManager.persistAndFlush(new User("Bob", "bob@test.com"));
+
+    List&lt;User&gt; users = userRepository.findByName("Alice");
+    assertThat(users).hasSize(1);
+    assertThat(users.get(0).getName()).isEqualTo("Alice");
+}</code></pre>
+
+            <p><strong>Testing update and delete operations:</strong></p>
+            <pre><code class="language-java">@Test
+void shouldUpdateAndDeleteUser() {
+    User user = entityManager.persistAndFlush(new User("Alice", "alice@test.com"));
+
+    user.setName("Alice Smith");
+    userRepository.save(user);
+
+    userRepository.deleteById(user.getId());
+    assertThat(userRepository.findById(user.getId())).isEmpty();
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Summary</h2>
+            <p>You've now mastered the fundamentals of data persistence in Spring Boot using JPA and Hibernate. From understanding how JPA provides a standard way to map Java objects to database tables, to creating entities with proper annotations, configuring database connections, and building repositories for data access - you have all the tools needed to integrate databases into your applications. The combination of entity mapping, Spring Data repositories, and automatic CRUD operations eliminates most of the complexity traditionally associated with database programming. With query methods, you can create sophisticated data retrieval logic using simple naming conventions, and proper testing ensures your data layer works reliably. Next, you'll explore advanced JPA features including entity relationships, custom queries, and performance optimization techniques that enable you to build complex, efficient data models for real-world applications.</p>
+          </section>
+
+          <section id="programming-challenge" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Programming Challenge</h2>
+            <div class="rounded-lg border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800">
+              <h3 class="mt-0">Challenge: Library Management System with JPA</h3>
+              <p><strong>Task:</strong> Build a complete library management system using JPA entities, repositories, and proper database integration.</p>
+
+              <p><strong>Requirements:</strong></p>
+              <ol>
+                <li>Create entities for the system:</li>
+                <ul>
+                  <li><code>Book</code>: id, title, author, isbn, publicationYear, available</li>
+                  <li><code>Member</code>: id, name, email, membershipDate, active status</li>
+                  <li><code>Loan</code>: id, book, member, loanDate, returnDate, returned status</li>
+                </ul>
+                <li>Implement repositories with custom query methods:</li>
+                <ul>
+                  <li>Find books by author or title (partial match)</li>
+                  <li>Find available books</li>
+                  <li>Find active members</li>
+                  <li>Find current loans (not returned)</li>
+                  <li>Find overdue loans (past due date)</li>
+                </ul>
+                <li>Create service layer methods:</li>
+                <ul>
+                  <li>Register new member</li>
+                  <li>Add new book to library</li>
+                  <li>Loan book to member</li>
+                  <li>Return book</li>
+                  <li>Search books by criteria</li>
+                </ul>
+                <li>Configure H2 database for development</li>
+                <li>Write comprehensive repository tests</li>
+                <li>Add proper validation annotations</li>
+              </ol>
+
+              <p><strong>Bonus features:</strong></p>
+              <ul>
+                <li>Add audit fields (createdDate, lastModified) to entities</li>
+                <li>Implement pagination for book search results</li>
+                <li>Create statistics queries (most popular books, active loan count)</li>
+                <li>Add book categories with enum mapping</li>
+                <li>Implement soft deletion for books and members</li>
+              </ul>
+
+              <p><strong>Learning Goals:</strong> Practice entity design, repository creation, custom query methods, service layer integration, and comprehensive testing of JPA-based data access in a realistic domain model.</p>
+            </div>
+          </section>
+
+          <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+            <a href="lesson-12.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
+            <a href="lesson-14.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
+          </nav>
+        </div>
+      </div>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('themeToggle').addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>

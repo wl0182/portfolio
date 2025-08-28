@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 15 - Spring Boot Security Basics with JWT</title>
+    <meta name="description" content="Spring Boot Security with JWT: authentication, authorization, security configuration, JWT tokens, and protecting REST APIs with practical examples and best practices." />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="lg:flex lg:gap-8">
+        <aside class="hidden lg:block lg:w-72">
+          <nav class="sticky top-8 rounded-xl border border-slate-200/60 bg-white/60 p-4 shadow-sm backdrop-blur dark:border-slate-800/60 dark:bg-slate-900/40" aria-label="Table of contents">
+            <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">On this page</h2>
+            <ol class="space-y-1 text-sm">
+              <li><a href="#introduction" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Introduction</a></li>
+              <li><a href="#understanding-security" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Understanding Security</a></li>
+              <li><a href="#spring-security-basics" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Spring Security Basics</a></li>
+              <li><a href="#authentication-vs-authorization" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Authentication vs Authorization</a></li>
+              <li><a href="#jwt-fundamentals" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">JWT Fundamentals</a></li>
+              <li><a href="#security-configuration" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Security Configuration</a></li>
+              <li><a href="#jwt-authentication" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">JWT Authentication</a></li>
+              <li><a href="#protecting-endpoints" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Protecting Endpoints</a></li>
+              <li><a href="#role-based-security" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Role-Based Security</a></li>
+              <li><a href="#security-testing" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Security Testing</a></li>
+              <li><a href="#security-best-practices" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Security Best Practices</a></li>
+              <li><a href="#summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Summary</a></li>
+              <li><a href="#programming-challenge" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Programming Challenge</a></li>
+            </ol>
+          </nav>
+        </aside>
+        <div class="min-w-0 flex-1">
+          <div class="mb-6">
+            <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Concepts</a>
+          </div>
+          <header class="mx-auto max-w-3xl text-center">
+            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 15: Spring Boot Security Basics with JWT</h1>
+            <p class="mt-2 text-slate-600 dark:text-slate-300">Master Spring Security fundamentals: implement authentication, authorization, JWT tokens, and protect your REST APIs with enterprise-grade security practices.</p>
+          </header>
+
+          <section id="introduction" class="prose prose-slate mt-6 max-w-none dark:prose-invert">
+            <h2>Introduction</h2>
+            <p>Building applications without security is like constructing a house without locks, leaving your valuable data and user information completely exposed to anyone who wants to access it. Spring Security provides a comprehensive, production-ready security framework that protects your applications from unauthorized access, data breaches, and various security threats. Combined with JWT (JSON Web Tokens), you can create stateless, scalable authentication systems that work perfectly with modern single-page applications and mobile apps. Security isn't just about keeping bad actors out - it's about ensuring that legitimate users can access exactly what they need while protecting sensitive operations and data. This lesson teaches you to implement authentication (who you are), authorization (what you can do), secure your REST endpoints, and follow security best practices that will make your applications enterprise-ready and trustworthy.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="understanding-security" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Understanding Security</h2>
+            <h3>Definition</h3>
+            <p>Application security involves protecting your software from unauthorized access, data breaches, and malicious attacks. It encompasses authentication (verifying user identity), authorization (controlling access to resources), data protection (encrypting sensitive information), and secure communication (preventing eavesdropping and tampering). Security is not an afterthought but a fundamental aspect that should be built into every layer of your application from the ground up.</p>
+
+            <h3>Analogy</h3>
+            <p>Think of application security like a multi-layered security system for a high-end office building. First, you need proper identification to enter the building (authentication) - showing your ID card to prove who you are. Once inside, different key cards give you access to different floors and rooms based on your role (authorization) - executives can access the boardroom, while interns can only access common areas. Security cameras monitor activities (logging and auditing), sensitive documents are kept in locked safes (data encryption), and all communications happen through secure channels (HTTPS). Guards patrol regularly (security monitoring), and there are emergency protocols for handling threats (incident response). Each layer works together to create a comprehensive security system that protects valuable assets while allowing legitimate business to continue smoothly.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Common security threats:</strong></p>
+            <pre><code class="language-java">// SQL Injection - malicious input
+String query = "SELECT * FROM users WHERE name = '" + userInput + "'";
+// If userInput = "'; DROP TABLE users; --"
+// This could delete your entire users table!
+</code></pre>
+
+            <p><strong>Cross-Site Scripting (XSS):</strong></p>
+            <pre><code class="language-java">// Unsafe: directly displaying user input
+model.addAttribute("username", request.getParameter("name"));
+// If name contains <script>alert('hacked')</script>, it executes
+</code></pre>
+
+            <p><strong>Unauthorized access:</strong></p>
+            <pre><code class="language-java">// Without security: anyone can access admin functions
+@GetMapping("/admin/delete-user/{id}")
+public String deleteUser(@PathVariable Long id) {
+    userService.delete(id);  // Anyone can delete any user!
+}
+</code></pre>
+
+            <p><strong>Data exposure:</strong></p>
+            <pre><code class="language-java">// Returning sensitive data to unauthorized users
+public User getUser(Long id) {
+    return userRepository.findById(id);  // Includes password, SSN, etc.
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="spring-security-basics" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Spring Security Basics</h2>
+            <h3>Definition</h3>
+            <p>Spring Security is a powerful framework that provides comprehensive security services for Java applications. It handles authentication, authorization, protection against common attacks, session management, and integration with various security standards. Spring Security uses a filter chain to intercept requests, check credentials, enforce access rules, and protect against security vulnerabilities. It integrates seamlessly with Spring Boot through auto-configuration while remaining highly customizable for specific security requirements.</p>
+
+            <h3>Analogy</h3>
+            <p>Spring Security is like hiring a professional security company to protect your office building. Instead of you having to learn about security cameras, access control systems, threat detection, and emergency protocols, the security company provides a complete, integrated solution. They install a sophisticated system with multiple checkpoints (filter chain) that automatically screens everyone entering the building, verifies their credentials against a database, checks their authorization level for different areas, and logs all activities for auditing. The security team handles everything from basic door locks to advanced threat detection, using industry-standard procedures and equipment. You can customize the security level for different areas - some rooms might be open to everyone, others require special clearance, and the most sensitive areas need multiple forms of authentication. The beauty is that this comprehensive security operates transparently, protecting your business without interfering with normal operations.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Adding Spring Security dependency:</strong></p>
+            <pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-security&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+
+            <p><strong>Default security behavior:</strong></p>
+            <pre><code class="language-java">// Spring Security automatically secures ALL endpoints
+// Default username: user
+// Password: generated in console logs
+// All requests require authentication</code></pre>
+
+            <p><strong>Basic security properties:</strong></p>
+            <pre><code class="language-properties">spring.security.user.name=admin
+spring.security.user.password=secret
+spring.security.user.roles=ADMIN</code></pre>
+
+            <p><strong>Security auto-configuration:</strong></p>
+            <pre><code class="language-java">// Spring Boot automatically configures:
+// - HTTP Basic authentication
+// - Form-based login
+// - CSRF protection
+// - Session management
+// - Password encoding</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="authentication-vs-authorization" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Authentication vs Authorization</h2>
+            <h3>Definition</h3>
+            <p>Authentication is the process of verifying who a user is by checking their credentials (username/password, tokens, biometrics). Authorization determines what an authenticated user is allowed to do by checking their permissions and roles. Authentication comes first - you must prove your identity before the system can decide what you're allowed to access. These two concepts work together to create a complete access control system that ensures the right people have the right level of access to your application's resources.</p>
+
+            <h3>Analogy</h3>
+            <p>Think of the difference between authentication and authorization like the process of getting into a concert venue and then accessing different areas. Authentication is like showing your ID at the main entrance to prove you are who you claim to be - the security guard checks your driver's license against your face to verify your identity. Once inside, authorization determines where you can go based on your ticket type: general admission gets you to the main floor, VIP tickets let you access the backstage area, and press passes allow you into the media section. Your identity is verified once (authentication), but your access level (authorization) is checked every time you try to enter a new area. A regular ticket holder trying to access the VIP lounge would be turned away not because their identity is questioned, but because their authorization level doesn't permit that access.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Authentication: Verifying identity</strong></p>
+            <pre><code class="language-java">@PostMapping("/login")
+public ResponseEntity<?> authenticate(@RequestBody LoginRequest request) {
+    String username = request.getUsername();
+    String password = request.getPassword();
+    // Verify credentials against database
+    User user = userService.authenticate(username, password);
+}</code></pre>
+
+            <p><strong>Authorization: Checking permissions</strong></p>
+            <pre><code class="language-java">@GetMapping("/admin/users")
+@PreAuthorize("hasRole('ADMIN')")  // Only ADMIN role can access
+public List<User> getAllUsers() {
+    return userService.findAll();
+}</code></pre>
+
+            <p><strong>Method-level authorization:</strong></p>
+            <pre><code class="language-java">@DeleteMapping("/posts/{id}")
+@PreAuthorize("hasRole('ADMIN') or @postService.isOwner(#id, authentication.name)")
+public void deletePost(@PathVariable Long id) {
+    // Only admin or post owner can delete
+}</code></pre>
+
+            <p><strong>Authentication vs Authorization flow:</strong></p>
+            <pre><code class="language-java">// 1. Authentication: Login with credentials
+// 2. System verifies identity
+// 3. Token/session created for authenticated user
+// 4. Authorization: Each request checks permissions
+// 5. Access granted or denied based on user's roles</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="jwt-fundamentals" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>JWT Fundamentals</h2>
+            <h3>Definition</h3>
+            <p>JWT (JSON Web Token) is a compact, self-contained token format that securely transmits information between parties. A JWT consists of three parts: header (algorithm info), payload (claims/data), and signature (verification). JWTs are stateless, meaning all necessary information is contained within the token itself, eliminating the need for server-side session storage. This makes them perfect for scalable applications, microservices, and single-page applications where you need to verify user identity and permissions without maintaining server state.</p>
+
+            <h3>Analogy</h3>
+            <p>Think of a JWT like a special concert wristband that contains all the information security needs in one place. Unlike a simple ticket stub that requires staff to look up your details in a computer system, this smart wristband has everything embedded directly on it: your name, what sections you can access, when the wristband expires, and a special holographic seal that proves it's authentic and hasn't been tampered with. Security guards can instantly verify your access level just by scanning the wristband - no need to call the box office or check a central database. The wristband is self-contained and cryptographically signed, so guards know immediately if someone has tried to forge or modify it. This system works perfectly even if thousands of people are entering different venues simultaneously, because each wristband carries its own verification information.</p>
+
+            <h3>Examples</h3>
+            <p><strong>JWT structure (header.payload.signature):</strong></p>
+            <pre><code class="language-java">// JWT Token example:
+// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
+// eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.
+// SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c</code></pre>
+
+            <p><strong>JWT payload (claims):</strong></p>
+            <pre><code class="language-java">{
+  "sub": "1234567890",        // Subject (user ID)
+  "name": "John Doe",         // User name
+  "roles": ["USER", "ADMIN"], // User roles
+  "iat": 1516239022,          // Issued at
+  "exp": 1516325422           // Expires at
+}</code></pre>
+
+            <p><strong>Creating JWT in Java:</strong></p>
+            <pre><code class="language-java">String token = Jwts.builder()
+    .setSubject(user.getUsername())
+    .claim("roles", user.getRoles())
+    .setExpiration(new Date(System.currentTimeMillis() + 86400000))
+    .signWith(secretKey)
+    .compact();</code></pre>
+
+            <p><strong>Validating JWT:</strong></p>
+            <pre><code class="language-java">Claims claims = Jwts.parserBuilder()
+    .setSigningKey(secretKey)
+    .build()
+    .parseClaimsJws(token)
+    .getBody();</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="security-configuration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Security Configuration</h2>
+            <h3>Definition</h3>
+            <p>Security configuration in Spring Boot involves creating a configuration class that customizes how Spring Security behaves. You define which endpoints require authentication, configure password encoding, set up authentication providers, and specify security filters. The SecurityFilterChain bean replaces the older WebSecurityConfigurerAdapter, providing a more functional approach to security configuration. Proper configuration ensures your application follows security best practices while remaining usable for legitimate users.</p>
+
+            <h3>Analogy</h3>
+            <p>Security configuration is like setting up the rules and procedures for a corporate office building's security system. You create a comprehensive security manual that specifies which areas are public (lobby, reception), which require employee badges (work floors), and which need special clearance (executive offices, server rooms). You define the authentication methods (ID cards, biometric scanners, security codes), set up different access levels for different employee types (intern, employee, manager, executive), and establish protocols for handling visitors. The manual also covers password policies (how often to change access codes), session management (how long badges remain active), and emergency procedures. Just like how security guards follow this manual to consistently enforce building security, Spring Security follows your configuration to protect your application endpoints and resources.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Basic security configuration:</strong></p>
+            <pre><code class="language-java">@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        return http.build();
+    }
+}</code></pre>
+
+            <p><strong>Configuring endpoint security:</strong></p>
+            <pre><code class="language-java">http.authorizeHttpRequests(auth -> auth
+    .requestMatchers("/public/**").permitAll()
+    .requestMatchers("/admin/**").hasRole("ADMIN")
+    .anyRequest().authenticated());</code></pre>
+
+            <p><strong>Password encoder configuration:</strong></p>
+            <pre><code class="language-java">@Bean
+public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();  // Strong password hashing
+}</code></pre>
+
+            <p><strong>CORS configuration:</strong></p>
+            <pre><code class="language-java">http.cors(cors -> cors.configurationSource(request -> {
+    CorsConfiguration config = new CorsConfiguration();
+    config.setAllowedOrigins(List.of("http://localhost:3000"));
+    config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+    return config;
+}));</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="jwt-authentication" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>JWT Authentication</h2>
+            <h3>Definition</h3>
+            <p>JWT authentication involves creating a custom authentication filter that intercepts requests, extracts JWT tokens from headers, validates the tokens, and sets up the security context for authenticated users. The process includes generating tokens during login, including them in subsequent requests, and validating them on the server side. This stateless approach eliminates the need for server-side session storage, making your application more scalable and suitable for distributed environments.</p>
+
+            <h3>Analogy</h3>
+            <p>JWT authentication is like using a smart keycard system in a modern office building. When you first arrive for work (login), you show your credentials to security and receive a smart keycard (JWT token) that contains all your access information encoded on it. This keycard has everything security needs to know: your name, department, clearance level, and when it expires. Throughout the day, whenever you approach a door (make a request), the card reader (JWT filter) scans your keycard, instantly verifies it's authentic and hasn't expired, and grants or denies access based on the information stored on the card. The beautiful thing is that each door can make decisions independently without calling the main security office - the keycard contains everything needed for verification. At the end of the day or when your employment status changes, the keycard expires automatically, and you'd need to get a new one to continue accessing the building.</p>
+
+            <h3>Examples</h3>
+            <p><strong>JWT authentication filter:</strong></p>
+            <pre><code class="language-java">@Component
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    protected void doFilterInternal(HttpServletRequest request,
+                                   HttpServletResponse response,
+                                   FilterChain filterChain) {
+        String token = extractToken(request);
+        if (token != null && validateToken(token)) {
+            setAuthentication(token);
+        }
+        filterChain.doFilter(request, response);
+    }
+}</code></pre>
+
+            <p><strong>Login endpoint generating JWT:</strong></p>
+            <pre><code class="language-java">@PostMapping("/login")
+public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+    Authentication auth = authenticationManager.authenticate(
+        new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+    );
+    String token = jwtService.generateToken(auth.getName());
+    return ResponseEntity.ok(new LoginResponse(token));
+}</code></pre>
+
+            <p><strong>Extracting token from request:</strong></p>
+            <pre><code class="language-java">private String extractToken(HttpServletRequest request) {
+    String bearerToken = request.getHeader("Authorization");
+    if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+        return bearerToken.substring(7);  // Remove "Bearer " prefix
+    }
+    return null;
+}</code></pre>
+
+            <p><strong>Client sending JWT token:</strong></p>
+            <pre><code class="language-java">// HTTP Header
+// Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="protecting-endpoints" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Protecting Endpoints</h2>
+            <h3>Definition</h3>
+            <p>Protecting endpoints involves configuring which URLs require authentication, what roles or authorities are needed to access specific resources, and how to handle unauthorized access attempts. Spring Security provides multiple ways to secure endpoints: URL-based security in configuration classes, method-level security with annotations, and programmatic security checks within your business logic. Different endpoints may have different security requirements - some might be public, others require authentication, and sensitive operations might need specific roles or permissions.</p>
+
+            <h3>Analogy</h3>
+            <p>Protecting endpoints is like designing access control for different areas of a large hospital. The lobby and information desk are open to everyone (public endpoints), but you need to show ID and sign in to visit patient rooms (authenticated endpoints). Only doctors can access the operating rooms (role-based access), and only authorized pharmacists can enter the medication storage area (permission-based access). The emergency room has special access rules during emergencies (conditional access), and the administrative offices require different credentials than medical areas (different authentication methods). Each area has security checkpoints appropriate to its sensitivity level, and the security system automatically enforces these rules, redirecting unauthorized people to appropriate areas or asking them to get proper clearance before proceeding.</p>
+
+            <h3>Examples</h3>
+            <p><strong>URL-based endpoint protection:</strong></p>
+            <pre><code class="language-java">http.authorizeHttpRequests(auth -> auth
+    .requestMatchers("/api/public/**").permitAll()
+    .requestMatchers("/api/auth/**").permitAll()
+    .requestMatchers("/api/admin/**").hasRole("ADMIN")
+    .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
+    .anyRequest().authenticated());</code></pre>
+
+            <p><strong>Method-level security:</strong></p>
+            <pre><code class="language-java">@PreAuthorize("hasRole('ADMIN')")
+@DeleteMapping("/users/{id}")
+public void deleteUser(@PathVariable Long id) {
+    userService.delete(id);
+}</code></pre>
+
+            <p><strong>Conditional authorization:</strong></p>
+            <pre><code class="language-java">@PreAuthorize("hasRole('ADMIN') or @userService.isCurrentUser(#id, authentication.name)")
+@PutMapping("/users/{id}")
+public User updateUser(@PathVariable Long id, @RequestBody User user) {
+    return userService.update(id, user);
+}</code></pre>
+
+            <p><strong>Programmatic security check:</strong></p>
+            <pre><code class="language-java">@GetMapping("/orders/{id}")
+public Order getOrder(@PathVariable Long id, Authentication auth) {
+    Order order = orderService.findById(id);
+    if (!order.getCustomer().getEmail().equals(auth.getName())) {
+        throw new AccessDeniedException("Cannot access another user's order");
+    }
+    return order;
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="role-based-security" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Role-Based Security</h2>
+            <h3>Definition</h3>
+            <p>Role-based security assigns users to roles (like ADMIN, USER, MANAGER) and grants permissions based on these roles rather than individual users. Roles simplify permission management by grouping related permissions together and make it easy to modify access levels by changing role assignments. Spring Security supports both role-based access control (RBAC) and more granular authority-based access control, allowing you to implement sophisticated permission systems that scale with your application's complexity and organizational structure.</p>
+
+            <h3>Analogy</h3>
+            <p>Role-based security is like how a restaurant operates with different staff positions, each having specific responsibilities and access levels. The dishwasher can access the kitchen and dish area but not the cash register or manager's office. Servers can access dining areas, place orders in the system, and handle payments, but can't modify menu prices or access employee records. Managers can access all areas, modify schedules, view sales reports, and handle customer complaints. The head chef can control kitchen operations and inventory but might not handle financial reports. Instead of giving each person individual keys to specific doors, you create master key sets for each role (DISHWASHER, SERVER, MANAGER, CHEF), and when someone gets promoted or changes positions, you just switch their key set rather than reconfiguring every individual permission. This system is much easier to manage and ensures consistent access levels for people in similar positions.</p>
+
+            <h3>Examples</h3>
+            <p><strong>User entity with roles:</strong></p>
+            <pre><code class="language-java">@Entity
+public class User {
+    @Id @GeneratedValue
+    private Long id;
+    private String username;
+    private String password;
+
+    @Enumerated(EnumType.STRING)
+    @ElementCollection(fetch = FetchType.EAGER)
+    private Set<Role> roles = new HashSet<>();
+}</code></pre>
+
+            <p><strong>Role enum definition:</strong></p>
+            <pre><code class="language-java">public enum Role {
+    USER, ADMIN, MANAGER, MODERATOR
+}</code></pre>
+
+            <p><strong>Role-based method security:</strong></p>
+            <pre><code class="language-java">@PreAuthorize("hasRole('ADMIN')")
+@GetMapping("/admin/users")
+public List<User> getAllUsers() { return userService.findAll(); }
+
+@PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+@GetMapping("/reports")
+public Report getReport() { return reportService.generate(); }</code></pre>
+
+            <p><strong>Custom UserDetailsService:</strong></p>
+            <pre><code class="language-java">@Service
+public class CustomUserDetailsService implements UserDetailsService {
+    public UserDetails loadUserByUsername(String username) {
+        User user = userRepository.findByUsername(username);
+        return org.springframework.security.core.userdetails.User.builder()
+            .username(user.getUsername())
+            .password(user.getPassword())
+            .authorities(user.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.name()))
+                .collect(Collectors.toList()))
+            .build();
+    }
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="security-testing" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Security Testing</h2>
+            <h3>Definition</h3>
+            <p>Security testing verifies that your authentication and authorization mechanisms work correctly under various scenarios. This includes testing successful authentication, authorization failures, token validation, role-based access control, and security edge cases. Spring Security provides testing support through @WithMockUser, @WithUserDetails, and MockMvc integration that allows you to simulate different user contexts and verify that security rules are properly enforced without compromising test isolation or requiring complex setup.</p>
+
+            <h3>Analogy</h3>
+            <p>Security testing is like conducting comprehensive drills and audits for a building's security system. You test every scenario: legitimate employees accessing their authorized areas (positive authentication tests), unauthorized people being properly denied access (negative authorization tests), expired keycards being rejected (token expiration tests), and emergency procedures working correctly (edge case testing). Security auditors simulate different roles - they might pose as employees, contractors, visitors, or even potential intruders to ensure the system responds appropriately in each situation. They test not just that the right people get in, but also that the wrong people are kept out, that alarms work properly, and that security logs capture all the necessary information. These comprehensive tests ensure that when real security challenges arise, the system performs exactly as designed.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Testing with mock user:</strong></p>
+            <pre><code class="language-java">@Test
+@WithMockUser(roles = "ADMIN")
+void adminCanAccessUserList() throws Exception {
+    mockMvc.perform(get("/api/admin/users"))
+           .andExpect(status().isOk());
+}</code></pre>
+
+            <p><strong>Testing authorization failure:</strong></p>
+            <pre><code class="language-java">@Test
+@WithMockUser(roles = "USER")
+void userCannotAccessAdminEndpoint() throws Exception {
+    mockMvc.perform(get("/api/admin/users"))
+           .andExpect(status().isForbidden());
+}</code></pre>
+
+            <p><strong>Testing JWT authentication:</strong></p>
+            <pre><code class="language-java">@Test
+void validTokenAllowsAccess() throws Exception {
+    String token = jwtService.generateToken("testuser");
+
+    mockMvc.perform(get("/api/profile")
+           .header("Authorization", "Bearer " + token))
+           .andExpect(status().isOk());
+}</code></pre>
+
+            <p><strong>Testing without authentication:</strong></p>
+            <pre><code class="language-java">@Test
+void unauthenticatedUserCannotAccessProtectedEndpoint() throws Exception {
+    mockMvc.perform(get("/api/profile"))
+           .andExpect(status().isUnauthorized());
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="security-best-practices" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Security Best Practices</h2>
+            <h3>Definition</h3>
+            <p>Security best practices involve implementing multiple layers of defense, following the principle of least privilege, securing sensitive data, validating all inputs, implementing proper session management, and maintaining security through regular updates and monitoring. These practices include using strong password hashing, implementing proper error handling that doesn't leak sensitive information, enabling HTTPS for all communications, and following secure coding practices that prevent common vulnerabilities like injection attacks and cross-site scripting.</p>
+
+            <h3>Analogy</h3>
+            <p>Security best practices are like implementing comprehensive safety protocols for a nuclear power plant. You don't rely on just one safety measure - instead, you implement multiple independent layers of protection (defense in depth). Workers only have access to areas and information they absolutely need for their jobs (principle of least privilege). All safety-critical information is encrypted and stored securely (data protection). Every input into control systems is validated and sanitized (input validation). All communications happen through secure, monitored channels (secure communication). Regular safety drills, inspections, and system updates ensure that security measures remain effective over time (continuous monitoring and updates). Emergency procedures are in place to handle any security incidents quickly and effectively (incident response). The goal is to create a system so robust that even if one security measure fails, multiple backup systems prevent any serious problems.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Strong password encoding:</strong></p>
+            <pre><code class="language-java">@Bean
+public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder(12);  // Strong cost factor
+}
+
+// Never store plain text passwords
+user.setPassword(passwordEncoder.encode(rawPassword));</code></pre>
+
+            <p><strong>Input validation and sanitization:</strong></p>
+            <pre><code class="language-java">@PostMapping("/users")
+public User createUser(@Valid @RequestBody CreateUserRequest request) {
+    // @Valid ensures all validation annotations are checked
+    String sanitizedName = StringEscapeUtils.escapeHtml4(request.getName());
+    return userService.create(request);
+}</code></pre>
+
+            <p><strong>Secure error handling:</strong></p>
+            <pre><code class="language-java">@ExceptionHandler(AccessDeniedException.class)
+public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException e) {
+    // Don't expose sensitive information in error messages
+    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+        .body(new ErrorResponse("Access denied", "FORBIDDEN"));
+}</code></pre>
+
+            <p><strong>Security headers configuration:</strong></p>
+            <pre><code class="language-java">http.headers(headers -> headers
+    .frameOptions().deny()                    // Prevent clickjacking
+    .contentTypeOptions().and()              // Prevent MIME sniffing
+    .httpStrictTransportSecurity(hstsConfig -> hstsConfig
+        .maxAgeInSeconds(31536000)           // Force HTTPS
+        .includeSubdomains(true)));          // Include all subdomains</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Summary</h2>
+            <p>You've now mastered the essential concepts of Spring Security and JWT authentication, from understanding the difference between authentication and authorization to implementing role-based access control and following security best practices. Spring Security provides a powerful, flexible framework for protecting your applications, while JWT tokens enable scalable, stateless authentication perfect for modern web applications. You've learned to configure security rules, protect endpoints, handle user roles, and test your security implementation thoroughly. These skills are crucial for building trustworthy applications that protect user data and maintain security in production environments. Next, you'll explore Spring Boot production features like actuators and monitoring, which help you maintain and observe your secure applications in real-world deployment scenarios.</p>
+          </section>
+
+          <section id="programming-challenge" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Programming Challenge</h2>
+            <div class="rounded-lg border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800">
+              <h3 class="mt-0">Challenge: Secure Task Management API</h3>
+              <p><strong>Task:</strong> Build a secure task management system with JWT authentication, role-based authorization, and comprehensive security features.</p>
+
+              <p><strong>Requirements:</strong></p>
+              <ol>
+                <li>Create entities:</li>
+                <ul>
+                  <li><code>User</code>: id, username, email, password, roles (USER, ADMIN, MANAGER)</li>
+                  <li><code>Task</code>: id, title, description, status, priority, assignedTo, createdBy</li>
+                  <li><code>Project</code>: id, name, description, members, createdBy</li>
+                </ul>
+                <li>Implement JWT authentication:</li>
+                <ul>
+                  <li>Login endpoint that returns JWT token</li>
+                  <li>JWT filter for validating tokens on protected endpoints</li>
+                  <li>Token should include user ID, username, and roles</li>
+                  <li>Token expiration and refresh mechanism</li>
+                </ul>
+                <li>Implement role-based authorization:</li>
+                <ul>
+                  <li>PUBLIC: Registration, login endpoints</li>
+                  <li>USER: View own tasks, create tasks, update own tasks</li>
+                  <li>MANAGER: Assign tasks to team members, view team tasks</li>
+                  <li>ADMIN: Full access to all users, tasks, and projects</li>
+                </ul>
+                <li>Secure endpoints with proper authorization:</li>
+                <ul>
+                  <li>Users can only see/edit their own profile unless they're admin</li>
+                  <li>Tasks can only be viewed/edited by assignee, creator, or manager</li>
+                  <li>Projects are visible to members and creators</li>
+                </ul>
+                <li>Add security features:</li>
+                <ul>
+                  <li>Password encryption with BCrypt</li>
+                  <li>Input validation for all request bodies</li>
+                  <li>Global exception handler for security errors</li>
+                  <li>CORS configuration for frontend integration</li>
+                </ul>
+                <li>Write comprehensive security tests</li>
+              </ol>
+
+              <p><strong>Bonus features:</strong></p>
+              <ul>
+                <li>Implement password reset functionality with secure tokens</li>
+                <li>Add rate limiting for authentication endpoints</li>
+                <li>Create audit logging for security-sensitive operations</li>
+                <li>Implement account lockout after failed login attempts</li>
+                <li>Add email verification for new user registration</li>
+              </ul>
+
+              <p><strong>Learning Goals:</strong> Practice comprehensive Spring Security implementation including JWT authentication, role-based authorization, method-level security, input validation, and security testing in a realistic business application.</p>
+            </div>
+          </section>
+
+          <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+            <a href="lesson-14.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
+            <a href="lesson-16.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
+          </nav>
+        </div>
+      </div>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('themeToggle').addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 14 - Spring Boot Data Access with JPA and Hibernate part 2</title>
+    <meta name="description" content="Spring Boot JPA and Hibernate part 2: entity relationships, custom queries, performance optimization, and advanced mapping techniques with practical examples." />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="lg:flex lg:gap-8">
+        <aside class="hidden lg:block lg:w-72">
+          <nav class="sticky top-8 rounded-xl border border-slate-200/60 bg-white/60 p-4 shadow-sm backdrop-blur dark:border-slate-800/60 dark:bg-slate-900/40" aria-label="Table of contents">
+            <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">On this page</h2>
+            <ol class="space-y-1 text-sm">
+              <li><a href="#introduction" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Introduction</a></li>
+              <li><a href="#entity-relationships" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Entity Relationships</a></li>
+              <li><a href="#onetoone-mapping" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">One-to-One Mapping</a></li>
+              <li><a href="#onetomany-mapping" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">One-to-Many Mapping</a></li>
+              <li><a href="#manytomany-mapping" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Many-to-Many Mapping</a></li>
+              <li><a href="#custom-queries" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Custom Queries</a></li>
+              <li><a href="#jpql-queries" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">JPQL Queries</a></li>
+              <li><a href="#native-queries" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Native Queries</a></li>
+              <li><a href="#pagination-sorting" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Pagination & Sorting</a></li>
+              <li><a href="#lazy-eager-loading" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Lazy vs Eager Loading</a></li>
+              <li><a href="#performance-optimization" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Performance Optimization</a></li>
+              <li><a href="#summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Summary</a></li>
+              <li><a href="#programming-challenge" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Programming Challenge</a></li>
+            </ol>
+          </nav>
+        </aside>
+        <div class="min-w-0 flex-1">
+          <div class="mb-6">
+            <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Concepts</a>
+          </div>
+          <header class="mx-auto max-w-3xl text-center">
+            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 14: Spring Boot Data Access with JPA and Hibernate part 2</h1>
+            <p class="mt-2 text-slate-600 dark:text-slate-300">Master advanced JPA concepts: entity relationships, custom queries, performance optimization, and sophisticated data modeling for complex applications.</p>
+          </header>
+
+          <section id="introduction" class="prose prose-slate mt-6 max-w-none dark:prose-invert">
+            <h2>Introduction</h2>
+            <p>Real-world applications rarely work with isolated data - customers have orders, orders contain products, students enroll in courses, and blog posts have comments. Building on the JPA fundamentals you learned in part 1, this lesson explores the advanced features that make JPA truly powerful for complex applications. You'll learn to model relationships between entities, write custom queries that go beyond simple finders, optimize performance through lazy loading and fetch strategies, and handle large datasets with pagination. These advanced techniques are essential for building scalable applications that can handle real-world data complexity. From one-to-one relationships like users and profiles, to many-to-many associations like students and courses, you'll master the art of expressing complex business relationships in clean, maintainable code. This lesson transforms you from someone who can store and retrieve individual objects into a developer who can architect sophisticated, high-performance data models.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="entity-relationships" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Entity Relationships</h2>
+            <h3>Definition</h3>
+            <p>Entity relationships define how different database tables connect to each other, mirroring real-world associations between objects. JPA provides annotations to map these relationships: @OneToOne for exclusive pairings, @OneToMany for parent-child hierarchies, @ManyToOne for the reverse direction, and @ManyToMany for complex associations. Understanding relationships is crucial because most business domains involve interconnected data that needs to be navigated efficiently and consistently.</p>
+
+            <h3>Analogy</h3>
+            <p>Think of entity relationships like connections in a large family tree or organizational chart. A person has one birth certificate (one-to-one), a parent can have many children (one-to-many), many children belong to one parent (many-to-one), and people can belong to multiple clubs while clubs have multiple members (many-to-many). Just as you can trace relationships in a family tree - finding someone's siblings, parents, or cousins - JPA relationships let you navigate between related data objects. The database acts like a sophisticated filing system that automatically maintains these connections, so when you look up a person, you can instantly access their family members, and when family structures change, all the connections update accordingly.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Understanding relationship types:</strong></p>
+            <pre><code class="language-java">// One-to-One: User ↔ Profile (each user has exactly one profile)
+// One-to-Many: Author → Books (one author writes many books)
+// Many-to-One: Books → Author (many books belong to one author)
+// Many-to-Many: Students ↔ Courses (students take multiple courses, courses have multiple students)
+</code></pre>
+
+            <p><strong>Bidirectional vs Unidirectional:</strong></p>
+            <pre><code class="language-java">// Bidirectional: Can navigate both ways (Author → Books, Book → Author)
+// Unidirectional: Navigate only one way (Author → Books only)
+</code></pre>
+
+            <p><strong>Owning side vs Non-owning side:</strong></p>
+            <pre><code class="language-java">// Owning side: Contains foreign key, controls relationship
+// Non-owning side: Uses mappedBy attribute, mirrors the relationship
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="onetoone-mapping" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>One-to-One Mapping</h2>
+            <h3>Definition</h3>
+            <p>One-to-one relationships connect exactly one entity to exactly one other entity, like a user and their profile, or a person and their passport. The @OneToOne annotation establishes this connection, typically with one side owning the foreign key. This relationship type is perfect for splitting large entities into logical pieces or for optional extensions where not every record needs the additional data.</p>
+
+            <h3>Analogy</h3>
+            <p>Think of a one-to-one relationship like the connection between a person and their driver's license. Each person can have at most one valid driver's license, and each driver's license belongs to exactly one person. You can't share a license, and you can't have multiple valid licenses at the same time. In a government database, the person's basic information (name, address, birth date) might be stored in one table, while driving-specific information (license number, restrictions, expiration date) is stored in a separate but connected table. This separation keeps the main person record clean while allowing detailed driving information for those who need it, just like how user profiles extend basic user accounts with additional personal details.</p>
+
+            <h3>Examples</h3>
+            <p><strong>User and Profile relationship:</strong></p>
+            <pre><code class="language-java">@Entity
+public class User {
+    @Id @GeneratedValue
+    private Long id;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "profile_id")
+    private Profile profile;
+}
+</code></pre>
+
+            <p><strong>Profile side of relationship:</strong></p>
+            <pre><code class="language-java">@Entity
+public class Profile {
+    @Id @GeneratedValue
+    private Long id;
+
+    @OneToOne(mappedBy = "profile")
+    private User user;  // Non-owning side
+}
+</code></pre>
+
+            <p><strong>Creating and linking entities:</strong></p>
+            <pre><code class="language-java">User user = new User("alice@example.com");
+Profile profile = new Profile("Alice", "Smith", "Software Developer");
+user.setProfile(profile);
+userRepository.save(user);  // Saves both user and profile
+</code></pre>
+
+            <p><strong>Querying with joins:</strong></p>
+            <pre><code class="language-java">@Query("SELECT u FROM User u JOIN FETCH u.profile WHERE u.email = ?1")
+Optional<User> findUserWithProfile(String email);
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="onetomany-mapping" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>One-to-Many Mapping</h2>
+            <h3>Definition</h3>
+            <p>One-to-many relationships connect one entity to multiple related entities, like an author having many books, or a blog post having many comments. The @OneToMany annotation on the parent side pairs with @ManyToOne on the child side. The child entity typically holds the foreign key that points back to the parent. This relationship type is fundamental for modeling hierarchical data and parent-child structures that appear throughout business applications.</p>
+
+            <h3>Analogy</h3>
+            <p>Imagine a library where each author can write multiple books, but each book has only one primary author. The library's computer system links all of Stephen King's novels to his author record, so when you look up Stephen King, you can see his entire catalog. Conversely, when you pick up any Stephen King book, you can immediately see who wrote it. This is exactly how one-to-many relationships work in databases - the author entity connects to multiple book entities, while each book connects back to its one author. The relationship is like invisible threads connecting related items, maintained automatically by the database so you can easily navigate from parents to children and back again.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Author with many Books:</strong></p>
+            <pre><code class="language-java">@Entity
+public class Author {
+    @Id @GeneratedValue
+    private Long id;
+
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    private List<Book> books = new ArrayList<>();
+}
+</code></pre>
+
+            <p><strong>Book belongs to one Author:</strong></p>
+            <pre><code class="language-java">@Entity
+public class Book {
+    @Id @GeneratedValue
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    private Author author;  // Owning side with foreign key
+}
+</code></pre>
+
+            <p><strong>Adding books to author:</strong></p>
+            <pre><code class="language-java">Author author = new Author("Stephen King");
+Book book1 = new Book("The Shining");
+Book book2 = new Book("It");
+
+author.addBook(book1);  // Helper method sets both sides
+author.addBook(book2);
+authorRepository.save(author);
+</code></pre>
+
+            <p><strong>Helper method for bidirectional consistency:</strong></p>
+            <pre><code class="language-java">public void addBook(Book book) {
+    books.add(book);
+    book.setAuthor(this);  // Keep both sides in sync
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="manytomany-mapping" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Many-to-Many Mapping</h2>
+            <h3>Definition</h3>
+            <p>Many-to-many relationships allow multiple entities on both sides to be associated with each other, like students enrolling in courses, or products belonging to multiple categories. JPA uses a join table (junction table) to store these relationships, with the @ManyToMany annotation managing the complexity. One side must be designated as the owning side using the @JoinTable annotation, while the other side uses mappedBy to indicate it's the non-owning side.</p>
+
+            <h3>Analogy</h3>
+            <p>Think of many-to-many relationships like the connection between actors and movies. Each actor can appear in multiple movies, and each movie features multiple actors. To track these relationships, Hollywood maintains detailed records (like a join table) that list every actor-movie combination. When you look up Tom Hanks, you see all his movies; when you look up Forrest Gump, you see all its actors. This cross-referencing system lets you navigate relationships in both directions without storing duplicate information. The join table acts like a sophisticated address book that maintains all the connections, automatically updated when actors join new projects or leave old ones, ensuring the relationships stay accurate and current.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Student and Course relationship:</strong></p>
+            <pre><code class="language-java">@Entity
+public class Student {
+    @Id @GeneratedValue
+    private Long id;
+
+    @ManyToMany
+    @JoinTable(name = "student_course",
+               joinColumns = @JoinColumn(name = "student_id"),
+               inverseJoinColumns = @JoinColumn(name = "course_id"))
+    private Set<Course> courses = new HashSet<>();
+}
+</code></pre>
+
+            <p><strong>Course side of relationship:</strong></p>
+            <pre><code class="language-java">@Entity
+public class Course {
+    @Id @GeneratedValue
+    private Long id;
+
+    @ManyToMany(mappedBy = "courses")
+    private Set<Student> students = new HashSet<>();  // Non-owning side
+}
+</code></pre>
+
+            <p><strong>Enrolling students in courses:</strong></p>
+            <pre><code class="language-java">Student alice = studentRepository.findByName("Alice");
+Course java = courseRepository.findByName("Java Programming");
+alice.getCourses().add(java);
+studentRepository.save(alice);  // Updates join table
+</code></pre>
+
+            <p><strong>Query for courses with student count:</strong></p>
+            <pre><code class="language-java">@Query("SELECT c, SIZE(c.students) FROM Course c")
+List<Object[]> findCoursesWithEnrollmentCount();
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="custom-queries" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Custom Queries</h2>
+            <h3>Definition</h3>
+            <p>Custom queries let you write specific database operations that go beyond the automatic query methods provided by Spring Data JPA. Using the @Query annotation, you can write JPQL (Java Persistence Query Language) or native SQL queries directly in your repository interfaces. Custom queries are essential when you need complex filtering, joins across multiple tables, aggregate functions, or specific performance optimizations that simple method names can't express.</p>
+
+            <h3>Analogy</h3>
+            <p>Think of custom queries like having a conversation with a librarian who speaks your language fluently. While the library's catalog system can handle simple requests like "find books by author X" or "show me all science fiction books," sometimes you need to ask more complex questions: "Show me all mystery novels published after 2000 by authors who have written at least three books, ordered by publication date." For these sophisticated requests, you need to speak the librarian's specialized language (JPQL or SQL) to get exactly what you want. The librarian understands both casual English (method names) and technical library science terminology (custom queries), using whichever approach best serves your specific information needs.</p>
+
+            <h3>Examples</h3>
+            <p><strong>JPQL query with parameters:</strong></p>
+            <pre><code class="language-java">@Query("SELECT u FROM User u WHERE u.age BETWEEN :minAge AND :maxAge")
+List<User> findUsersByAgeRange(@Param("minAge") int min, @Param("maxAge") int max);
+</code></pre>
+
+            <p><strong>Complex join query:</strong></p>
+            <pre><code class="language-java">@Query("SELECT DISTINCT a FROM Author a JOIN a.books b WHERE b.category = :category")
+List<Author> findAuthorsByBookCategory(@Param("category") String category);
+</code></pre>
+
+            <p><strong>Aggregate query with grouping:</strong></p>
+            <pre><code class="language-java">@Query("SELECT a.name, COUNT(b) FROM Author a JOIN a.books b GROUP BY a.name")
+List<Object[]> findAuthorBookCounts();
+</code></pre>
+
+            <p><strong>Update query:</strong></p>
+            <pre><code class="language-java">@Modifying
+@Query("UPDATE User u SET u.lastLogin = CURRENT_TIMESTAMP WHERE u.id = :id")
+int updateLastLogin(@Param("id") Long userId);
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="jpql-queries" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>JPQL Queries</h2>
+            <h3>Definition</h3>
+            <p>JPQL (Java Persistence Query Language) is an object-oriented query language that works with entity objects rather than database tables. It looks similar to SQL but operates on your Java entity classes and their relationships. JPQL queries are database-independent and automatically translate to the appropriate SQL dialect for your database. This abstraction lets you write queries that focus on your business objects while JPA handles the database-specific details.</p>
+
+            <h3>Analogy</h3>
+            <p>JPQL is like having a universal translator that speaks "business language" instead of "database language." When you want to find information, you speak in terms of the business concepts you understand - customers, orders, products - rather than having to think about foreign keys, table joins, and column names. You say "find all customers who have placed orders worth more than $100" instead of "SELECT c.* FROM customers c INNER JOIN orders o ON c.id = o.customer_id WHERE o.total > 100." The translator (JPQL) understands your business-focused request and converts it into whatever technical database language is needed, whether it's MySQL, PostgreSQL, or Oracle, letting you focus on what you want rather than how the database stores it.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Basic JPQL syntax:</strong></p>
+            <pre><code class="language-java">@Query("SELECT u FROM User u WHERE u.email LIKE :pattern")
+List<User> findByEmailPattern(@Param("pattern") String pattern);
+</code></pre>
+
+            <p><strong>JPQL with relationships:</strong></p>
+            <pre><code class="language-java">@Query("SELECT o FROM Order o JOIN o.customer c WHERE c.name = :customerName")
+List<Order> findOrdersByCustomerName(@Param("customerName") String name);
+</code></pre>
+
+            <p><strong>JPQL functions and expressions:</strong></p>
+            <pre><code class="language-java">@Query("SELECT u FROM User u WHERE UPPER(u.name) = UPPER(:name) AND u.createdDate > :date")
+List<User> findRecentUsersByName(@Param("name") String name, @Param("date") LocalDate date);
+</code></pre>
+
+            <p><strong>JPQL with subqueries:</strong></p>
+            <pre><code class="language-java">@Query("SELECT u FROM User u WHERE u.id IN (SELECT o.customer.id FROM Order o WHERE o.total > :amount)")
+List<User> findCustomersWithLargeOrders(@Param("amount") BigDecimal amount);
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="native-queries" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Native Queries</h2>
+            <h3>Definition</h3>
+            <p>Native queries use raw SQL specific to your database vendor, giving you access to database-specific features, optimizations, or complex operations that JPQL can't express. While they sacrifice database independence, native queries are powerful for performance-critical operations, complex reporting, or when you need database-specific functions. Use native queries sparingly and only when JPQL isn't sufficient for your needs.</p>
+
+            <h3>Analogy</h3>
+            <p>Native queries are like speaking directly to a specialist in their technical language instead of using a translator. While the universal translator (JPQL) handles most conversations perfectly, sometimes you need to communicate complex, specialized concepts that require the precision and power of speaking the expert's native language. A database specialist might understand advanced optimization techniques, specific performance tricks, or specialized functions that don't translate well through the universal system. You lose the convenience of automatic translation to other languages, but you gain access to the full depth and sophistication that comes with direct, expert-level communication.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Native SQL query:</strong></p>
+            <pre><code class="language-java">@Query(value = "SELECT * FROM users WHERE created_date > NOW() - INTERVAL 30 DAY",
+       nativeQuery = true)
+List<User> findRecentUsers();
+</code></pre>
+
+            <p><strong>Native query with complex joins:</strong></p>
+            <pre><code class="language-java">@Query(value = """
+    SELECT u.name, COUNT(o.id) as order_count, SUM(o.total) as total_spent
+    FROM users u LEFT JOIN orders o ON u.id = o.customer_id
+    GROUP BY u.id, u.name HAVING COUNT(o.id) > :minOrders
+    """, nativeQuery = true)
+List<Object[]> findTopCustomers(@Param("minOrders") int minOrders);
+</code></pre>
+
+            <p><strong>Database-specific functions:</strong></p>
+            <pre><code class="language-java">@Query(value = "SELECT * FROM products WHERE MATCH(name, description) AGAINST(:search)",
+       nativeQuery = true)
+List<Product> fullTextSearch(@Param("search") String searchTerm);
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="pagination-sorting" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Pagination & Sorting</h2>
+            <h3>Definition</h3>
+            <p>Pagination breaks large result sets into smaller, manageable chunks, while sorting organizes data in meaningful order. Spring Data JPA provides Pageable and Sort parameters that automatically generate LIMIT/OFFSET clauses and ORDER BY statements. This is essential for applications that handle large datasets, providing better performance and user experience by loading only the data currently needed rather than overwhelming users with thousands of results at once.</p>
+
+            <h3>Analogy</h3>
+            <p>Pagination and sorting are like organizing a massive library catalog into manageable sections with a logical order. Instead of presenting visitors with a overwhelming dump of all 50,000 books at once, the library creates a user-friendly browsing system: books are sorted alphabetically by title or author, then divided into pages showing 20 books each. Visitors can easily navigate through "Page 1 of 2,500" to find what they want, jumping to specific sections or browsing systematically. The library's computer system handles the complex work of organizing and dividing the collection, while visitors enjoy a smooth, responsive experience that doesn't overwhelm them with information or make them wait for massive lists to load.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Repository with pagination support:</strong></p>
+            <pre><code class="language-java">public interface BookRepository extends JpaRepository<Book, Long> {
+    Page<Book> findByAuthorName(String authorName, Pageable pageable);
+    Page<Book> findByCategory(String category, Pageable pageable);
+}
+</code></pre>
+
+            <p><strong>Using pagination in service:</strong></p>
+            <pre><code class="language-java">Pageable pageable = PageRequest.of(0, 10, Sort.by("title"));
+Page<Book> bookPage = bookRepository.findByCategory("Fiction", pageable);
+List<Book> books = bookPage.getContent();  // Current page items
+</code></pre>
+
+            <p><strong>Sorting with multiple criteria:</strong></p>
+            <pre><code class="language-java">Sort sort = Sort.by("category").ascending().and(Sort.by("publicationDate").descending());
+Pageable pageable = PageRequest.of(0, 20, sort);
+</code></pre>
+
+            <p><strong>Getting pagination information:</strong></p>
+            <pre><code class="language-java">Page<Book> page = bookRepository.findAll(pageable);
+int totalPages = page.getTotalPages();
+long totalElements = page.getTotalElements();
+boolean hasNext = page.hasNext();
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="lazy-eager-loading" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Lazy vs Eager Loading</h2>
+            <h3>Definition</h3>
+            <p>Loading strategies control when related entities are fetched from the database. Lazy loading (default for collections) fetches related data only when accessed, while eager loading fetches everything immediately. The choice affects performance significantly: lazy loading reduces initial query time but can cause N+1 query problems, while eager loading may fetch unnecessary data but guarantees everything is available. Understanding and controlling fetch strategies is crucial for application performance.</p>
+
+            <h3>Analogy</h3>
+            <p>Think of lazy vs eager loading like two different approaches to packing for a family vacation. Eager loading is like packing everyone's suitcases completely before leaving the house - you grab all the clothes, toiletries, and accessories for every family member right away. This takes longer upfront, and you might pack things you won't need, but once you're at your destination, everything is immediately available. Lazy loading is like packing just the essentials initially, then going back to get specific items only when someone asks for them. This gets you out the door faster, but you might end up making multiple trips back home when different family members realize they need their favorite shirt or special shoes. The best approach depends on your trip length, packing space, and how often people will need their extra items.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Default lazy loading for collections:</strong></p>
+            <pre><code class="language-java">@Entity
+public class Author {
+    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)  // Default
+    private List<Book> books;  // Loaded only when accessed
+}
+</code></pre>
+
+            <p><strong>Eager loading for immediate access:</strong></p>
+            <pre><code class="language-java">@Entity
+public class Order {
+    @ManyToOne(fetch = FetchType.EAGER)
+    private Customer customer;  // Always loaded with order
+}
+</code></pre>
+
+            <p><strong>Solving N+1 query problem with JOIN FETCH:</strong></p>
+            <pre><code class="language-java">@Query("SELECT a FROM Author a JOIN FETCH a.books WHERE a.id = :id")
+Optional<Author> findAuthorWithBooks(@Param("id") Long id);
+</code></pre>
+
+            <p><strong>Entity graph for complex fetching:</strong></p>
+            <pre><code class="language-java">@EntityGraph(attributePaths = {"books", "profile"})
+@Query("SELECT a FROM Author a WHERE a.name = :name")
+List<Author> findAuthorWithBooksAndProfile(@Param("name") String name);
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="performance-optimization" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Performance Optimization</h2>
+            <h3>Definition</h3>
+            <p>JPA performance optimization involves reducing database queries, minimizing data transfer, and using appropriate caching strategies. Key techniques include using projections to fetch only needed fields, enabling query caching, optimizing fetch strategies, using batch operations for bulk updates, and monitoring query execution with SQL logging. Good performance requires understanding when and how your application accesses data, then optimizing those access patterns.</p>
+
+            <h3>Analogy</h3>
+            <p>Performance optimization is like optimizing your grocery shopping routine. Instead of making separate trips for each item (N+1 queries), you plan ahead and get everything in one efficient trip (JOIN FETCH). You use a shopping list with only what you need (projections) rather than wandering every aisle. You buy frequently used items in bulk (caching) and organize your route through the store for maximum efficiency (query optimization). You might even coordinate with neighbors to share trips for common items (batch operations). The goal is to get everything you need with minimal time and effort, using smart planning and efficient strategies rather than just working harder.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Using projections for specific fields:</strong></p>
+            <pre><code class="language-java">@Query("SELECT u.name, u.email FROM User u WHERE u.active = true")
+List<Object[]> findActiveUserSummary();
+
+// Or with interface projections
+interface UserSummary {
+    String getName();
+    String getEmail();
+}
+</code></pre>
+
+            <p><strong>Batch operations for performance:</strong></p>
+            <pre><code class="language-java">@Modifying
+@Query("UPDATE User u SET u.active = false WHERE u.lastLogin < :cutoffDate")
+int deactivateInactiveUsers(@Param("cutoffDate") LocalDate cutoffDate);
+</code></pre>
+
+            <p><strong>Hibernate-specific optimizations:</strong></p>
+            <pre><code class="language-java">// Enable query cache
+spring.jpa.properties.hibernate.cache.use_query_cache=true
+
+// Show SQL for debugging
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+</code></pre>
+
+            <p><strong>Using @BatchSize for collection loading:</strong></p>
+            <pre><code class="language-java">@Entity
+public class Author {
+    @OneToMany(mappedBy = "author")
+    @BatchSize(size = 10)  // Load up to 10 collections at once
+    private List<Book> books;
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Summary</h2>
+            <p>You've now mastered advanced JPA concepts that enable you to build sophisticated, high-performance data layers for complex applications. From modeling intricate entity relationships that mirror real-world business associations, to writing custom queries that precisely fetch the data you need, to optimizing performance through smart loading strategies and caching - you have the tools to handle enterprise-level data requirements. Understanding relationship mapping, pagination, and performance optimization positions you to build applications that scale gracefully and respond quickly even with large datasets. These advanced JPA skills form the foundation for secure, high-performance applications. Next, you'll learn Spring Security, which will teach you to protect the valuable data models and APIs you can now build with confidence.</p>
+          </section>
+
+          <section id="programming-challenge" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Programming Challenge</h2>
+            <div class="rounded-lg border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800">
+              <h3 class="mt-0">Challenge: Advanced E-commerce Data Model</h3>
+              <p><strong>Task:</strong> Build a comprehensive e-commerce data model with complex relationships, custom queries, and performance optimizations.</p>
+
+              <p><strong>Requirements:</strong></p>
+              <ol>
+                <li>Create entity relationships:</li>
+                <ul>
+                  <li><code>Customer</code> ↔ <code>Order</code> (one-to-many)</li>
+                  <li><code>Order</code> ↔ <code>OrderItem</code> (one-to-many)</li>
+                  <li><code>Product</code> ↔ <code>Category</code> (many-to-many)</li>
+                  <li><code>Customer</code> ↔ <code>Address</code> (one-to-many, billing/shipping)</li>
+                  <li><code>Product</code> ↔ <code>Review</code> (one-to-many)</li>
+                </ul>
+                <li>Implement custom queries:</li>
+                <ul>
+                  <li>Find top-selling products with total quantities sold</li>
+                  <li>Find customers who spent more than a certain amount</li>
+                  <li>Find products by category with average rating</li>
+                  <li>Monthly sales report with totals and order counts</li>
+                </ul>
+                <li>Add performance optimizations:</li>
+                <ul>
+                  <li>Use appropriate fetch strategies</li>
+                  <li>Implement pagination for product listings</li>
+                  <li>Create projections for summary views</li>
+                  <li>Use JOIN FETCH to avoid N+1 queries</li>
+                </ul>
+                <li>Include advanced features:</li>
+                <ul>
+                  <li>Audit fields (created/modified timestamps)</li>
+                  <li>Soft deletion for products and customers</li>
+                  <li>Calculated fields (order totals, average ratings)</li>
+                  <li>Custom validation annotations</li>
+                </ul>
+              </ol>
+
+              <p><strong>Bonus features:</strong></p>
+              <ul>
+                <li>Implement product search with full-text search</li>
+                <li>Add inventory tracking with stock levels</li>
+                <li>Create customer loyalty points system</li>
+                <li>Implement product recommendations based on purchase history</li>
+                <li>Add comprehensive test suite for all custom queries</li>
+              </ul>
+
+              <p><strong>Learning Goals:</strong> Practice advanced entity modeling, complex relationship mapping, custom query development, performance optimization techniques, and building a realistic, scalable data architecture for a complex business domain.</p>
+            </div>
+          </section>
+
+          <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+            <a href="lesson-13.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
+            <a href="lesson-15.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
+          </nav>
+        </div>
+      </div>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('themeToggle').addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>
