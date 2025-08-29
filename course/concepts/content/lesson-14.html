@@ -56,6 +56,7 @@
               <li><a href="#native-queries" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Native Queries</a></li>
               <li><a href="#pagination-sorting" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Pagination & Sorting</a></li>
               <li><a href="#lazy-eager-loading" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Lazy vs Eager Loading</a></li>
+              <li><a href="#n-plus-one-problem" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">N+1 Query Problem</a></li>
               <li><a href="#transaction-management" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Transaction Management</a></li>
               <li><a href="#connection-management" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Connection Management</a></li>
               <li><a href="#performance-optimization" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Performance Optimization</a></li>
@@ -408,6 +409,52 @@ Optional&lt;Author&gt; findAuthorWithBooks(@Param("id") Long id);</code></pre>
             <pre><code class="language-java">@EntityGraph(attributePaths = {"books", "profile"})
 @Query("SELECT a FROM Author a WHERE a.name = :name")
 List&lt;Author&gt; findAuthorWithBooksAndProfile(@Param("name") String name);</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="n-plus-one-problem" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>N+1 Query Problem</h2>
+            <h3>Definition</h3>
+            <p>The N+1 query problem occurs when your application executes one query to fetch N parent records, then executes N additional queries to fetch related data for each parent record, resulting in N+1 total database queries instead of a more efficient approach. This happens commonly with lazy loading when you iterate over a collection of entities and access their lazy-loaded relationships. The problem severely impacts performance as the number of parent records grows, turning what should be 2 queries into potentially hundreds or thousands of queries.</p>
+
+            <h3>Analogy</h3>
+            <p>The N+1 query problem is like a inefficient mail delivery system in a large apartment building. Instead of the mail carrier making one trip to collect all mail for the building (1 query) and then delivering everything in a single efficient route through all floors (1 more query), imagine if the carrier made one trip to get the list of residents (1 query), then made a separate round trip back to the post office for each individual resident's mail (N additional queries). So for a 100-unit building, instead of 2 trips total, the carrier makes 101 trips! This becomes exponentially more wasteful as the building gets larger. The residents get their mail eventually, but the system is incredibly inefficient, causing traffic jams, wasted fuel, and frustrated postal workers. A smart mail system would gather all the information needed in just a couple of efficient trips, just like how proper database query optimization should work.</p>
+
+            <h3>Examples</h3>
+            <p><strong>N+1 Problem Example - The Bad Way:</strong></p>
+            <pre><code class="language-java">// This triggers N+1 queries!
+List&lt;Author&gt; authors = authorRepository.findAll();  // 1 query to get authors
+for (Author author : authors) {
+    System.out.println(author.getBooks().size());   // N queries (one per author)
+}
+// Result: 1 + N queries instead of 2 queries</code></pre>
+
+            <p><strong>Solution 1: JOIN FETCH in JPQL:</strong></p>
+            <pre><code class="language-java">@Query("SELECT DISTINCT a FROM Author a JOIN FETCH a.books")
+List&lt;Author&gt; findAllAuthorsWithBooks();
+
+// Usage - only 1 query total!
+List&lt;Author&gt; authors = authorRepository.findAllAuthorsWithBooks();
+for (Author author : authors) {
+    System.out.println(author.getBooks().size());  // No additional queries
+}</code></pre>
+
+            <p><strong>Solution 2: @EntityGraph annotation:</strong></p>
+            <pre><code class="language-java">@EntityGraph(attributePaths = {"books"})
+@Query("SELECT a FROM Author a")
+List&lt;Author&gt; findAllWithBooks();
+
+// This eagerly fetches books with authors in 1 query</code></pre>
+
+            <p><strong>Solution 3: @BatchSize for collections:</strong></p>
+            <pre><code class="language-java">@Entity
+public class Author {
+    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
+    @BatchSize(size = 10)  // Fetches up to 10 collections at once
+    private List&lt;Book&gt; books;
+}
+// Reduces N+1 to 1 + (N/10) queries</code></pre>
           </section>
 
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
