@@ -97,7 +97,7 @@ String query = "SELECT * FROM users WHERE name = '" + userInput + "'";
             <p><strong>Cross-Site Scripting (XSS):</strong></p>
             <pre><code class="language-java">// Unsafe: directly displaying user input
 model.addAttribute("username", request.getParameter("name"));
-// If name contains <script>alert('hacked')</script>, it executes
+// If name containsalert('hacked'), it executes
 </code></pre>
 
             <p><strong>Unauthorized access:</strong></p>

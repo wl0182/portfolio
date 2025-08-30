@@ -511,34 +511,55 @@ public List&lt;User&gt; getAllUsers() {
           <section id="connection-management" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Connection Management</h2>
             <h3>Definition</h3>
-            <p>Connection management in JPA involves configuring and managing the database connections used by your application. This includes setting connection parameters, managing connection pools, and ensuring efficient use of database resources. Proper connection management is essential for application performance and stability, especially under load, as it affects how quickly and reliably your application can access the database.</p>
+            <p>Connection management in JPA involves configuring and optimizing how your application connects to and communicates with the database. This includes managing connection pools, setting connection timeouts, configuring connection validation, and monitoring connection health. A connection pool maintains a set of reusable database connections to avoid the overhead of creating and destroying connections for each database operation. Proper connection management is crucial for application performance, scalability, and resource utilization.</p>
 
             <h3>Analogy</h3>
-            <p>Think of connection management like managing the lanes in a busy highway interchange. Just as cars (database requests) need clear, well-managed lanes (connections) to travel smoothly without collisions or traffic jams, your application needs properly managed database connections to operate efficiently. Good connection management ensures that requests are processed quickly and resources are used effectively, just like a well-managed interchange keeps traffic flowing smoothly and safely.</p>
+            <p>Connection management is like managing a fleet of delivery trucks for a busy restaurant. Instead of buying a new truck every time you need to make a delivery (creating a new connection), you maintain a pool of trucks that drivers can use and return when finished (connection pool). You keep enough trucks available to handle peak hours without having too many sitting idle during slow periods. Each truck is regularly inspected and maintained (connection validation), and you monitor their usage to optimize your fleet size. If a truck breaks down, you remove it from service and potentially add a replacement (connection health monitoring). This system ensures fast, reliable deliveries while managing costs and resources efficiently.</p>
 
             <h3>Examples</h3>
-            <p><strong>Basic connection configuration:</strong></p>
-            <pre><code class="language-java">spring.datasource.url=jdbc:mysql://localhost:3306/mydb
-spring.datasource.username=root
-spring.datasource.password=secret
-</code></pre>
+            <p><strong>HikariCP connection pool configuration:</strong></p>
+            <pre><code class="language-properties"># Connection pool settings
+spring.datasource.hikari.maximum-pool-size=20
+spring.datasource.hikari.minimum-idle=5
+spring.datasource.hikari.idle-timeout=300000
+spring.datasource.hikari.max-lifetime=1200000
+spring.datasource.hikari.connection-timeout=20000</code></pre>
 
-            <p><strong>Connection pool settings:</strong></p>
-            <pre><code class="language-java">spring.datasource.hikari.maximum-pool-size=10
-spring.datasource.hikari.minimum-idle=2
-spring.datasource.hikari.idle-timeout=30000
-</code></pre>
+            <p><strong>Connection validation:</strong></p>
+            <pre><code class="language-properties"># Test connections before use
+spring.datasource.hikari.connection-test-query=SELECT 1
+spring.datasource.hikari.validation-timeout=3000</code></pre>
 
-            <p><strong>Testing database connection:</strong></p>
-            <pre><code class="language-java">@PostConstruct
-public void init() {
-    try (Connection conn = dataSource.getConnection()) {
-        // Test the connection...
-    } catch (SQLException e) {
-        // Handle exception...
+            <p><strong>Multiple datasource configuration:</strong></p>
+            <pre><code class="language-java">@Configuration
+public class DatabaseConfig {
+    @Primary
+    @Bean
+    @ConfigurationProperties("spring.datasource.primary")
+    public DataSource primaryDataSource() {
+        return DataSourceBuilder.create().build();
     }
-}
-</code></pre>
+
+    @Bean
+    @ConfigurationProperties("spring.datasource.secondary")
+    public DataSource secondaryDataSource() {
+        return DataSourceBuilder.create().build();
+    }
+}</code></pre>
+
+            <p><strong>Connection pool monitoring:</strong></p>
+            <pre><code class="language-java">@Component
+public class ConnectionPoolMonitor {
+    @Autowired
+    private HikariDataSource dataSource;
+
+    @EventListener
+    public void logPoolStats() {
+        HikariPoolMXBean poolBean = dataSource.getHikariPoolMXBean();
+        logger.info("Active connections: {}, Idle connections: {}",
+                   poolBean.getActiveConnections(), poolBean.getIdleConnections());
+    }
+}</code></pre>
           </section>
 
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
@@ -585,6 +606,13 @@ public class Author {
     @BatchSize(size = 10)  // Load up to 10 collections at once
     private List&lt;Book&gt; books;
 }</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Summary</h2>
+            <p>You've now mastered advanced JPA and Hibernate concepts that are essential for building sophisticated, high-performance data-driven applications. From modeling complex entity relationships and writing custom queries to optimizing performance and managing database connections, these skills form the foundation of professional Java development. You've learned to navigate the trade-offs between lazy and eager loading, solve the N+1 query problem, implement proper transaction management, and optimize connection pools for scalability. The custom query techniques with JPQL and native SQL give you the flexibility to handle any data access requirement, while the performance optimization strategies ensure your applications can handle real-world loads efficiently. These advanced JPA features prepare you to architect data layers that are both powerful and maintainable, setting the stage for building secure, production-ready applications in the upcoming lessons on Spring Security and deployment strategies.</p>
           </section>
 
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
