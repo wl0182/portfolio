@@ -1,0 +1,1036 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 22 - Spring Boot Microservices Advanced Topics Part 2</title>
+    <meta name="description" content="Advanced Spring Boot microservices: service mesh integration, distributed tracing, advanced monitoring, performance optimization, resilience patterns, and production-ready microservices architecture with practical examples and best practices." />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="lg:flex lg:gap-8">
+        <aside class="hidden lg:block lg:w-72">
+          <nav class="sticky top-8 rounded-xl border border-slate-200/60 bg-white/60 p-4 shadow-sm backdrop-blur dark:border-slate-800/60 dark:bg-slate-900/40" aria-label="Table of contents">
+            <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">On this page</h2>
+            <ol class="space-y-1 text-sm">
+              <li><a href="#introduction" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Introduction</a></li>
+              <li><a href="#service-mesh-architecture" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Service Mesh Architecture</a></li>
+              <li><a href="#distributed-tracing" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Distributed Tracing</a></li>
+              <li><a href="#advanced-monitoring" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Advanced Monitoring</a></li>
+              <li><a href="#performance-optimization" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Performance Optimization</a></li>
+              <li><a href="#resilience-patterns" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Resilience Patterns</a></li>
+              <li><a href="#event-driven-architecture" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Event-Driven Architecture</a></li>
+              <li><a href="#microservices-testing" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Microservices Testing</a></li>
+              <li><a href="#deployment-strategies" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Deployment Strategies</a></li>
+              <li><a href="#data-consistency" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Data Consistency</a></li>
+              <li><a href="#security-best-practices" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Security Best Practices</a></li>
+              <li><a href="#summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Summary</a></li>
+              <li><a href="#programming-challenge" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Programming Challenge</a></li>
+            </ol>
+          </nav>
+        </aside>
+        <div class="min-w-0 flex-1">
+          <div class="mb-6">
+            <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Concepts</a>
+          </div>
+          <header class="mx-auto max-w-3xl text-center">
+            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 22: Spring Boot Microservices Advanced Topics Part 2</h1>
+            <p class="mt-2 text-slate-600 dark:text-slate-300">Master advanced microservices patterns: service mesh, distributed tracing, advanced monitoring, performance optimization, and production-ready resilience patterns for enterprise-scale applications.</p>
+          </header>
+
+          <section id="introduction" class="prose prose-slate mt-6 max-w-none dark:prose-invert">
+            <h2>Introduction</h2>
+            <p>Building microservices is like constructing a smart city instead of a single massive building. While your previous lessons taught you the fundamentals of creating individual buildings (services) and connecting them with roads (communication), this lesson focuses on the advanced infrastructure that makes a smart city truly intelligent and resilient. You'll learn about service mesh architecture that acts like a sophisticated traffic management system, distributed tracing that provides GPS tracking for every request across your services, and advanced monitoring that gives you real-time insights into every aspect of your system's health. We'll explore performance optimization techniques that ensure your services run efficiently under heavy load, resilience patterns that keep your system running even when individual components fail, and deployment strategies that allow you to update services without downtime. These advanced topics are essential for building production-ready microservices that can scale to serve millions of users while maintaining reliability, security, and observability.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="service-mesh-architecture" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Service Mesh Architecture</h2>
+            <h3>Definition</h3>
+            <p>A service mesh is a dedicated infrastructure layer that handles service-to-service communication, providing features like traffic management, security, and observability without requiring changes to your application code. It consists of a data plane (lightweight proxies deployed alongside each service) and a control plane (manages configuration and policies). The service mesh intercepts all network communication between services, automatically handling cross-cutting concerns like load balancing, circuit breaking, retries, timeouts, and encryption. Popular service mesh solutions include Istio, Linkerd, and Consul Connect, each providing a comprehensive platform for managing microservices communication at scale.</p>
+
+            <h3>Analogy</h3>
+            <p>Think of a service mesh like the comprehensive infrastructure system of a modern smart city. Just as a city has an intelligent traffic management system that automatically routes vehicles through the best paths, manages traffic lights, provides real-time traffic information, and ensures emergency vehicles get priority access, a service mesh provides intelligent routing for your microservices communication. The traffic control towers (control plane) monitor the entire city and make routing decisions, while smart traffic lights and road sensors (data plane proxies) are deployed at every intersection to execute those decisions locally. Citizens (your application code) don't need to worry about traffic management, road construction, or emergency protocols - the city's infrastructure handles all of that transparently. The system provides real-time monitoring of traffic flow, automatic rerouting around accidents or construction, and security checkpoints, all without requiring individual drivers to change how they drive.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Istio service mesh configuration:</strong></p>
+            <pre><code class="language-yaml">apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: user-service
+spec:
+  hosts:
+  - user-service
+  http:
+  - route:
+    - destination:
+        host: user-service
+        subset: v2
+      weight: 20
+    - destination:
+        host: user-service
+        subset: v1
+      weight: 80
+</code></pre>
+
+            <p><strong>Circuit breaker configuration:</strong></p>
+            <pre><code class="language-yaml">apiVersion: networking.istio.io/v1beta1
+kind: DestinationRule
+metadata:
+  name: payment-service
+spec:
+  host: payment-service
+  trafficPolicy:
+    circuitBreaker:
+      consecutiveErrors: 3
+      interval: 30s
+      baseEjectionTime: 30s
+</code></pre>
+
+            <p><strong>Automatic TLS encryption:</strong></p>
+            <pre><code class="language-yaml">apiVersion: security.istio.io/v1beta1
+kind: PeerAuthentication
+metadata:
+  name: default
+spec:
+  mtls:
+    mode: STRICT
+</code></pre>
+
+            <p><strong>Service mesh benefits:</strong></p>
+            <pre><code class="language-java">// Your application code remains unchanged
+@RestController
+public class UserController {
+    @Autowired
+    private PaymentService paymentService;
+
+    @GetMapping("/users/{id}/payments")
+    public List<Payment> getUserPayments(@PathVariable Long id) {
+        return paymentService.getPayments(id); // Service mesh handles retry, circuit breaking, etc.
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="distributed-tracing" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Distributed Tracing</h2>
+            <h3>Definition</h3>
+            <p>Distributed tracing tracks requests as they flow through multiple microservices, creating a complete picture of how each request is processed across your entire system. Each trace consists of spans that represent individual operations, forming a tree structure that shows the path and timing of a request through your services. Tracing provides insights into performance bottlenecks, error propagation, and service dependencies, making it essential for debugging and optimizing microservices architectures. Spring Cloud Sleuth automatically instruments your Spring Boot applications, while tools like Zipkin, Jaeger, and AWS X-Ray provide visualization and analysis of trace data.</p>
+
+            <h3>Analogy</h3>
+            <p>Distributed tracing is like having a sophisticated package tracking system for a global shipping network. When you send a package (make a request), the system creates a unique tracking number (trace ID) that follows the package through every step of its journey. As the package moves through different facilities - the local post office, regional sorting center, international hub, customs, destination country sorting center, and final delivery truck - each location scans the package and records detailed information: when it arrived, how long it spent there, any delays or issues, and when it departed. You can see the complete journey timeline, identify exactly where delays occurred, understand which routes are most efficient, and spot patterns in delivery problems. If a package gets lost or delayed, you can trace its exact path and pinpoint where the issue occurred, just like how distributed tracing helps you understand the complete lifecycle of a request across your microservices.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Spring Cloud Sleuth configuration:</strong></p>
+            <pre><code class="language-properties">spring.sleuth.zipkin.base-url=http://zipkin:9411
+spring.sleuth.sampler.probability=1.0
+spring.application.name=user-service
+</code></pre>
+
+            <p><strong>Custom span creation:</strong></p>
+            <pre><code class="language-java">@Service
+public class UserService {
+
+    @NewSpan("user-validation")
+    public boolean validateUser(@SpanTag("userId") Long userId) {
+        // Automatically traced operation
+        return userRepository.existsById(userId);
+    }
+}
+</code></pre>
+
+            <p><strong>Manual span management:</strong></p>
+            <pre><code class="language-java">@Autowired
+private Tracer tracer;
+
+public void processOrder(Order order) {
+    Span span = tracer.nextSpan()
+        .name("order-processing")
+        .tag("order.id", order.getId().toString())
+        .start();
+
+    try (Tracer.SpanInScope ws = tracer.withSpanInScope(span)) {
+        // Your processing logic here
+        validateOrder(order);
+        calculateTotal(order);
+    } finally {
+        span.end();
+    }
+}
+</code></pre>
+
+            <p><strong>Trace correlation across services:</strong></p>
+            <pre><code class="language-java">@RestTemplate
+@LoadBalanced
+public RestTemplate restTemplate() {
+    return new RestTemplate(); // Automatically propagates trace context
+}
+
+// Trace ID and span ID automatically passed in HTTP headers
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="advanced-monitoring" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Advanced Monitoring</h2>
+            <h3>Definition</h3>
+            <p>Advanced monitoring in microservices goes beyond basic health checks to provide comprehensive observability through metrics, logs, and traces. It includes business metrics (user registrations, order completion rates), technical metrics (response times, error rates, resource utilization), and custom metrics specific to your domain. Monitoring strategies include setting up alerting rules, creating dashboards for different stakeholders, implementing SLOs (Service Level Objectives), and using techniques like synthetic monitoring and chaos engineering to proactively identify issues. Tools like Prometheus, Grafana, ELK stack, and Spring Boot Actuator provide the foundation for robust monitoring systems.</p>
+
+            <h3>Analogy</h3>
+            <p>Advanced monitoring is like having a comprehensive mission control center for a space station. The control center doesn't just monitor whether the station is still in orbit (basic health checks); it continuously tracks hundreds of metrics: oxygen levels in each compartment, power consumption of every system, crew vital signs, equipment performance, communication signal strength, orbital trajectory, and even psychological well-being of the crew. Different specialists monitor different aspects - flight controllers watch navigation, life support engineers monitor air and water systems, and mission planners track progress toward objectives. The system has multiple layers of alerts: yellow warnings for minor issues that need attention, red alerts for critical problems requiring immediate action, and predictive alerts that warn about potential future problems based on trending data. Just as mission control can quickly identify which system is causing problems and how it affects the overall mission, advanced microservices monitoring gives you complete visibility into your system's health and performance.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Custom metrics with Micrometer:</strong></p>
+            <pre><code class="language-java">@Service
+public class OrderService {
+    private final Counter orderCounter;
+    private final Timer orderProcessingTimer;
+
+    public OrderService(MeterRegistry meterRegistry) {
+        this.orderCounter = Counter.builder("orders.created")
+            .tag("service", "order-service")
+            .register(meterRegistry);
+        this.orderProcessingTimer = Timer.builder("order.processing.time")
+            .register(meterRegistry);
+    }
+
+    public Order createOrder(Order order) {
+        return orderProcessingTimer.recordCallable(() -> {
+            orderCounter.increment();
+            return processOrder(order);
+        });
+    }
+}
+</code></pre>
+
+            <p><strong>Health indicator implementation:</strong></p>
+            <pre><code class="language-java">@Component
+public class DatabaseHealthIndicator implements HealthIndicator {
+
+    @Autowired
+    private DataSource dataSource;
+
+    @Override
+    public Health health() {
+        try {
+            Connection connection = dataSource.getConnection();
+            // Test database connectivity
+            return Health.up()
+                .withDetail("database", "Available")
+                .withDetail("connections", getConnectionCount())
+                .build();
+        } catch (Exception e) {
+            return Health.down()
+                .withDetail("database", "Unavailable")
+                .withException(e)
+                .build();
+        }
+    }
+}
+</code></pre>
+
+            <p><strong>Structured logging:</strong></p>
+            <pre><code class="language-java">@RestController
+public class UserController {
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
+    @GetMapping("/users/{id}")
+    public User getUser(@PathVariable Long id) {
+        logger.info("Fetching user with id: {}", id);
+
+        try {
+            User user = userService.findById(id);
+            logger.info("Successfully retrieved user: {}", user.getUsername());
+            return user;
+        } catch (UserNotFoundException e) {
+            logger.error("User not found with id: {}", id, e);
+            throw e;
+        }
+    }
+}
+</code></pre>
+
+            <p><strong>Prometheus metrics configuration:</strong></p>
+            <pre><code class="language-yaml">management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  endpoint:
+    metrics:
+      enabled: true
+    prometheus:
+      enabled: true
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="performance-optimization" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Performance Optimization</h2>
+            <h3>Definition</h3>
+            <p>Performance optimization in microservices involves identifying and eliminating bottlenecks to improve response times, throughput, and resource utilization. Key techniques include connection pooling to manage database connections efficiently, async processing for non-blocking operations, caching strategies to reduce redundant work, database optimization through proper indexing and query optimization, and JVM tuning for optimal garbage collection and memory usage. Performance optimization requires continuous monitoring, load testing, and profiling to identify areas for improvement and validate the effectiveness of optimizations.</p>
+
+            <h3>Analogy</h3>
+            <p>Performance optimization is like fine-tuning a Formula 1 racing car for peak performance. Just as race engineers analyze every component - from aerodynamics and engine tuning to tire pressure and fuel mixture - you need to examine every aspect of your microservices. The engine (JVM) needs proper tuning for optimal power delivery, the fuel system (database connections) must provide consistent flow without waste, the cooling system (caching) prevents overheating by managing heat efficiently, and the transmission (async processing) ensures power is delivered smoothly without losing momentum. Race engineers use telemetry data to monitor performance in real-time, identify bottlenecks during practice runs, and make adjustments between races. Similarly, you use monitoring tools to track performance metrics, conduct load testing to identify weak points, and continuously optimize your services to achieve maximum performance under race conditions (production load).</p>
+
+            <h3>Examples</h3>
+            <p><strong>Connection pool optimization:</strong></p>
+            <pre><code class="language-properties">spring.datasource.hikari.maximum-pool-size=20
+spring.datasource.hikari.minimum-idle=5
+spring.datasource.hikari.connection-timeout=20000
+spring.datasource.hikari.idle-timeout=300000
+spring.datasource.hikari.max-lifetime=1200000
+</code></pre>
+
+            <p><strong>Async processing with CompletableFuture:</strong></p>
+            <pre><code class="language-java">@Service
+public class NotificationService {
+
+    @Async
+    public CompletableFuture<Void> sendEmailNotification(String email, String message) {
+        // Non-blocking email sending
+        emailClient.send(email, message);
+        return CompletableFuture.completedFuture(null);
+    }
+
+    @Async
+    public CompletableFuture<Void> sendSmsNotification(String phone, String message) {
+        // Non-blocking SMS sending
+        smsClient.send(phone, message);
+        return CompletableFuture.completedFuture(null);
+    }
+}
+</code></pre>
+
+            <p><strong>Redis caching implementation:</strong></p>
+            <pre><code class="language-java">@Service
+public class UserService {
+
+    @Cacheable(value = "users", key = "#id")
+    public User findById(Long id) {
+        return userRepository.findById(id);
+    }
+
+    @CacheEvict(value = "users", key = "#user.id")
+    public User updateUser(User user) {
+        return userRepository.save(user);
+    }
+}
+</code></pre>
+
+            <p><strong>JVM optimization settings:</strong></p>
+            <pre><code class="language-bash">JAVA_OPTS="-Xms512m -Xmx2g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+PrintGC"
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="resilience-patterns" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Resilience Patterns</h2>
+            <h3>Definition</h3>
+            <p>Resilience patterns are design strategies that help microservices handle failures gracefully and maintain system stability when individual components fail. Key patterns include circuit breakers that prevent cascading failures, retry mechanisms with exponential backoff, timeouts to avoid hanging requests, bulkheads that isolate failures, and graceful degradation that provides reduced functionality when dependencies are unavailable. These patterns work together to create fault-tolerant systems that can recover automatically from transient failures and continue operating even when some services are experiencing issues.</p>
+
+            <h3>Analogy</h3>
+            <p>Resilience patterns are like the safety systems in a modern cruise ship designed to handle emergencies and keep passengers safe. The ship has watertight bulkheads (bulkhead pattern) that can isolate flooding to prevent the entire ship from sinking. If the main engines fail, backup generators automatically kick in (circuit breaker and fallback). The ship has multiple communication systems - if satellite communication fails, it falls back to radio, and if that fails, it uses emergency beacons (retry with fallback). Life boats are strategically distributed (graceful degradation) so that even if some areas become inaccessible, passengers can still evacuate safely. The crew follows strict timeout procedures - if a distress call isn't answered within a specific time, they escalate to the next level of emergency protocols. All these systems work together to ensure that even if multiple things go wrong simultaneously, the ship can continue operating safely and get everyone to their destination or to safety.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Circuit breaker with Resilience4j:</strong></p>
+            <pre><code class="language-java">@Component
+public class PaymentServiceClient {
+
+    @CircuitBreaker(name = "payment-service", fallbackMethod = "fallbackPayment")
+    @Retry(name = "payment-service")
+    @TimeLimiter(name = "payment-service")
+    public CompletableFuture<PaymentResponse> processPayment(PaymentRequest request) {
+        return CompletableFuture.supplyAsync(() ->
+            restTemplate.postForObject("/payments", request, PaymentResponse.class)
+        );
+    }
+
+    public CompletableFuture<PaymentResponse> fallbackPayment(PaymentRequest request, Exception ex) {
+        return CompletableFuture.completedFuture(
+            new PaymentResponse("PENDING", "Payment will be processed later")
+        );
+    }
+}
+</code></pre>
+
+            <p><strong>Bulkhead pattern with thread pools:</strong></p>
+            <pre><code class="language-java">@Configuration
+public class ThreadPoolConfig {
+
+    @Bean("emailExecutor")
+    public Executor emailExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(5);
+        executor.setMaxPoolSize(10);
+        executor.setQueueCapacity(100);
+        executor.setThreadNamePrefix("email-");
+        return executor;
+    }
+
+    @Bean("smsExecutor")
+    public Executor smsExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(3);
+        executor.setMaxPoolSize(5);
+        executor.setQueueCapacity(50);
+        executor.setThreadNamePrefix("sms-");
+        return executor;
+    }
+}
+</code></pre>
+
+            <p><strong>Graceful degradation:</strong></p>
+            <pre><code class="language-java">@Service
+public class RecommendationService {
+
+    public List<Product> getRecommendations(Long userId) {
+        try {
+            return aiRecommendationService.getPersonalizedRecommendations(userId);
+        } catch (Exception e) {
+            logger.warn("AI service unavailable, falling back to popular products", e);
+            return popularProductService.getPopularProducts();
+        }
+    }
+}
+</code></pre>
+
+            <p><strong>Timeout configuration:</strong></p>
+            <pre><code class="language-properties">resilience4j.timelimiter.instances.payment-service.timeout-duration=3s
+resilience4j.circuitbreaker.instances.payment-service.failure-rate-threshold=50
+resilience4j.retry.instances.payment-service.max-attempts=3
+resilience4j.retry.instances.payment-service.wait-duration=1s
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="event-driven-architecture" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Event-Driven Architecture</h2>
+            <h3>Definition</h3>
+            <p>Event-driven architecture enables microservices to communicate through asynchronous events rather than direct synchronous calls, creating loosely coupled systems that can scale and evolve independently. Services publish events when significant state changes occur, and other services subscribe to relevant events to trigger their own business logic. This pattern supports eventual consistency, improves system resilience, and enables complex workflows to be broken down into manageable, independent steps. Event streaming platforms like Kafka, RabbitMQ, and cloud-based solutions provide reliable event delivery, ordering guarantees, and replay capabilities.</p>
+
+            <h3>Analogy</h3>
+            <p>Event-driven architecture is like a modern newsroom where breaking news spreads through multiple channels simultaneously. When a significant event happens (like a major sports victory), a reporter immediately publishes the news (event) to the newsroom's central news wire (event stream). Different departments subscribe to relevant news categories: the sports desk picks up sports events, the business desk monitors financial news, the weather team tracks storm updates, and the social media team watches for trending topics. Each department processes the news according to their needs - the sports desk writes detailed analysis, the social media team creates quick posts, and the business desk might analyze market implications. No department waits for others to finish, and if one department is temporarily overwhelmed, the news still reaches all other departments. The newsroom can easily add new departments or change how existing ones respond to news without affecting the overall news distribution system.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Event publishing with Spring Cloud Stream:</strong></p>
+            <pre><code class="language-java">@Service
+public class OrderService {
+
+    @Autowired
+    private StreamBridge streamBridge;
+
+    public Order createOrder(Order order) {
+        Order savedOrder = orderRepository.save(order);
+
+        OrderCreatedEvent event = new OrderCreatedEvent(
+            savedOrder.getId(),
+            savedOrder.getUserId(),
+            savedOrder.getTotal()
+        );
+
+        streamBridge.send("order-events", event);
+        return savedOrder;
+    }
+}
+</code></pre>
+
+            <p><strong>Event consumption:</strong></p>
+            <pre><code class="language-java">@Component
+public class InventoryService {
+
+    @EventListener
+    public void handleOrderCreated(OrderCreatedEvent event) {
+        logger.info("Processing inventory for order: {}", event.getOrderId());
+
+        // Update inventory levels
+        inventoryRepository.reserveItems(event.getOrderId());
+
+        // Publish inventory reserved event
+        publishInventoryReservedEvent(event.getOrderId());
+    }
+}
+</code></pre>
+
+            <p><strong>Event sourcing pattern:</strong></p>
+            <pre><code class="language-java">@Entity
+public class EventStore {
+    private String aggregateId;
+    private String eventType;
+    private String eventData;
+    private LocalDateTime timestamp;
+    private Long version;
+
+    // Event replay for aggregate reconstruction
+    public Account rebuildAccount(String accountId) {
+        List<AccountEvent> events = eventStore.findByAggregateIdOrderByVersion(accountId);
+
+        Account account = new Account(accountId);
+        events.forEach(account::apply);
+        return account;
+    }
+}
+</code></pre>
+
+            <p><strong>SAGA pattern for distributed transactions:</strong></p>
+            <pre><code class="language-java">@Component
+public class OrderSaga {
+
+    @SagaOrchestrationStart
+    public void handleOrderCreated(OrderCreatedEvent event) {
+        commandGateway.send(new ReserveInventoryCommand(event.getOrderId()));
+    }
+
+    @SagaOnEvent
+    public void handle(InventoryReservedEvent event) {
+        commandGateway.send(new ProcessPaymentCommand(event.getOrderId()));
+    }
+
+    @SagaOnEvent
+    public void handle(PaymentFailedEvent event) {
+        commandGateway.send(new CancelInventoryReservationCommand(event.getOrderId()));
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="microservices-testing" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Microservices Testing</h2>
+            <h3>Definition</h3>
+            <p>Microservices testing requires a comprehensive strategy that covers unit tests for individual components, integration tests for service interactions, contract tests to ensure API compatibility, and end-to-end tests for complete user journeys. Testing strategies include test doubles (mocks, stubs) for isolating services during testing, consumer-driven contract testing to prevent breaking changes, chaos engineering to test system resilience, and performance testing to validate system behavior under load. Tools like Testcontainers, WireMock, Pact, and Spring Cloud Contract help create reliable, maintainable test suites for distributed systems.</p>
+
+            <h3>Analogy</h3>
+            <p>Microservices testing is like the comprehensive quality assurance process for manufacturing a complex product like a smartphone. Just as phone manufacturers test individual components (unit tests) - checking that the camera sensor works, the battery holds charge, and the processor performs calculations correctly - you test each microservice in isolation. They also test how components work together (integration tests) - ensuring the camera app can access the camera hardware, the battery properly powers all components, and the screen displays processor output correctly. Contract testing is like ensuring all components follow standardized connection protocols - USB-C ports must work with any compliant cable, and Bluetooth must connect to standard devices. End-to-end testing simulates real user scenarios - making calls, taking photos, running apps - to ensure the complete product works as expected. Performance testing stress-tests the phone under heavy usage, and chaos engineering is like testing what happens when you drop the phone or expose it to extreme temperatures.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Unit test with test slices:</strong></p>
+            <pre><code class="language-java">@WebMvcTest(UserController.class)
+class UserControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private UserService userService;
+
+    @Test
+    void shouldReturnUser() throws Exception {
+        User user = new User("john", "john@example.com");
+        when(userService.findById(1L)).thenReturn(user);
+
+        mockMvc.perform(get("/users/1"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.username").value("john"));
+    }
+}
+</code></pre>
+
+            <p><strong>Integration test with Testcontainers:</strong></p>
+            <pre><code class="language-java">@SpringBootTest
+@Testcontainers
+class UserServiceIntegrationTest {
+
+    @Container
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:13")
+            .withDatabaseName("testdb")
+            .withUsername("test")
+            .withPassword("test");
+
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgres::getJdbcUrl);
+        registry.add("spring.datasource.username", postgres::getUsername);
+        registry.add("spring.datasource.password", postgres::getPassword);
+    }
+
+    @Test
+    void shouldPersistUser() {
+        User user = userService.createUser("john", "john@example.com");
+        assertThat(userRepository.findById(user.getId())).isPresent();
+    }
+}
+</code></pre>
+
+            <p><strong>Contract testing with Spring Cloud Contract:</strong></p>
+            <pre><code class="language-groovy">Contract.make {
+    description "should return user by id"
+    request {
+        method GET()
+        url "/users/1"
+        headers {
+            accept(applicationJson())
+        }
+    }
+    response {
+        status OK()
+        headers {
+            contentType(applicationJson())
+        }
+        body {
+            id: 1
+            username: "john"
+            email: "john@example.com"
+        }
+    }
+}
+</code></pre>
+
+            <p><strong>WireMock for external service testing:</strong></p>
+            <pre><code class="language-java">@Test
+void shouldHandleExternalServiceCall() {
+    wireMockServer.stubFor(get(urlEqualTo("/external/api/users/1"))
+        .willReturn(aResponse()
+            .withStatus(200)
+            .withHeader("Content-Type", "application/json")
+            .withBody("{\"id\":1,\"name\":\"John\"}")));
+
+    ExternalUser user = externalService.getUser(1L);
+    assertThat(user.getName()).isEqualTo("John");
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="deployment-strategies" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Deployment Strategies</h2>
+            <h3>Definition</h3>
+            <p>Deployment strategies for microservices enable zero-downtime deployments and minimize risks when releasing new versions. Key strategies include blue-green deployment (maintaining two identical production environments), canary releases (gradually rolling out changes to a subset of users), rolling updates (updating instances one at a time), and feature flags (controlling feature visibility without deployment). These strategies, combined with automated testing, monitoring, and rollback capabilities, allow teams to deploy frequently while maintaining system stability and user experience.</p>
+
+            <h3>Analogy</h3>
+            <p>Deployment strategies are like different approaches to renovating a busy restaurant while keeping it open for business. Blue-green deployment is like having two identical restaurants - while customers dine in Restaurant A, you completely renovate Restaurant B with new décor, menu, and equipment. Once everything is perfect and tested, you simply redirect all customers to Restaurant B and close Restaurant A for renovation. Canary deployment is like introducing a new menu item to just one table first, then gradually offering it to more tables as you confirm customers like it and the kitchen can handle the preparation. Rolling updates are like renovating the restaurant section by section - you might update the bar area while keeping the dining room open, then update dining room tables one at a time while others continue serving customers. Feature flags are like having a special menu that only certain customers can see, allowing you to test new dishes with select patrons before making them available to everyone.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Blue-green deployment with Kubernetes:</strong></p>
+            <pre><code class="language-yaml">apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: user-service
+spec:
+  strategy:
+    blueGreen:
+      activeService: user-service-active
+      previewService: user-service-preview
+      autoPromotionEnabled: false
+      prePromotionAnalysis:
+        templates:
+        - templateName: success-rate
+      postPromotionAnalysis:
+        templates:
+        - templateName: success-rate
+</code></pre>
+
+            <p><strong>Canary deployment configuration:</strong></p>
+            <pre><code class="language-yaml">apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: payment-service
+spec:
+  strategy:
+    canary:
+      steps:
+      - setWeight: 10
+      - pause: {duration: 300s}
+      - setWeight: 30
+      - pause: {duration: 300s}
+      - setWeight: 50
+      - pause: {duration: 300s}
+      - setWeight: 100
+</code></pre>
+
+            <p><strong>Feature flags implementation:</strong></p>
+            <pre><code class="language-java">@RestController
+public class PaymentController {
+
+    @Autowired
+    private FeatureFlagService featureFlagService;
+
+    @PostMapping("/payments")
+    public PaymentResponse processPayment(@RequestBody PaymentRequest request) {
+        if (featureFlagService.isEnabled("new-payment-processor", request.getUserId())) {
+            return newPaymentService.process(request);
+        } else {
+            return legacyPaymentService.process(request);
+        }
+    }
+}
+</code></pre>
+
+            <p><strong>Health check for deployment validation:</strong></p>
+            <pre><code class="language-java">@Component
+public class DeploymentReadinessCheck implements HealthIndicator {
+
+    @Value("${app.warmup.required:true}")
+    private boolean warmupRequired;
+
+    @Override
+    public Health health() {
+        if (warmupRequired && !isWarmedUp()) {
+            return Health.down()
+                .withDetail("status", "warming up")
+                .build();
+        }
+
+        return Health.up()
+            .withDetail("status", "ready")
+            .build();
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="data-consistency" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Data Consistency</h2>
+            <h3>Definition</h3>
+            <p>Data consistency in microservices involves managing data integrity across distributed services that each own their data. Since traditional ACID transactions don't work across service boundaries, microservices rely on eventual consistency patterns, saga patterns for distributed transactions, event sourcing for audit trails, and CQRS (Command Query Responsibility Segregation) for read/write optimization. The challenge is balancing consistency guarantees with system performance and availability, often accepting eventual consistency in favor of system resilience and scalability.</p>
+
+            <h3>Analogy</h3>
+            <p>Data consistency in microservices is like maintaining accurate records across different departments of a large multinational corporation. Each department (microservice) maintains its own records and operates independently, but they need to stay synchronized for the company to function properly. When the sales department closes a deal, they immediately update their records, then notify accounting (who updates revenue), inventory (who reserves products), and shipping (who prepares for delivery). Each department processes this information at their own pace - accounting might update immediately, while shipping might batch process updates every hour. The company accepts that there might be brief periods where departments have slightly different views of the same information (eventual consistency), but they have processes to ensure all departments eventually align. If something goes wrong - like a payment failing after inventory was reserved - they have rollback procedures (compensating transactions) to undo the changes across all affected departments.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Saga pattern implementation:</strong></p>
+            <pre><code class="language-java">@Component
+public class OrderProcessingSaga {
+
+    @SagaOrchestrationStart
+    @EventHandler
+    public void handle(OrderCreatedEvent event) {
+        SagaLifecycle.associateWith("orderId", event.getOrderId());
+        commandGateway.send(new ReserveInventoryCommand(event.getOrderId(), event.getItems()));
+    }
+
+    @EventHandler
+    public void handle(InventoryReservedEvent event) {
+        commandGateway.send(new ProcessPaymentCommand(event.getOrderId(), event.getAmount()));
+    }
+
+    @EventHandler
+    public void handle(PaymentProcessedEvent event) {
+        commandGateway.send(new ShipOrderCommand(event.getOrderId()));
+    }
+
+    @EventHandler
+    public void handle(PaymentFailedEvent event) {
+        commandGateway.send(new ReleaseInventoryCommand(event.getOrderId()));
+        commandGateway.send(new CancelOrderCommand(event.getOrderId()));
+    }
+}
+</code></pre>
+
+            <p><strong>Event sourcing for auditability:</strong></p>
+            <pre><code class="language-java">@Aggregate
+public class BankAccount {
+    @AggregateIdentifier
+    private String accountId;
+    private BigDecimal balance;
+
+    @CommandHandler
+    public BankAccount(CreateAccountCommand cmd) {
+        AggregateLifecycle.apply(new AccountCreatedEvent(cmd.getAccountId(), cmd.getInitialBalance()));
+    }
+
+    @EventSourcingHandler
+    public void on(AccountCreatedEvent event) {
+        this.accountId = event.getAccountId();
+        this.balance = event.getInitialBalance();
+    }
+
+    @CommandHandler
+    public void handle(DebitAccountCommand cmd) {
+        if (balance.compareTo(cmd.getAmount()) < 0) {
+            throw new InsufficientFundsException();
+        }
+        AggregateLifecycle.apply(new AccountDebitedEvent(accountId, cmd.getAmount()));
+    }
+}
+</code></pre>
+
+            <p><strong>CQRS read model:</strong></p>
+            <pre><code class="language-java">@EventHandler
+public class OrderProjectionHandler {
+
+    @Autowired
+    private OrderReadModelRepository repository;
+
+    @EventHandler
+    public void on(OrderCreatedEvent event) {
+        OrderReadModel readModel = new OrderReadModel(
+            event.getOrderId(),
+            event.getCustomerId(),
+            event.getTotal(),
+            OrderStatus.CREATED
+        );
+        repository.save(readModel);
+    }
+
+    @EventHandler
+    public void on(OrderShippedEvent event) {
+        OrderReadModel readModel = repository.findById(event.getOrderId());
+        readModel.setStatus(OrderStatus.SHIPPED);
+        readModel.setShippedDate(event.getShippedDate());
+        repository.save(readModel);
+    }
+}
+</code></pre>
+
+            <p><strong>Idempotency for consistency:</strong></p>
+            <pre><code class="language-java">@RestController
+public class PaymentController {
+
+    @PostMapping("/payments")
+    public ResponseEntity<PaymentResponse> processPayment(
+            @RequestBody PaymentRequest request,
+            @RequestHeader("Idempotency-Key") String idempotencyKey) {
+
+        // Check if payment already processed
+        Optional<Payment> existingPayment = paymentService.findByIdempotencyKey(idempotencyKey);
+        if (existingPayment.isPresent()) {
+            return ResponseEntity.ok(PaymentResponse.from(existingPayment.get()));
+        }
+
+        Payment payment = paymentService.processPayment(request, idempotencyKey);
+        return ResponseEntity.ok(PaymentResponse.from(payment));
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="security-best-practices" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Security Best Practices</h2>
+            <h3>Definition</h3>
+            <p>Security in microservices requires a multi-layered approach that addresses authentication, authorization, data protection, network security, and monitoring. Best practices include implementing zero-trust security models where no service is trusted by default, using mutual TLS for service-to-service communication, implementing proper API gateway security, storing secrets securely, maintaining audit logs, and following the principle of least privilege. Security must be embedded throughout the development lifecycle, from design and coding to deployment and monitoring.</p>
+
+            <h3>Analogy</h3>
+            <p>Microservices security is like implementing comprehensive security for a large corporate campus with multiple buildings and departments. Just as a campus uses multiple security layers - perimeter security at the main gate (API gateway), individual building access controls (service authentication), keycard systems for sensitive areas (authorization), security cameras throughout (monitoring and logging), and secure communication between security stations (encrypted service communication) - your microservices need layered security. Each building (service) has its own security protocols and doesn't trust visitors just because they entered the campus; they must prove their identity and authorization at each building. Security guards (security services) patrol regularly, monitor for suspicious activity, and maintain detailed logs of all access attempts. The campus also has incident response procedures for handling security breaches and regular security audits to identify vulnerabilities.</p>
+
+            <h3>Examples</h3>
+            <p><strong>OAuth2 resource server configuration:</strong></p>
+            <pre><code class="language-java">@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.oauth2ResourceServer(oauth2 -> oauth2
+            .jwt(jwt -> jwt
+                .jwtAuthenticationConverter(jwtAuthenticationConverter())
+            )
+        )
+        .authorizeHttpRequests(authz -> authz
+            .requestMatchers("/actuator/health").permitAll()
+            .requestMatchers("/api/public/**").permitAll()
+            .requestMatchers("/api/admin/**").hasRole("ADMIN")
+            .anyRequest().authenticated()
+        );
+        return http.build();
+    }
+}
+</code></pre>
+
+            <p><strong>Secure service-to-service communication:</strong></p>
+            <pre><code class="language-java">@Component
+public class SecureServiceClient {
+
+    @Autowired
+    private OAuth2AuthorizedClientManager authorizedClientManager;
+
+    public UserProfile getUserProfile(String userId) {
+        OAuth2AuthorizedClient authorizedClient = authorizedClientManager
+            .authorize(OAuth2AuthorizeRequest.withClientRegistrationId("user-service")
+                .principal("service-account")
+                .build());
+
+        String accessToken = authorizedClient.getAccessToken().getTokenValue();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(accessToken);
+
+        HttpEntity<?> entity = new HttpEntity<>(headers);
+
+        return restTemplate.exchange(
+            "/users/" + userId,
+            HttpMethod.GET,
+            entity,
+            UserProfile.class
+        ).getBody();
+    }
+}
+</code></pre>
+
+            <p><strong>Secrets management:</strong></p>
+            <pre><code class="language-properties"># Using Spring Cloud Vault
+spring.cloud.vault.enabled=true
+spring.cloud.vault.host=vault.example.com
+spring.cloud.vault.port=8200
+spring.cloud.vault.scheme=https
+spring.cloud.vault.authentication=TOKEN
+spring.cloud.vault.token=${VAULT_TOKEN}
+spring.cloud.vault.kv.enabled=true
+spring.cloud.vault.kv.backend=secret
+</code></pre>
+
+            <p><strong>Security audit logging:</strong></p>
+            <pre><code class="language-java">@Component
+public class SecurityAuditLogger {
+
+    private static final Logger auditLogger = LoggerFactory.getLogger("SECURITY_AUDIT");
+
+    @EventListener
+    public void handleAuthenticationSuccess(AuthenticationSuccessEvent event) {
+        String username = event.getAuthentication().getName();
+        String authorities = event.getAuthentication().getAuthorities().toString();
+
+        auditLogger.info("Authentication successful: user={}, authorities={}, timestamp={}",
+            username, authorities, Instant.now());
+    }
+
+    @EventListener
+    public void handleAuthenticationFailure(AbstractAuthenticationFailureEvent event) {
+        String username = event.getAuthentication().getName();
+        String reason = event.getException().getMessage();
+
+        auditLogger.warn("Authentication failed: user={}, reason={}, timestamp={}",
+            username, reason, Instant.now());
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Summary</h2>
+            <p>You've now mastered advanced microservices patterns and practices that enable building truly production-ready, enterprise-scale distributed systems. From service mesh architecture that intelligently manages service communication to distributed tracing that provides complete visibility into request flows, you understand how to implement sophisticated infrastructure that supports complex microservices ecosystems. You've learned performance optimization techniques, resilience patterns that prevent cascading failures, and event-driven architectures that enable loose coupling and scalability. Your knowledge extends to comprehensive testing strategies, deployment approaches that minimize risk, data consistency patterns for distributed systems, and security practices that protect your services in production. These advanced topics form the foundation for building microservices that can handle real-world complexity, scale to serve millions of users, and maintain reliability in the face of inevitable failures. Next, you'll dive deep into database management and transactions in microservices, exploring how to handle data persistence and consistency challenges in distributed environments.</p>
+          </section>
+
+          <section id="programming-challenge" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Programming Challenge</h2>
+            <div class="rounded-lg border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800">
+              <h3 class="mt-0">Challenge: Resilient E-commerce Microservices Platform</h3>
+              <p><strong>Task:</strong> Build an advanced e-commerce platform that demonstrates production-ready microservices patterns including resilience, monitoring, and event-driven architecture.</p>
+
+              <p><strong>Services to implement:</strong></p>
+              <ol>
+                <li><strong>Product Service:</strong> Manages product catalog with caching and search</li>
+                <li><strong>Order Service:</strong> Handles order processing with saga pattern</li>
+                <li><strong>Payment Service:</strong> Processes payments with circuit breaker</li>
+                <li><strong>Inventory Service:</strong> Manages stock levels with event sourcing</li>
+                <li><strong>Notification Service:</strong> Sends emails/SMS with async processing</li>
+              </ol>
+
+              <p><strong>Advanced features to implement:</strong></p>
+              <ul>
+                <li>Circuit breaker pattern with Resilience4j for payment service</li>
+                <li>Distributed tracing with Spring Cloud Sleuth and Zipkin</li>
+                <li>Event-driven communication using Spring Cloud Stream</li>
+                <li>Saga pattern for order processing workflow</li>
+                <li>Custom metrics and health indicators</li>
+                <li>Redis caching for product catalog</li>
+                <li>Async processing with @Async and CompletableFuture</li>
+                <li>Integration testing with Testcontainers</li>
+                <li>Contract testing between services</li>
+                <li>Feature flags for A/B testing payment processors</li>
+              </ul>
+
+              <p><strong>Resilience requirements:</strong></p>
+              <ul>
+                <li>Implement fallback methods for external service calls</li>
+                <li>Add retry logic with exponential backoff</li>
+                <li>Configure timeouts for all inter-service calls</li>
+                <li>Implement graceful degradation when services are unavailable</li>
+                <li>Add bulkhead pattern using separate thread pools</li>
+              </ul>
+
+              <p><strong>Monitoring and observability:</strong></p>
+              <ul>
+                <li>Custom business metrics (orders/minute, revenue, etc.)</li>
+                <li>Structured logging with correlation IDs</li>
+                <li>Health checks for all external dependencies</li>
+                <li>Prometheus metrics endpoint</li>
+                <li>Distributed tracing across all service calls</li>
+              </ul>
+
+              <p><strong>Learning Goals:</strong> Practice implementing production-ready microservices with advanced patterns, understand how different resilience patterns work together, gain experience with distributed tracing and monitoring, and learn to build event-driven systems that can handle real-world complexity and scale.</p>
+            </div>
+          </section>
+
+          <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+            <a href="lesson-21.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
+            <a href="lesson-23.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
+          </nav>
+        </div>
+      </div>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('themeToggle').addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>
