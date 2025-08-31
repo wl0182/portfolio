@@ -56,6 +56,11 @@
               <li><a href="#thread-safety" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Thread Safety</a></li>
               <li><a href="#deadlocks" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Deadlocks</a></li>
               <li><a href="#executor-service" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">ExecutorService</a></li>
+              <li><a href="#thread-interruption" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Thread Interruption</a></li>
+              <li><a href="#volatile-keyword" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Volatile Keyword</a></li>
+              <li><a href="#wait-notify" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Wait & Notify</a></li>
+              <li><a href="#thread-local" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">ThreadLocal</a></li>
+              <li><a href="#atomic-operations" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Atomic Operations</a></li>
               <li><a href="#common-pitfalls" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Common Pitfalls</a></li>
               <li><a href="#practical-scenarios" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Practical Scenarios</a></li>
               <li><a href="#summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Summary</a></li>
@@ -510,6 +515,361 @@ for (Future<String> future : futures) {
 scheduler.scheduleAtFixedRate(() -> {
     cleanupOldData();
 }, 0, 30, TimeUnit.SECONDS);
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="thread-interruption" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Thread Interruption</h2>
+            <h3>Definition</h3>
+            <p>Thread interruption is a cooperative mechanism for signaling a thread to stop its current activity. When a thread is interrupted, it receives an interrupt signal that it can check and respond to appropriately. The interrupted thread can choose to stop what it's doing, clean up resources, and terminate gracefully. Interruption is safer than forcibly killing threads because it allows proper cleanup and prevents resource leaks. However, threads must actively check for interruption and handle InterruptedException properly for this mechanism to work effectively.</p>
+
+            <h3>Analogy</h3>
+            <p>Thread interruption is like a polite tap on the shoulder to get someone's attention during a conversation. Instead of rudely shouting or physically pulling someone away from their task, you gently interrupt them and give them a chance to finish their sentence, save their work, or politely excuse themselves from the conversation. The person being interrupted can choose to acknowledge the signal immediately or finish their current thought before responding. This courteous approach ensures that important tasks can be completed properly and relationships remain intact. Similarly, thread interruption allows running threads to receive a signal, complete critical operations, clean up resources, and shut down gracefully rather than being abruptly terminated.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Checking for interruption:</strong></p>
+            <pre><code class="language-java">while (!Thread.currentThread().isInterrupted()) {
+    // Do work
+    processNextItem();
+}
+System.out.println("Thread was interrupted, stopping gracefully");
+</code></pre>
+
+            <p><strong>Handling InterruptedException:</strong></p>
+            <pre><code class="language-java">try {
+    Thread.sleep(5000);
+} catch (InterruptedException e) {
+    Thread.currentThread().interrupt(); // Restore interrupt status
+    System.out.println("Sleep was interrupted");
+    return; // Exit gracefully
+}
+</code></pre>
+
+            <p><strong>Interrupting a thread:</strong></p>
+            <pre><code class="language-java">Thread worker = new Thread(() -> {
+    while (!Thread.currentThread().isInterrupted()) {
+        doWork();
+    }
+});
+worker.start();
+// Later, interrupt the thread
+worker.interrupt();
+</code></pre>
+
+            <p><strong>Proper interruption handling pattern:</strong></p>
+            <pre><code class="language-java">public void run() {
+    try {
+        while (!Thread.currentThread().isInterrupted()) {
+            performTask();
+            Thread.sleep(1000);
+        }
+    } catch (InterruptedException e) {
+        Thread.currentThread().interrupt();
+    } finally {
+        cleanup();
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="volatile-keyword" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Volatile Keyword</h2>
+            <h3>Definition</h3>
+            <p>The volatile keyword ensures that changes to a variable are immediately visible to all threads and prevents compiler optimizations that might cache the variable's value. When a variable is declared volatile, every read gets the latest value from main memory, and every write is immediately flushed to main memory. This guarantees visibility across threads but doesn't provide atomicity for compound operations. Volatile is useful for flags, status indicators, and simple coordination between threads, but synchronization is still needed for complex operations on shared data.</p>
+
+            <h3>Analogy</h3>
+            <p>Think of volatile like a public announcement board in a busy office building. When someone posts a notice on this special board (writes to a volatile variable), it immediately becomes visible to everyone walking by (all threads can see the change instantly). Without this special board, people might rely on outdated copies of notices they picked up earlier (cached values), not realizing that the original has been updated. However, this announcement board only ensures that everyone sees the same information - it doesn't prevent two people from trying to post conflicting notices at the same time (it doesn't provide atomicity). For complex coordination, you still need meeting rooms with locked doors (synchronization) to ensure only one person can make changes at a time.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Volatile flag for thread coordination:</strong></p>
+            <pre><code class="language-java">class Worker {
+    private volatile boolean running = true;
+
+    public void run() {
+        while (running) {
+            doWork();
+        }
+    }
+
+    public void stop() {
+        running = false; // Immediately visible to worker thread
+    }
+}
+</code></pre>
+
+            <p><strong>Volatile vs non-volatile behavior:</strong></p>
+            <pre><code class="language-java">// Without volatile: other threads might not see changes
+private boolean flag = false;
+
+// With volatile: changes immediately visible to all threads
+private volatile boolean flag = false;
+</code></pre>
+
+            <p><strong>Volatile for status sharing:</strong></p>
+            <pre><code class="language-java">class TaskProcessor {
+    private volatile String status = "IDLE";
+
+    public void updateStatus(String newStatus) {
+        status = newStatus; // Visible to all threads immediately
+    }
+
+    public String getStatus() {
+        return status; // Always returns latest value
+    }
+}
+</code></pre>
+
+            <p><strong>Volatile limitations (not atomic):</strong></p>
+            <pre><code class="language-java">private volatile int counter = 0;
+
+// This is NOT thread-safe even with volatile!
+counter++; // Still needs synchronization for atomicity
+
+// Volatile only good for simple reads/writes
+private volatile boolean ready = false;
+ready = true; // This is thread-safe
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="wait-notify" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Wait & Notify</h2>
+            <h3>Definition</h3>
+            <p>Wait and notify are methods used for thread communication and coordination. When a thread calls wait() on an object, it releases the lock on that object and goes to sleep until another thread calls notify() or notifyAll() on the same object. This mechanism allows threads to efficiently wait for specific conditions to be met rather than continuously checking (busy waiting). Wait and notify must be used within synchronized blocks or methods, and they enable elegant producer-consumer patterns and other coordination scenarios where threads need to signal each other about state changes.</p>
+
+            <h3>Analogy</h3>
+            <p>Wait and notify work like a restaurant's kitchen communication system. When a server (thread) places an order but the kitchen is busy, instead of standing there asking "Is my order ready?" every few seconds (busy waiting), the server goes back to serving other customers and tells the kitchen staff "Please call me when order #15 is ready" (wait()). When the chef finishes the order, they ring a bell and announce "Order #15 is ready!" (notify()), which signals the waiting server to come back and pick up the food. This system is much more efficient than having servers constantly interrupting the kitchen to check on their orders. The kitchen (synchronized block) ensures only one person can communicate at a time, preventing chaos and miscommunication.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Basic wait and notify pattern:</strong></p>
+            <pre><code class="language-java">class SharedResource {
+    private boolean dataReady = false;
+
+    public synchronized void waitForData() throws InterruptedException {
+        while (!dataReady) {
+            wait(); // Release lock and wait
+        }
+        // Data is now ready, proceed
+    }
+
+    public synchronized void notifyDataReady() {
+        dataReady = true;
+        notify(); // Wake up waiting thread
+    }
+}
+</code></pre>
+
+            <p><strong>Producer-consumer with wait/notify:</strong></p>
+            <pre><code class="language-java">class Buffer {
+    private Queue<String> queue = new LinkedList<>();
+    private final int MAX_SIZE = 10;
+
+    public synchronized void produce(String item) throws InterruptedException {
+        while (queue.size() == MAX_SIZE) {
+            wait(); // Wait for space
+        }
+        queue.offer(item);
+        notifyAll(); // Notify consumers
+    }
+
+    public synchronized String consume() throws InterruptedException {
+        while (queue.isEmpty()) {
+            wait(); // Wait for items
+        }
+        String item = queue.poll();
+        notifyAll(); // Notify producers
+        return item;
+    }
+}
+</code></pre>
+
+            <p><strong>Using notifyAll() vs notify():</strong></p>
+            <pre><code class="language-java">// notify() - wakes up one waiting thread
+notify();
+
+// notifyAll() - wakes up all waiting threads (safer)
+notifyAll();
+</code></pre>
+
+            <p><strong>Always use wait() in a loop:</strong></p>
+            <pre><code class="language-java">// Correct: check condition in loop
+synchronized(obj) {
+    while (!condition) {
+        obj.wait();
+    }
+}
+
+// Wrong: checking condition only once
+synchronized(obj) {
+    if (!condition) {
+        obj.wait(); // Spurious wakeup might occur
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="thread-local" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>ThreadLocal</h2>
+            <h3>Definition</h3>
+            <p>ThreadLocal provides thread-local variables where each thread has its own independent copy of the variable. This allows you to store data that should be accessible throughout a thread's execution but isolated from other threads. ThreadLocal is useful for maintaining context information (like user sessions, database connections, or transaction states) without passing parameters through every method call. Each thread sees only its own value, eliminating the need for synchronization when accessing thread-local data.</p>
+
+            <h3>Analogy</h3>
+            <p>ThreadLocal is like giving each employee in a company their own personal notebook that only they can read and write in. While everyone might have a notebook with the same title (like "Daily Tasks"), each person's notebook contains completely different information that's relevant only to their work. When an employee writes something in their notebook, it doesn't affect anyone else's notebook, and they don't need to worry about someone else changing their notes. If an employee moves between different departments during the day, they can carry their notebook with them and always have access to their personal context and information. This eliminates the need for complex sharing systems while ensuring each person has the information they need for their specific tasks.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Basic ThreadLocal usage:</strong></p>
+            <pre><code class="language-java">class UserContext {
+    private static ThreadLocal<String> currentUser = new ThreadLocal<>();
+
+    public static void setUser(String username) {
+        currentUser.set(username);
+    }
+
+    public static String getUser() {
+        return currentUser.get();
+    }
+
+    public static void clear() {
+        currentUser.remove(); // Important: prevent memory leaks
+    }
+}
+</code></pre>
+
+            <p><strong>ThreadLocal with initial value:</strong></p>
+            <pre><code class="language-java">private static ThreadLocal<SimpleDateFormat> dateFormatter =
+    ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd"));
+
+public String formatDate(Date date) {
+    return dateFormatter.get().format(date); // Each thread gets its own formatter
+}
+</code></pre>
+
+            <p><strong>Database connection per thread:</strong></p>
+            <pre><code class="language-java">class DatabaseManager {
+    private static ThreadLocal<Connection> connectionHolder = new ThreadLocal<>();
+
+    public static Connection getConnection() {
+        Connection conn = connectionHolder.get();
+        if (conn == null) {
+            conn = createNewConnection();
+            connectionHolder.set(conn);
+        }
+        return conn;
+    }
+
+    public static void closeConnection() {
+        Connection conn = connectionHolder.get();
+        if (conn != null) {
+            conn.close();
+            connectionHolder.remove();
+        }
+    }
+}
+</code></pre>
+
+            <p><strong>Web request context example:</strong></p>
+            <pre><code class="language-java">class RequestContext {
+    private static ThreadLocal<String> requestId = new ThreadLocal<>();
+    private static ThreadLocal<String> userRole = new ThreadLocal<>();
+
+    public static void setRequestInfo(String id, String role) {
+        requestId.set(id);
+        userRole.set(role);
+    }
+
+    public static String getRequestId() {
+        return requestId.get();
+    }
+
+    public static boolean hasAdminRole() {
+        return "ADMIN".equals(userRole.get());
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="atomic-operations" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Atomic Operations</h2>
+            <h3>Definition</h3>
+            <p>Atomic operations are single, indivisible operations that complete entirely or not at all, without the possibility of interference from other threads. Java provides atomic classes like AtomicInteger, AtomicBoolean, and AtomicReference that use low-level CPU instructions to ensure thread-safe operations without the overhead of synchronization. These operations are much faster than synchronized blocks for simple operations like incrementing counters, updating flags, or swapping references. Atomic operations guarantee both visibility and atomicity, making them perfect for high-performance concurrent scenarios.</p>
+
+            <h3>Analogy</h3>
+            <p>Atomic operations are like using a high-tech vending machine that can only process one transaction at a time, but does it incredibly fast. When you insert money and select a product, the entire transaction (checking payment, dispensing item, giving change) happens as one complete, uninterruptible action. No one else can interfere halfway through your transaction - either the whole operation succeeds, or it fails completely and rolls back. Unlike a traditional store where you might have to wait in line, talk to a cashier, and handle multiple steps (like synchronized methods), the vending machine handles simple operations instantly and atomically. For complex purchases requiring multiple items or special handling, you'd still need to visit the traditional store (use synchronization), but for simple, common operations, the vending machine (atomic operations) is much faster and more efficient.</p>
+
+            <h3>Examples</h3>
+            <p><strong>AtomicInteger for thread-safe counting:</strong></p>
+            <pre><code class="language-java">private AtomicInteger counter = new AtomicInteger(0);
+
+public void increment() {
+    counter.incrementAndGet(); // Thread-safe, no synchronization needed
+}
+
+public int getCount() {
+    return counter.get();
+}
+</code></pre>
+
+            <p><strong>AtomicBoolean for flags:</strong></p>
+            <pre><code class="language-java">private AtomicBoolean isRunning = new AtomicBoolean(true);
+
+public void stop() {
+    isRunning.set(false);
+}
+
+public void run() {
+    while (isRunning.get()) {
+        doWork();
+    }
+}
+</code></pre>
+
+            <p><strong>AtomicReference for object swapping:</strong></p>
+            <pre><code class="language-java">private AtomicReference<String> currentStatus = new AtomicReference<>("IDLE");
+
+public boolean updateStatus(String expectedStatus, String newStatus) {
+    return currentStatus.compareAndSet(expectedStatus, newStatus);
+}
+
+// Usage: only update if current status is what we expect
+if (updateStatus("IDLE", "PROCESSING")) {
+    // Successfully changed from IDLE to PROCESSING
+}
+</code></pre>
+
+            <p><strong>Compare-and-swap operations:</strong></p>
+            <pre><code class="language-java">AtomicInteger value = new AtomicInteger(10);
+
+// Only update if current value is 10
+boolean success = value.compareAndSet(10, 20);
+
+// Atomic increment and get previous value
+int previousValue = value.getAndIncrement();
+
+// Atomic add operation
+int newValue = value.addAndGet(5);
+</code></pre>
+
+            <p><strong>Performance comparison:</strong></p>
+            <pre><code class="language-java">// Synchronized approach (slower)
+private int counter = 0;
+public synchronized void increment() {
+    counter++;
+}
+
+// Atomic approach (faster for simple operations)
+private AtomicInteger counter = new AtomicInteger(0);
+public void increment() {
+    counter.incrementAndGet();
+}
 </code></pre>
           </section>
 
