@@ -1,0 +1,999 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 24 - Spring Boot Async Programming and Messaging with Kafka Part 2</title>
+    <meta name="description" content="Master advanced Kafka patterns, stream processing, exactly-once semantics, and building robust event-driven architectures with Spring Boot for scalable microservices." />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="lg:flex lg:gap-8">
+        <aside class="hidden lg:block lg:w-72">
+          <nav class="sticky top-8 rounded-xl border border-slate-200/60 bg-white/60 p-4 shadow-sm backdrop-blur dark:border-slate-800/60 dark:bg-slate-900/40" aria-label="Table of contents">
+            <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">On this page</h2>
+            <ol class="space-y-1 text-sm">
+              <li><a href="#introduction" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Introduction</a></li>
+              <li><a href="#kafka-streams" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Kafka Streams</a></li>
+              <li><a href="#exactly-once-semantics" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Exactly-Once Semantics</a></li>
+              <li><a href="#consumer-groups-advanced" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Consumer Groups Advanced</a></li>
+              <li><a href="#dead-letter-queues" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Dead Letter Queues</a></li>
+              <li><a href="#event-sourcing" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Event Sourcing</a></li>
+              <li><a href="#saga-pattern" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Saga Pattern</a></li>
+              <li><a href="#outbox-pattern" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Outbox Pattern</a></li>
+              <li><a href="#monitoring-kafka" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Monitoring Kafka</a></li>
+              <li><a href="#summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Summary</a></li>
+              <li><a href="#programming-challenge" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Programming Challenge</a></li>
+            </ol>
+          </nav>
+        </aside>
+        <div class="min-w-0 flex-1">
+          <div class="mb-6">
+            <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Concepts</a>
+          </div>
+          <header class="mx-auto max-w-3xl text-center">
+            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 24: Spring Boot Async Programming and Messaging with Kafka Part 2</h1>
+            <p class="mt-2 text-slate-600 dark:text-slate-300">Master advanced Kafka patterns, stream processing, exactly-once semantics, and building robust event-driven architectures with Spring Boot for scalable microservices.</p>
+          </header>
+
+          <section id="introduction" class="prose prose-slate mt-6 max-w-none dark:prose-invert">
+            <h2>Introduction</h2>
+            <p>Building on the fundamentals from the previous lesson, this lesson dives deep into advanced Kafka patterns and techniques that are essential for production-ready event-driven systems. While basic producers and consumers get you started, real-world applications need sophisticated patterns like stream processing, exactly-once delivery guarantees, and robust error handling strategies. You'll learn about Kafka Streams for real-time data transformation, how to implement exactly-once semantics to prevent duplicate processing, and advanced consumer group management for scalable message consumption. We'll explore critical patterns like event sourcing for maintaining complete audit trails, the saga pattern for managing distributed transactions, and the outbox pattern for ensuring data consistency. Additionally, you'll discover how to implement dead letter queues for handling poison messages and monitoring strategies to maintain healthy Kafka deployments. These advanced concepts are what separate basic messaging implementations from enterprise-grade, resilient systems that can handle the complexities of modern distributed applications.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="kafka-streams" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Kafka Streams</h2>
+            <h3>Definition</h3>
+            <p>Kafka Streams is a client library for building applications and microservices that process and analyze data stored in Kafka in real-time. Unlike traditional batch processing, Kafka Streams enables continuous processing of streaming data with low latency and high throughput. It provides a high-level DSL (Domain Specific Language) for common stream processing operations like filtering, mapping, grouping, aggregating, and joining streams. Kafka Streams applications are regular Java applications that can be deployed anywhere, and they automatically handle parallelization, fault tolerance, and exactly-once processing semantics. The library treats input data as continuous streams and produces output streams, making it perfect for real-time analytics, data transformation, and event processing.</p>
+
+            <h3>Analogy</h3>
+            <p>Kafka Streams is like having a sophisticated assembly line in a modern factory that processes items continuously as they arrive on the conveyor belt. Instead of collecting items in batches and processing them all at once (traditional batch processing), each item is inspected, modified, or combined with other items immediately as it passes through different stations on the assembly line. Workers at each station (stream processors) can filter out defective items, transform them by adding components, group similar items together, or merge items from multiple conveyor belts. The assembly line runs 24/7, automatically adjusting the number of workers based on the volume of items, and if one worker gets sick, another can immediately take their place without stopping the entire line. The factory keeps a detailed log of every operation performed on each item, so if something goes wrong, they can trace back exactly what happened and even replay the processing from any point in time.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Basic stream processing setup:</strong></p>
+            <pre><code class="language-java">@Configuration
+@EnableKafkaStreams
+public class StreamsConfig {
+
+    @Bean
+    public KafkaStreamsConfiguration kStreamsConfig() {
+        Map&lt;String, Object&gt; props = new HashMap&lt;&gt;();
+        props.put(StreamsConfig.APPLICATION_ID_CONFIG, "order-processing-app");
+        props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        return new KafkaStreamsConfiguration(props);
+    }
+}
+</code></pre>
+
+            <p><strong>Simple stream transformation:</strong></p>
+            <pre><code class="language-java">@Component
+public class OrderStreamProcessor {
+
+    @Autowired
+    public void processOrderStream(StreamsBuilder streamsBuilder) {
+        KStream&lt;String, String&gt; orderStream = streamsBuilder.stream("raw-orders");
+
+        orderStream
+            .filter((key, value) -> isValidOrder(value))
+            .mapValues(this::enrichOrderData)
+            .to("processed-orders");
+    }
+}
+</code></pre>
+
+            <p><strong>Stream aggregation and windowing:</strong></p>
+            <pre><code class="language-java">public void calculateOrderStats(StreamsBuilder builder) {
+    KStream&lt;String, Order&gt; orders = builder.stream("orders");
+
+    // Count orders per customer in 5-minute windows
+    KTable&lt;Windowed&lt;String&gt;, Long&gt; orderCounts = orders
+        .groupByKey()
+        .windowedBy(TimeWindows.of(Duration.ofMinutes(5)))
+        .count();
+
+    orderCounts.toStream().to("order-statistics");
+}
+</code></pre>
+
+            <p><strong>Stream joins for complex processing:</strong></p>
+            <pre><code class="language-java">public void joinOrdersWithPayments(StreamsBuilder builder) {
+    KStream&lt;String, Order&gt; orders = builder.stream("orders");
+    KStream&lt;String, Payment&gt; payments = builder.stream("payments");
+
+    // Join orders with payments within 10-minute window
+    KStream&lt;String, OrderPayment&gt; enrichedOrders = orders.join(
+        payments,
+        (order, payment) -> new OrderPayment(order, payment),
+        JoinWindows.of(Duration.ofMinutes(10))
+    );
+
+    enrichedOrders.to("enriched-orders");
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="exactly-once-semantics" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Exactly-Once Semantics</h2>
+            <h3>Definition</h3>
+            <p>Exactly-once semantics in Kafka ensures that each message is processed exactly once, even in the presence of failures, network issues, or application restarts. This is crucial for financial transactions, inventory management, and any scenario where duplicate processing could cause serious problems. Kafka achieves this through a combination of idempotent producers (preventing duplicate sends), transactional messaging (atomic writes across multiple partitions), and consumer offset management (tracking what's been processed). Exactly-once processing is more complex than at-least-once or at-most-once delivery but provides the strongest guarantees for critical business operations.</p>
+
+            <h3>Analogy</h3>
+            <p>Exactly-once semantics is like having a foolproof bank transfer system that ensures money is moved from one account to another exactly once, no matter what technical problems occur. When you initiate a transfer, the system assigns a unique transaction ID and keeps a detailed record of every step. If the network fails during the transfer, the system can check its records and continue from where it left off without starting over or creating a duplicate transaction. The system has multiple safeguards: it won't deduct money from your account twice (idempotent producer), it ensures that either both the deduction and deposit happen or neither does (transactional semantics), and it keeps perfect records of what's been completed (offset management). Even if the bank's computer crashes in the middle of the transfer, when it restarts, it can examine its transaction log and complete only what wasn't finished, never duplicating work that was already done.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Producer configuration for exactly-once:</strong></p>
+            <pre><code class="language-java">@Bean
+public ProducerFactory&lt;String, String&gt; exactlyOnceProducerFactory() {
+    Map&lt;String, Object&gt; props = new HashMap&lt;&gt;();
+    props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+    props.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);
+    props.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG, "payment-producer");
+    props.put(ProducerConfig.ACKS_CONFIG, "all");
+    return new DefaultKafkaProducerFactory&lt;&gt;(props);
+}
+</code></pre>
+
+            <p><strong>Transactional message production:</strong></p>
+            <pre><code class="language-java">@Service
+@Transactional
+public class PaymentService {
+
+    @Autowired
+    private KafkaTransactionManager transactionManager;
+
+    @KafkaTransactional
+    public void processPayment(PaymentRequest request) {
+        // Database operation
+        Payment payment = paymentRepository.save(new Payment(request));
+
+        // Kafka message - both succeed or both fail
+        kafkaTemplate.send("payment-completed", payment.getId(), payment);
+        kafkaTemplate.send("audit-events", "payment-processed", payment.getId());
+    }
+}
+</code></pre>
+
+            <p><strong>Consumer configuration for exactly-once:</strong></p>
+            <pre><code class="language-java">@Bean
+public ConsumerFactory&lt;String, String&gt; exactlyOnceConsumerFactory() {
+    Map&lt;String, Object&gt; props = new HashMap&lt;&gt;();
+    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+    props.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG, "read_committed");
+    props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
+    return new DefaultKafkaConsumerFactory&lt;&gt;(props);
+}
+</code></pre>
+
+            <p><strong>Manual offset management for exactly-once:</strong></p>
+            <pre><code class="language-java">@KafkaListener(topics = "payment-events")
+public void handlePayment(ConsumerRecord&lt;String, String&gt; record,
+                         Acknowledgment acknowledgment) {
+    try {
+        // Process the payment
+        paymentProcessor.process(record.value());
+
+        // Only acknowledge after successful processing
+        acknowledgment.acknowledge();
+    } catch (Exception e) {
+        logger.error("Payment processing failed", e);
+        // Don't acknowledge - message will be redelivered
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="consumer-groups-advanced" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Consumer Groups Advanced</h2>
+            <h3>Definition</h3>
+            <p>Advanced consumer group management involves sophisticated strategies for scaling message consumption, handling rebalancing, managing consumer lag, and optimizing throughput across multiple consumer instances. Consumer groups automatically distribute partitions among group members, but understanding partition assignment strategies, rebalancing triggers, and lag monitoring is crucial for building resilient, high-performance systems. Advanced topics include sticky partition assignment for better performance, cooperative rebalancing to minimize downtime, consumer lag monitoring for capacity planning, and strategies for handling slow consumers that could impact the entire group's performance.</p>
+
+            <h3>Analogy</h3>
+            <p>Advanced consumer group management is like managing a large team of specialized workers in a busy sorting facility that processes packages arriving on multiple conveyor belts. The facility manager (Kafka coordinator) intelligently assigns each worker to specific conveyor belts based on their current workload and expertise. When new workers join the shift or others take breaks, the manager quickly redistributes the conveyor belt assignments to maintain optimal processing speed without stopping the entire operation. The manager continuously monitors how fast each worker is processing packages compared to the arrival rate, identifying bottlenecks and redistributing work accordingly. If one conveyor belt gets backed up because a worker is slower, the system can temporarily assign additional workers to that belt or implement strategies to prevent the backup from affecting other parts of the operation. The facility keeps detailed performance metrics, tracking processing rates, backlogs, and worker efficiency to optimize the entire operation.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Advanced consumer group configuration:</strong></p>
+            <pre><code class="language-java">@Bean
+public ConsumerFactory&lt;String, String&gt; advancedConsumerFactory() {
+    Map&lt;String, Object&gt; props = new HashMap&lt;&gt;();
+    props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+    props.put(ConsumerConfig.GROUP_ID_CONFIG, "order-processing-group");
+    props.put(ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG,
+              StickyAssignor.class.getName());
+    props.put(ConsumerConfig.SESSION_TIMEOUT_MS_CONFIG, 30000);
+    props.put(ConsumerConfig.HEARTBEAT_INTERVAL_MS_CONFIG, 3000);
+    return new DefaultKafkaConsumerFactory&lt;&gt;(props);
+}
+</code></pre>
+
+            <p><strong>Consumer with partition-specific processing:</strong></p>
+            <pre><code class="language-java">@KafkaListener(topics = "orders", groupId = "order-processing-group")
+public void processOrder(ConsumerRecord&lt;String, Order&gt; record,
+                        @Header(KafkaHeaders.RECEIVED_PARTITION_ID) int partition) {
+
+    logger.info("Processing order from partition {}: {}", partition, record.key());
+
+    // Partition-specific processing logic
+    if (partition % 2 == 0) {
+        processHighPriorityOrder(record.value());
+    } else {
+        processStandardOrder(record.value());
+    }
+}
+</code></pre>
+
+            <p><strong>Consumer lag monitoring:</strong></p>
+            <pre><code class="language-java">@Component
+public class ConsumerLagMonitor {
+
+    @Autowired
+    private KafkaAdmin kafkaAdmin;
+
+    @Scheduled(fixedRate = 30000)
+    public void monitorConsumerLag() {
+        AdminClient adminClient = AdminClient.create(kafkaAdmin.getConfigurationProperties());
+
+        try {
+            Map&lt;TopicPartition, OffsetAndMetadata&gt; offsets =
+                adminClient.listConsumerGroupOffsets("order-processing-group")
+                          .partitionsToOffsetAndMetadata().get();
+
+            for (Map.Entry&lt;TopicPartition, OffsetAndMetadata&gt; entry : offsets.entrySet()) {
+                long lag = calculateLag(entry.getKey(), entry.getValue());
+                if (lag > 1000) {
+                    logger.warn("High consumer lag detected: {} messages", lag);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to monitor consumer lag", e);
+        }
+    }
+}
+</code></pre>
+
+            <p><strong>Graceful consumer shutdown:</strong></p>
+            <pre><code class="language-java">@Component
+public class OrderConsumer {
+
+    private volatile boolean running = true;
+
+    @EventListener
+    public void handleShutdown(ContextClosedEvent event) {
+        running = false;
+    }
+
+    @KafkaListener(topics = "orders")
+    public void processOrder(Order order) {
+        if (!running) {
+            logger.info("Shutdown in progress, skipping message processing");
+            return;
+        }
+
+        orderService.processOrder(order);
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="dead-letter-queues" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Dead Letter Queues</h2>
+            <h3>Definition</h3>
+            <p>Dead Letter Queues (DLQ) are special topics used to store messages that cannot be processed successfully after multiple retry attempts, preventing poison messages from blocking normal message processing. When a consumer repeatedly fails to process a message due to data corruption, format issues, or business logic errors, the message is sent to a DLQ for manual investigation and handling. This pattern ensures that one problematic message doesn't stop the processing of other valid messages. DLQs typically include metadata about the original failure, retry count, and error details to help with debugging and eventual reprocessing once the issue is resolved.</p>
+
+            <h3>Analogy</h3>
+            <p>Dead Letter Queues are like the quality control reject bin in a manufacturing plant where defective items that can't be fixed on the production line are set aside for special handling. When an item comes down the assembly line and workers try multiple times to fix or process it but keep failing, instead of letting it jam up the entire production line, they place it in a special reject bin with a detailed tag explaining what went wrong, how many times they tried to fix it, and when it failed. The production line continues operating smoothly while quality control specialists later examine the rejected items to understand why they failed - whether it's a design flaw, corrupted materials, or a process issue. Once they identify and fix the root cause, they can often reprocess the rejected items successfully and update the production line to prevent similar failures in the future.</p>
+
+            <h3>Examples</h3>
+            <p><strong>DLQ configuration with retry policy:</strong></p>
+            <pre><code class="language-java">@Bean
+public RetryTopicConfiguration retryTopicConfiguration() {
+    return RetryTopicConfigurationBuilder
+        .newInstance()
+        .fixedBackOff(1000)
+        .maxAttempts(3)
+        .includeTopics("order-events")
+        .dltStrategy(DltStrategy.FAIL_ON_ERROR)
+        .build();
+}
+</code></pre>
+
+            <p><strong>Consumer with DLQ handling:</strong></p>
+            <pre><code class="language-java">@Component
+public class OrderEventConsumer {
+
+    @KafkaListener(topics = "order-events")
+    public void handleOrderEvent(Order order) {
+        try {
+            orderService.processOrder(order);
+        } catch (ValidationException e) {
+            logger.error("Order validation failed: {}", order.getId(), e);
+            throw e; // Will be retried and eventually sent to DLQ
+        } catch (Exception e) {
+            logger.error("Unexpected error processing order: {}", order.getId(), e);
+            throw e;
+        }
+    }
+
+    @DltHandler
+    public void handleDltOrder(Order order, @Header KafkaHeaders.EXCEPTION_MESSAGE String error) {
+        logger.error("Order sent to DLT: {} due to: {}", order.getId(), error);
+
+        // Send alert or create ticket for manual review
+        alertService.sendDltAlert(order, error);
+
+        // Store in database for later analysis
+        dltRepository.save(new DltRecord(order, error, Instant.now()));
+    }
+}
+</code></pre>
+
+            <p><strong>Manual DLQ message reprocessing:</strong></p>
+            <pre><code class="language-java">@Service
+public class DltReprocessingService {
+
+    @KafkaListener(topics = "order-events.DLT")
+    public void processDltMessages(Order order,
+                                  @Header KafkaHeaders.ORIGINAL_TOPIC String originalTopic) {
+
+        logger.info("Reprocessing DLT message from topic: {}", originalTopic);
+
+        try {
+            // Apply fixes or updated logic
+            Order correctedOrder = orderCorrectionService.fix(order);
+
+            // Send back to original topic for reprocessing
+            kafkaTemplate.send(originalTopic, correctedOrder);
+
+        } catch (Exception e) {
+            logger.error("Failed to reprocess DLT message", e);
+        }
+    }
+}
+</code></pre>
+
+            <p><strong>DLQ monitoring and alerting:</strong></p>
+            <pre><code class="language-java">@Component
+public class DltMonitor {
+
+    @Scheduled(fixedRate = 60000)
+    public void monitorDltQueues() {
+        List&lt;String&gt; dltTopics = List.of("order-events.DLT", "payment-events.DLT");
+
+        for (String topic : dltTopics) {
+            long messageCount = getDltMessageCount(topic);
+            if (messageCount > 10) {
+                alertService.sendAlert("High DLT volume in " + topic + ": " + messageCount);
+            }
+        }
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="event-sourcing" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Event Sourcing</h2>
+            <h3>Definition</h3>
+            <p>Event sourcing is an architectural pattern where application state is determined by a sequence of events rather than storing current state directly. Instead of updating records in place, every change to application state is captured as an immutable event and stored in an event store (often Kafka). The current state is reconstructed by replaying all events from the beginning. This provides a complete audit trail, enables temporal queries (what was the state at any point in time), supports complex business workflows, and allows for easy debugging and testing. Event sourcing is particularly powerful when combined with CQRS (Command Query Responsibility Segregation) for separating read and write models.</p>
+
+            <h3>Analogy</h3>
+            <p>Event sourcing is like maintaining a complete, detailed diary of everything that happens in your life instead of just keeping a summary of your current situation. Rather than having a single document that says "John has $1000 in his bank account," event sourcing keeps a chronological record of every transaction: "John deposited $500 on Monday, spent $20 on coffee Tuesday, received $520 salary on Friday." To know John's current balance, you read through all the transactions and calculate the total. This approach means you can answer questions like "What was John's balance last Wednesday?" or "How much did John spend on coffee this month?" You can also detect patterns, audit every change, and if you discover an error in your calculation logic, you can replay all the events with the corrected logic to get the right current state. It's like having a perfect, immutable historical record that never loses information.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Event store implementation:</strong></p>
+            <pre><code class="language-java">@Entity
+public class EventStore {
+    private String aggregateId;
+    private String eventType;
+    private String eventData;
+    private LocalDateTime timestamp;
+    private Long version;
+
+    // Event sourcing ensures immutability
+    // No update methods, only insert
+}
+</code></pre>
+
+            <p><strong>Domain event definition:</strong></p>
+            <pre><code class="language-java">public abstract class DomainEvent {
+    private final String aggregateId;
+    private final LocalDateTime occurredOn;
+
+    public DomainEvent(String aggregateId) {
+        this.aggregateId = aggregateId;
+        this.occurredOn = LocalDateTime.now();
+    }
+}
+
+public class AccountDebitedEvent extends DomainEvent {
+    private final BigDecimal amount;
+    private final String reason;
+
+    public AccountDebitedEvent(String accountId, BigDecimal amount, String reason) {
+        super(accountId);
+        this.amount = amount;
+        this.reason = reason;
+    }
+}
+</code></pre>
+
+            <p><strong>Aggregate with event sourcing:</strong></p>
+            <pre><code class="language-java">public class Account {
+    private String id;
+    private BigDecimal balance;
+    private List&lt;DomainEvent&gt; uncommittedEvents = new ArrayList&lt;&gt;();
+
+    public void debit(BigDecimal amount, String reason) {
+        if (balance.compareTo(amount) &lt; 0) {
+            throw new InsufficientFundsException();
+        }
+
+        AccountDebitedEvent event = new AccountDebitedEvent(id, amount, reason);
+        apply(event);
+        uncommittedEvents.add(event);
+    }
+
+    private void apply(AccountDebitedEvent event) {
+        this.balance = this.balance.subtract(event.getAmount());
+    }
+
+    // Reconstruct state from events
+    public static Account fromEvents(List&lt;DomainEvent&gt; events) {
+        Account account = new Account();
+        events.forEach(account::apply);
+        return account;
+    }
+}
+</code></pre>
+
+            <p><strong>Event sourcing with Kafka:</strong></p>
+            <pre><code class="language-java">@Service
+public class AccountEventStore {
+
+    @Autowired
+    private KafkaTemplate&lt;String, DomainEvent&gt; kafkaTemplate;
+
+    public void saveEvents(String aggregateId, List&lt;DomainEvent&gt; events) {
+        for (DomainEvent event : events) {
+            kafkaTemplate.send("account-events", aggregateId, event);
+        }
+    }
+
+    @KafkaListener(topics = "account-events")
+    public void handleAccountEvent(DomainEvent event) {
+        // Update read model or projections
+        projectionService.updateProjection(event);
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="saga-pattern" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Saga Pattern</h2>
+            <h3>Definition</h3>
+            <p>The Saga pattern manages distributed transactions across multiple microservices by breaking them into a series of local transactions, each with a corresponding compensating action for rollback. Since distributed transactions are complex and can hurt performance, sagas provide eventual consistency by coordinating multiple services through event-driven choreography or centralized orchestration. If any step fails, the saga executes compensating transactions to undo previous steps, ensuring data consistency across services. There are two main approaches: choreography (services coordinate through events) and orchestration (a central coordinator manages the workflow).</p>
+
+            <h3>Analogy</h3>
+            <p>The Saga pattern is like planning a complex international trip with multiple bookings where each step depends on the previous one, but you can't use a single payment that covers everything. You book flights, then hotels, then car rentals, then activities - each with a separate, non-refundable payment. However, you have a detailed plan: if the hotel booking fails, you know exactly how to cancel the flight and get credit; if the car rental falls through, you know how to cancel both the hotel and get flight credit; and so on. You either complete the entire trip successfully, or you systematically undo each completed booking in reverse order until you're back to where you started. You might coordinate this yourself by watching for confirmation emails and acting accordingly (choreography), or you might hire a travel agent who manages the entire process and handles cancellations if something goes wrong (orchestration).</p>
+
+            <h3>Examples</h3>
+            <p><strong>Saga orchestrator pattern:</strong></p>
+            <pre><code class="language-java">@Service
+public class OrderSagaOrchestrator {
+
+    @SagaOrchestrationStart
+    public void processOrder(OrderCreatedEvent event) {
+        // Step 1: Reserve inventory
+        sagaManager.choreography()
+            .step("reserve-inventory")
+            .invokeParticipant("inventory-service", new ReserveInventoryCommand(event))
+            .onRevert("release-inventory", new ReleaseInventoryCommand(event))
+
+            // Step 2: Process payment
+            .step("process-payment")
+            .invokeParticipant("payment-service", new ProcessPaymentCommand(event))
+            .onRevert("refund-payment", new RefundPaymentCommand(event))
+
+            // Step 3: Ship order
+            .step("ship-order")
+            .invokeParticipant("shipping-service", new ShipOrderCommand(event))
+            .onRevert("cancel-shipment", new CancelShipmentCommand(event));
+    }
+}
+</code></pre>
+
+            <p><strong>Saga participant implementation:</strong></p>
+            <pre><code class="language-java">@Component
+public class InventoryServiceParticipant {
+
+    @SagaParticipant
+    @KafkaListener(topics = "inventory-commands")
+    public void handleReserveInventory(ReserveInventoryCommand command) {
+        try {
+            inventoryService.reserve(command.getProductId(), command.getQuantity());
+            sagaManager.reportSuccess(command.getSagaId(), "inventory-reserved");
+        } catch (InsufficientInventoryException e) {
+            sagaManager.reportFailure(command.getSagaId(), "inventory-unavailable");
+        }
+    }
+
+    @SagaCompensation
+    @KafkaListener(topics = "inventory-compensations")
+    public void handleReleaseInventory(ReleaseInventoryCommand command) {
+        inventoryService.release(command.getProductId(), command.getQuantity());
+        sagaManager.reportCompensationCompleted(command.getSagaId());
+    }
+}
+</code></pre>
+
+            <p><strong>Choreography-based saga:</strong></p>
+            <pre><code class="language-java">// Order Service
+@EventHandler
+public void on(OrderCreatedEvent event) {
+    eventPublisher.publish(new ReserveInventoryEvent(event.getOrderId()));
+}
+
+// Inventory Service
+@EventHandler
+public void on(ReserveInventoryEvent event) {
+    try {
+        inventoryService.reserve(event.getProductId());
+        eventPublisher.publish(new InventoryReservedEvent(event.getOrderId()));
+    } catch (Exception e) {
+        eventPublisher.publish(new InventoryReservationFailedEvent(event.getOrderId()));
+    }
+}
+
+// Payment Service
+@EventHandler
+public void on(InventoryReservedEvent event) {
+    eventPublisher.publish(new ProcessPaymentEvent(event.getOrderId()));
+}
+</code></pre>
+
+            <p><strong>Saga state management:</strong></p>
+            <pre><code class="language-java">@Entity
+public class SagaInstance {
+    private String sagaId;
+    private String sagaType;
+    private SagaStatus status;
+    private String currentStep;
+    private Map&lt;String, Object&gt; sagaData;
+    private List&lt;CompensationAction&gt; compensations;
+
+    public void addCompensation(CompensationAction action) {
+        compensations.add(0, action); // Add to beginning for reverse order
+    }
+
+    public void executeCompensations() {
+        compensations.forEach(CompensationAction::execute);
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="outbox-pattern" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Outbox Pattern</h2>
+            <h3>Definition</h3>
+            <p>The Outbox pattern ensures reliable publication of events by storing them in the same database transaction as the business data, then publishing them to the message broker in a separate process. This solves the dual-write problem where you need to update your database and send a message atomically - if either operation fails, both should be rolled back. The pattern works by storing events in an "outbox" table within the same database transaction as your business logic, then using a separate publisher process to read from the outbox and publish events to Kafka. This guarantees that events are published exactly once and only for committed database transactions.</p>
+
+            <h3>Analogy</h3>
+            <p>The Outbox pattern is like a reliable mail system in a busy office where important documents must be both filed in the office records and sent to external partners. Instead of trying to file the document and mail it simultaneously (which could fail if the postal service is down), the office uses a two-step process: first, they file the document in their records along with a note in their "outgoing mail" tray about what needs to be sent (all in one atomic filing action). Then, a dedicated mail clerk regularly checks the outgoing mail tray and sends out all the noted correspondence. If the filing fails, nothing goes in the outgoing mail tray. If the mailing fails, the clerk will try again later since the note remains in the tray. This ensures that every filed document results in exactly one external communication, and every external communication corresponds to a properly filed document, even if there are temporary postal service outages or filing system problems.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Outbox table definition:</strong></p>
+            <pre><code class="language-java">@Entity
+@Table(name = "outbox_events")
+public class OutboxEvent {
+    @Id
+    private String id;
+    private String aggregateId;
+    private String eventType;
+    private String eventData;
+    private LocalDateTime createdAt;
+    private boolean processed;
+
+    // No-args constructor and getters
+}
+</code></pre>
+
+            <p><strong>Service with outbox pattern:</strong></p>
+            <pre><code class="language-java">@Service
+@Transactional
+public class OrderService {
+
+    @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
+    private OutboxEventRepository outboxRepository;
+
+    public Order createOrder(CreateOrderRequest request) {
+        // Business logic - save order
+        Order order = new Order(request);
+        Order savedOrder = orderRepository.save(order);
+
+        // Store event in outbox - same transaction
+        OrderCreatedEvent event = new OrderCreatedEvent(savedOrder);
+        OutboxEvent outboxEvent = new OutboxEvent(
+            UUID.randomUUID().toString(),
+            savedOrder.getId(),
+            "OrderCreated",
+            objectMapper.writeValueAsString(event)
+        );
+
+        outboxEventRepository.save(outboxEvent);
+
+        return savedOrder;
+        // Transaction commits - both order and outbox event are saved atomically
+    }
+}
+</code></pre>
+
+            <p><strong>Outbox event publisher:</strong></p>
+            <pre><code class="language-java">@Component
+public class OutboxEventPublisher {
+
+    @Autowired
+    private OutboxEventRepository outboxRepository;
+
+    @Autowired
+    private KafkaTemplate&lt;String, String&gt; kafkaTemplate;
+
+    @Scheduled(fixedDelay = 5000)
+    @Transactional
+    public void publishOutboxEvents() {
+        List&lt;OutboxEvent&gt; unpublishedEvents = outboxRepository.findByProcessedFalse();
+
+        for (OutboxEvent event : unpublishedEvents) {
+            try {
+                // Publish to Kafka
+                kafkaTemplate.send(getTopicName(event.getEventType()),
+                                 event.getAggregateId(),
+                                 event.getEventData());
+
+                // Mark as processed
+                event.setProcessed(true);
+                outboxRepository.save(event);
+
+            } catch (Exception e) {
+                logger.error("Failed to publish outbox event: {}", event.getId(), e);
+                // Will retry on next scheduled run
+            }
+        }
+    }
+}
+</code></pre>
+
+            <p><strong>Change Data Capture (CDC) approach:</strong></p>
+            <pre><code class="language-java">// Alternative: Use Debezium or similar CDC tool
+// to automatically publish database changes to Kafka
+
+@Configuration
+public class DebeziumConfig {
+
+    @Bean
+    public DebeziumEngine&lt;RecordChangeEvent&lt;SourceRecord&gt;&gt; debeziumEngine() {
+        return DebeziumEngine.create(Connect.class)
+            .using(getDebeziumProperties())
+            .notifying(this::handleChangeEvent)
+            .build();
+    }
+
+    private void handleChangeEvent(RecordChangeEvent&lt;SourceRecord&gt; event) {
+        // Automatically publish database changes to Kafka
+        if (isOutboxTable(event)) {
+            publishEventToKafka(event);
+        }
+    }
+}
+</code></pre>
+
+            <p><strong>Outbox cleanup:</strong></p>
+            <pre><code class="language-java">@Component
+public class OutboxCleaner {
+
+    @Scheduled(cron = "0 0 2 * * ?") // Run at 2 AM daily
+    @Transactional
+    public void cleanupProcessedEvents() {
+        LocalDateTime cutoff = LocalDateTime.now().minusDays(7);
+
+        int deletedCount = outboxRepository.deleteByProcessedTrueAndCreatedAtBefore(cutoff);
+        logger.info("Cleaned up {} processed outbox events", deletedCount);
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="monitoring-kafka" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Monitoring Kafka</h2>
+            <h3>Definition</h3>
+            <p>Monitoring Kafka involves tracking metrics across producers, consumers, brokers, and topics to ensure optimal performance, identify bottlenecks, and prevent issues before they impact applications. Key metrics include throughput (messages per second), latency (end-to-end message delivery time), consumer lag (how far behind consumers are), partition distribution, broker health, and error rates. Effective monitoring combines JMX metrics, application-level metrics, and log analysis to provide comprehensive visibility into the Kafka ecosystem. Tools like Prometheus, Grafana, and specialized Kafka monitoring solutions help visualize these metrics and alert on anomalies.</p>
+
+            <h3>Analogy</h3>
+            <p>Monitoring Kafka is like running a comprehensive health and performance monitoring system for a busy metropolitan postal service that handles millions of letters and packages daily. You track how many items are processed per hour at each sorting facility (throughput), how long it takes mail to travel from sender to recipient (latency), how backed up each postal route is (consumer lag), and whether delivery trucks are evenly distributed across districts (partition balance). You monitor the health of sorting machines (broker health), track error rates like lost or damaged packages, and watch for unusual patterns that might indicate problems. Your monitoring dashboard shows real-time statistics from every post office, alerts you when delivery times exceed acceptable limits, warns about equipment failures before they cause major disruptions, and helps you optimize routes and staffing. Just as the postal service needs this visibility to ensure reliable mail delivery, Kafka systems need comprehensive monitoring to ensure reliable message delivery at scale.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Producer metrics monitoring:</strong></p>
+            <pre><code class="language-java">@Component
+public class KafkaProducerMetrics {
+
+    private final MeterRegistry meterRegistry;
+    private final Counter successCounter;
+    private final Counter errorCounter;
+    private final Timer sendTimer;
+
+    public KafkaProducerMetrics(MeterRegistry meterRegistry) {
+        this.meterRegistry = meterRegistry;
+        this.successCounter = Counter.builder("kafka.producer.success")
+            .register(meterRegistry);
+        this.errorCounter = Counter.builder("kafka.producer.error")
+            .register(meterRegistry);
+        this.sendTimer = Timer.builder("kafka.producer.send.duration")
+            .register(meterRegistry);
+    }
+
+    public void recordSuccess() {
+        successCounter.increment();
+    }
+
+    public void recordError() {
+        errorCounter.increment();
+    }
+}
+</code></pre>
+
+            <p><strong>Consumer lag monitoring:</strong></p>
+            <pre><code class="language-java">@Component
+public class ConsumerLagMonitor {
+
+    @Autowired
+    private KafkaAdmin kafkaAdmin;
+
+    @Gauge(name = "kafka.consumer.lag", description = "Consumer lag per partition")
+    public double getConsumerLag(@GaugeParameter("topic") String topic,
+                                @GaugeParameter("partition") int partition,
+                                @GaugeParameter("group") String groupId) {
+
+        try (AdminClient adminClient = AdminClient.create(kafkaAdmin.getConfigurationProperties())) {
+
+            TopicPartition topicPartition = new TopicPartition(topic, partition);
+
+            // Get current offset
+            OffsetAndMetadata committed = adminClient
+                .listConsumerGroupOffsets(groupId)
+                .partitionsToOffsetAndMetadata()
+                .get()
+                .get(topicPartition);
+
+            // Get latest offset
+            Map&lt;TopicPartition, OffsetSpec&gt; latestOffsets =
+                Map.of(topicPartition, OffsetSpec.latest());
+            Long latestOffset = adminClient
+                .listOffsets(latestOffsets)
+                .partitionResult(topicPartition)
+                .get()
+                .offset();
+
+            return latestOffset - committed.offset();
+
+        } catch (Exception e) {
+            logger.error("Failed to calculate consumer lag", e);
+            return -1;
+        }
+    }
+}
+</code></pre>
+
+            <p><strong>Health check endpoint:</strong></p>
+            <pre><code class="language-java">@Component
+public class KafkaHealthIndicator implements HealthIndicator {
+
+    @Autowired
+    private KafkaAdmin kafkaAdmin;
+
+    @Override
+    public Health health() {
+        try (AdminClient adminClient = AdminClient.create(kafkaAdmin.getConfigurationProperties())) {
+
+            // Check cluster health
+            Collection&lt;Node&gt; nodes = adminClient.describeCluster().nodes().get();
+
+            if (nodes.isEmpty()) {
+                return Health.down()
+                    .withDetail("error", "No Kafka brokers available")
+                    .build();
+            }
+
+            return Health.up()
+                .withDetail("brokers", nodes.size())
+                .withDetail("cluster-id", adminClient.describeCluster().clusterId().get())
+                .build();
+
+        } catch (Exception e) {
+            return Health.down()
+                .withDetail("error", e.getMessage())
+                .build();
+        }
+    }
+}
+</code></pre>
+
+            <p><strong>Custom metrics dashboard configuration:</strong></p>
+            <pre><code class="language-java">@Configuration
+public class KafkaMetricsConfig {
+
+    @Bean
+    public MeterFilter kafkaMetricsFilter() {
+        return MeterFilter.denyNameStartsWith("kafka.consumer.fetch");
+    }
+
+    @EventListener
+    public void onProducerMetric(KafkaProducerMetricEvent event) {
+        Metrics.gauge("kafka.producer.batch.size", event.getBatchSize());
+        Metrics.gauge("kafka.producer.record.queue.time", event.getQueueTime());
+    }
+
+    @Scheduled(fixedRate = 30000)
+    public void publishCustomMetrics() {
+        // Publish business-specific metrics
+        Metrics.gauge("kafka.topics.count", getTopicCount());
+        Metrics.gauge("kafka.partitions.under.replicated", getUnderReplicatedPartitions());
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Summary</h2>
+            <p>You've now mastered advanced Kafka patterns and techniques essential for building production-ready, event-driven systems. Kafka Streams enables real-time data processing and transformation with powerful windowing and join capabilities. Exactly-once semantics provides the strongest delivery guarantees for critical business operations through idempotent producers and transactional messaging. Advanced consumer group management techniques help you build scalable, resilient message processing systems with proper lag monitoring and rebalancing strategies. Dead letter queues ensure poison messages don't disrupt normal processing while providing mechanisms for error analysis and reprocessing. You understand sophisticated architectural patterns like event sourcing for complete audit trails, the saga pattern for managing distributed transactions, and the outbox pattern for reliable event publishing. Finally, comprehensive monitoring strategies help you maintain healthy Kafka deployments with proper visibility into performance and potential issues. These advanced concepts enable you to build enterprise-grade, event-driven architectures that can handle the complexity and scale requirements of modern distributed systems while maintaining reliability and consistency.</p>
+          </section>
+
+          <section id="programming-challenge" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Programming Challenge</h2>
+            <div class="rounded-lg border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800">
+              <h3 class="mt-0">Challenge: Build an Advanced Event-Driven E-commerce Platform</h3>
+              <p><strong>Task:</strong> Create a comprehensive e-commerce system implementing advanced Kafka patterns and enterprise-grade event-driven architecture.</p>
+
+              <p><strong>Core Services:</strong></p>
+              <ol>
+                <li><strong>Order Service:</strong> Manages orders with event sourcing and outbox pattern</li>
+                <li><strong>Inventory Service:</strong> Handles stock management with exactly-once processing</li>
+                <li><strong>Payment Service:</strong> Processes payments with saga pattern coordination</li>
+                <li><strong>Shipping Service:</strong> Manages shipments with dead letter queue handling</li>
+                <li><strong>Analytics Service:</strong> Real-time processing with Kafka Streams</li>
+                <li><strong>Notification Service:</strong> Handles alerts with consumer groups</li>
+              </ol>
+
+              <p><strong>Advanced Patterns to Implement:</strong></p>
+              <ul>
+                <li><strong>Event Sourcing:</strong> Order aggregate with complete event history</li>
+                <li><strong>Saga Pattern:</strong> Order fulfillment saga with compensation logic</li>
+                <li><strong>Outbox Pattern:</strong> Reliable event publishing from order service</li>
+                <li><strong>Exactly-Once Semantics:</strong> Payment processing with transactional guarantees</li>
+                <li><strong>Dead Letter Queues:</strong> Error handling for all services</li>
+                <li><strong>Stream Processing:</strong> Real-time analytics and fraud detection</li>
+              </ul>
+
+              <p><strong>Kafka Streams Features:</strong></p>
+              <ul>
+                <li>Real-time order statistics (count, total value) in sliding windows</li>
+                <li>Customer behavior analysis joining orders with user events</li>
+                <li>Fraud detection using pattern matching and thresholds</li>
+                <li>Inventory level monitoring with automated reorder triggers</li>
+                <li>Revenue dashboard with real-time aggregations</li>
+              </ul>
+
+              <p><strong>Monitoring and Observability:</strong></p>
+              <ul>
+                <li>Custom metrics for each service (throughput, latency, errors)</li>
+                <li>Consumer lag monitoring with alerting</li>
+                <li>Health check endpoints for all Kafka integrations</li>
+                <li>DLQ monitoring with automatic alert generation</li>
+                <li>Saga state tracking and visualization</li>
+              </ul>
+
+              <p><strong>Technical Requirements:</strong></p>
+              <ul>
+                <li>Exactly-once configuration for critical paths</li>
+                <li>Sticky partition assignment for optimal performance</li>
+                <li>Graceful shutdown handling for all consumers</li>
+                <li>Event schema evolution support</li>
+                <li>Comprehensive error handling and retry policies</li>
+                <li>Performance optimization (batching, compression)</li>
+              </ul>
+
+              <p><strong>Workflow Example:</strong></p>
+              <ol>
+                <li>Customer places order → Order service creates order with event sourcing</li>
+                <li>Order saga begins → Coordinates inventory, payment, and shipping</li>
+                <li>Kafka Streams processes order event → Updates real-time analytics</li>
+                <li>Fraud detection stream flags suspicious patterns → Triggers alerts</li>
+                <li>If any saga step fails → Compensation actions restore consistency</li>
+                <li>Success path → Customer receives notifications at each step</li>
+                <li>Analytics dashboard shows real-time business metrics</li>
+              </ol>
+
+              <p><strong>Learning Goals:</strong> Master enterprise Kafka patterns, implement robust error handling strategies, understand event-driven architecture trade-offs, gain experience with production monitoring and observability, and build systems that handle real-world complexity and scale requirements.</p>
+            </div>
+          </section>
+
+          <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+            <a href="lesson-23.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
+            <a href="lesson-25.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
+          </nav>
+        </div>
+      </div>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('themeToggle').addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>
