@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Lesson 17 - Spring Boot Caching</title>
-    <meta name="description" content="Spring Boot caching: cache abstraction, providers, annotations, strategies, and performance optimization with practical examples and best practices." />
+    <title>Lesson 17 - Spring Boot Production Monitoring and Caching</title>
+    <meta name="description" content="Master Spring Boot Actuator monitoring and caching: health checks, metrics, endpoints, cache strategies, and performance optimization for production applications." />
     <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <script>
@@ -47,16 +47,18 @@
             <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">On this page</h2>
             <ol class="space-y-1 text-sm">
               <li><a href="#introduction" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Introduction</a></li>
+              <li><a href="#understanding-actuator" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Understanding Actuator</a></li>
+              <li><a href="#health-checks" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Health Checks</a></li>
+              <li><a href="#application-info" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Application Info</a></li>
+              <li><a href="#metrics-monitoring" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Metrics Monitoring</a></li>
+              <li><a href="#custom-endpoints" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Custom Endpoints</a></li>
               <li><a href="#understanding-caching" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Understanding Caching</a></li>
               <li><a href="#spring-cache-abstraction" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Spring Cache Abstraction</a></li>
               <li><a href="#cache-annotations" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Cache Annotations</a></li>
               <li><a href="#cache-providers" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Cache Providers</a></li>
               <li><a href="#cache-configuration" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Cache Configuration</a></li>
-              <li><a href="#cache-strategies" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Cache Strategies</a></li>
-              <li><a href="#conditional-caching" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Conditional Caching</a></li>
-              <li><a href="#cache-monitoring" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Cache Monitoring</a></li>
-              <li><a href="#distributed-caching" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Distributed Caching</a></li>
-              <li><a href="#caching-best-practices" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Caching Best Practices</a></li>
+              <li><a href="#monitoring-caching" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Monitoring & Caching</a></li>
+              <li><a href="#production-best-practices" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Production Best Practices</a></li>
               <li><a href="#summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Summary</a></li>
               <li><a href="#programming-challenge" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Programming Challenge</a></li>
             </ol>
@@ -67,13 +69,240 @@
             <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Concepts</a>
           </div>
           <header class="mx-auto max-w-3xl text-center">
-            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 17: Spring Boot Caching</h1>
-            <p class="mt-2 text-slate-600 dark:text-slate-300">Master Spring Boot caching to dramatically improve application performance: implement cache strategies, configure providers, and monitor cache effectiveness for faster, more scalable applications.</p>
+            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 17: Spring Boot Production Monitoring and Caching</h1>
+            <p class="mt-2 text-slate-600 dark:text-slate-300">Master Spring Boot Actuator for production monitoring and implement intelligent caching strategies to build high-performance, observable applications ready for enterprise environments.</p>
           </header>
 
           <section id="introduction" class="prose prose-slate mt-6 max-w-none dark:prose-invert">
             <h2>Introduction</h2>
-            <p>Imagine having to look up the same phone number in a physical phone book every single time you wanted to call someone, even if you called them five times in one day. That would be incredibly inefficient compared to writing down frequently used numbers on a sticky note next to your phone. Caching in Spring Boot works exactly the same way - instead of repeatedly executing expensive operations like database queries, API calls, or complex calculations, your application stores the results in fast-access memory for quick retrieval. Spring Boot's caching abstraction makes this optimization incredibly simple with just a few annotations, while supporting various cache providers from simple in-memory storage to sophisticated distributed systems like Redis. Proper caching can reduce response times from hundreds of milliseconds to just a few milliseconds, dramatically improving user experience and reducing server load. This lesson teaches you to implement effective caching strategies, choose appropriate cache providers, and monitor cache performance to build lightning-fast applications.</p>
+            <p>Building production-ready applications requires two critical capabilities: comprehensive observability to understand how your application is performing, and intelligent caching to ensure it performs well under load. Spring Boot Actuator provides production-ready monitoring features that give you deep insights into application health, metrics, and operational status, while Spring's caching abstraction offers powerful performance optimization through intelligent data storage and retrieval. Think of monitoring as your application's vital signs monitor and caching as its short-term memory - monitoring tells you what's happening and whether everything is healthy, while caching helps your application respond faster by remembering frequently needed information. Together, these capabilities enable you to build applications that not only perform exceptionally well but also provide the observability needed to maintain that performance in production environments. This lesson teaches you to implement both comprehensive monitoring and effective caching strategies that work together to create resilient, high-performance applications.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="understanding-actuator" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Understanding Actuator</h2>
+            <h3>Definition</h3>
+            <p>Spring Boot Actuator is a set of production-ready features that help you monitor and manage your application when it's running in production. It provides built-in endpoints for health checks, application metrics, environment details, and operational information. Actuator endpoints are automatically secured and can be customized or extended to meet specific monitoring requirements. These features give operations teams and developers the visibility they need to maintain healthy, performant applications in production environments.</p>
+
+            <h3>Analogy</h3>
+            <p>Think of Spring Boot Actuator like the comprehensive dashboard and diagnostic system in a modern car. Just as your car's dashboard shows you essential information like speed, fuel level, engine temperature, and oil pressure, Actuator provides a dashboard view of your application's vital signs. The car's diagnostic port allows mechanics to connect specialized tools to get detailed information about engine performance, sensor readings, and error codes - similarly, Actuator endpoints allow monitoring tools and operations teams to connect and get detailed insights into your application's performance, health status, and internal metrics.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Adding Actuator dependency:</strong></p>
+            <pre><code class="language-xml">&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+
+            <p><strong>Basic Actuator configuration:</strong></p>
+            <pre><code class="language-properties">management.endpoints.web.exposure.include=health,info,metrics,caches
+management.endpoint.health.show-details=always
+management.endpoints.web.base-path=/actuator</code></pre>
+
+            <p><strong>Accessing health endpoint:</strong></p>
+            <pre><code class="language-bash"># GET /actuator/health
+{
+  "status": "UP",
+  "components": {
+    "db": {"status": "UP"},
+    "diskSpace": {"status": "UP"},
+    "cacheManager": {"status": "UP"}
+  }
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="health-checks" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Health Checks</h2>
+            <h3>Definition</h3>
+            <p>Health checks provide a way to verify that your application and its dependencies are functioning correctly. Spring Boot Actuator includes built-in health indicators for databases, disk space, and other common components, and you can create custom health indicators for business-specific dependencies. Health checks return a status (UP, DOWN, OUT_OF_SERVICE) along with detailed information about what's being checked. Load balancers and monitoring systems use these endpoints to determine if an instance should receive traffic or needs attention.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Custom health indicator for cache:</strong></p>
+            <pre><code class="language-java">@Component
+public class CacheHealthIndicator implements HealthIndicator {
+    @Autowired
+    private CacheManager cacheManager;
+
+    public Health health() {
+        try {
+            Cache userCache = cacheManager.getCache("users");
+            if (userCache != null) {
+                return Health.up()
+                    .withDetail("cache", "users")
+                    .withDetail("status", "available")
+                    .build();
+            }
+            return Health.down().withDetail("cache", "unavailable").build();
+        } catch (Exception e) {
+            return Health.down(e).build();
+        }
+    }
+}</code></pre>
+
+            <p><strong>Database and cache health check:</strong></p>
+            <pre><code class="language-java">@Component
+public class ApplicationHealthIndicator implements HealthIndicator {
+    public Health health() {
+        boolean dbHealth = checkDatabaseConnection();
+        boolean cacheHealth = checkCacheAvailability();
+
+        if (dbHealth && cacheHealth) {
+            return Health.up()
+                .withDetail("database", "connected")
+                .withDetail("cache", "available")
+                .build();
+        }
+        return Health.down()
+            .withDetail("database", dbHealth ? "connected" : "disconnected")
+            .withDetail("cache", cacheHealth ? "available" : "unavailable")
+            .build();
+    }
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="application-info" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Application Info</h2>
+            <h3>Definition</h3>
+            <p>The info endpoint provides metadata about your application such as version numbers, build information, Git commit details, and custom application properties. This information helps operations teams understand exactly which version is deployed, when it was built, and what features it contains. You can customize the info endpoint to include cache configuration details, monitoring settings, and other operational information.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Application info with cache details:</strong></p>
+            <pre><code class="language-properties">info.app.name=E-commerce Platform
+info.app.description=Product catalog with caching and monitoring
+info.app.version=@project.version@
+info.features.caching=enabled
+info.features.monitoring=enabled</code></pre>
+
+            <p><strong>Custom info contributor with cache information:</strong></p>
+            <pre><code class="language-java">@Component
+public class CacheInfoContributor implements InfoContributor {
+    @Autowired
+    private CacheManager cacheManager;
+
+    public void contribute(Info.Builder builder) {
+        Collection<String> cacheNames = cacheManager.getCacheNames();
+        builder.withDetail("caching", Map.of(
+            "provider", cacheManager.getClass().getSimpleName(),
+            "caches", cacheNames,
+            "count", cacheNames.size()
+        ));
+    }
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="metrics-monitoring" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Metrics Monitoring</h2>
+            <h3>Definition</h3>
+            <p>Spring Boot Actuator provides comprehensive metrics about your application's performance, including JVM statistics, HTTP request metrics, database connection pool stats, and cache performance metrics. Built on Micrometer, it supports various monitoring systems like Prometheus, Grafana, and New Relic. Metrics help you understand application behavior over time, identify performance bottlenecks, track cache effectiveness, and set up alerting for abnormal conditions.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Cache metrics monitoring:</strong></p>
+            <pre><code class="language-java">@Component
+public class CacheMetricsCollector {
+    private final MeterRegistry meterRegistry;
+    private final CacheManager cacheManager;
+
+    public CacheMetricsCollector(MeterRegistry meterRegistry, CacheManager cacheManager) {
+        this.meterRegistry = meterRegistry;
+        this.cacheManager = cacheManager;
+
+        // Register cache size gauges
+        cacheManager.getCacheNames().forEach(cacheName -> {
+            Gauge.builder("cache.size")
+                 .tag("cache", cacheName)
+                 .register(meterRegistry, this, metrics -> getCacheSize(cacheName));
+        });
+    }
+
+    private double getCacheSize(String cacheName) {
+        Cache cache = cacheManager.getCache(cacheName);
+        return cache != null ? cache.getNativeCache().size() : 0;
+    }
+}</code></pre>
+
+            <p><strong>Custom business metrics with caching:</strong></p>
+            <pre><code class="language-java">@Service
+public class ProductService {
+    private final Counter cacheHits;
+    private final Counter cacheMisses;
+    private final Timer queryTimer;
+
+    public ProductService(MeterRegistry meterRegistry) {
+        this.cacheHits = Counter.builder("cache.hits").tag("cache", "products").register(meterRegistry);
+        this.cacheMisses = Counter.builder("cache.misses").tag("cache", "products").register(meterRegistry);
+        this.queryTimer = Timer.builder("products.query.time").register(meterRegistry);
+    }
+
+    @Cacheable("products")
+    public Product findProduct(Long id) {
+        Timer.Sample sample = Timer.start();
+        try {
+            return productRepository.findById(id);
+        } finally {
+            sample.stop(queryTimer);
+        }
+    }
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="custom-endpoints" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Custom Endpoints</h2>
+            <h3>Definition</h3>
+            <p>Custom Actuator endpoints allow you to expose application-specific operational information and controls. You can create endpoints for cache management, performance diagnostics, or business metrics. Custom endpoints follow the same security and exposure patterns as built-in endpoints, ensuring consistent access control and discoverability.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Cache management endpoint:</strong></p>
+            <pre><code class="language-java">@Endpoint(id = "cache-management")
+@Component
+public class CacheManagementEndpoint {
+    @Autowired
+    private CacheManager cacheManager;
+
+    @ReadOperation
+    public Map<String, Object> getCacheInfo() {
+        Map<String, Object> cacheInfo = new HashMap<>();
+        cacheManager.getCacheNames().forEach(name -> {
+            Cache cache = cacheManager.getCache(name);
+            cacheInfo.put(name, Map.of(
+                "size", cache.getNativeCache().size(),
+                "type", cache.getClass().getSimpleName()
+            ));
+        });
+        return cacheInfo;
+    }
+
+    @WriteOperation
+    public void clearCache(@Selector String cacheName) {
+        Cache cache = cacheManager.getCache(cacheName);
+        if (cache != null) {
+            cache.clear();
+        }
+    }
+}</code></pre>
+
+            <p><strong>Performance monitoring endpoint:</strong></p>
+            <pre><code class="language-java">@WebEndpoint(id = "performance")
+@Component
+public class PerformanceEndpoint {
+    @ReadOperation
+    public WebEndpointResponse<Map<String, Object>> getPerformanceStats() {
+        Map<String, Object> stats = Map.of(
+            "jvm-memory", getMemoryUsage(),
+            "cache-stats", getCacheStatistics(),
+            "request-metrics", getRequestMetrics()
+        );
+        return new WebEndpointResponse<>(stats, 200);
+    }
+}</code></pre>
           </section>
 
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
@@ -81,40 +310,27 @@
           <section id="understanding-caching" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Understanding Caching</h2>
             <h3>Definition</h3>
-            <p>Caching is a performance optimization technique that stores copies of frequently accessed data in fast-access storage to avoid repeated expensive operations. When data is requested, the cache is checked first; if found (cache hit), the cached data is returned immediately. If not found (cache miss), the expensive operation is performed, and the result is stored in the cache for future requests. Effective caching can reduce database load, improve response times, and enhance overall application scalability by serving popular data from memory rather than slow storage systems.</p>
+            <p>Caching is a performance optimization technique that stores copies of frequently accessed data in fast-access storage to avoid repeated expensive operations. When data is requested, the cache is checked first; if found (cache hit), the cached data is returned immediately. If not found (cache miss), the expensive operation is performed, and the result is stored in the cache for future requests. Effective caching can reduce database load, improve response times, and enhance overall application scalability.</p>
 
             <h3>Analogy</h3>
-            <p>Think of caching like the strategy a busy chef uses in a restaurant kitchen. Instead of going to the main storage room every time they need common ingredients like salt, pepper, or olive oil, the chef keeps frequently used items on the counter within arm's reach. When an order comes in for a dish that needs salt, the chef grabs it from the counter (cache hit) rather than walking to the storage room (database query). Occasionally, an ingredient runs out and the chef must restock from the main storage (cache miss), but this happens much less frequently than if they fetched every ingredient from storage for every dish. The counter space is limited, so the chef keeps only the most commonly used items there, replacing less popular ingredients when space is needed. This system dramatically speeds up cooking times and reduces the physical effort required, just like how application caching speeds up data access and reduces system load.</p>
+            <p>Think of caching like the strategy a busy chef uses in a restaurant kitchen. Instead of going to the main storage room every time they need common ingredients like salt, pepper, or olive oil, the chef keeps frequently used items on the counter within arm's reach. When an order comes in for a dish that needs salt, the chef grabs it from the counter (cache hit) rather than walking to the storage room (database query). Occasionally, an ingredient runs out and the chef must restock from the main storage (cache miss), but this happens much less frequently than if they fetched every ingredient from storage for every dish.</p>
 
             <h3>Examples</h3>
             <p><strong>Without caching - repeated database queries:</strong></p>
             <pre><code class="language-java">public User getUser(Long id) {
     return userRepository.findById(id);  // Database query every time
-}
-</code></pre>
+}</code></pre>
 
             <p><strong>With caching - store results in memory:</strong></p>
             <pre><code class="language-java">@Cacheable("users")
 public User getUser(Long id) {
     return userRepository.findById(id);  // Query once, cache result
-}
-</code></pre>
+}</code></pre>
 
             <p><strong>Cache performance comparison:</strong></p>
             <pre><code class="language-java">// Without cache: 200ms database query every time
 // With cache: 200ms first time, 2ms subsequent requests
-// 100x performance improvement for cached data!
-</code></pre>
-
-            <p><strong>Common caching scenarios:</strong></p>
-            <pre><code class="language-java">// Expensive calculations
-@Cacheable("calculations")
-public BigDecimal calculateTax(Order order) { /* complex logic */ }
-
-// External API calls
-@Cacheable("exchange-rates")
-public ExchangeRate getExchangeRate(String currency) { /* API call */ }
-</code></pre>
+// 100x performance improvement for cached data!</code></pre>
           </section>
 
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
@@ -122,10 +338,7 @@ public ExchangeRate getExchangeRate(String currency) { /* API call */ }
           <section id="spring-cache-abstraction" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Spring Cache Abstraction</h2>
             <h3>Definition</h3>
-            <p>Spring's cache abstraction provides a unified programming model for caching that works with different cache providers without changing your code. The abstraction uses annotations to declare caching behavior, automatically handling cache operations like storing, retrieving, and evicting data. You can switch between cache providers (from simple HashMap to Redis clusters) by changing configuration, not code. This abstraction decouples your business logic from specific caching implementations, making your applications more maintainable and portable.</p>
-
-            <h3>Analogy</h3>
-            <p>Spring's cache abstraction is like having a universal remote control that works with any TV, stereo, or streaming device. Instead of learning different button layouts for each device (different cache providers), you use the same familiar interface - "play," "pause," "volume up" - regardless of whether you're controlling a Samsung TV, Sony stereo, or Netflix app. The universal remote (Spring cache abstraction) translates your commands into the specific signals each device understands, but you don't need to know those details. If you upgrade your TV or switch streaming services, you keep using the same remote with the same buttons; only the underlying device changes. Similarly, Spring's cache abstraction lets you use the same @Cacheable annotations whether you're using simple in-memory caching, Redis, or Hazelcast - the business logic stays the same while the underlying cache technology can change as needed.</p>
+            <p>Spring's cache abstraction provides a unified programming model for caching that works with different cache providers without changing your code. The abstraction uses annotations to declare caching behavior, automatically handling cache operations like storing, retrieving, and evicting data. You can switch between cache providers (from simple HashMap to Redis clusters) by changing configuration, not code.</p>
 
             <h3>Examples</h3>
             <p><strong>Enable caching in Spring Boot:</strong></p>
@@ -135,35 +348,21 @@ public class Application {
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
-}
-</code></pre>
+}</code></pre>
 
-            <p><strong>Simple cache configuration:</strong></p>
+            <p><strong>Cache configuration with monitoring:</strong></p>
             <pre><code class="language-java">@Configuration
 public class CacheConfig {
     @Bean
     public CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager("users", "products");
+        CaffeineCacheManager manager = new CaffeineCacheManager("users", "products");
+        manager.setCaffeine(Caffeine.newBuilder()
+            .maximumSize(1000)
+            .expireAfterWrite(10, TimeUnit.MINUTES)
+            .recordStats()); // Enable statistics for monitoring
+        return manager;
     }
-}
-</code></pre>
-
-            <p><strong>Basic cacheable method:</strong></p>
-            <pre><code class="language-java">@Service
-public class ProductService {
-    @Cacheable("products")
-    public Product getProduct(Long id) {
-        return productRepository.findById(id);
-    }
-}
-</code></pre>
-
-            <p><strong>Cache provider flexibility:</strong></p>
-            <pre><code class="language-java">// Same code works with different providers:
-// ConcurrentMapCacheManager (simple)
-// RedisCacheManager (distributed)
-// CaffeineCacheManager (high-performance)
-</code></pre>
+}</code></pre>
           </section>
 
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
@@ -171,42 +370,35 @@ public class ProductService {
           <section id="cache-annotations" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Cache Annotations</h2>
             <h3>Definition</h3>
-            <p>Spring provides several cache annotations that declaratively define caching behavior. @Cacheable caches method results, @CacheEvict removes cached data, @CachePut updates cache entries, and @Caching combines multiple cache operations. These annotations use SpEL (Spring Expression Language) for dynamic cache keys and conditions. The annotations handle all cache operations automatically, including key generation, serialization, and cache provider interaction, keeping your business logic clean and focused.</p>
-
-            <h3>Analogy</h3>
-            <p>Cache annotations are like smart labels you put on storage boxes in your garage that automatically manage what goes in and out. @Cacheable is like a label that says "if you're looking for Christmas decorations, check this box first - if it's not here, go to the attic and bring a copy back to put in this box for next time." @CacheEvict is like a label that says "when spring cleaning happens, empty this box completely." @CachePut is like a label that says "whenever you buy new holiday decorations, immediately put a copy in this box and replace what was there." @Caching is like a master label that can combine multiple instructions: "check the box, but also clean out old items and add the new ones." These smart labels handle all the box management automatically based on what you're trying to do, so you just focus on decorating for the holidays rather than managing storage logistics.</p>
+            <p>Spring provides several cache annotations that declaratively define caching behavior. @Cacheable caches method results, @CacheEvict removes cached data, @CachePut updates cache entries, and @Caching combines multiple cache operations. These annotations use SpEL (Spring Expression Language) for dynamic cache keys and conditions.</p>
 
             <h3>Examples</h3>
             <p><strong>@Cacheable - cache method results:</strong></p>
             <pre><code class="language-java">@Cacheable(value = "users", key = "#id")
 public User findUser(Long id) {
     return userRepository.findById(id);
-}
-</code></pre>
+}</code></pre>
 
             <p><strong>@CacheEvict - remove cached data:</strong></p>
             <pre><code class="language-java">@CacheEvict(value = "users", key = "#user.id")
 public void updateUser(User user) {
     userRepository.save(user);
-}
-</code></pre>
+}</code></pre>
 
             <p><strong>@CachePut - update cache:</strong></p>
             <pre><code class="language-java">@CachePut(value = "users", key = "#result.id")
 public User createUser(User user) {
     return userRepository.save(user);
-}
-</code></pre>
+}</code></pre>
 
-            <p><strong>@Caching - multiple operations:</strong></p>
-            <pre><code class="language-java">@Caching(
-    evict = @CacheEvict(value = "users", key = "#user.id"),
-    put = @CachePut(value = "active-users", key = "#user.id")
-)
-public User activateUser(User user) {
-    return userRepository.save(user);
-}
-</code></pre>
+            <p><strong>Conditional caching with monitoring:</strong></p>
+            <pre><code class="language-java">@Cacheable(value = "products", condition = "#result != null", unless = "#result.price > 1000")
+public Product findProduct(Long id) {
+    Product product = productRepository.findById(id);
+    // Log cache operation for monitoring
+    logger.info("Product {} cached: {}", id, product != null);
+    return product;
+}</code></pre>
           </section>
 
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
@@ -214,43 +406,35 @@ public User activateUser(User user) {
           <section id="cache-providers" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Cache Providers</h2>
             <h3>Definition</h3>
-            <p>Cache providers are the underlying storage mechanisms that actually hold cached data. Spring Boot supports various providers: ConcurrentHashMap for simple in-memory caching, Caffeine for high-performance local caching with advanced features, Redis for distributed caching across multiple servers, and Hazelcast for in-memory data grids. Each provider has different characteristics regarding performance, memory management, persistence, and distribution capabilities. Choosing the right provider depends on your application's scalability requirements, data size, and infrastructure constraints.</p>
-
-            <h3>Analogy</h3>
-            <p>Cache providers are like different types of storage solutions you might use for organizing tools in a workshop. A simple toolbox (ConcurrentHashMap) works great for basic needs - it's lightweight, easy to use, and perfect for personal projects, but it can't handle industrial-scale work. A professional tool chest with multiple drawers and advanced organization (Caffeine) offers much better capacity and efficiency for serious craftsmen. A shared storage warehouse (Redis) allows multiple workshops to store and access tools collectively, perfect for large construction projects where teams need to coordinate. An automated industrial storage system (Hazelcast) provides enterprise-grade organization with robotic retrieval and intelligent distribution across multiple facilities. Each storage solution serves different needs - you wouldn't use an industrial warehouse for a simple home repair, but you also wouldn't try to manage a construction company's tools with a basic toolbox.</p>
+            <p>Cache providers are the underlying storage mechanisms that actually hold cached data. Spring Boot supports various providers: ConcurrentHashMap for simple in-memory caching, Caffeine for high-performance local caching with advanced features, Redis for distributed caching across multiple servers, and Hazelcast for in-memory data grids. Each provider has different characteristics regarding performance, memory management, persistence, and distribution capabilities.</p>
 
             <h3>Examples</h3>
-            <p><strong>Simple in-memory caching:</strong></p>
-            <pre><code class="language-java">@Bean
-public CacheManager cacheManager() {
-    return new ConcurrentMapCacheManager("users", "products");
-}
-</code></pre>
-
-            <p><strong>Caffeine high-performance cache:</strong></p>
+            <p><strong>Caffeine high-performance cache with monitoring:</strong></p>
             <pre><code class="language-java">@Bean
 public CacheManager caffeineCacheManager() {
     CaffeineCacheManager manager = new CaffeineCacheManager();
-    manager.setCaffeine(Caffeine.newBuilder().maximumSize(1000).expireAfterWrite(10, TimeUnit.MINUTES));
+    manager.setCaffeine(Caffeine.newBuilder()
+        .maximumSize(1000)
+        .expireAfterWrite(10, TimeUnit.MINUTES)
+        .recordStats()  // Enable statistics
+        .removalListener((key, value, cause) -> {
+            logger.info("Cache entry removed: key={}, cause={}", key, cause);
+        }));
     return manager;
-}
-</code></pre>
+}</code></pre>
 
-            <p><strong>Redis distributed cache:</strong></p>
+            <p><strong>Redis distributed cache configuration:</strong></p>
             <pre><code class="language-java">@Bean
 public CacheManager redisCacheManager(RedisConnectionFactory factory) {
-    return RedisCacheManager.builder(factory)
-        .cacheDefaults(cacheConfiguration())
-        .build();
-}
-</code></pre>
+    RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
+        .entryTtl(Duration.ofMinutes(30))
+        .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()));
 
-            <p><strong>Cache provider comparison:</strong></p>
-            <pre><code class="language-java">// ConcurrentHashMap: Simple, fast, single JVM
-// Caffeine: Fast, advanced features, single JVM
-// Redis: Distributed, persistent, multiple JVMs
-// Hazelcast: Distributed, in-memory grid, clustering
-</code></pre>
+    return RedisCacheManager.builder(factory)
+        .cacheDefaults(config)
+        .transactionAware()  // Support for monitoring transactions
+        .build();
+}</code></pre>
           </section>
 
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
@@ -258,350 +442,278 @@ public CacheManager redisCacheManager(RedisConnectionFactory factory) {
           <section id="cache-configuration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Cache Configuration</h2>
             <h3>Definition</h3>
-            <p>Cache configuration defines how caches behave regarding size limits, expiration policies, eviction strategies, and serialization. Configuration includes setting maximum cache sizes, time-based expiration (TTL), access-based expiration, and cache warming strategies. Proper configuration ensures optimal memory usage, prevents cache growth from consuming all available memory, and maintains data freshness appropriate for your application's requirements. Different caches within the same application can have different configurations based on their specific usage patterns and requirements.</p>
-
-            <h3>Analogy</h3>
-            <p>Cache configuration is like setting up rules for organizing your refrigerator to keep food fresh and maximize space. You establish expiration policies (check dates and throw out old food), size limits (don't overstuff shelves), and placement strategies (frequently used items at eye level, seasonal items in back). Some items like milk need frequent rotation and short expiration times, while items like condiments can stay longer and don't need prime real estate. You might have different zones with different rules: the main shelves for everyday items with moderate expiration, the crisper drawer for vegetables with longer expiration, and the door for condiments that rarely expire. These rules prevent your refrigerator from becoming cluttered with spoiled food while ensuring you can quickly find what you need. Cache configuration works similarly, establishing rules for different types of data to optimize both performance and memory usage.</p>
+            <p>Cache configuration defines how caches behave regarding size limits, expiration policies, eviction strategies, and serialization. Configuration includes setting maximum cache sizes, time-based expiration (TTL), access-based expiration, and cache warming strategies. Proper configuration ensures optimal memory usage, prevents cache growth from consuming all available memory, and maintains data freshness appropriate for your application's requirements.</p>
 
             <h3>Examples</h3>
-            <p><strong>Time-based expiration configuration:</strong></p>
-            <pre><code class="language-properties">spring.cache.caffeine.spec=maximumSize=1000,expireAfterWrite=10m
-spring.cache.cache-names=users,products,exchange-rates
-</code></pre>
+            <p><strong>Environment-specific cache configuration:</strong></p>
+            <pre><code class="language-properties"># application-dev.properties
+spring.cache.caffeine.spec=maximumSize=100,expireAfterWrite=5m
 
-            <p><strong>Different expiration for different caches:</strong></p>
+# application-prod.properties
+spring.cache.caffeine.spec=maximumSize=10000,expireAfterWrite=30m
+management.metrics.cache.instrument=true</code></pre>
+
+            <p><strong>Multiple cache configurations:</strong></p>
             <pre><code class="language-java">@Bean
 public CacheManager cacheManager() {
     CaffeineCacheManager manager = new CaffeineCacheManager();
-    manager.registerCustomCache("users",
-        Caffeine.newBuilder().expireAfterWrite(1, TimeUnit.HOURS).build());
-    manager.registerCustomCache("exchange-rates",
-        Caffeine.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build());
+
+    // Short-lived user sessions
+    manager.registerCustomCache("user-sessions",
+        Caffeine.newBuilder()
+            .expireAfterAccess(30, TimeUnit.MINUTES)
+            .recordStats()
+            .build());
+
+    // Long-lived reference data
+    manager.registerCustomCache("reference-data",
+        Caffeine.newBuilder()
+            .expireAfterWrite(4, TimeUnit.HOURS)
+            .maximumSize(5000)
+            .recordStats()
+            .build());
+
     return manager;
-}
-</code></pre>
-
-            <p><strong>Redis cache configuration:</strong></p>
-            <pre><code class="language-java">@Bean
-public RedisCacheConfiguration cacheConfiguration() {
-    return RedisCacheConfiguration.defaultCacheConfig()
-        .entryTtl(Duration.ofMinutes(30))
-        .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
-        .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer()));
-}
-</code></pre>
-
-            <p><strong>Cache size and eviction policies:</strong></p>
-            <pre><code class="language-java">Caffeine.newBuilder()
-    .maximumSize(10000)                    // Max entries
-    .expireAfterAccess(2, TimeUnit.HOURS)  // Remove if not accessed
-    .removalListener((key, value, cause) -> {
-        logger.info("Cache entry removed: " + cause);
-    })
-</code></pre>
+}</code></pre>
           </section>
 
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
-          <section id="cache-strategies" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Cache Strategies</h2>
+          <section id="monitoring-caching" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Monitoring & Caching Integration</h2>
             <h3>Definition</h3>
-            <p>Cache strategies define when and how data moves between cache and persistent storage. Cache-aside (lazy loading) loads data into cache only when requested and missed. Write-through updates both cache and database simultaneously. Write-behind (write-back) updates cache immediately and database asynchronously. Read-through automatically loads missing data from the database. Each strategy has different trade-offs regarding consistency, performance, and complexity. Choosing the right strategy depends on your application's read/write patterns, consistency requirements, and performance goals.</p>
-
-            <h3>Analogy</h3>
-            <p>Cache strategies are like different approaches to managing a well-stocked office supply closet. Cache-aside is like only restocking supplies when someone needs them and finds the closet empty - you make a trip to the store when you discover you're out of printer paper. Write-through is like maintaining a detailed inventory system where every time you add or remove supplies, you immediately update both the physical closet and the master inventory list. Write-behind is like updating the closet immediately when someone takes supplies, but waiting until the end of the day to update the paperwork in batches. Read-through is like having a smart closet that automatically orders and stocks items the moment someone tries to take something that isn't there. Each approach has different benefits: cache-aside is simple but can have delays, write-through is consistent but slower, write-behind is fast but risks data loss, and read-through is convenient but more complex to implement.</p>
+            <p>Integrating monitoring with caching provides comprehensive visibility into cache performance, helping optimize cache strategies and troubleshoot performance issues. This includes tracking cache hit rates, monitoring eviction patterns, measuring cache-related response times, and alerting on cache health issues. Proper integration ensures that caching improvements are measurable and cache-related problems are quickly identified.</p>
 
             <h3>Examples</h3>
-            <p><strong>Cache-aside pattern (manual control):</strong></p>
-            <pre><code class="language-java">public User getUser(Long id) {
-    User user = cacheManager.getCache("users").get(id, User.class);
-    if (user == null) {
-        user = userRepository.findById(id);
-        cacheManager.getCache("users").put(id, user);
+            <p><strong>Cache metrics endpoint:</strong></p>
+            <pre><code class="language-java">@RestController
+public class CacheMonitoringController {
+    @Autowired
+    private CacheManager cacheManager;
+
+    @GetMapping("/actuator/cache-stats")
+    public Map<String, Object> getCacheStatistics() {
+        Map<String, Object> stats = new HashMap<>();
+
+        cacheManager.getCacheNames().forEach(cacheName -> {
+            Cache cache = cacheManager.getCache(cacheName);
+            if (cache.getNativeCache() instanceof com.github.benmanes.caffeine.cache.Cache) {
+                com.github.benmanes.caffeine.cache.stats.CacheStats cacheStats =
+                    ((com.github.benmanes.caffeine.cache.Cache<?, ?>) cache.getNativeCache()).stats();
+
+                stats.put(cacheName, Map.of(
+                    "hitRate", cacheStats.hitRate(),
+                    "missCount", cacheStats.missCount(),
+                    "evictionCount", cacheStats.evictionCount(),
+                    "size", ((com.github.benmanes.caffeine.cache.Cache<?, ?>) cache.getNativeCache()).estimatedSize()
+                ));
+            }
+        });
+
+        return stats;
     }
-    return user;
-}
-</code></pre>
+}</code></pre>
 
-            <p><strong>Write-through pattern:</strong></p>
-            <pre><code class="language-java">@CachePut(value = "users", key = "#user.id")
-public User updateUser(User user) {
-    return userRepository.save(user);  // Update both DB and cache
-}
-</code></pre>
-
-            <p><strong>Cache warming strategy:</strong></p>
-            <pre><code class="language-java">@EventListener(ApplicationReadyEvent.class)
-public void warmCache() {
-    List<Product> popularProducts = productRepository.findTop100ByOrderBySalesDesc();
-    popularProducts.forEach(product ->
-        cacheManager.getCache("products").put(product.getId(), product));
-}
-</code></pre>
-
-            <p><strong>Cache refresh strategy:</strong></p>
-            <pre><code class="language-java">@Scheduled(fixedRate = 300000) // Every 5 minutes
-public void refreshExchangeRates() {
-    cacheManager.getCache("exchange-rates").clear();
-    exchangeRateService.preloadRates();  // Refresh critical data
-}
-</code></pre>
-          </section>
-
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="conditional-caching" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Conditional Caching</h2>
-            <h3>Definition</h3>
-            <p>Conditional caching allows you to cache data only when specific conditions are met, preventing unnecessary cache pollution and optimizing memory usage. Using Spring Expression Language (SpEL), you can define conditions based on method parameters, return values, or application state. Common conditions include caching only successful results, excluding null values, caching based on user roles, or applying different cache behavior based on data characteristics. Conditional caching ensures that cache space is used efficiently for data that truly benefits from caching.</p>
-
-            <h3>Analogy</h3>
-            <p>Conditional caching is like having smart storage rules in a busy photography studio. You don't want to store every single photo in your quick-access portfolio case - instead, you establish intelligent rules: "only store photos rated 4 stars or higher," "don't store photos larger than 50MB in the quick case," or "only cache photos from paying clients." You might also have rules like "if it's a wedding photo, definitely cache it because clients will want to see it multiple times, but if it's a test shot, don't bother." These conditions prevent your valuable, limited quick-access storage from being cluttered with photos that aren't likely to be requested again, while ensuring that high-value, frequently accessed photos are always readily available. The storage system automatically applies these rules, so you don't have to manually decide what to store each time.</p>
-
-            <h3>Examples</h3>
-            <p><strong>Cache only successful results:</strong></p>
-            <pre><code class="language-java">@Cacheable(value = "users", condition = "#result != null")
-public User findUser(Long id) {
-    return userRepository.findById(id).orElse(null);
-}
-</code></pre>
-
-            <p><strong>Cache based on method parameters:</strong></p>
-            <pre><code class="language-java">@Cacheable(value = "products", condition = "#category != 'TEMP'")
-public List<Product> findByCategory(String category) {
-    return productRepository.findByCategory(category);
-}
-</code></pre>
-
-            <p><strong>Cache eviction with conditions:</strong></p>
-            <pre><code class="language-java">@CacheEvict(value = "users", key = "#user.id",
-            condition = "#user.status == 'ACTIVE'")
-public void updateUser(User user) {
-    userRepository.save(user);
-}
-</code></pre>
-
-            <p><strong>Cache only for expensive operations:</strong></p>
-            <pre><code class="language-java">@Cacheable(value = "reports", condition = "#days > 30")
-public Report generateReport(int days) {
-    // Only cache reports for long periods (expensive to generate)
-    return reportService.generate(days);
-}
-</code></pre>
-          </section>
-
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="cache-monitoring" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Cache Monitoring</h2>
-            <h3>Definition</h3>
-            <p>Cache monitoring tracks cache performance metrics like hit rates, miss rates, eviction counts, and memory usage to optimize cache effectiveness. Spring Boot Actuator provides built-in cache metrics that integrate with monitoring systems like Micrometer and Prometheus. Key metrics include cache hit ratio (percentage of requests served from cache), eviction rate (how often data is removed), and cache size trends. Monitoring helps identify cache tuning opportunities, detect cache thrashing, and validate that caching strategies are providing expected performance benefits.</p>
-
-            <h3>Analogy</h3>
-            <p>Cache monitoring is like tracking the performance of a busy restaurant's ingredient prep station. The chef keeps statistics on how often they find ingredients already prepped and ready (cache hit rate) versus having to prepare them from scratch (cache miss rate). They also track how often they have to throw out prepared ingredients that went bad before being used (eviction rate) and how much prep space is being used at different times of day (cache utilization). By analyzing these metrics, the chef can optimize their prep strategy: if the hit rate is low, they might be preparing the wrong ingredients; if the eviction rate is high, they might be preparing too much too early; if utilization is always at 100%, they might need more prep space. These insights help the chef balance preparation efficiency with waste reduction, just like cache monitoring helps optimize the balance between performance and resource usage.</p>
-
-            <h3>Examples</h3>
-            <p><strong>Enable cache metrics with Actuator:</strong></p>
-            <pre><code class="language-properties">management.endpoints.web.exposure.include=caches,metrics
-management.endpoint.caches.enabled=true
-</code></pre>
-
-            <p><strong>Custom cache metrics:</strong></p>
+            <p><strong>Cache health indicator:</strong></p>
             <pre><code class="language-java">@Component
-public class CacheMetrics {
+public class CacheHealthIndicator implements HealthIndicator {
+    @Autowired
+    private CacheManager cacheManager;
+
+    @Override
+    public Health health() {
+        Health.Builder builder = Health.up();
+
+        cacheManager.getCacheNames().forEach(cacheName -> {
+            Cache cache = cacheManager.getCache(cacheName);
+            try {
+                // Test cache operation
+                cache.get("health-check", () -> "OK");
+                builder.withDetail(cacheName, "healthy");
+            } catch (Exception e) {
+                builder.down().withDetail(cacheName, "unhealthy: " + e.getMessage());
+            }
+        });
+
+        return builder.build();
+    }
+}</code></pre>
+
+            <p><strong>Cache warming with monitoring:</strong></p>
+            <pre><code class="language-java">@Component
+public class CacheWarmupService {
+    private final Logger logger = LoggerFactory.getLogger(CacheWarmupService.class);
     private final MeterRegistry meterRegistry;
 
-    public CacheMetrics(MeterRegistry meterRegistry, CacheManager cacheManager) {
-        Gauge.builder("cache.size")
-             .tag("cache", "users")
-             .register(meterRegistry, cacheManager.getCache("users"),
-                      cache -> cache.getNativeCache().size());
-    }
-}
-</code></pre>
+    @EventListener(ApplicationReadyEvent.class)
+    public void warmupCaches() {
+        Timer.Sample sample = Timer.start(meterRegistry);
 
-            <p><strong>Cache statistics access:</strong></p>
-            <pre><code class="language-java">@GetMapping("/cache/stats")
-public Map<String, Object> getCacheStats() {
-    Cache cache = cacheManager.getCache("users");
-    CacheStats stats = ((CaffeineCache) cache).getNativeCache().stats();
-    return Map.of(
-        "hitRate", stats.hitRate(),
-        "missCount", stats.missCount(),
-        "evictionCount", stats.evictionCount()
-    );
-}
-</code></pre>
+        try {
+            // Warm up popular products
+            List<Product> popularProducts = productRepository.findTop100ByOrderBySalesDesc();
+            popularProducts.forEach(product ->
+                cacheManager.getCache("products").put(product.getId(), product));
+
+            logger.info("Cache warmed with {} products", popularProducts.size());
+            meterRegistry.counter("cache.warmup.success").increment();
+        } catch (Exception e) {
+            logger.error("Cache warmup failed", e);
+            meterRegistry.counter("cache.warmup.failure").increment();
+        } finally {
+            sample.stop(Timer.builder("cache.warmup.duration").register(meterRegistry));
+        }
+    }
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="production-best-practices" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Production Best Practices</h2>
+            <h3>Definition</h3>
+            <p>Production best practices for monitoring and caching involve securing endpoints, optimizing cache strategies, implementing proper alerting, and ensuring observability doesn't impact performance. This includes protecting sensitive monitoring endpoints, choosing appropriate cache eviction policies, setting up meaningful alerts, and monitoring the monitoring systems themselves to ensure reliability.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Production monitoring security:</strong></p>
+            <pre><code class="language-java">@Configuration
+public class ActuatorSecurityConfig {
+    @Bean
+    public SecurityFilterChain actuatorSecurity(HttpSecurity http) throws Exception {
+        return http.requestMatcher(EndpointRequest.toAnyEndpoint())
+                  .authorizeHttpRequests(auth -> auth
+                      .requestMatchers(EndpointRequest.to("health")).permitAll()
+                      .requestMatchers(EndpointRequest.to("cache-stats")).hasRole("ADMIN")
+                      .anyRequest().hasRole("ACTUATOR"))
+                  .build();
+    }
+}</code></pre>
 
             <p><strong>Cache monitoring alerts:</strong></p>
-            <pre><code class="language-java">@EventListener
-public void onCacheEviction(CacheEvictEvent event) {
-    if (evictionCounter.incrementAndGet() > EVICTION_THRESHOLD) {
-        alertService.sendAlert("High cache eviction rate detected");
+            <pre><code class="language-java">@Component
+public class CacheAlertingService {
+    private final MeterRegistry meterRegistry;
+
+    @EventListener
+    @Async
+    public void onCacheEviction(CacheEvictEvent event) {
+        meterRegistry.counter("cache.evictions", "cache", event.getCacheName()).increment();
+
+        // Alert if eviction rate is too high
+        if (isEvictionRateHigh(event.getCacheName())) {
+            alertingService.sendAlert(
+                "High cache eviction rate detected for cache: " + event.getCacheName()
+            );
+        }
     }
-}
-</code></pre>
-          </section>
 
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+    @Scheduled(fixedRate = 60000) // Every minute
+    public void checkCacheHealth() {
+        cacheManager.getCacheNames().forEach(cacheName -> {
+            Cache cache = cacheManager.getCache(cacheName);
+            double hitRate = getCacheHitRate(cache);
 
-          <section id="distributed-caching" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Distributed Caching</h2>
-            <h3>Definition</h3>
-            <p>Distributed caching shares cached data across multiple application instances, enabling horizontal scaling while maintaining cache consistency. Solutions like Redis, Hazelcast, or Memcached provide shared cache storage that multiple application servers can access simultaneously. Distributed caching solves the problem of cache synchronization in multi-instance deployments, prevents cache data duplication, and allows for larger total cache capacity. However, it introduces network latency and requires careful consideration of serialization, consistency, and failure handling strategies.</p>
-
-            <h3>Analogy</h3>
-            <p>Distributed caching is like transitioning from individual desk organizers to a shared office supply room that serves multiple departments. When each employee had their own desk organizer (local cache), they could quickly access their personal supplies, but popular items were duplicated across many desks, and if someone left the company, their supplies were lost. A shared supply room (distributed cache) allows all departments to access the same inventory, eliminates duplication, and provides much larger total storage capacity. However, employees now need to walk to the supply room (network latency) rather than reaching into their desk drawer, and there need to be procedures for handling situations when the supply room is temporarily unavailable. The shared system works best for large organizations where the benefits of coordination and larger capacity outweigh the slight inconvenience of centralized access.</p>
-
-            <h3>Examples</h3>
-            <p><strong>Redis distributed cache setup:</strong></p>
-            <pre><code class="language-properties">spring.redis.host=redis-server
-spring.redis.port=6379
-spring.cache.type=redis
-spring.cache.redis.time-to-live=600000
-</code></pre>
-
-            <p><strong>Redis cache configuration:</strong></p>
-            <pre><code class="language-java">@Bean
-public RedisCacheManager cacheManager(RedisConnectionFactory factory) {
-    RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
-        .entryTtl(Duration.ofMinutes(10))
-        .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()));
-
-    return RedisCacheManager.builder(factory)
-        .cacheDefaults(config)
-        .build();
-}
-</code></pre>
-
-            <p><strong>Hazelcast distributed cache:</strong></p>
-            <pre><code class="language-java">@Bean
-public HazelcastInstance hazelcastInstance() {
-    Config config = new Config();
-    config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(true);
-    return Hazelcast.newHazelcastInstance(config);
-}
-</code></pre>
-
-            <p><strong>Cache serialization consideration:</strong></p>
-            <pre><code class="language-java">// Objects stored in distributed cache must be serializable
-public class User implements Serializable {
-    private static final long serialVersionUID = 1L;
-    // User fields and methods
-}
-</code></pre>
-          </section>
-
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="caching-best-practices" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Caching Best Practices</h2>
-            <h3>Definition</h3>
-            <p>Effective caching requires following established patterns and avoiding common pitfalls. Best practices include caching immutable or slowly-changing data, using appropriate cache keys that avoid collisions, setting reasonable expiration times, monitoring cache performance, handling cache failures gracefully, and avoiding caching large objects that consume excessive memory. Additionally, consider cache warming for critical data, implement proper error handling for cache operations, and ensure that cached data doesn't contain sensitive information that shouldn't be stored in memory.</p>
-
-            <h3>Analogy</h3>
-            <p>Caching best practices are like the wisdom gained from years of managing a successful restaurant's food prep and storage systems. Experienced chefs know to prep stable ingredients that won't spoil quickly (cache slowly-changing data), use clear labeling to avoid mixing up similar dishes (unique cache keys), set appropriate storage times for different ingredients (reasonable expiration), regularly check what's being used most often (monitor performance), and have backup plans when the walk-in cooler breaks down (graceful failure handling). They also know not to pre-make everything (avoid caching everything), to prepare popular items in advance during slow periods (cache warming), and to never store raw meat next to ready-to-eat items (separate sensitive data). These practices develop from understanding both the benefits and risks of food storage, ensuring efficiency while maintaining safety and quality standards.</p>
-
-            <h3>Examples</h3>
-            <p><strong>Cache immutable and slow-changing data:</strong></p>
-            <pre><code class="language-java">@Cacheable("countries")  // Good: country data rarely changes
-public List<Country> getAllCountries() { return countryRepository.findAll(); }
-
-// Avoid caching frequently changing data
-public BigDecimal getCurrentStockPrice(String symbol) { /* Don't cache */ }
-</code></pre>
-
-            <p><strong>Use meaningful cache keys:</strong></p>
-            <pre><code class="language-java">@Cacheable(value = "user-orders", key = "#userId + '-' + #status")
-public List<Order> getUserOrders(Long userId, String status) {
-    return orderRepository.findByUserIdAndStatus(userId, status);
-}
-</code></pre>
-
-            <p><strong>Handle cache failures gracefully:</strong></p>
-            <pre><code class="language-java">public User getUser(Long id) {
-    try {
-        return cacheManager.getCache("users").get(id, () -> userRepository.findById(id));
-    } catch (Exception e) {
-        logger.warn("Cache failure, falling back to database", e);
-        return userRepository.findById(id);
+            if (hitRate < 0.8) { // Alert if hit rate drops below 80%
+                alertingService.sendAlert(
+                    String.format("Low cache hit rate (%.2f) for cache: %s", hitRate, cacheName)
+                );
+            }
+        });
     }
-}
-</code></pre>
+}</code></pre>
 
-            <p><strong>Set appropriate cache sizes and expiration:</strong></p>
-            <pre><code class="language-java">// Configure based on actual usage patterns
-Caffeine.newBuilder()
-    .maximumSize(10000)                    // Based on memory constraints
-    .expireAfterWrite(30, TimeUnit.MINUTES) // Based on data freshness needs
-    .recordStats()                         // Enable monitoring
-</code></pre>
+            <p><strong>Production cache configuration:</strong></p>
+            <pre><code class="language-yaml"># application-prod.yml
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,cache-stats
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    cache:
+      instrument: true
+    export:
+      prometheus:
+        enabled: true
+
+spring:
+  cache:
+    caffeine:
+      spec: maximumSize=50000,expireAfterWrite=1h,recordStats=true</code></pre>
           </section>
 
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
           <section id="summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Summary</h2>
-            <p>You've now mastered Spring Boot caching, from understanding basic cache concepts to implementing sophisticated distributed caching strategies. Spring's cache abstraction provides a powerful, flexible way to dramatically improve application performance with minimal code changes, while supporting various cache providers from simple in-memory storage to enterprise-grade distributed systems. You've learned to use cache annotations effectively, configure appropriate expiration and eviction policies, monitor cache performance, and follow best practices that maximize benefits while avoiding common pitfalls. Proper caching can transform slow applications into lightning-fast systems that scale effortlessly under load. Next, you'll explore comprehensive performance optimization techniques that build upon caching to create high-performance Spring Boot applications ready for production environments.</p>
+            <p>You've now mastered both Spring Boot Actuator monitoring and caching strategies, creating a powerful combination for building high-performance, observable applications. Actuator provides the comprehensive monitoring capabilities needed to understand application health and performance, while Spring's caching abstraction offers the tools to optimize that performance through intelligent data storage and retrieval. The integration of monitoring and caching creates a virtuous cycle: monitoring helps you identify what to cache and how well your caching strategies are working, while caching improves the performance metrics you're monitoring. You've learned to implement health checks, track meaningful metrics, create custom endpoints, configure various cache providers, and follow production best practices that ensure both performance and observability. These skills enable you to build applications that not only perform exceptionally well but also provide the visibility needed to maintain and improve that performance over time. Next, you'll explore comprehensive performance optimization techniques that build upon these monitoring and caching foundations.</p>
           </section>
 
           <section id="programming-challenge" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Programming Challenge</h2>
             <div class="rounded-lg border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800">
-              <h3 class="mt-0">Challenge: Multi-Level Caching E-commerce System</h3>
-              <p><strong>Task:</strong> Build an e-commerce product catalog with intelligent multi-level caching that optimizes for different data access patterns and performance requirements.</p>
+              <h3 class="mt-0">Challenge: Comprehensive Monitoring and Caching E-commerce Platform</h3>
+              <p><strong>Task:</strong> Build a Spring Boot e-commerce application with comprehensive monitoring capabilities and intelligent multi-level caching that demonstrates the integration of observability and performance optimization.</p>
 
               <p><strong>Requirements:</strong></p>
               <ol>
-                <li>Create entities and services:</li>
+                <li>Create core entities and services:</li>
                 <ul>
-                  <li><code>Product</code>: id, name, description, price, category, popularity score</li>
-                  <li><code>Category</code>: id, name, description</li>
-                  <li><code>ProductService</code> with search and retrieval methods</li>
-                  <li><code>RecommendationService</code> for expensive recommendation calculations</li>
+                  <li><code>Product</code>, <code>Category</code>, <code>Order</code>, <code>User</code> entities</li>
+                  <li>Service layer with business logic for product catalog and order processing</li>
+                  <li>REST endpoints for product search, user management, and order operations</li>
                 </ul>
-                <li>Implement multi-level caching strategy:</li>
+                <li>Implement comprehensive monitoring:</li>
                 <ul>
-                  <li>L1 Cache: Individual products (fast access, 1-hour TTL)</li>
-                  <li>L2 Cache: Product lists by category (medium TTL, 30 minutes)</li>
-                  <li>L3 Cache: Expensive recommendations (long TTL, 4 hours)</li>
-                  <li>L4 Cache: Popular products (cache warming, refreshed nightly)</li>
+                  <li>Custom health indicators for database, cache, and external services</li>
+                  <li>Business metrics tracking (orders per minute, popular products, revenue)</li>
+                  <li>Custom Actuator endpoints for business dashboard and cache management</li>
+                  <li>Application events monitoring for startup, shutdown, and critical operations</li>
                 </ul>
-                <li>Add conditional caching:</li>
+                <li>Design intelligent caching strategy:</li>
                 <ul>
-                  <li>Only cache products with popularity score > 50</li>
-                  <li>Don't cache temporary or discontinued products</li>
-                  <li>Cache search results only for queries longer than 3 characters</li>
+                  <li>L1 Cache: Individual products (1-hour TTL, high hit rate expected)</li>
+                  <li>L2 Cache: Product categories and search results (30-min TTL)</li>
+                  <li>L3 Cache: User profiles and preferences (4-hour TTL)</li>
+                  <li>L4 Cache: Popular products with cache warming at startup</li>
                 </ul>
-                <li>Implement cache management:</li>
+                <li>Integrate monitoring with caching:</li>
                 <ul>
-                  <li>Custom cache eviction when products are updated</li>
-                  <li>Cache warming for popular products at startup</li>
-                  <li>Scheduled cache refresh for recommendations</li>
+                  <li>Cache hit/miss rate monitoring and alerting</li>
+                  <li>Cache size and eviction pattern tracking</li>
+                  <li>Performance comparison metrics (with/without cache)</li>
+                  <li>Cache health indicators and automatic failover strategies</li>
                 </ul>
-                <li>Add monitoring and management:</li>
+                <li>Implement production features:</li>
                 <ul>
-                  <li>Custom Actuator endpoint showing cache statistics</li>
-                  <li>Cache hit/miss ratio monitoring</li>
-                  <li>Administrative endpoints for cache clearing</li>
+                  <li>Structured logging with correlation IDs for request tracing</li>
+                  <li>Security configuration for monitoring endpoints</li>
+                  <li>Environment-specific cache and monitoring configurations</li>
+                  <li>Graceful degradation when cache is unavailable</li>
                 </ul>
-                <li>Configure for different environments:</li>
+                <li>Add management and operations capabilities:</li>
                 <ul>
-                  <li>Development: Simple in-memory caching</li>
-                  <li>Production: Redis distributed caching with appropriate serialization</li>
+                  <li>Administrative endpoints for cache clearing and statistics</li>
+                  <li>Scheduled cache refresh for critical data</li>
+                  <li>Performance alerting based on response times and error rates</li>
+                  <li>Prometheus metrics export for external monitoring systems</li>
                 </ul>
               </ol>
 
               <p><strong>Bonus features:</strong></p>
               <ul>
-                <li>Implement cache-aside pattern for complex search queries</li>
-                <li>Add cache stampede protection for expensive operations</li>
-                <li>Create custom cache key generators for complex scenarios</li>
-                <li>Implement cache versioning for gradual updates</li>
-                <li>Add cache preloading based on user behavior patterns</li>
+                <li>Distributed caching with Redis and monitoring across multiple instances</li>
+                <li>Cache warming based on user behavior patterns and popular search terms</li>
+                <li>Dynamic cache configuration adjustment based on monitoring data</li>
+                <li>Circuit breaker pattern with cache fallback and monitoring integration</li>
+                <li>Custom cache eviction listeners with monitoring and alerting</li>
+                <li>A/B testing framework for cache strategies with performance monitoring</li>
               </ul>
 
-              <p><strong>Learning Goals:</strong> Practice designing comprehensive caching strategies, implementing conditional caching, monitoring cache performance, and building production-ready caching solutions that handle real-world complexity and scale requirements.</p>
+              <p><strong>Learning Goals:</strong> Practice integrating comprehensive monitoring with intelligent caching strategies, implementing production-ready observability features, creating meaningful business metrics, and building systems that provide both excellent performance and operational visibility for enterprise environments.</p>
             </div>
           </section>
 
