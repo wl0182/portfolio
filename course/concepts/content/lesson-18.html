@@ -3,8 +3,8 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Lesson 18 - Spring Boot Performance Optimization and Best Practices</title>
-    <meta name="description" content="Spring Boot performance optimization: profiling, memory management, database optimization, caching strategies, and production best practices for high-performance applications." />
+    <title>Lesson 18 - Spring Boot Application: All Components Working Together</title>
+    <meta name="description" content="Learn how to build a complete Spring Boot application with proper project structure, integrating all components including controllers, services, repositories, security, and data access layers." />
     <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <script>
@@ -47,17 +47,20 @@
             <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">On this page</h2>
             <ol class="space-y-1 text-sm">
               <li><a href="#introduction" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Introduction</a></li>
-              <li><a href="#performance-fundamentals" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Performance Fundamentals</a></li>
-              <li><a href="#application-profiling" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Application Profiling</a></li>
-              <li><a href="#jvm-optimization" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">JVM Optimization</a></li>
-              <li><a href="#database-optimization" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Database Optimization</a></li>
-              <li><a href="#web-layer-optimization" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Web Layer Optimization</a></li>
-              <li><a href="#memory-management" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Memory Management</a></li>
-              <li><a href="#async-processing" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Async Processing</a></li>
-              <li><a href="#configuration-tuning" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Configuration Tuning</a></li>
-              <li><a href="#production-deployment" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Production Deployment</a></li>
-              <li><a href="#performance-testing" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Performance Testing</a></li>
-              <li><a href="#optimization-best-practices" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Optimization Best Practices</a></li>
+              <li><a href="#project-structure" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Project Structure</a></li>
+              <li><a href="#layered-architecture" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Layered Architecture</a></li>
+              <li><a href="#data-layer" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Data Layer</a></li>
+              <li><a href="#service-layer" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Service Layer</a></li>
+              <li><a href="#web-layer" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Web Layer</a></li>
+              <li><a href="#configuration-layer" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Configuration Layer</a></li>
+              <li><a href="#caching-integration" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Caching Integration</a></li>
+              <li><a href="#validation-integration" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Validation Integration</a></li>
+              <li><a href="#security-integration" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Security Integration</a></li>
+              <li><a href="#monitoring-layer" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Monitoring Layer</a></li>
+              <li><a href="#exception-handling" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Exception Handling</a></li>
+              <li><a href="#testing-strategy" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Testing Strategy</a></li>
+              <li><a href="#step-by-step-build" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Step-by-Step Build</a></li>
+              <li><a href="#component-integration" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Component Integration</a></li>
               <li><a href="#summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Summary</a></li>
               <li><a href="#programming-challenge" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Programming Challenge</a></li>
             </ol>
@@ -68,496 +71,1081 @@
             <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Concepts</a>
           </div>
           <header class="mx-auto max-w-3xl text-center">
-            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 18: Spring Boot Performance Optimization and Best Practices</h1>
-            <p class="mt-2 text-slate-600 dark:text-slate-300">Master comprehensive performance optimization techniques to build lightning-fast, scalable Spring Boot applications that excel in production environments.</p>
+            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 18: Spring Boot Application - All Components Working Together</h1>
+            <p class="mt-2 text-slate-600 dark:text-slate-300">Learn how to build a complete Spring Boot application with proper project structure, integrating controllers, services, repositories, security, and data access layers into a cohesive system.</p>
           </header>
 
           <section id="introduction" class="prose prose-slate mt-6 max-w-none dark:prose-invert">
             <h2>Introduction</h2>
-            <p>Building a Spring Boot application that works is one thing, but creating one that performs exceptionally under real-world load is entirely different. Performance optimization is the art and science of making your applications faster, more efficient, and capable of handling increased traffic without degrading user experience. Just like tuning a race car for optimal performance, optimizing a Spring Boot application involves fine-tuning every component from the JVM and database queries to caching strategies and network configurations. Poor performance can drive users away, increase infrastructure costs, and damage your reputation, while well-optimized applications delight users with instant responses and scale gracefully as your business grows. This lesson teaches you systematic approaches to identify performance bottlenecks, implement proven optimization techniques, and follow best practices that ensure your applications perform brilliantly in production environments.</p>
+            <p>Building a complete Spring Boot application is like conducting an orchestra where every instrument must play in harmony to create beautiful music. You've learned individual components like controllers, services, repositories, security, and data access, but now it's time to see how they all work together in a real application. A well-structured Spring Boot application follows clear architectural patterns that separate concerns, promote maintainability, and enable scalability. Understanding how to organize your project structure, connect different layers, and manage dependencies between components is crucial for building professional applications. This lesson guides you through creating a complete application step by step, showing you how each piece fits together and demonstrating best practices for project organization that will serve you well in real-world development.</p>
           </section>
 
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
-          <section id="performance-fundamentals" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Performance Fundamentals</h2>
+          <section id="project-structure" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Project Structure</h2>
             <h3>Definition</h3>
-            <p>Performance optimization focuses on improving response times, throughput, resource utilization, and scalability. Key metrics include latency (how fast individual requests complete), throughput (how many requests you can handle per second), CPU and memory usage, and user-perceived performance. Understanding these fundamentals helps you identify what to measure, where to look for problems, and how to prioritize optimization efforts for maximum impact on user experience.</p>
+            <p>Project structure in Spring Boot follows conventions that organize code into logical packages based on functionality and architectural layers. A well-organized structure separates presentation logic (controllers), business logic (services), data access logic (repositories), and configuration components. This separation makes code easier to understand, test, and maintain while following Spring Boot's convention-over-configuration philosophy that reduces boilerplate and increases productivity.</p>
 
             <h3>Analogy</h3>
-            <p>Think of performance optimization like tuning a high-performance sports car. You don't just make random modifications - you systematically analyze each component to find the limiting factors. The engine (application logic) needs to run efficiently, the fuel system (database) must deliver resources quickly, the cooling system (memory management) prevents overheating, and the aerodynamics (network optimization) reduce drag. A race car engineer uses precise instruments to measure lap times, acceleration, and fuel consumption, then makes targeted improvements where they'll have the biggest impact. Similarly, performance optimization requires measuring your application's behavior under various conditions, identifying the biggest bottlenecks, and making strategic improvements that deliver measurable results. Just as you wouldn't put racing tires on a car with a weak engine, you optimize application components in order of their impact on overall performance.</p>
+            <p>Think of project structure like organizing a well-run restaurant. The dining area (controllers) handles customer interactions, the kitchen (services) prepares the food according to recipes, the pantry (repositories) manages ingredient storage and retrieval, and the management office (configuration) sets policies and procedures. Each area has a specific purpose and clear boundaries, but they all work together seamlessly. The waitstaff doesn't cook food, the chefs don't handle payments, and the storage manager doesn't serve customers - but information and resources flow efficiently between areas. When a customer orders a meal, the request flows from dining room to kitchen to pantry and back, with each area doing what it does best. A Spring Boot application works the same way, with each package and layer having clear responsibilities while collaborating to fulfill user requests efficiently and maintainably.</p>
 
             <h3>Examples</h3>
-            <p><strong>Performance metrics to track:</strong></p>
+            <p><strong>Standard project structure:</strong></p>
+            <pre><code class="language-text">src/main/java/com/example/app/
+├── Application.java              # Main class
+├── controller/                   # Web layer
+│   ├── UserController.java
+│   └── ProductController.java
+├── service/                      # Business layer
+│   ├── UserService.java
+│   └── ProductService.java
+├── repository/                   # Data layer
+│   ├── UserRepository.java
+│   └── ProductRepository.java
+├── model/                        # Domain entities
+│   ├── User.java
+│   └── Product.java
+├── dto/                          # Data transfer objects
+│   ├── UserDto.java
+│   └── ProductDto.java
+└── config/                       # Configuration
+    ├── SecurityConfig.java
+    └── DatabaseConfig.java
+</code></pre>
+
+            <p><strong>Main application class:</strong></p>
+            <pre><code class="language-java">@SpringBootApplication
+public class Application {
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+}
+</code></pre>
+
+            <p><strong>Package organization by feature:</strong></p>
+            <pre><code class="language-text">src/main/java/com/example/app/
+├── user/
+│   ├── UserController.java
+│   ├── UserService.java
+│   ├── UserRepository.java
+│   └── User.java
+└── product/
+    ├── ProductController.java
+    ├── ProductService.java
+    ├── ProductRepository.java
+    └── Product.java
+</code></pre>
+
+            <p><strong>Configuration properties structure:</strong></p>
+            <pre><code class="language-properties"># application.yml organized by component
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/app
+    username: ${DB_USER:admin}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  security:
+    jwt:
+      secret: ${JWT_SECRET}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="layered-architecture" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Layered Architecture</h2>
+            <h3>Definition</h3>
+            <p>Layered architecture organizes application components into horizontal layers where each layer has specific responsibilities and can only communicate with adjacent layers. The typical layers are presentation (controllers), business (services), persistence (repositories), and domain (entities). This architecture promotes separation of concerns, makes testing easier, and allows changes in one layer without affecting others. Dependencies flow downward, meaning higher layers depend on lower layers but not vice versa.</p>
+
+            <h3>Analogy</h3>
+            <p>Layered architecture is like a multi-story corporate building where each floor has a specific function and clear communication protocols. The executive floor (presentation layer) makes high-level decisions and communicates with clients, the management floor (business layer) implements company policies and coordinates operations, the operations floor (service layer) handles day-to-day work processes, and the basement (data layer) stores and retrieves company records. Information flows up and down through proper channels - executives don't directly access file cabinets in the basement, and data clerks don't make executive decisions. Each floor focuses on its expertise while relying on the floors below for support. When someone needs information, the request flows down through proper channels until it reaches the right floor, then the response flows back up. This structured approach ensures everyone knows their role, prevents chaos, and makes the organization scalable and maintainable.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Layer dependency diagram:</strong></p>
+            <pre><code class="language-text">Controller Layer (Web)
+    ↓ depends on
+Service Layer (Business)
+    ↓ depends on
+Repository Layer (Data)
+    ↓ depends on
+Domain Layer (Entities)
+</code></pre>
+
+            <p><strong>Controller layer implementation:</strong></p>
+            <pre><code class="language-java">@RestController
+@RequestMapping("/api/users")
+public class UserController {
+    private final UserService userService;
+
+    @GetMapping("/{id}")
+    public UserDto getUser(@PathVariable Long id) {
+        return userService.findById(id);  // Delegates to service
+    }
+}
+</code></pre>
+
+            <p><strong>Service layer with business logic:</strong></p>
+            <pre><code class="language-java">@Service
+public class UserService {
+    private final UserRepository userRepository;
+
+    public UserDto findById(Long id) {
+        User user = userRepository.findById(id)
+            .orElseThrow(() -> new UserNotFoundException(id));
+        return convertToDto(user);  // Business logic
+    }
+}
+</code></pre>
+
+            <p><strong>Repository layer for data access:</strong></p>
+            <pre><code class="language-java">@Repository
+public interface UserRepository extends JpaRepository&lt;User, Long&gt; {
+    Optional&lt;User&gt; findByEmail(String email);
+    List&lt;User&gt; findByActiveTrue();
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="data-layer" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Data Layer</h2>
+            <h3>Definition</h3>
+            <p>The data layer handles all database interactions and data persistence concerns in your Spring Boot application. It consists of entities (domain models), repositories (data access), and configuration for database connections. This layer abstracts database-specific details from business logic, provides a clean API for data operations, and ensures data consistency and integrity. Spring Data JPA simplifies repository implementation with automatic query generation and custom query support.</p>
+
+            <h3>Analogy</h3>
+            <p>The data layer is like a professional library system with librarians, catalogs, and storage areas. The entities (books) contain the actual information, the repositories (librarians) know exactly where everything is stored and how to retrieve it efficiently, and the database configuration (library policies) determines how the collection is organized and accessed. When someone needs information, they don't wander through the stacks randomly - they ask the librarian (repository) who uses the catalog system (database indexes) to quickly locate and retrieve the exact resources needed. The librarians handle all the complex filing, cross-referencing, and maintenance tasks, so researchers (business logic) can focus on analyzing information rather than worrying about storage details. This organized approach ensures information is reliable, accessible, and properly maintained.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Entity with relationships:</strong></p>
+            <pre><code class="language-java">@Entity
+@Table(name = "users")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(unique = true)
+    private String email;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List&lt;Order&gt; orders = new ArrayList&lt;&gt;();
+}
+</code></pre>
+
+            <p><strong>Repository with custom queries:</strong></p>
+            <pre><code class="language-java">@Repository
+public interface UserRepository extends JpaRepository&lt;User, Long&gt; {
+    @Query("SELECT u FROM User u WHERE u.active = true")
+    List&lt;User&gt; findActiveUsers();
+
+    @Modifying
+    @Query("UPDATE User u SET u.lastLogin = :date WHERE u.id = :id")
+    void updateLastLogin(@Param("id") Long id, @Param("date") LocalDateTime date);
+}
+</code></pre>
+
+            <p><strong>Database configuration:</strong></p>
+            <pre><code class="language-java">@Configuration
+@EnableJpaRepositories
+public class DatabaseConfig {
+
+    @Bean
+    @Primary
+    public DataSource dataSource() {
+        HikariConfig config = new HikariConfig();
+        config.setMaximumPoolSize(20);
+        return new HikariDataSource(config);
+    }
+}
+</code></pre>
+
+            <p><strong>Transaction management:</strong></p>
+            <pre><code class="language-java">@Service
+@Transactional
+public class UserService {
+
+    @Transactional(readOnly = true)
+    public List&lt;User&gt; findAll() {
+        return userRepository.findAll();
+    }
+
+    public User createUser(User user) {
+        // Automatic transaction management
+        return userRepository.save(user);
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="service-layer" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Service Layer</h2>
+            <h3>Definition</h3>
+            <p>The service layer contains your application's business logic and coordinates operations between different components. Services encapsulate complex business rules, orchestrate calls to repositories, handle transactions, and transform data between layers. This layer is where your application's core functionality lives, independent of how data is stored or how users interact with the system. Services should be focused, testable, and reusable across different parts of your application.</p>
+
+            <h3>Analogy</h3>
+            <p>The service layer is like the management team in a company that makes strategic decisions and coordinates between departments. When a customer wants to process a complex order, the sales manager (service) doesn't just pass the request directly to the warehouse (repository). Instead, they check inventory levels, verify customer credit, calculate discounts, coordinate with shipping, and ensure everything happens in the right sequence according to business rules. The manager knows how to handle exceptions - what to do when items are out of stock, how to process rush orders, and when to escalate issues to higher management. They transform raw data (like product codes) into meaningful information (like customer invoices) and ensure that all departments work together smoothly to achieve business objectives. This coordination and decision-making expertise is what makes the business run effectively.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Service with business logic:</strong></p>
+            <pre><code class="language-java">@Service
+public class OrderService {
+    private final OrderRepository orderRepository;
+    private final UserService userService;
+    private final PaymentService paymentService;
+
+    public OrderDto createOrder(CreateOrderRequest request) {
+        User user = userService.validateUser(request.getUserId());
+        Order order = new Order(user, request.getItems());
+
+        if (order.getTotal().compareTo(BigDecimal.valueOf(1000)) > 0) {
+            order.setStatus(OrderStatus.PENDING_APPROVAL);
+        }
+
+        return convertToDto(orderRepository.save(order));
+    }
+}
+</code></pre>
+
+            <p><strong>Service coordination:</strong></p>
+            <pre><code class="language-java">@Service
+public class UserRegistrationService {
+
+    public UserDto registerUser(RegistrationRequest request) {
+        validateRequest(request);
+
+        User user = createUser(request);
+        sendWelcomeEmail(user);
+        logRegistrationEvent(user);
+
+        return convertToDto(user);
+    }
+}
+</code></pre>
+
+            <p><strong>Service with validation:</strong></p>
+            <pre><code class="language-java">@Service
+public class ProductService {
+
+    public ProductDto updateProduct(Long id, UpdateProductRequest request) {
+        Product product = findProductById(id);
+
+        if (request.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new InvalidPriceException("Price must be positive");
+        }
+
+        product.updateFromRequest(request);
+        return convertToDto(productRepository.save(product));
+    }
+}
+</code></pre>
+
+            <p><strong>Service interfaces for testability:</strong></p>
+            <pre><code class="language-java">public interface EmailService {
+    void sendWelcomeEmail(User user);
+    void sendPasswordResetEmail(User user, String token);
+}
+
+@Service
+public class EmailServiceImpl implements EmailService {
+    // Implementation details
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="web-layer" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Web Layer</h2>
+            <h3>Definition</h3>
+            <p>The web layer handles HTTP requests and responses, managing the interaction between users and your application. Controllers receive requests, validate input, delegate to services, and return appropriate responses. This layer also includes request/response DTOs, validation annotations, and error handling. The web layer should be thin, focusing on HTTP concerns while delegating business logic to services. It transforms external requests into internal operations and formats results for client consumption.</p>
+
+            <h3>Analogy</h3>
+            <p>The web layer is like the reception desk and customer service department of a busy office building. When visitors (HTTP requests) arrive, the receptionist (controller) greets them, checks their credentials, determines what they need, and directs them to the right department (service). The receptionist doesn't solve complex problems themselves - they know who to call and how to route requests efficiently. They also handle the communication protocol - translating visitor requests into internal language the organization understands, and then translating responses back into terms visitors can understand. When problems occur, they provide appropriate error messages and guide visitors to alternative solutions. The reception area also maintains visitor logs (request logging) and ensures security protocols are followed before allowing access to internal departments.</p>
+
+            <h3>Examples</h3>
+            <p><strong>REST controller with validation:</strong></p>
+            <pre><code class="language-java">@RestController
+@RequestMapping("/api/users")
+@Validated
+public class UserController {
+    private final UserService userService;
+
+    @PostMapping
+    public ResponseEntity&lt;UserDto&gt; createUser(@Valid @RequestBody CreateUserRequest request) {
+        UserDto user = userService.createUser(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(user);
+    }
+
+    @GetMapping("/{id}")
+    public UserDto getUser(@PathVariable @Positive Long id) {
+        return userService.findById(id);
+    }
+}
+</code></pre>
+
+            <p><strong>Request/Response DTOs:</strong></p>
+            <pre><code class="language-java">public class CreateUserRequest {
+    @NotBlank
+    @Email
+    private String email;
+
+    @NotBlank
+    @Size(min = 8)
+    private String password;
+
+    @NotBlank
+    private String firstName;
+}
+
+public class UserDto {
+    private Long id;
+    private String email;
+    private String firstName;
+    private LocalDateTime createdAt;
+}
+</code></pre>
+
+            <p><strong>Global exception handling:</strong></p>
+            <pre><code class="language-java">@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleUserNotFound(UserNotFoundException ex) {
+        ErrorResponse error = new ErrorResponse("USER_NOT_FOUND", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleValidation(MethodArgumentNotValidException ex) {
+        // Handle validation errors
+        return ResponseEntity.badRequest().body(createValidationError(ex));
+    }
+}
+</code></pre>
+
+            <p><strong>Controller integration testing:</strong></p>
+            <pre><code class="language-java">@WebMvcTest(UserController.class)
+class UserControllerTest {
+    @MockBean
+    private UserService userService;
+
+    @Test
+    void shouldCreateUser() throws Exception {
+        mockMvc.perform(post("/api/users")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {"email": "test@example.com", "firstName": "John"}
+                    """))
+                .andExpect(status().isCreated());
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="configuration-layer" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Configuration Layer</h2>
+            <h3>Definition</h3>
+            <p>The configuration layer defines how your Spring Boot application components are wired together and how they behave in different environments. Configuration classes use annotations like @Configuration, @Bean, and @ConfigurationProperties to set up beans, define dependencies, and customize framework behavior. This layer separates configuration concerns from business logic, making your application more flexible and easier to deploy across different environments with different settings.</p>
+
+            <h3>Analogy</h3>
+            <p>The configuration layer is like the setup crew and technical specifications for a theater production. Before the show begins, the crew configures the stage, lighting, sound systems, and backstage equipment according to detailed specifications. They don't perform in the show, but they ensure all the technical elements work together perfectly so the actors can focus on their performances. Different venues might require different configurations - a small theater needs different lighting than a large auditorium - but the same show can adapt to various environments. The configuration crew also sets up communication systems so the director can coordinate with lighting technicians, sound engineers, and stage managers. In Spring Boot applications, configuration classes work similarly, setting up the technical infrastructure so your business components can focus on their core responsibilities while being flexible enough to work in development, testing, and production environments.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Database configuration:</strong></p>
+            <pre><code class="language-java">@Configuration
+public class DatabaseConfig {
+
+    @Bean
+    @ConfigurationProperties(prefix = "spring.datasource")
+    public DataSource dataSource() {
+        return DataSourceBuilder.create().build();
+    }
+
+    @Bean
+    public JpaTransactionManager transactionManager(EntityManagerFactory emf) {
+        return new JpaTransactionManager(emf);
+    }
+}
+</code></pre>
+
+            <p><strong>Security configuration:</strong></p>
+            <pre><code class="language-java">@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        return http
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/public/**").permitAll()
+                .anyRequest().authenticated())
+            .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
+            .build();
+    }
+}
+</code></pre>
+
+            <p><strong>Application properties configuration:</strong></p>
+            <pre><code class="language-java">@ConfigurationProperties(prefix = "app")
+@Component
+public class AppProperties {
+    private String name;
+    private String version;
+    private Security security = new Security();
+
+    public static class Security {
+        private String jwtSecret;
+        private int jwtExpirationHours = 24;
+    }
+}
+</code></pre>
+
+            <p><strong>Profile-specific configuration:</strong></p>
+            <pre><code class="language-yaml"># application-dev.yml
+spring:
+  datasource:
+    url: jdbc:h2:mem:devdb
+  jpa:
+    show-sql: true
+
+---
+# application-prod.yml
+spring:
+  datasource:
+    url: jdbc:mysql://prod-server:3306/app
+  jpa:
+    show-sql: false
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="caching-integration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Caching Integration</h2>
+            <h3>Definition</h3>
+            <p>The caching layer improves application performance by temporarily storing frequently accessed data in memory, reducing the need to repeatedly fetch data from the database or recompute results. Spring Boot provides easy integration with caching providers like Ehcache, Hazelcast, and Redis. Caching can be applied at various levels - method results, data queries, or even whole objects - and can significantly speed up response times for read-heavy applications.</p>
+
+            <h3>Analogy</h3>
+            <p>Caching is like having a well-organized set of frequently used tools and materials within easy reach of a craftsman, instead of having to fetch them from storage every time they are needed. For a chef, caching might mean having commonly used ingredients pre-prepared and stored within arm's reach, so they don't have to chop vegetables or measure spices from scratch for every single dish. In a software application, caching stores copies of data or computed results in a location that can be accessed much more quickly than the original source, whether that's a database, an external service, or a complex computation. Just as a chef can prepare a meal faster with pre-chopped ingredients, an application can respond to requests faster with cached data.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Method-level caching:</strong></p>
+            <pre><code class="language-java">@Service
+public class ProductService {
+
+    @Cacheable("products")
+    public ProductDto getProduct(Long id) {
+        // Expensive operation, e.g. database call
+    }
+}
+</code></pre>
+
+            <p><strong>Cache configuration:</strong></p>
+            <pre><code class="language-java">@Configuration
+@EnableCaching
+public class CacheConfig {
+
+    @Bean
+    public CacheManager cacheManager() {
+        EhCacheManagerFactoryBean factory = new EhCacheManagerFactoryBean();
+        factory.setConfigLocation(new ClassPathResource("ehcache.xml"));
+        factory.setShared(true);
+        return factory.getObject();
+    }
+}
+</code></pre>
+
+            <p><strong>Cache eviction:</strong></p>
+            <pre><code class="language-java">@Service
+public class ProductService {
+
+    @CacheEvict(value = "products", allEntries = true)
+    public void clearCache() {
+        // Cache eviction logic
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="validation-integration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Validation Integration</h2>
+            <h3>Definition</h3>
+            <p>The validation layer ensures that only valid data enters your system and that business rules are enforced consistently. Spring Boot provides powerful validation features, including JSR-303/JSR-380 Bean Validation, custom validators, and integration with Spring MVC for automatic request validation. Proper validation prevents invalid data from causing errors or inconsistent states within your application.</p>
+
+            <h3>Analogy</h3>
+            <p>Validation is like having a strict quality control process in a manufacturing line that checks each product against predefined standards before it is allowed to proceed to the next stage or be shipped to customers. Just as a manufacturer wouldn't want defective products to reach customers, leading to dissatisfaction or damage to the brand, an application must ensure that only data that meets all correctness and business rules enters the system. Validation acts as a protective barrier, catching errors and inconsistencies early, whether they are due to user input mistakes, system integration issues, or data corruption.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Field-level validation:</strong></p>
+            <pre><code class="language-java">public class CreateUserRequest {
+    @NotBlank
+    @Email
+    private String email;
+
+    @NotBlank
+    @Size(min = 8)
+    private String password;
+}
+</code></pre>
+
+            <p><strong>Custom validation annotation:</strong></p>
+            <pre><code class="language-java">@Target({ElementType.TYPE, ElementType.METHOD})
+@Retention(RetentionPolicy.RUNTIME)
+@Constraint(validatedBy = PasswordsMatchValidator.class)
+public @interface PasswordsMatch {
+    String message() default "Passwords do not match";
+    Class&lt;?&gt;[] groups() default {};
+    Class&lt;? extends Payload&gt;[] payload() default {};
+}
+
+public class PasswordsMatchValidator implements ConstraintValidator&lt;PasswordsMatch, Object&gt; {
+    public boolean isValid(Object obj, ConstraintValidatorContext context) {
+        // Validation logic
+    }
+}
+</code></pre>
+
+            <p><strong>Global validation error handling:</strong></p>
+            <pre><code class="language-java">@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity&lt;ValidationErrorResponse&gt; handleValidation(MethodArgumentNotValidException ex) {
+        ValidationErrorResponse response = new ValidationErrorResponse();
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+            response.addError(error.getField(), error.getDefaultMessage()));
+        return ResponseEntity.badRequest().body(response);
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="security-integration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Security Integration</h2>
+            <h3>Definition</h3>
+            <p>Security integration weaves authentication and authorization throughout your Spring Boot application layers. Security filters intercept requests before they reach controllers, security annotations protect service methods, and security context provides user information across the application. Integration includes configuring authentication providers, defining access rules, handling security exceptions, and ensuring security policies are consistently applied across all application components.</p>
+
+            <h3>Analogy</h3>
+            <p>Security integration is like implementing a comprehensive security system throughout a modern office building. There's not just one security guard at the front door - instead, there are multiple security layers working together seamlessly. Key cards control building access, elevator permissions determine which floors you can reach, door locks protect sensitive areas, and security cameras monitor activity throughout. The security system knows who you are from the moment you enter, and that identity follows you everywhere, automatically granting or denying access based on your role and clearance level. Security personnel don't interrupt normal business operations - they work invisibly in the background, only becoming noticeable when someone tries to access something they shouldn't. Emergency protocols ensure that if a security breach occurs anywhere, the entire system responds appropriately to protect the organization's assets and people.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Method-level security:</strong></p>
+            <pre><code class="language-java">@Service
+@PreAuthorize("hasRole('ADMIN')")
+public class AdminService {
+
+    @PreAuthorize("hasPermission(#userId, 'User', 'READ')")
+    public UserDto getUser(Long userId) {
+        return userService.findById(userId);
+    }
+
+    @PostAuthorize("returnObject.ownerId == authentication.name")
+    public DocumentDto getDocument(Long docId) {
+        return documentService.findById(docId);
+    }
+}
+</code></pre>
+
+            <p><strong>Security context usage:</strong></p>
+            <pre><code class="language-java">@Service
+public class AuditService {
+
+    public void logUserAction(String action) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+
+        AuditLog log = new AuditLog(username, action, LocalDateTime.now());
+        auditRepository.save(log);
+    }
+}
+</code></pre>
+
+            <p><strong>Custom security annotations:</strong></p>
+            <pre><code class="language-java">@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+@PreAuthorize("@securityService.canAccessResource(#resourceId, authentication)")
+public @interface CanAccessResource {
+}
+
+@RestController
+public class ResourceController {
+
+    @GetMapping("/resources/{id}")
+    @CanAccessResource
+    public ResourceDto getResource(@PathVariable Long resourceId) {
+        return resourceService.findById(resourceId);
+    }
+}
+</code></pre>
+
+            <p><strong>Security exception handling:</strong></p>
+            <pre><code class="language-java">@RestControllerAdvice
+public class SecurityExceptionHandler {
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleAccessDenied(AccessDeniedException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+            .body(new ErrorResponse("ACCESS_DENIED", "Insufficient privileges"));
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="monitoring-layer" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Monitoring Layer</h2>
+            <h3>Definition</h3>
+            <p>The monitoring layer provides insights into your application's performance, behavior, and overall health in real-time. Spring Boot offers integration with monitoring systems like Prometheus, Grafana, and Micrometer, allowing you to collect and visualize metrics, logs, and traces. Effective monitoring helps you detect issues early, understand usage patterns, and ensure your application is running smoothly and efficiently.</p>
+
+            <h3>Analogy</h3>
+            <p>Monitoring is like having a comprehensive set of sensors and gauges in a car that provide real-time data on speed, engine temperature, fuel level, and more. Just as a driver relies on these indicators to ensure the car is functioning properly and to detect any potential issues early, developers and operators use monitoring tools to observe the application's vital signs. If any metric goes beyond the normal range - like high CPU usage, low memory, or slow response times - it's a sign that something needs attention. Monitoring helps maintain the application's health, performance, and reliability, just as dashboard indicators help maintain the vehicle's operability and safety.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Application metrics with Micrometer:</strong></p>
             <pre><code class="language-java">@RestController
 public class MetricsController {
+
     private final MeterRegistry meterRegistry;
 
-    @GetMapping("/slow-endpoint")
-    @Timed(name = "endpoint.response.time")
-    public String slowEndpoint() {
-        return "Response";  // Automatically tracks response time
+    @GetMapping("/api/metrics")
+    public List&lt;Meter> listMetrics() {
+        return meterRegistry.getMeters();
     }
 }
 </code></pre>
 
-            <p><strong>Response time measurement:</strong></p>
-            <pre><code class="language-java">long start = System.currentTimeMillis();
-processRequest(request);
-long duration = System.currentTimeMillis() - start;
-responseTimeHistogram.record(duration);
-</code></pre>
+            <p><strong>Prometheus configuration:</strong></p>
+            <pre><code class="language-java">@Configuration
+public class PrometheusConfig {
 
-            <p><strong>Throughput monitoring:</strong></p>
-            <pre><code class="language-java">Counter requestCounter = Counter.builder("requests.total")
-    .tag("endpoint", "/api/users")
-    .register(meterRegistry);
-requestCounter.increment();  // Track requests per second
-</code></pre>
-
-            <p><strong>Performance goals setting:</strong></p>
-            <pre><code class="language-properties"># Target performance goals
-response.time.p95=200ms
-throughput.target=1000rps
-memory.usage.max=80%
-cpu.usage.average=70%
-</code></pre>
-          </section>
-
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="application-profiling" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Application Profiling</h2>
-            <h3>Definition</h3>
-            <p>Application profiling analyzes your running application to identify performance bottlenecks, memory leaks, and inefficient code paths. Profiling tools like JProfiler, VisualVM, or async-profiler help you understand where your application spends time and memory. Profiling reveals hot spots (frequently executed code), memory allocation patterns, and thread contention issues that aren't obvious from looking at code alone. It's the detective work that tells you exactly where to focus your optimization efforts.</p>
-
-            <h3>Analogy</h3>
-            <p>Application profiling is like using diagnostic equipment to analyze a complex manufacturing plant. Instead of guessing why production is slow, you install sensors throughout the facility to measure exactly where bottlenecks occur. You track how long each assembly station takes, which machines use the most power, where materials pile up in queues, and which workers are overloaded. The diagnostic data reveals surprising insights - maybe the packaging station that seemed fast is actually the bottleneck because it has to wait for parts from a slow supplier. Profiling tools work the same way, providing detailed visibility into your application's runtime behavior. They show you which methods consume the most CPU time, where objects are created and garbage collected, and which database queries are slowest, giving you concrete data to guide optimization decisions rather than relying on assumptions.</p>
-
-            <h3>Examples</h3>
-            <p><strong>JVM profiling with Flight Recorder:</strong></p>
-            <pre><code class="language-bash"># Enable JFR profiling
-java -XX:+FlightRecorder -XX:StartFlightRecording=duration=60s,filename=profile.jfr MyApp
-</code></pre>
-
-            <p><strong>Custom profiling annotations:</strong></p>
-            <pre><code class="language-java">@Component
-public class ProfiledService {
-    @Timed("service.method.execution")
-    public void expensiveOperation() {
-        // Method automatically profiled
+    @Bean
+    public ServletRegistrationBean&lt;PrometheusServlet&gt; prometheusServlet() {
+        return new ServletRegistrationBean&lt;&gt;(new PrometheusServlet(), "/actuator/prometheus");
     }
 }
 </code></pre>
 
-            <p><strong>Memory profiling setup:</strong></p>
-            <pre><code class="language-properties"># Enable detailed GC logging
--XX:+UseG1GC -XX:+PrintGC -XX:+PrintGCDetails
--Xloggc:gc.log -XX:+PrintGCTimeStamps
-</code></pre>
-
-            <p><strong>Thread dump analysis:</strong></p>
-            <pre><code class="language-java">// Generate thread dump programmatically for analysis
-ThreadMXBean threadMX = ManagementFactory.getThreadMXBean();
-ThreadInfo[] threadInfos = threadMX.dumpAllThreads(true, true);
-// Analyze for deadlocks and contention
-</code></pre>
-          </section>
-
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="jvm-optimization" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>JVM Optimization</h2>
-            <h3>Definition</h3>
-            <p>JVM optimization involves tuning garbage collection, heap sizing, and runtime parameters to maximize application performance. Modern JVMs like HotSpot and OpenJ9 provide sophisticated garbage collectors (G1, ZGC, Shenandoah) and adaptive optimizations, but they need proper configuration for your specific workload. JVM tuning includes setting appropriate heap sizes, choosing the right GC algorithm, configuring GC parameters, and enabling optimizations that reduce pause times and improve throughput.</p>
-
-            <h3>Analogy</h3>
-            <p>JVM optimization is like tuning the engine management system in a modern car. The engine control unit (JVM) automatically adjusts fuel injection, timing, and turbo boost based on driving conditions, but you can configure it for different performance profiles - economy mode for fuel efficiency or sport mode for maximum power. The fuel tank size (heap memory) needs to match your driving patterns, the air filter (garbage collection) needs regular attention to maintain performance, and various sensors (JVM monitoring) provide data to fine-tune the system. Just as a poorly tuned engine wastes fuel and reduces performance, a poorly configured JVM can cause frequent pauses, high memory usage, and reduced throughput. Professional tuners use dyno testing and data analysis to optimize engine performance, while JVM tuning requires profiling tools and performance testing to find the optimal configuration for your specific application workload.</p>
-
-            <h3>Examples</h3>
-            <p><strong>G1 garbage collector tuning:</strong></p>
-            <pre><code class="language-properties"># Optimized G1 GC settings
--XX:+UseG1GC -XX:MaxGCPauseMillis=100
--XX:G1HeapRegionSize=16m -XX:+G1UseAdaptiveIHOP
-</code></pre>
-
-            <p><strong>Heap sizing for production:</strong></p>
-            <pre><code class="language-properties"># Set initial and maximum heap size
--Xms4g -Xmx4g  # Avoid heap expansion overhead
--XX:NewRatio=3 # Old generation 3x larger than young
-</code></pre>
-
-            <p><strong>JIT compiler optimization:</strong></p>
-            <pre><code class="language-properties"># Enable aggressive optimizations
--XX:+UseCompressedOops -XX:+TieredCompilation
--XX:CompileThreshold=10000
-</code></pre>
-
-            <p><strong>GC monitoring configuration:</strong></p>
-            <pre><code class="language-properties"># Detailed GC logging for analysis
--Xlog:gc*:gc.log:time,tags,level
--XX:+UnlockExperimentalVMOptions
-</code></pre>
-          </section>
-
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="database-optimization" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Database Optimization</h2>
-            <h3>Definition</h3>
-            <p>Database optimization focuses on improving query performance, reducing connection overhead, and optimizing data access patterns. Key techniques include proper indexing, query optimization, connection pooling, lazy loading strategies, and avoiding N+1 query problems. Database performance often becomes the primary bottleneck in applications, so optimizing queries, using efficient JPA mappings, and implementing appropriate caching strategies can dramatically improve overall application performance.</p>
-
-            <h3>Analogy</h3>
-            <p>Database optimization is like organizing and staffing a massive library to serve thousands of simultaneous researchers efficiently. You need smart indexing systems (database indexes) so people can find books quickly without searching every shelf. The checkout desk needs enough staff (connection pool) to handle peak times without long queues, but not so many that they're idle during quiet periods. Popular books should be kept in a quick-access section (caching), and the library layout should minimize walking time (query optimization). You also need systems to prevent researchers from making multiple trips for related materials (avoiding N+1 queries) - if someone needs a book series, they should get all volumes at once rather than making separate trips for each book. The library's performance depends on having the right infrastructure, organization systems, and policies that serve users quickly while making efficient use of resources.</p>
-
-            <h3>Examples</h3>
-            <p><strong>Connection pool optimization:</strong></p>
-            <pre><code class="language-properties"># HikariCP configuration for high performance
-spring.datasource.hikari.maximum-pool-size=20
-spring.datasource.hikari.minimum-idle=5
-spring.datasource.hikari.connection-timeout=20000
-spring.datasource.hikari.idle-timeout=300000
-</code></pre>
-
-            <p><strong>JPA fetch optimization:</strong></p>
-            <pre><code class="language-java">@Query("SELECT u FROM User u JOIN FETCH u.orders WHERE u.id = :id")
-Optional<User> findUserWithOrders(@Param("id") Long id);
-// Avoids N+1 queries by fetching related data in one query
-</code></pre>
-
-            <p><strong>Pagination for large datasets:</strong></p>
-            <pre><code class="language-java">@GetMapping("/users")
-public Page<User> getUsers(Pageable pageable) {
-    return userRepository.findAll(pageable);  // Efficient pagination
-}
-</code></pre>
-
-            <p><strong>Database query optimization:</strong></p>
-            <pre><code class="language-java">@Query("SELECT new com.example.UserSummary(u.id, u.name) FROM User u")
-List<UserSummary> findUserSummaries();
-// Projection to fetch only needed fields
-</code></pre>
-          </section>
-
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="web-layer-optimization" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Web Layer Optimization</h2>
-            <h3>Definition</h3>
-            <p>Web layer optimization improves HTTP performance through compression, caching headers, connection management, and efficient serialization. Techniques include enabling GZIP compression, setting appropriate cache headers, using HTTP/2, implementing static resource optimization, and optimizing JSON serialization. The web layer is often the first performance bottleneck users encounter, so optimizing response sizes, reducing round trips, and leveraging browser caching can significantly improve perceived performance.</p>
-
-            <h3>Analogy</h3>
-            <p>Web layer optimization is like streamlining a busy restaurant's service to handle more customers efficiently. You implement systems to reduce wait times: compress bulky orders into efficient packages (GZIP compression), use express lanes for frequent customers who know what they want (HTTP caching), train servers to carry multiple dishes per trip instead of making separate trips (HTTP/2 multiplexing), and set up a coffee station where customers can serve themselves for simple requests (static resource caching). The kitchen also prepares popular appetizers in advance (resource pre-loading) and uses lighter plates for takeout orders (optimized JSON responses). These optimizations don't change the food quality, but they dramatically improve the customer experience by reducing waiting times and making service more efficient, allowing the restaurant to serve more customers without expanding the kitchen or hiring more staff.</p>
-
-            <h3>Examples</h3>
-            <p><strong>Enable GZIP compression:</strong></p>
-            <pre><code class="language-properties">server.compression.enabled=true
-server.compression.mime-types=application/json,text/html,text/css
-server.compression.min-response-size=1024
-</code></pre>
-
-            <p><strong>HTTP caching configuration:</strong></p>
-            <pre><code class="language-java">@GetMapping("/api/data")
-public ResponseEntity<Data> getData() {
-    return ResponseEntity.ok()
-        .cacheControl(CacheControl.maxAge(30, TimeUnit.MINUTES))
-        .body(data);
-}
-</code></pre>
-
-            <p><strong>Static resource optimization:</strong></p>
-            <pre><code class="language-properties">spring.web.resources.cache.cachecontrol.max-age=365d
-spring.web.resources.chain.strategy.content.enabled=true
-spring.web.resources.chain.strategy.fixed.enabled=true
-</code></pre>
-
-            <p><strong>JSON serialization optimization:</strong></p>
-            <pre><code class="language-java">@JsonView(Views.Summary.class)
-@GetMapping("/users")
-public List<User> getUsers() {
-    return userService.findAll();  // Only serialize summary fields
+            <p><strong>Grafana dashboard configuration:</strong></p>
+            <pre><code class="language-json">{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": "__expr__",
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(255, 255, 255, 0.5)",
+        "name": "Annotations & Alerts",
+        "type": "annotations"
+      }
+    ]
+  },
+  "editable": true,
+  "gnetId": null,
+  "id": 2,
+  "links": [],
+  "panels": [
+    {
+      "datasource": "Prometheus",
+      "id": 2,
+      "interval": "10s",
+      "legendFormat": "{{instance}}",
+      "metrics": [
+        {
+          "expr": "rate(http_requests_total[1m])",
+          "interval": "",
+          "legendFormat": "requests/sec",
+          "refId": "A"
+        }
+      ],
+      "title": "HTTP Requests",
+      "type": "graph"
+    }
+  ],
+  "schemaVersion": 26,
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "title": "Application Monitoring",
+  "version": 1
 }
 </code></pre>
           </section>
 
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
-          <section id="memory-management" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Memory Management</h2>
+          <section id="exception-handling" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Exception Handling</h2>
             <h3>Definition</h3>
-            <p>Effective memory management involves optimizing object creation, reducing garbage collection pressure, and preventing memory leaks. Techniques include object pooling for expensive objects, using primitive collections when appropriate, avoiding unnecessary object creation in hot paths, and properly managing lifecycle of large objects. Good memory management reduces GC pauses, improves throughput, and prevents OutOfMemoryError crashes that can bring down production applications.</p>
+            <p>Exception handling in a complete Spring Boot application provides consistent error responses across all layers and components. Global exception handlers catch and transform exceptions into appropriate HTTP responses, while custom exceptions carry domain-specific error information. Proper exception handling includes logging, error codes, user-friendly messages, and different handling strategies for different types of errors (validation, business logic, system errors).</p>
 
             <h3>Analogy</h3>
-            <p>Memory management is like running an efficient warehouse operation where space is limited and valuable. You want to minimize waste by reusing containers when possible (object pooling), avoid storing unnecessary packaging (primitive vs object types), organize inventory efficiently so popular items are easily accessible (memory locality), and regularly clean out obsolete stock (garbage collection). A well-managed warehouse doesn't constantly shuffle inventory around - items flow in, get used, and flow out smoothly. Poor memory management is like a chaotic warehouse where workers constantly reorganize everything, space fills up with redundant inventory, and operations stop frequently for major cleanups. The goal is smooth, efficient operations where memory allocation and cleanup happen naturally without disrupting the main business of serving customers.</p>
+            <p>Exception handling is like having a well-trained crisis management team that handles problems consistently throughout an organization. When something goes wrong anywhere in the company - whether it's a customer complaint, equipment failure, or communication breakdown - the crisis team has established procedures for each type of problem. They don't panic or give inconsistent responses; instead, they follow proven protocols to assess the situation, communicate appropriately with affected parties, document what happened, and implement solutions. Customer-facing staff are trained to provide helpful, professional responses even when internal systems fail, while technical teams work behind the scenes to resolve issues. The crisis management system ensures that problems are handled gracefully, customers receive consistent service, and the organization learns from each incident to prevent similar issues in the future.</p>
 
             <h3>Examples</h3>
-            <p><strong>Object pooling for expensive resources:</strong></p>
-            <pre><code class="language-java">@Component
-public class ConnectionPool {
-    private final Queue<Connection> pool = new ConcurrentLinkedQueue<>();
+            <p><strong>Custom business exceptions:</strong></p>
+            <pre><code class="language-java">public class UserNotFoundException extends RuntimeException {
+    private final Long userId;
 
-    public Connection borrowConnection() {
-        return pool.poll() != null ? pool.poll() : createConnection();
+    public UserNotFoundException(Long userId) {
+        super("User not found with id: " + userId);
+        this.userId = userId;
+    }
+}
+
+public class InsufficientBalanceException extends RuntimeException {
+    private final BigDecimal balance;
+    private final BigDecimal required;
+}
+</code></pre>
+
+            <p><strong>Comprehensive exception handler:</strong></p>
+            <pre><code class="language-java">@RestControllerAdvice
+public class GlobalExceptionHandler {
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleUserNotFound(UserNotFoundException ex) {
+        logger.warn("User not found: {}", ex.getMessage());
+        return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity&lt;ValidationErrorResponse&gt; handleValidation(ConstraintViolationException ex) {
+        ValidationErrorResponse response = new ValidationErrorResponse();
+        ex.getConstraintViolations().forEach(violation ->
+            response.addError(violation.getPropertyPath().toString(), violation.getMessage()));
+        return ResponseEntity.badRequest().body(response);
     }
 }
 </code></pre>
 
-            <p><strong>Efficient collection usage:</strong></p>
-            <pre><code class="language-java">// Use primitive collections for better memory efficiency
-TIntObjectHashMap<String> efficientMap = new TIntObjectHashMap<>();
-// Instead of HashMap<Integer, String> which boxes integers
+            <p><strong>Error response DTOs:</strong></p>
+            <pre><code class="language-java">public class ErrorResponse {
+    private String code;
+    private String message;
+    private LocalDateTime timestamp;
+    private String path;
+}
+
+public class ValidationErrorResponse {
+    private Map&lt;String, String&gt; fieldErrors = new HashMap&lt;&gt;();
+    private LocalDateTime timestamp = LocalDateTime.now();
+}
 </code></pre>
 
-            <p><strong>Lazy initialization patterns:</strong></p>
+            <p><strong>Layer-specific error handling:</strong></p>
+            <pre><code class="language-java">@Service
+public class PaymentService {
+
+    public PaymentResult processPayment(PaymentRequest request) {
+        try {
+            return paymentGateway.charge(request);
+        } catch (PaymentGatewayException ex) {
+            logger.error("Payment gateway error: {}", ex.getMessage());
+            throw new PaymentProcessingException("Payment could not be processed", ex);
+        } catch (Exception ex) {
+            logger.error("Unexpected error during payment processing", ex);
+            throw new SystemException("An unexpected error occurred", ex);
+        }
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="testing-strategy" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Testing Strategy</h2>
+            <h3>Definition</h3>
+            <p>A comprehensive testing strategy for Spring Boot applications includes unit tests for individual components, integration tests for component interactions, and end-to-end tests for complete workflows. Different testing approaches are used for different layers - @WebMvcTest for controllers, @DataJpaTest for repositories, and @SpringBootTest for full application context. Testing strategy also includes test data management, mocking external dependencies, and automated test execution in CI/CD pipelines.</p>
+
+            <h3>Analogy</h3>
+            <p>Testing strategy is like quality assurance in aircraft manufacturing, where safety demands multiple levels of rigorous testing. Individual components like engines are tested in isolation (unit tests) to ensure they meet specifications. Then components are tested together (integration tests) to verify they work properly when connected - does the engine communicate correctly with the flight control system? Finally, the complete aircraft undergoes flight testing (end-to-end tests) under real conditions to ensure everything works together safely. Each testing level serves a specific purpose: component testing catches basic defects quickly and cheaply, integration testing reveals interface problems, and flight testing validates that the entire system performs as expected. Test pilots use simulators and controlled environments to test dangerous scenarios safely, just like how we use test databases and mock services to test error conditions without risking production systems.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Unit testing services:</strong></p>
+            <pre><code class="language-java">@ExtendWith(MockitoExtension.class)
+class UserServiceTest {
+    @Mock
+    private UserRepository userRepository;
+
+    @InjectMocks
+    private UserService userService;
+
+    @Test
+    void shouldFindUserById() {
+        User user = new User("test@example.com");
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        UserDto result = userService.findById(1L);
+
+        assertThat(result.getEmail()).isEqualTo("test@example.com");
+    }
+}
+</code></pre>
+
+            <p><strong>Integration testing controllers:</strong></p>
+            <pre><code class="language-java">@SpringBootTest
+@AutoConfigureTestDatabase(replace = Replace.NONE)
+@Testcontainers
+class UserControllerIntegrationTest {
+    @Container
+    static PostgreSQLContainer&lt;?&gt; postgres = new PostgreSQLContainer&lt;&gt;("postgres:13");
+
+    @Autowired
+    private TestRestTemplate restTemplate;
+
+    @Test
+    void shouldCreateAndRetrieveUser() {
+        CreateUserRequest request = new CreateUserRequest("test@example.com", "John");
+
+        ResponseEntity&lt;UserDto&gt; response = restTemplate.postForEntity(
+            "/api/users", request, UserDto.class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(response.getBody().getEmail()).isEqualTo("test@example.com");
+    }
+}
+</code></pre>
+
+            <p><strong>Repository testing:</strong></p>
+            <pre><code class="language-java">@DataJpaTest
+class UserRepositoryTest {
+    @Autowired
+    private TestEntityManager entityManager;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Test
+    void shouldFindActiveUsers() {
+        User activeUser = new User("active@example.com", true);
+        User inactiveUser = new User("inactive@example.com", false);
+        entityManager.persistAndFlush(activeUser);
+        entityManager.persistAndFlush(inactiveUser);
+
+        List&lt;User&gt; result = userRepository.findByActiveTrue();
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).getEmail()).isEqualTo("active@example.com");
+    }
+}
+</code></pre>
+
+            <p><strong>Test configuration:</strong></p>
+            <pre><code class="language-java">@TestConfiguration
+public class TestConfig {
+
+    @Bean
+    @Primary
+    public EmailService mockEmailService() {
+        return Mockito.mock(EmailService.class);
+    }
+
+    @Bean
+    @Primary
+    public Clock testClock() {
+        return Clock.fixed(Instant.parse("2023-01-01T00:00:00Z"), ZoneOffset.UTC);
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="step-by-step-build" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Step-by-Step Build Process</h2>
+            <h3>Definition</h3>
+            <p>Building a Spring Boot application step-by-step involves creating components in a logical order that allows you to test and validate each piece before adding complexity. The typical progression starts with domain models and repositories, then adds services, controllers, configuration, and finally integration features like security and error handling. This incremental approach helps identify issues early and ensures each layer is working correctly before building upon it.</p>
+
+            <h3>Analogy</h3>
+            <p>Building a Spring Boot application step-by-step is like constructing a house where you must complete each phase before moving to the next. You start with the foundation (domain models and database), ensuring it's solid and properly designed to support everything that comes after. Then you build the structural framework (repositories and services), which provides the skeleton that holds everything together. Next comes the electrical and plumbing (configuration and integration), followed by the walls and interior (controllers and web layer). Finally, you add finishing touches like security systems and error handling. At each stage, you test and inspect the work - you don't wait until the house is complete to discover the foundation is cracked or the wiring is faulty. Each phase builds upon the previous one, so mistakes early in the process become increasingly expensive to fix as you progress. This methodical approach ensures a solid, well-integrated final product.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Step 1: Define domain models:</strong></p>
             <pre><code class="language-java">@Entity
 public class User {
-    @OneToMany(fetch = FetchType.LAZY)
-    private List<Order> orders;  // Only load when accessed
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Email
+    @Column(unique = true, nullable = false)
+    private String email;
+
+    @NotBlank
+    private String firstName;
+
+    // Test with repository before adding complexity
 }
 </code></pre>
 
-            <p><strong>Memory leak prevention:</strong></p>
-            <pre><code class="language-java">@PreDestroy
-public void cleanup() {
-    cache.clear();           // Clear caches on shutdown
-    threadPool.shutdown();   // Properly shutdown thread pools
+            <p><strong>Step 2: Create repositories:</strong></p>
+            <pre><code class="language-java">@Repository
+public interface UserRepository extends JpaRepository&lt;User, Long&gt; {
+    Optional&lt;User&gt; findByEmail(String email);
+}
+
+// Test data access before adding business logic
+@DataJpaTest
+class UserRepositoryTest {
+    // Verify CRUD operations work correctly
+}
+</code></pre>
+
+            <p><strong>Step 3: Implement services:</strong></p>
+            <pre><code class="language-java">@Service
+public class UserService {
+    private final UserRepository userRepository;
+
+    public UserDto createUser(CreateUserRequest request) {
+        // Business logic implementation
+        // Test business rules before adding web layer
+    }
+}
+</code></pre>
+
+            <p><strong>Step 4: Add web controllers:</strong></p>
+            <pre><code class="language-java">@RestController
+@RequestMapping("/api/users")
+public class UserController {
+    private final UserService userService;
+
+    @PostMapping
+    public ResponseEntity&lt;UserDto&gt; createUser(@Valid @RequestBody CreateUserRequest request) {
+        // Web layer implementation
+        // Test HTTP endpoints before adding security
+    }
+}
+</code></pre>
+
+            <p><strong>Step 5: Configure security and integrate:</strong></p>
+            <pre><code class="language-java">@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+    // Add security last, after core functionality works
+    // Test security integration thoroughly
 }
 </code></pre>
           </section>
 
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
-          <section id="async-processing" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Async Processing</h2>
+          <section id="component-integration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Component Integration</h2>
             <h3>Definition</h3>
-            <p>Asynchronous processing improves perceived performance and resource utilization by handling long-running operations in the background. Spring provides @Async methods, reactive programming with WebFlux, and message queues for decoupling slow operations from user requests. Async processing prevents blocking threads while waiting for I/O operations, external API calls, or heavy computations, allowing your application to handle more concurrent requests with the same resources.</p>
+            <p>Component integration ensures all parts of your Spring Boot application work together seamlessly through dependency injection, event handling, and shared configuration. Integration involves managing bean lifecycles, handling cross-cutting concerns like logging and metrics, coordinating transactions across multiple components, and ensuring data consistency throughout the application. Proper integration makes your application behave as a cohesive system rather than a collection of independent parts.</p>
 
             <h3>Analogy</h3>
-            <p>Async processing is like how a well-organized restaurant handles complex orders during busy periods. Instead of making customers wait while the kitchen prepares elaborate dishes, the restaurant takes orders quickly, gives customers a number, and lets them relax while the food is prepared in the background. Simple orders like drinks are served immediately, while complex meals are prepared by specialized chefs working in parallel. The waiting staff isn't tied up watching the kitchen - they can continue taking new orders and serving ready items. When complex dishes are finished, customers are notified and served promptly. This system allows the restaurant to handle many more customers than if each server had to wait for every order to complete before taking the next one. The key is separating quick interactions (taking orders) from slow processes (cooking complex meals) so that fast operations aren't blocked by slow ones.</p>
+            <p>Component integration is like coordinating a symphony orchestra where dozens of musicians with different instruments must perform together in perfect harmony. The conductor (Spring container) ensures everyone starts and stops at the right time, follows the same tempo, and responds to dynamic changes during the performance. The sheet music (configuration) provides the common framework that tells each section when to play, but the real magic happens when the violins, brass, woodwinds, and percussion blend together to create something beautiful that none could achieve alone. Each musician is skilled individually, but they must listen to each other, follow cues, and adjust their performance based on what's happening around them. When integration works well, the audience hears one magnificent piece of music, not a cacophony of separate instruments fighting for attention.</p>
 
             <h3>Examples</h3>
-            <p><strong>Async method execution:</strong></p>
-            <pre><code class="language-java">@Service
-public class EmailService {
-    @Async
-    public CompletableFuture<Void> sendWelcomeEmail(User user) {
-        // Long-running email operation doesn't block caller
-        return CompletableFuture.completedFuture(null);
-    }
-}
-</code></pre>
-
-            <p><strong>Reactive web endpoints:</strong></p>
-            <pre><code class="language-java">@GetMapping("/users")
-public Flux<User> getUsers() {
-    return userService.findAllReactive()  // Non-blocking stream
-        .delayElements(Duration.ofMillis(100));
-}
-</code></pre>
-
-            <p><strong>Background task processing:</strong></p>
+            <p><strong>Event-driven integration:</strong></p>
             <pre><code class="language-java">@Component
-public class TaskProcessor {
+public class UserEventHandler {
+
     @EventListener
-    @Async
-    public void processOrderAsync(OrderCreatedEvent event) {
-        // Handle heavy processing without blocking request
+    public void handleUserRegistration(UserRegisteredEvent event) {
+        emailService.sendWelcomeEmail(event.getUser());
+        auditService.logUserRegistration(event.getUser());
+        notificationService.notifyAdmins(event.getUser());
+    }
+}
+
+@Service
+public class UserService {
+    private final ApplicationEventPublisher eventPublisher;
+
+    public UserDto registerUser(RegistrationRequest request) {
+        User user = createUser(request);
+        eventPublisher.publishEvent(new UserRegisteredEvent(user));
+        return convertToDto(user);
     }
 }
 </code></pre>
 
-            <p><strong>Thread pool configuration:</strong></p>
+            <p><strong>Cross-cutting concern integration:</strong></p>
+            <pre><code class="language-java">@Aspect
+@Component
+public class LoggingAspect {
+
+    @Around("@annotation(Loggable)")
+    public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
+        long start = System.currentTimeMillis();
+        try {
+            Object result = joinPoint.proceed();
+            long duration = System.currentTimeMillis() - start;
+            logger.info("Method {} executed in {}ms", joinPoint.getSignature().getName(), duration);
+            return result;
+        } catch (Exception e) {
+            logger.error("Method {} failed after {}ms", joinPoint.getSignature().getName(),
+                        System.currentTimeMillis() - start, e);
+            throw e;
+        }
+    }
+}
+</code></pre>
+
+            <p><strong>Configuration integration:</strong></p>
             <pre><code class="language-java">@Configuration
-@EnableAsync
-public class AsyncConfig {
+public class IntegrationConfig {
+
+    @Bean
+    @ConditionalOnProperty(name = "app.features.email", havingValue = "true")
+    public EmailService emailService() {
+        return new SmtpEmailService();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(EmailService.class)
+    public EmailService noOpEmailService() {
+        return new NoOpEmailService();
+    }
+
     @Bean
     public TaskExecutor taskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(10);
-        executor.setMaxPoolSize(50);
+        executor.setCorePoolSize(4);
+        executor.setMaxPoolSize(8);
         return executor;
     }
 }
 </code></pre>
-          </section>
 
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="configuration-tuning" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Configuration Tuning</h2>
-            <h3>Definition</h3>
-            <p>Configuration tuning involves optimizing Spring Boot's auto-configuration and application properties for production workloads. This includes tuning embedded server settings, connection pools, security configurations, and disabling development features. Proper configuration ensures your application uses resources efficiently, handles expected load, and provides appropriate security without performance overhead from unnecessary features or overly conservative default settings.</p>
-
-            <h3>Analogy</h3>
-            <p>Configuration tuning is like adjusting a race car's setup for different track conditions. The same car needs different settings for Monaco's tight corners versus Monza's high-speed straights. You adjust suspension for the track surface, gear ratios for acceleration patterns, aerodynamics for speed versus downforce, and tire pressure for grip and wear characteristics. Default factory settings work for general driving, but peak performance requires tuning each system for specific conditions. Similarly, Spring Boot's default configuration works well for development and general use, but production environments need adjustments for expected load patterns, security requirements, resource constraints, and performance goals. You might tighten security settings, increase connection pools for high traffic, disable debug features for better performance, or adjust timeouts for your specific infrastructure. The goal is optimizing every configurable parameter for your specific production environment and usage patterns.</p>
-
-            <h3>Examples</h3>
-            <p><strong>Production server configuration:</strong></p>
-            <pre><code class="language-properties">server.tomcat.max-threads=200
-server.tomcat.min-spare-threads=20
-server.tomcat.max-connections=8192
-server.tomcat.accept-count=100
-</code></pre>
-
-            <p><strong>Security performance tuning:</strong></p>
-            <pre><code class="language-properties">spring.security.user.password=
-spring.jpa.show-sql=false
-management.endpoints.web.exposure.include=health,metrics
-</code></pre>
-
-            <p><strong>JPA performance configuration:</strong></p>
-            <pre><code class="language-properties">spring.jpa.hibernate.ddl-auto=validate
-spring.jpa.properties.hibernate.jdbc.batch_size=25
-spring.jpa.properties.hibernate.order_inserts=true
-spring.jpa.properties.hibernate.order_updates=true
-</code></pre>
-
-            <p><strong>Logging optimization:</strong></p>
-            <pre><code class="language-properties">logging.level.org.hibernate.SQL=WARN
-logging.level.org.springframework.web=WARN
-logging.pattern.console=%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n
-</code></pre>
-          </section>
-
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="production-deployment" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Production Deployment</h2>
-            <h3>Definition</h3>
-            <p>Production deployment optimization focuses on infrastructure configuration, containerization, load balancing, and operational concerns. This includes optimizing Docker containers, configuring reverse proxies, implementing health checks, setting up horizontal scaling, and ensuring proper resource allocation. Production deployment affects application performance through infrastructure choices, network configuration, and operational practices that impact reliability and speed.</p>
-
-            <h3>Analogy</h3>
-            <p>Production deployment is like setting up a high-end restaurant chain across multiple locations. Each restaurant (application instance) needs proper facilities (infrastructure), reliable supply chains (networking), quality control systems (monitoring), and trained staff (operational procedures). You need load distribution so customers are directed to less busy locations (load balancing), backup systems when equipment fails (redundancy), standardized recipes and procedures across all locations (containerization), and management systems to monitor performance across the entire chain (observability). The goal is consistent, high-quality service regardless of which location customers visit, with the ability to open new locations quickly when demand increases. Just as a poorly managed restaurant chain can fail despite great food, excellent application code can perform poorly without proper production infrastructure and operational practices.</p>
-
-            <h3>Examples</h3>
-            <p><strong>Optimized Docker configuration:</strong></p>
-            <pre><code class="language-dockerfile">FROM openjdk:17-jre-slim
-COPY app.jar app.jar
-ENV JAVA_OPTS="-Xms2g -Xmx2g -XX:+UseG1GC"
-ENTRYPOINT exec java $JAVA_OPTS -jar app.jar
-</code></pre>
-
-            <p><strong>Health check configuration:</strong></p>
-            <pre><code class="language-properties">management.endpoint.health.probes.enabled=true
-management.health.livenessstate.enabled=true
-management.health.readinessstate.enabled=true
-</code></pre>
-
-            <p><strong>Load balancer health check:</strong></p>
+            <p><strong>Health check integration:</strong></p>
             <pre><code class="language-java">@Component
-public class CustomHealthIndicator implements HealthIndicator {
+public class ApplicationHealthIndicator implements HealthIndicator {
+    private final DatabaseHealthService databaseHealth;
+    private final ExternalApiHealthService apiHealth;
+
+    @Override
     public Health health() {
-        return isApplicationReady() ? Health.up().build() : Health.down().build();
+        Health.Builder builder = Health.up();
+
+        if (!databaseHealth.isHealthy()) {
+            builder.down().withDetail("database", "Connection failed");
+        }
+
+        if (!apiHealth.isHealthy()) {
+            builder.outOfService().withDetail("external-api", "Service unavailable");
+        }
+
+        return builder.build();
     }
-}
-</code></pre>
-
-            <p><strong>Graceful shutdown configuration:</strong></p>
-            <pre><code class="language-properties">server.shutdown=graceful
-spring.lifecycle.timeout-per-shutdown-phase=30s
-</code></pre>
-          </section>
-
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="performance-testing" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Performance Testing</h2>
-            <h3>Definition</h3>
-            <p>Performance testing validates that your optimizations actually improve performance under realistic conditions. This includes load testing with tools like JMeter or Gatling, stress testing to find breaking points, endurance testing for memory leaks, and spike testing for handling traffic bursts. Performance testing provides objective data about your application's behavior under various load conditions and validates that optimizations deliver expected improvements without introducing regressions.</p>
-
-            <h3>Analogy</h3>
-            <p>Performance testing is like stress-testing a newly built bridge before opening it to traffic. Engineers don't just assume the bridge will handle expected loads - they systematically test it with increasing weights, verify it can handle rush hour traffic, test its response to sudden loads like emergency vehicles, and monitor it over extended periods to ensure it doesn't develop structural problems. They measure deflection under load, check for vibrations, monitor stress points, and validate that safety margins remain adequate under all conditions. Similarly, performance testing applies controlled loads to your application, measures response times and resource usage, identifies breaking points, and validates that the system behaves predictably under stress. Just as you wouldn't drive on an untested bridge, you shouldn't deploy applications to production without thorough performance validation under realistic conditions.</p>
-
-            <h3>Examples</h3>
-            <p><strong>JMeter load testing script:</strong></p>
-            <pre><code class="language-xml">&lt;ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup"&gt;
-  &lt;stringProp name="ThreadGroup.num_threads"&gt;100&lt;/stringProp&gt;
-  &lt;stringProp name="ThreadGroup.ramp_time"&gt;60&lt;/stringProp&gt;
-&lt;/ThreadGroup&gt;
-</code></pre>
-
-            <p><strong>Application performance monitoring:</strong></p>
-            <pre><code class="language-java">@Component
-public class PerformanceMonitor {
-    @EventListener
-    public void onRequest(RequestReceivedEvent event) {
-        Timer.Sample sample = Timer.start(meterRegistry);
-        // Monitor and record performance metrics
-    }
-}
-</code></pre>
-
-            <p><strong>Benchmark testing setup:</strong></p>
-            <pre><code class="language-java">@BenchmarkMode(Mode.Throughput)
-@OutputTimeUnit(TimeUnit.SECONDS)
-public class ServiceBenchmark {
-    @Benchmark
-    public void testServicePerformance() {
-        service.processRequest();  // Measure throughput
-    }
-}
-</code></pre>
-
-            <p><strong>Continuous performance monitoring:</strong></p>
-            <pre><code class="language-properties"># Alert on performance degradation
-alert.response.time.p95.threshold=500ms
-alert.throughput.minimum=800rps
-alert.error.rate.maximum=1%
-</code></pre>
-          </section>
-
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="optimization-best-practices" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Optimization Best Practices</h2>
-            <h3>Definition</h3>
-            <p>Effective optimization follows systematic approaches: measure before optimizing, focus on the biggest bottlenecks first, make one change at a time, validate improvements with data, and avoid premature optimization. Best practices include using profiling tools to identify actual problems, implementing monitoring to track performance over time, testing optimizations thoroughly, and documenting changes for future reference. Following these practices ensures optimization efforts are productive and don't introduce new problems.</p>
-
-            <h3>Analogy</h3>
-            <p>Optimization best practices are like following proven methodologies for improving any complex system, whether it's a manufacturing plant, sports team, or symphony orchestra. You start by measuring current performance to establish baselines, then identify the biggest constraint that limits overall performance. You make one targeted improvement at a time so you can measure its impact, rather than changing everything simultaneously and losing track of what worked. You continuously monitor performance to catch regressions early, document successful changes so they can be replicated, and avoid making unnecessary changes to systems that are already working well. Professional consultants follow these methodologies because they've learned that systematic, data-driven approaches are much more effective than making random changes based on hunches. The goal is sustainable, measurable improvement that builds upon previous successes rather than creating chaos through uncontrolled changes.</p>
-
-            <h3>Examples</h3>
-            <p><strong>Performance measurement baseline:</strong></p>
-            <pre><code class="language-java">@Component
-public class PerformanceBaseline {
-    public void establishBaseline() {
-        // Record current performance metrics before optimization
-        recordMetric("baseline.response.time", getCurrentResponseTime());
-        recordMetric("baseline.throughput", getCurrentThroughput());
-    }
-}
-</code></pre>
-
-            <p><strong>A/B testing for optimizations:</strong></p>
-            <pre><code class="language-java">@GetMapping("/api/data")
-public ResponseEntity<Data> getData(@RequestParam boolean useOptimization) {
-    if (useOptimization) {
-        return optimizedDataService.getData();  // Test new approach
-    }
-    return standardDataService.getData();       // Control group
-}
-</code></pre>
-
-            <p><strong>Performance regression detection:</strong></p>
-            <pre><code class="language-java">@Test
-public void performanceRegressionTest() {
-    long startTime = System.currentTimeMillis();
-    service.processLargeDataset();
-    long duration = System.currentTimeMillis() - startTime;
-    assertThat(duration).isLessThan(MAX_ACCEPTABLE_DURATION);
-}
-</code></pre>
-
-            <p><strong>Optimization documentation:</strong></p>
-            <pre><code class="language-java">/**
- * Optimization applied: Added connection pooling
- * Performance improvement: 40% reduction in response time
- * Baseline: 200ms average, Optimized: 120ms average
- * Date: 2023-10-15, Author: Developer
- */
-@Component
-public class OptimizedDatabaseService {
-    // Implementation details
 }
 </code></pre>
           </section>
@@ -566,80 +1154,38 @@ public class OptimizedDatabaseService {
 
           <section id="summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Summary</h2>
-            <p>You've now mastered comprehensive performance optimization techniques for Spring Boot applications, from understanding fundamental performance principles to implementing advanced optimization strategies across every layer of your application stack. You've learned to use profiling tools to identify bottlenecks, optimize JVM and database performance, implement effective caching and async processing, and follow systematic approaches to ensure optimizations deliver measurable improvements. These skills enable you to build applications that not only function correctly but excel under production loads, providing excellent user experiences while making efficient use of infrastructure resources. Performance optimization is an ongoing process that requires measurement, analysis, and continuous improvement, but the techniques you've learned provide a solid foundation for building high-performance applications. Next, you'll explore advanced Spring Boot topics and microservices architecture, where performance optimization becomes even more critical for building scalable distributed systems.</p>
+            <p>Building a complete Spring Boot application requires understanding how all components work together in harmony. You've learned how to structure projects with clear separation of concerns, implement layered architecture with controllers, services, and repositories, and integrate security, configuration, and error handling throughout your application. The step-by-step approach ensures each layer is solid before building upon it, while proper component integration creates a cohesive system that's maintainable, testable, and scalable. This comprehensive understanding prepares you to build professional applications that follow best practices and can grow with your business needs.</p>
           </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
           <section id="programming-challenge" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Programming Challenge</h2>
-            <div class="rounded-lg border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800">
-              <h3 class="mt-0">Challenge: High-Performance Order Processing System</h3>
-              <p><strong>Task:</strong> Build and optimize a high-performance order processing system that can handle high-volume traffic with minimal response times and efficient resource usage.</p>
-
-              <p><strong>Requirements:</strong></p>
-              <ol>
-                <li>Create a complete order processing system:</li>
-                <ul>
-                  <li><code>Order</code>, <code>Product</code>, <code>Customer</code>, <code>Inventory</code> entities</li>
-                  <li>REST endpoints for order creation, retrieval, and processing</li>
-                  <li>Service layer with business logic for order validation and processing</li>
-                  <li>Repository layer with optimized database access</li>
-                </ul>
-                <li>Implement comprehensive performance optimizations:</li>
-                <ul>
-                  <li>Multi-level caching strategy (Redis for distributed, Caffeine for local)</li>
-                  <li>Database optimization with proper indexing and query optimization</li>
-                  <li>Connection pool tuning for high concurrency</li>
-                  <li>Async processing for heavy operations (inventory updates, notifications)</li>
-                </ul>
-                <li>Add performance monitoring and profiling:</li>
-                <ul>
-                  <li>Custom metrics for order processing times and throughput</li>
-                  <li>Performance timers for critical operations</li>
-                  <li>Memory and GC monitoring</li>
-                  <li>Database query performance tracking</li>
-                </ul>
-                <li>Implement production-ready optimizations:</li>
-                <ul>
-                  <li>JVM tuning with appropriate GC settings</li>
-                  <li>Web layer optimization (compression, caching headers)</li>
-                  <li>Resource management and cleanup</li>
-                  <li>Health checks and graceful shutdown</li>
-                </ul>
-                <li>Performance testing and validation:</li>
-                <ul>
-                  <li>Load testing setup with JMeter or similar</li>
-                  <li>Performance benchmarks and regression tests</li>
-                  <li>Stress testing to find breaking points</li>
-                  <li>A/B testing framework for optimization validation</li>
-                </ul>
-              </ol>
-
-              <p><strong>Performance goals:</strong></p>
-              <ul>
-                <li>Order creation: &lt;100ms response time (95th percentile)</li>
-                <li>Order retrieval: &lt;50ms response time (95th percentile)</li>
-                <li>Throughput: Handle 1000+ requests per second</li>
-                <li>Memory usage: &lt;2GB heap under normal load</li>
-                <li>GC pause times: &lt;100ms maximum</li>
-              </ul>
-
-              <p><strong>Bonus optimizations:</strong></p>
-              <ul>
-                <li>Implement reactive programming for non-blocking operations</li>
-                <li>Add database read replicas for scaling read operations</li>
-                <li>Create custom serialization for faster JSON processing</li>
-                <li>Implement circuit breaker pattern for external dependencies</li>
-                <li>Add distributed tracing for performance analysis</li>
-              </ul>
-
-              <p><strong>Learning Goals:</strong> Practice comprehensive performance optimization across all application layers, implement systematic performance monitoring, validate optimizations with concrete measurements, and build production-ready high-performance systems using real-world optimization techniques.</p>
-            </div>
+            <p><strong>Build a Complete Task Management Application</strong></p>
+            <p>Create a Spring Boot application that demonstrates all the concepts covered in this lesson. Your application should include:</p>
+            <ul>
+              <li><strong>Domain Models:</strong> Task, User, and Project entities with proper relationships</li>
+              <li><strong>Data Layer:</strong> Repositories with custom queries for finding tasks by status, user, and project</li>
+              <li><strong>Service Layer:</strong> Business logic for task assignment, status transitions, and project management</li>
+              <li><strong>Web Layer:</strong> REST controllers with proper validation and error handling</li>
+              <li><strong>Security:</strong> JWT authentication with role-based access (USER, PROJECT_MANAGER, ADMIN)</li>
+              <li><strong>Configuration:</strong> Profile-specific settings for development and production</li>
+              <li><strong>Testing:</strong> Unit tests for services, integration tests for controllers</li>
+              <li><strong>Integration:</strong> Event publishing when tasks are completed, email notifications</li>
+            </ul>
+            <p>Focus on proper project structure, clear separation of concerns, and demonstrating how all components work together to create a functional application. Include proper error handling, validation, and security throughout all layers.</p>
           </section>
 
-          <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
-            <a href="lesson-17.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
-            <a href="lesson-19.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
-          </nav>
+          <div class="mt-12 flex justify-between">
+            <a href="lesson-17.html" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              Previous
+            </a>
+            <a href="lesson-19.html" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">
+              Next
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+          </div>
         </div>
       </div>
     </main>
