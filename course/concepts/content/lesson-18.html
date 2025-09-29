@@ -85,7 +85,11 @@
           <section id="project-structure" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Project Structure</h2>
             <h3>Definition</h3>
-            <p>Project structure in Spring Boot follows conventions that organize code into logical packages based on functionality and architectural layers. A well-organized structure separates presentation logic (controllers), business logic (services), data access logic (repositories), and configuration components. This separation makes code easier to understand, test, and maintain while following Spring Boot's convention-over-configuration philosophy that reduces boilerplate and increases productivity.</p>
+            <ul>
+                <li>Project structure in Spring Boot follows conventions that organize code into logical packages based on functionality and architectural layers.</li>
+                <li>A well-organized structure separates presentation logic (controllers), business logic (services), data access logic (repositories), and configuration components.</li>
+                <li>This separation makes code easier to understand, test, and maintain while following Spring Boot's convention-over-configuration philosophy that reduces boilerplate and increases productivity.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Think of project structure like organizing a well-run restaurant. The dining area (controllers) handles customer interactions, the kitchen (services) prepares the food according to recipes, the pantry (repositories) manages ingredient storage and retrieval, and the management office (configuration) sets policies and procedures. Each area has a specific purpose and clear boundaries, but they all work together seamlessly. The waitstaff doesn't cook food, the chefs don't handle payments, and the storage manager doesn't serve customers - but information and resources flow efficiently between areas. When a customer orders a meal, the request flows from dining room to kitchen to pantry and back, with each area doing what it does best. A Spring Boot application works the same way, with each package and layer having clear responsibilities while collaborating to fulfill user requests efficiently and maintainably.</p>
@@ -157,7 +161,12 @@ spring:
           <section id="layered-architecture" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Layered Architecture</h2>
             <h3>Definition</h3>
-            <p>Layered architecture organizes application components into horizontal layers where each layer has specific responsibilities and can only communicate with adjacent layers. The typical layers are presentation (controllers), business (services), persistence (repositories), and domain (entities). This architecture promotes separation of concerns, makes testing easier, and allows changes in one layer without affecting others. Dependencies flow downward, meaning higher layers depend on lower layers but not vice versa.</p>
+            <ul>
+                <li>Layered architecture organizes application components into horizontal layers where each layer has specific responsibilities and can only communicate with adjacent layers.</li>
+                <li>The typical layers are presentation (controllers), business (services), persistence (repositories), and domain (entities).</li>
+                <li>This architecture promotes separation of concerns, makes testing easier, and allows changes in one layer without affecting others.</li>
+                <li>Dependencies flow downward, meaning higher layers depend on lower layers but not vice versa.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Layered architecture is like a multi-story corporate building where each floor has a specific function and clear communication protocols. The executive floor (presentation layer) makes high-level decisions and communicates with clients, the management floor (business layer) implements company policies and coordinates operations, the operations floor (service layer) handles day-to-day work processes, and the basement (data layer) stores and retrieves company records. Information flows up and down through proper channels - executives don't directly access file cabinets in the basement, and data clerks don't make executive decisions. Each floor focuses on its expertise while relying on the floors below for support. When someone needs information, the request flows down through proper channels until it reaches the right floor, then the response flows back up. This structured approach ensures everyone knows their role, prevents chaos, and makes the organization scalable and maintainable.</p>
@@ -213,7 +222,12 @@ public interface UserRepository extends JpaRepository&lt;User, Long&gt; {
           <section id="data-layer" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Data Layer</h2>
             <h3>Definition</h3>
-            <p>The data layer handles all database interactions and data persistence concerns in your Spring Boot application. It consists of entities (domain models), repositories (data access), and configuration for database connections. This layer abstracts database-specific details from business logic, provides a clean API for data operations, and ensures data consistency and integrity. Spring Data JPA simplifies repository implementation with automatic query generation and custom query support.</p>
+            <ul>
+                <li>The data layer handles all database interactions and data persistence concerns in your Spring Boot application.</li>
+                <li>It consists of entities (domain models), repositories (data access), and configuration for database connections.</li>
+                <li>This layer abstracts database-specific details from business logic, provides a clean API for data operations, and ensures data consistency and integrity.</li>
+                <li>Spring Data JPA simplifies repository implementation with automatic query generation and custom query support.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>The data layer is like a professional library system with librarians, catalogs, and storage areas. The entities (books) contain the actual information, the repositories (librarians) know exactly where everything is stored and how to retrieve it efficiently, and the database configuration (library policies) determines how the collection is organized and accessed. When someone needs information, they don't wander through the stacks randomly - they ask the librarian (repository) who uses the catalog system (database indexes) to quickly locate and retrieve the exact resources needed. The librarians handle all the complex filing, cross-referencing, and maintenance tasks, so researchers (business logic) can focus on analyzing information rather than worrying about storage details. This organized approach ensures information is reliable, accessible, and properly maintained.</p>
@@ -285,7 +299,12 @@ public class UserService {
           <section id="service-layer" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Service Layer</h2>
             <h3>Definition</h3>
-            <p>The service layer contains your application's business logic and coordinates operations between different components. Services encapsulate complex business rules, orchestrate calls to repositories, handle transactions, and transform data between layers. This layer is where your application's core functionality lives, independent of how data is stored or how users interact with the system. Services should be focused, testable, and reusable across different parts of your application.</p>
+            <ul>
+                <li>The service layer contains your application's business logic and coordinates operations between different components.</li>
+                <li>Services encapsulate complex business rules, orchestrate calls to repositories, handle transactions, and transform data between layers.</li>
+                <li>This layer is where your application's core functionality lives, independent of how data is stored or how users interact with the system.</li>
+                <li>Services should be focused, testable, and reusable across different parts of your application.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>The service layer is like the management team in a company that makes strategic decisions and coordinates between departments. When a customer wants to process a complex order, the sales manager (service) doesn't just pass the request directly to the warehouse (repository). Instead, they check inventory levels, verify customer credit, calculate discounts, coordinate with shipping, and ensure everything happens in the right sequence according to business rules. The manager knows how to handle exceptions - what to do when items are out of stock, how to process rush orders, and when to escalate issues to higher management. They transform raw data (like product codes) into meaningful information (like customer invoices) and ensure that all departments work together smoothly to achieve business objectives. This coordination and decision-making expertise is what makes the business run effectively.</p>
@@ -362,7 +381,13 @@ public class EmailServiceImpl implements EmailService {
           <section id="web-layer" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Web Layer</h2>
             <h3>Definition</h3>
-            <p>The web layer handles HTTP requests and responses, managing the interaction between users and your application. Controllers receive requests, validate input, delegate to services, and return appropriate responses. This layer also includes request/response DTOs, validation annotations, and error handling. The web layer should be thin, focusing on HTTP concerns while delegating business logic to services. It transforms external requests into internal operations and formats results for client consumption.</p>
+            <ul>
+                <li>The web layer handles HTTP requests and responses, managing the interaction between users and your application.</li>
+                <li>Controllers receive requests, validate input, delegate to services, and return appropriate responses.</li>
+                <li>This layer also includes request/response DTOs, validation annotations, and error handling.</li>
+                <li>The web layer should be thin, focusing on HTTP concerns while delegating business logic to services.</li>
+                <li>It transforms external requests into internal operations and formats results for client consumption.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>The web layer is like the reception desk and customer service department of a busy office building. When visitors (HTTP requests) arrive, the receptionist (controller) greets them, checks their credentials, determines what they need, and directs them to the right department (service). The receptionist doesn't solve complex problems themselves - they know who to call and how to route requests efficiently. They also handle the communication protocol - translating visitor requests into internal language the organization understands, and then translating responses back into terms visitors can understand. When problems occur, they provide appropriate error messages and guide visitors to alternative solutions. The reception area also maintains visitor logs (request logging) and ensures security protocols are followed before allowing access to internal departments.</p>
@@ -452,7 +477,11 @@ class UserControllerTest {
           <section id="configuration-layer" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Configuration Layer</h2>
             <h3>Definition</h3>
-            <p>The configuration layer defines how your Spring Boot application components are wired together and how they behave in different environments. Configuration classes use annotations like @Configuration, @Bean, and @ConfigurationProperties to set up beans, define dependencies, and customize framework behavior. This layer separates configuration concerns from business logic, making your application more flexible and easier to deploy across different environments with different settings.</p>
+            <ul>
+                <li>The configuration layer defines how your Spring Boot application components are wired together and how they behave in different environments.</li>
+                <li>Configuration classes use annotations like @Configuration, @Bean, and @ConfigurationProperties to set up beans, define dependencies, and customize framework behavior.</li>
+                <li>This layer separates configuration concerns from business logic, making your application more flexible and easier to deploy across different environments with different settings.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>The configuration layer is like the setup crew and technical specifications for a theater production. Before the show begins, the crew configures the stage, lighting, sound systems, and backstage equipment according to detailed specifications. They don't perform in the show, but they ensure all the technical elements work together perfectly so the actors can focus on their performances. Different venues might require different configurations - a small theater needs different lighting than a large auditorium - but the same show can adapt to various environments. The configuration crew also sets up communication systems so the director can coordinate with lighting technicians, sound engineers, and stage managers. In Spring Boot applications, configuration classes work similarly, setting up the technical infrastructure so your business components can focus on their core responsibilities while being flexible enough to work in development, testing, and production environments.</p>
@@ -530,7 +559,11 @@ spring:
           <section id="caching-integration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Caching Integration</h2>
             <h3>Definition</h3>
-            <p>The caching layer improves application performance by temporarily storing frequently accessed data in memory, reducing the need to repeatedly fetch data from the database or recompute results. Spring Boot provides easy integration with caching providers like Ehcache, Hazelcast, and Redis. Caching can be applied at various levels - method results, data queries, or even whole objects - and can significantly speed up response times for read-heavy applications.</p>
+            <ul>
+                <li>The caching layer improves application performance by temporarily storing frequently accessed data in memory, reducing the need to repeatedly fetch data from the database or recompute results.</li>
+                <li>Spring Boot provides easy integration with caching providers like Ehcache, Hazelcast, and Redis.</li>
+                <li>Caching can be applied at various levels - method results, data queries, or even whole objects - and can significantly speed up response times for read-heavy applications.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Caching is like having a well-organized set of frequently used tools and materials within easy reach of a craftsman, instead of having to fetch them from storage every time they are needed. For a chef, caching might mean having commonly used ingredients pre-prepared and stored within arm's reach, so they don't have to chop vegetables or measure spices from scratch for every single dish. In a software application, caching stores copies of data or computed results in a location that can be accessed much more quickly than the original source, whether that's a database, an external service, or a complex computation. Just as a chef can prepare a meal faster with pre-chopped ingredients, an application can respond to requests faster with cached data.</p>
@@ -579,7 +612,11 @@ public class ProductService {
           <section id="validation-integration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Validation Integration</h2>
             <h3>Definition</h3>
-            <p>The validation layer ensures that only valid data enters your system and that business rules are enforced consistently. Spring Boot provides powerful validation features, including JSR-303/JSR-380 Bean Validation, custom validators, and integration with Spring MVC for automatic request validation. Proper validation prevents invalid data from causing errors or inconsistent states within your application.</p>
+            <ul>
+                <li>The validation layer ensures that only valid data enters your system and that business rules are enforced consistently.</li>
+                <li>Spring Boot provides powerful validation features, including JSR-303/JSR-380 Bean Validation, custom validators, and integration with Spring MVC for automatic request validation.</li>
+                <li>Proper validation prevents invalid data from causing errors or inconsistent states within your application.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Validation is like having a strict quality control process in a manufacturing line that checks each product against predefined standards before it is allowed to proceed to the next stage or be shipped to customers. Just as a manufacturer wouldn't want defective products to reach customers, leading to dissatisfaction or damage to the brand, an application must ensure that only data that meets all correctness and business rules enters the system. Validation acts as a protective barrier, catching errors and inconsistencies early, whether they are due to user input mistakes, system integration issues, or data corruption.</p>
@@ -634,7 +671,11 @@ public class GlobalExceptionHandler {
           <section id="security-integration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Security Integration</h2>
             <h3>Definition</h3>
-            <p>Security integration weaves authentication and authorization throughout your Spring Boot application layers. Security filters intercept requests before they reach controllers, security annotations protect service methods, and security context provides user information across the application. Integration includes configuring authentication providers, defining access rules, handling security exceptions, and ensuring security policies are consistently applied across all application components.</p>
+            <ul>
+                <li>Security integration weaves authentication and authorization throughout your Spring Boot application layers.</li>
+                <li>Security filters intercept requests before they reach controllers, security annotations protect service methods, and security context provides user information across the application.</li>
+                <li>Integration includes configuring authentication providers, defining access rules, handling security exceptions, and ensuring security policies are consistently applied across all application components.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Security integration is like implementing a comprehensive security system throughout a modern office building. There's not just one security guard at the front door - instead, there are multiple security layers working together seamlessly. Key cards control building access, elevator permissions determine which floors you can reach, door locks protect sensitive areas, and security cameras monitor activity throughout. The security system knows who you are from the moment you enter, and that identity follows you everywhere, automatically granting or denying access based on your role and clearance level. Security personnel don't interrupt normal business operations - they work invisibly in the background, only becoming noticeable when someone tries to access something they shouldn't. Emergency protocols ensure that if a security breach occurs anywhere, the entire system responds appropriately to protect the organization's assets and people.</p>
@@ -707,7 +748,11 @@ public class SecurityExceptionHandler {
           <section id="monitoring-layer" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Monitoring Layer</h2>
             <h3>Definition</h3>
-            <p>The monitoring layer provides insights into your application's performance, behavior, and overall health in real-time. Spring Boot offers integration with monitoring systems like Prometheus, Grafana, and Micrometer, allowing you to collect and visualize metrics, logs, and traces. Effective monitoring helps you detect issues early, understand usage patterns, and ensure your application is running smoothly and efficiently.</p>
+            <ul>
+                <li>The monitoring layer provides insights into your application's performance, behavior, and overall health in real-time.</li>
+                <li>Spring Boot offers integration with monitoring systems like Prometheus, Grafana, and Micrometer, allowing you to collect and visualize metrics, logs, and traces.</li>
+                <li>Effective monitoring helps you detect issues early, understand usage patterns, and ensure your application is running smoothly and efficiently.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Monitoring is like having a comprehensive set of sensors and gauges in a car that provide real-time data on speed, engine temperature, fuel level, and more. Just as a driver relies on these indicators to ensure the car is functioning properly and to detect any potential issues early, developers and operators use monitoring tools to observe the application's vital signs. If any metric goes beyond the normal range - like high CPU usage, low memory, or slow response times - it's a sign that something needs attention. Monitoring helps maintain the application's health, performance, and reliability, just as dashboard indicators help maintain the vehicle's operability and safety.</p>
@@ -790,7 +835,11 @@ public class PrometheusConfig {
           <section id="exception-handling" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Exception Handling</h2>
             <h3>Definition</h3>
-            <p>Exception handling in a complete Spring Boot application provides consistent error responses across all layers and components. Global exception handlers catch and transform exceptions into appropriate HTTP responses, while custom exceptions carry domain-specific error information. Proper exception handling includes logging, error codes, user-friendly messages, and different handling strategies for different types of errors (validation, business logic, system errors).</p>
+            <ul>
+                <li>Exception handling in a complete Spring Boot application provides consistent error responses across all layers and components.</li>
+                <li>Global exception handlers catch and transform exceptions into appropriate HTTP responses, while custom exceptions carry domain-specific error information.</li>
+                <li>Proper exception handling includes logging, error codes, user-friendly messages, and different handling strategies for different types of errors (validation, business logic, system errors).</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Exception handling is like having a well-trained crisis management team that handles problems consistently throughout an organization. When something goes wrong anywhere in the company - whether it's a customer complaint, equipment failure, or communication breakdown - the crisis team has established procedures for each type of problem. They don't panic or give inconsistent responses; instead, they follow proven protocols to assess the situation, communicate appropriately with affected parties, document what happened, and implement solutions. Customer-facing staff are trained to provide helpful, professional responses even when internal systems fail, while technical teams work behind the scenes to resolve issues. The crisis management system ensures that problems are handled gracefully, customers receive consistent service, and the organization learns from each incident to prevent similar issues in the future.</p>
@@ -871,7 +920,11 @@ public class PaymentService {
           <section id="testing-strategy" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Testing Strategy</h2>
             <h3>Definition</h3>
-            <p>A comprehensive testing strategy for Spring Boot applications includes unit tests for individual components, integration tests for component interactions, and end-to-end tests for complete workflows. Different testing approaches are used for different layers - @WebMvcTest for controllers, @DataJpaTest for repositories, and @SpringBootTest for full application context. Testing strategy also includes test data management, mocking external dependencies, and automated test execution in CI/CD pipelines.</p>
+            <ul>
+                <li>A comprehensive testing strategy for Spring Boot applications includes unit tests for individual components, integration tests for component interactions, and end-to-end tests for complete workflows.</li>
+                <li>Different testing approaches are used for different layers - @WebMvcTest for controllers, @DataJpaTest for repositories, and @SpringBootTest for full application context.</li>
+                <li>Testing strategy also includes test data management, mocking external dependencies, and automated test execution in CI/CD pipelines.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Testing strategy is like quality assurance in aircraft manufacturing, where safety demands multiple levels of rigorous testing. Individual components like engines are tested in isolation (unit tests) to ensure they meet specifications. Then components are tested together (integration tests) to verify they work properly when connected - does the engine communicate correctly with the flight control system? Finally, the complete aircraft undergoes flight testing (end-to-end tests) under real conditions to ensure everything works together safely. Each testing level serves a specific purpose: component testing catches basic defects quickly and cheaply, integration testing reveals interface problems, and flight testing validates that the entire system performs as expected. Test pilots use simulators and controlled environments to test dangerous scenarios safely, just like how we use test databases and mock services to test error conditions without risking production systems.</p>
@@ -970,7 +1023,11 @@ public class TestConfig {
           <section id="step-by-step-build" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Step-by-Step Build Process</h2>
             <h3>Definition</h3>
-            <p>Building a Spring Boot application step-by-step involves creating components in a logical order that allows you to test and validate each piece before adding complexity. The typical progression starts with domain models and repositories, then adds services, controllers, configuration, and finally integration features like security and error handling. This incremental approach helps identify issues early and ensures each layer is working correctly before building upon it.</p>
+            <ul>
+                <li>Building a Spring Boot application step-by-step involves creating components in a logical order that allows you to test and validate each piece before adding complexity.</li>
+                <li>The typical progression starts with domain models and repositories, then adds services, controllers, configuration, and finally integration features like security and error handling.</li>
+                <li>This incremental approach helps identify issues early and ensures each layer is working correctly before building upon it.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Building a Spring Boot application step-by-step is like constructing a house where you must complete each phase before moving to the next. You start with the foundation (domain models and database), ensuring it's solid and properly designed to support everything that comes after. Then you build the structural framework (repositories and services), which provides the skeleton that holds everything together. Next comes the electrical and plumbing (configuration and integration), followed by the walls and interior (controllers and web layer). Finally, you add finishing touches like security systems and error handling. At each stage, you test and inspect the work - you don't wait until the house is complete to discover the foundation is cracked or the wiring is faulty. Each phase builds upon the previous one, so mistakes early in the process become increasingly expensive to fix as you progress. This methodical approach ensures a solid, well-integrated final product.</p>
@@ -1048,7 +1105,11 @@ public class SecurityConfig {
           <section id="component-integration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Component Integration</h2>
             <h3>Definition</h3>
-            <p>Component integration ensures all parts of your Spring Boot application work together seamlessly through dependency injection, event handling, and shared configuration. Integration involves managing bean lifecycles, handling cross-cutting concerns like logging and metrics, coordinating transactions across multiple components, and ensuring data consistency throughout the application. Proper integration makes your application behave as a cohesive system rather than a collection of independent parts.</p>
+            <ul>
+                <li>Component integration ensures all parts of your Spring Boot application work together seamlessly through dependency injection, event handling, and shared configuration.</li>
+                <li>Integration involves managing bean lifecycles, handling cross-cutting concerns like logging and metrics, coordinating transactions across multiple components, and ensuring data consistency throughout the application.</li>
+                <li>Proper integration makes your application behave as a cohesive system rather than a collection of independent parts.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Component integration is like coordinating a symphony orchestra where dozens of musicians with different instruments must perform together in perfect harmony. The conductor (Spring container) ensures everyone starts and stops at the right time, follows the same tempo, and responds to dynamic changes during the performance. The sheet music (configuration) provides the common framework that tells each section when to play, but the real magic happens when the violins, brass, woodwinds, and percussion blend together to create something beautiful that none could achieve alone. Each musician is skilled individually, but they must listen to each other, follow cues, and adjust their performance based on what's happening around them. When integration works well, the audience hears one magnificent piece of music, not a cacophony of separate instruments fighting for attention.</p>

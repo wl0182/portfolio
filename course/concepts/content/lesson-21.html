@@ -1,432 +1,3 @@
-<!doctype html>
-<html lang="en" class="scroll-smooth">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Lesson 21 - Spring Boot Microservices Advanced Topics</title>
-    <meta name="description" content="Spring Boot microservices advanced topics: distributed data management, deployment strategies, monitoring, security patterns, and building production-ready microservices ecosystems." />
-    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
-    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-    <script>
-      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
-    </script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
-    <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
-  </head>
-  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
-    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
-
-    <header class="z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
-      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
-        <a href="../../../" class="group inline-flex items-center gap-3">
-          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
-          <div class="leading-tight">
-            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
-            <div class="font-semibold">Wassim Lagnaoui</div>
-          </div>
-        </a>
-        <nav class="hidden items-center gap-6 md:flex">
-          <a href="../../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
-          <a href="../../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
-          <a href="../../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
-          <a href="../../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
-          <a href="../../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
-          <a href="../../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
-        </nav>
-        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
-          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
-          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        </button>
-      </div>
-    </header>
-
-    <main class="mx-auto max-w-7xl px-6 py-10">
-      <div class="lg:flex lg:gap-8">
-        <aside class="hidden lg:block lg:w-72">
-          <nav class="sticky top-8 rounded-xl border border-slate-200/60 bg-white/60 p-4 shadow-sm backdrop-blur dark:border-slate-800/60 dark:bg-slate-900/40" aria-label="Table of contents">
-            <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">On this page</h2>
-            <ol class="space-y-1 text-sm">
-              <li><a href="#introduction" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Introduction</a></li>
-              <li><a href="#distributed-data-management" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Distributed Data Management</a></li>
-              <li><a href="#saga-pattern" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Saga Pattern</a></li>
-              <li><a href="#event-sourcing" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Event Sourcing</a></li>
-              <li><a href="#cqrs-pattern" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">CQRS Pattern</a></li>
-              <li><a href="#container-orchestration" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Container Orchestration</a></li>
-              <li><a href="#blue-green-deployment" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Blue-Green Deployment</a></li>
-              <li><a href="#canary-releases" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Canary Releases</a></li>
-              <li><a href="#observability-patterns" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Observability Patterns</a></li>
-              <li><a href="#security-in-microservices" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Security in Microservices</a></li>
-              <li><a href="#testing-strategies" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Testing Strategies</a></li>
-              <li><a href="#organizational-patterns" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Organizational Patterns</a></li>
-              <li><a href="#migration-strategies" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Migration Strategies</a></li>
-              <li><a href="#summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Summary</a></li>
-              <li><a href="#programming-challenge" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Programming Challenge</a></li>
-            </ol>
-          </nav>
-        </aside>
-        <div class="min-w-0 flex-1">
-          <div class="mb-6">
-            <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Concepts</a>
-          </div>
-          <header class="mx-auto max-w-3xl text-center">
-            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 21: Spring Boot Microservices Advanced Topics</h1>
-            <p class="mt-2 text-slate-600 dark:text-slate-300">Master advanced microservices patterns: distributed data management, sophisticated deployment strategies, comprehensive observability, and building enterprise-grade distributed systems.</p>
-          </header>
-
-          <section id="introduction" class="prose prose-slate mt-6 max-w-none dark:prose-invert">
-            <h2>Introduction</h2>
-            <p>Building microservices that work in development is just the first step - creating production-ready distributed systems that scale to millions of users requires mastering advanced patterns and practices that address the complex challenges of distributed computing. You need sophisticated strategies for managing data consistency across services, deploying updates without downtime, maintaining observability across dozens of services, and ensuring security in a distributed environment where traditional perimeter-based approaches don't work. Advanced microservices topics cover the patterns and practices that separate toy applications from enterprise-grade systems: distributed transaction management through sagas, eventual consistency with event sourcing, zero-downtime deployments with blue-green and canary strategies, comprehensive observability through distributed tracing and metrics, and organizational patterns that enable teams to work effectively with microservices at scale. This final lesson completes your journey from Spring Boot basics to enterprise microservices mastery, providing the advanced knowledge needed to build and operate world-class distributed systems.</p>
-          </section>
-
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="distributed-data-management" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Distributed Data Management</h2>
-            <h3>Definition</h3>
-            <p>Distributed data management addresses the challenge of maintaining data consistency and integrity across multiple microservices, each with their own databases. Unlike monolithic applications where ACID transactions ensure consistency, microservices require new approaches like eventual consistency, distributed transactions, and data synchronization patterns. Key strategies include database-per-service patterns, shared data anti-patterns, and techniques for handling cross-service data dependencies while maintaining service autonomy.</p>
-
-            <h3>Analogy</h3>
-            <p>Distributed data management is like coordinating inventory across a large retail chain with multiple warehouses and stores, each maintaining their own stock records. In a single-store operation, you can instantly check inventory and update quantities in one system, but with multiple locations, you need sophisticated coordination. When a customer orders online, you might reserve items from different warehouses, coordinate shipping, and update inventory across multiple systems. Each location maintains its own inventory database for operational efficiency, but they need to synchronize information for accurate availability and prevent overselling. Sometimes you accept that inventory counts might be slightly off between locations for a few minutes (eventual consistency) rather than locking all systems during every transaction. The key is designing processes that maintain overall system integrity while allowing each location to operate independently and efficiently.</p>
-
-            <h3>Examples</h3>
-            <p><strong>Database per service pattern:</strong></p>
-            <pre><code class="language-java">// Each service owns its data
-@Entity
-@Table(name = "users")
-public class User {
-    // User service database
-}
-
-@Entity
-@Table(name = "orders")
-public class Order {
-    private String userId;  // Reference by ID, not entity
-    // Order service database
-}
-</code></pre>
-
-            <p><strong>Data synchronization events:</strong></p>
-            <pre><code class="language-java">@EventListener
-public void onUserUpdated(UserUpdatedEvent event) {
-    // Sync user data to order service's read model
-    userReadModel.updateUser(event.getUser());
-}
-</code></pre>
-
-            <p><strong>Eventual consistency handling:</strong></p>
-            <pre><code class="language-java">@Service
-public class OrderService {
-    public Order createOrder(CreateOrderRequest request) {
-        // Create order immediately, validate user asynchronously
-        Order order = new Order(request.getUserId(), PENDING_VALIDATION);
-        publishEvent(new OrderCreatedEvent(order));
-        return order;
-    }
-}
-</code></pre>
-
-            <p><strong>Data anti-corruption layer:</strong></p>
-            <pre><code class="language-java">@Component
-public class UserDataAdapter {
-    public LocalUser adaptExternalUser(ExternalUser externalUser) {
-        // Transform external user format to local domain model
-        return LocalUser.builder()
-            .id(externalUser.getIdentifier())
-            .name(externalUser.getFullName())
-            .build();
-    }
-}
-</code></pre>
-          </section>
-
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="saga-pattern" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Saga Pattern</h2>
-            <h3>Definition</h3>
-            <p>The Saga pattern manages distributed transactions by breaking them into a series of local transactions, each with a compensating action that can undo the work if later steps fail. Instead of traditional two-phase commit protocols that don't scale well in microservices, sagas coordinate long-running transactions through choreography (event-driven) or orchestration (centrally managed) approaches. Sagas maintain eventual consistency while providing mechanisms to handle failures and ensure system integrity across service boundaries.</p>
-
-            <h3>Analogy</h3>
-            <p>The Saga pattern is like planning a complex wedding where multiple vendors must coordinate their services, but if one vendor fails, you need a way to cancel or modify all the other arrangements. When booking a wedding, you might reserve the venue, book catering, hire photographers, and arrange flowers as separate transactions. If the venue cancels at the last minute, you need to systematically undo or modify all the other bookings - cancel catering, reschedule photography, and adjust flower delivery. Each vendor has their own booking system and policies, so you can't use a single "master transaction" that locks everything until confirmed. Instead, you coordinate through a series of individual bookings, each with a clear cancellation policy. The wedding planner (saga orchestrator) tracks the overall progress and executes the compensation plan if anything goes wrong, ensuring you don't end up with flowers for a cancelled wedding or catering for a venue you don't have.</p>
-
-            <h3>Examples</h3>
-            <p><strong>Saga orchestrator pattern:</strong></p>
-            <pre><code class="language-java">@Component
-public class OrderSagaOrchestrator {
-    public void processOrder(Order order) {
-        try {
-            reserveInventory(order);
-            processPayment(order);
-            shipOrder(order);
-            order.complete();
-        } catch (Exception e) {
-            compensate(order, e);
-        }
-    }
-}
-</code></pre>
-
-            <p><strong>Choreography-based saga:</strong></p>
-            <pre><code class="language-java">@EventListener
-public void onOrderCreated(OrderCreatedEvent event) {
-    try {
-        inventoryService.reserve(event.getItems());
-        publishEvent(new InventoryReservedEvent(event.getOrderId()));
-    } catch (Exception e) {
-        publishEvent(new InventoryReservationFailedEvent(event.getOrderId()));
-    }
-}
-</code></pre>
-
-            <p><strong>Compensation actions:</strong></p>
-            <pre><code class="language-java">@Service
-public class PaymentService {
-    public void processPayment(PaymentRequest request) {
-        // Process payment
-    }
-
-    public void refundPayment(String paymentId) {
-        // Compensation action for payment
-    }
-}
-</code></pre>
-
-            <p><strong>Saga state management:</strong></p>
-            <pre><code class="language-java">@Entity
-public class OrderSaga {
-    private String orderId;
-    private SagaState state;
-    private List<SagaStep> completedSteps;
-
-    public void addCompletedStep(SagaStep step) {
-        completedSteps.add(step);
-    }
-}
-</code></pre>
-          </section>
-
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="event-sourcing" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Event Sourcing</h2>
-            <h3>Definition</h3>
-            <p>Event sourcing stores the state of applications as a sequence of events rather than current state snapshots. Every change to application state is captured as an event that is appended to an event store. Current state is derived by replaying events from the beginning or from a snapshot. This approach provides a complete audit trail, enables temporal queries, supports event replay for debugging, and facilitates building multiple read models from the same event stream for different use cases.</p>
-
-            <h3>Analogy</h3>
-            <p>Event sourcing is like keeping a detailed bank account ledger that records every transaction instead of just showing your current balance. Traditional banking systems might only show "Current Balance: $1,543.21," but event sourcing keeps the complete history: "Started with $1,000, deposited $500 on Monday, paid $50 for groceries Tuesday, received $200 salary Wednesday, paid $106.79 for utilities Thursday." You can reconstruct your current balance by replaying all transactions, and more importantly, you can answer questions like "What was my balance last Tuesday?" or "How much did I spend on groceries this month?" The ledger becomes an authoritative history that enables you to build different views: monthly summaries, spending categories, or tax reports - all derived from the same underlying transaction history. If there's ever a dispute about a transaction, you have the complete, immutable record of exactly what happened and when.</p>
-
-            <h3>Examples</h3>
-            <p><strong>Event store implementation:</strong></p>
-            <pre><code class="language-java">@Entity
-public class EventStore {
-    private String aggregateId;
-    private String eventType;
-    private String eventData;
-    private Long sequence;
-    private LocalDateTime timestamp;
-}
-</code></pre>
-
-            <p><strong>Domain events:</strong></p>
-            <pre><code class="language-java">public class OrderCreatedEvent implements DomainEvent {
-    private final String orderId;
-    private final String customerId;
-    private final List<OrderItem> items;
-    private final LocalDateTime timestamp;
-}
-</code></pre>
-
-            <p><strong>Event-sourced aggregate:</strong></p>
-            <pre><code class="language-java">public class Order {
-    private String id;
-    private OrderStatus status;
-    private List<DomainEvent> changes = new ArrayList<>();
-
-    public void apply(OrderCreatedEvent event) {
-        this.id = event.getOrderId();
-        this.status = OrderStatus.CREATED;
-    }
-
-    public static Order fromHistory(List<DomainEvent> events) {
-        Order order = new Order();
-        events.forEach(order::apply);
-        return order;
-    }
-}
-</code></pre>
-
-            <p><strong>Event replay for reconstruction:</strong></p>
-            <pre><code class="language-java">@Service
-public class EventSourcingRepository {
-    public Order findById(String orderId) {
-        List<DomainEvent> events = eventStore.getEvents(orderId);
-        return Order.fromHistory(events);
-    }
-}
-</code></pre>
-          </section>
-
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="cqrs-pattern" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>CQRS Pattern</h2>
-            <h3>Definition</h3>
-            <p>Command Query Responsibility Segregation (CQRS) separates read and write operations into different models, allowing each to be optimized independently. Commands handle state changes and business logic, while queries provide optimized read models for different use cases. CQRS works particularly well with event sourcing, where events update multiple read models asynchronously. This pattern enables high-performance reads, complex reporting capabilities, and independent scaling of read and write workloads.</p>
-
-            <h3>Analogy</h3>
-            <p>CQRS is like how a modern newspaper operation separates news gathering and reporting from news reading and distribution. The newsroom (command side) focuses on investigating stories, conducting interviews, and writing articles - optimized for accuracy, fact-checking, and editorial workflow. Meanwhile, the distribution system (query side) creates different formats for different audiences: a website optimized for quick browsing, a mobile app for commuters, a print edition for detailed reading, and social media summaries for sharing. Each reading format is specifically designed for its audience and use case, but they all derive from the same underlying news content. The newsroom doesn't worry about website performance or mobile layouts - they focus on creating quality content. The distribution systems don't handle news gathering - they focus on presenting information effectively. This separation allows each side to excel at what it does best while serving the same overall purpose.</p>
-
-            <h3>Examples</h3>
-            <p><strong>Command and query separation:</strong></p>
-            <pre><code class="language-java">// Command side - handles writes
-@RestController
-public class OrderCommandController {
-    @PostMapping("/orders")
-    public void createOrder(@RequestBody CreateOrderCommand command) {
-        orderCommandService.handle(command);
-    }
-}
-
-// Query side - handles reads
-@RestController
-public class OrderQueryController {
-    @GetMapping("/orders/{id}")
-    public OrderView getOrder(@PathVariable String id) {
-        return orderQueryService.findById(id);
-    }
-}
-</code></pre>
-
-            <p><strong>Command handler:</strong></p>
-            <pre><code class="language-java">@Component
-public class CreateOrderCommandHandler {
-    public void handle(CreateOrderCommand command) {
-        Order order = new Order(command);
-        orderRepository.save(order);
-        eventPublisher.publish(new OrderCreatedEvent(order));
-    }
-}
-</code></pre>
-
-            <p><strong>Read model projection:</strong></p>
-            <pre><code class="language-java">@EventListener
-public void on(OrderCreatedEvent event) {
-    OrderSummaryView summary = new OrderSummaryView(
-        event.getOrderId(),
-        event.getCustomerName(),
-        event.getTotalAmount()
-    );
-    orderSummaryRepository.save(summary);
-}
-</code></pre>
-
-            <p><strong>Specialized query models:</strong></p>
-            <pre><code class="language-java">public class CustomerOrderHistory {
-    private String customerId;
-    private int totalOrders;
-    private BigDecimal totalSpent;
-    private LocalDate lastOrderDate;
-}
-</code></pre>
-          </section>
-
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="container-orchestration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Container Orchestration</h2>
-            <h3>Definition</h3>
-            <p>Container orchestration manages the deployment, scaling, networking, and availability of containerized microservices across clusters of machines. Kubernetes is the dominant orchestration platform, providing automated deployment, service discovery, load balancing, rolling updates, and self-healing capabilities. Orchestration transforms individual containers into resilient, scalable distributed systems that can automatically respond to failures, traffic changes, and resource demands without manual intervention.</p>
-
-            <h3>Analogy</h3>
-            <p>Container orchestration is like having an intelligent logistics system for managing a fleet of food trucks across a large city. Instead of manually telling each truck where to go and what to do, the orchestration system (Kubernetes) automatically assigns trucks to locations based on demand, weather, events, and traffic patterns. If a truck breaks down, the system automatically dispatches a replacement. During lunch rush, more trucks are automatically deployed to business districts. If there's a festival in the park, the system scales up ice cream trucks in that area. The system handles all the complex coordination: tracking which trucks are where, routing customers to nearby trucks, balancing the workload across trucks, and ensuring there's always adequate coverage. Truck operators focus on serving customers while the orchestration system handles the logistics of where to be, when to scale up or down, and how to maintain service during equipment failures or maintenance periods.</p>
-
-            <h3>Examples</h3>
-            <p><strong>Kubernetes deployment manifest:</strong></p>
-            <pre><code class="language-yaml">apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: user-service
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: user-service
-  template:
-    spec:
-      containers:
-      - name: user-service
-        image: user-service:latest
-</code></pre>
-
-            <p><strong>Service discovery and load balancing:</strong></p>
-            <pre><code class="language-yaml">apiVersion: v1
-kind: Service
-metadata:
-  name: user-service
-spec:
-  selector:
-    app: user-service
-  ports:
-  - port: 80
-    targetPort: 8080
-</code></pre>
-
-            <p><strong>Auto-scaling configuration:</strong></p>
-            <pre><code class="language-yaml">apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: user-service-hpa
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: user-service
-  minReplicas: 2
-  maxReplicas: 10
-  targetCPUUtilizationPercentage: 70
-</code></pre>
-
-            <p><strong>Health checks and self-healing:</strong></p>
-            <pre><code class="language-yaml">livenessProbe:
-  httpGet:
-    path: /actuator/health
-    port: 8080
-  initialDelaySeconds: 30
-  periodSeconds: 10
-readinessProbe:
-  httpGet:
-    path: /actuator/health/readiness
-    port: 8080
-</code></pre>
-          </section>
-
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="blue-green-deployment" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Blue-Green Deployment</h2>
-            <h3>Definition</h3>
-            <p>Blue-green deployment maintains two identical production environments (blue and green), with only one serving live traffic at any time. When deploying updates, the new version is deployed to the inactive environment, tested thoroughly, then traffic is switched over instantly. This approach enables zero-downtime deployments, instant rollbacks if issues are discovered, and the ability to test the complete system under production conditions before going live. Blue-green deployments reduce deployment risk and provide confidence in release processes.</p>
-
-            <h3>Analogy</h3>
-            <p>Blue-green deployment is like how airlines manage aircraft maintenance and operations to ensure continuous service. An airline might have two identical aircraft serving the same route - while one plane (blue) carries passengers, the other (green) undergoes maintenance, upgrades, or testing. When it's time to introduce a new in-flight entertainment system or safety equipment, they install and test everything on the green aircraft while the blue aircraft continues normal operations. Once the green aircraft passes all safety checks and testing, they simply swap the aircraft assignments - passengers now board the upgraded green aircraft while the blue aircraft goes offline for its updates. If any problems are discovered with the upgrades, they can instantly switch back to the blue aircraft. This ensures passengers always have reliable service while allowing the airline to introduce improvements safely and test them thoroughly under real operating conditions before committing to the change.</p>
-
-            <h3>Examples</h3>
-            <p><strong>Blue-green infrastructure setup:</strong></p>
-            <pre><code class="language-yaml"># Blue environment
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: user-service-blue
-  labels:
-    version: blue
-spec:
-  replicas: 3
-  template:
-    metadata:
-      labels:
-        app: user-service
-        version: blue
-</code></pre>
 
             <p><strong>Traffic switching service:</strong></p>
             <pre><code class="language-yaml">apiVersion: v1
@@ -532,7 +103,7 @@ public class UserController {
             <h2>Observability Patterns</h2>
             <h3>Definition</h3>
             <p>Observability in microservices requires comprehensive monitoring across three pillars: metrics (quantitative measurements), logs (detailed event records), and traces (request flow across services). Advanced observability includes distributed tracing to follow requests across service boundaries, correlated logging for debugging, alerting on business and technical metrics, and dashboards that provide actionable insights. Effective observability enables rapid incident response, proactive problem detection, and data-driven optimization decisions.</p>
-
+<!doctype html>
             <h3>Analogy</h3>
             <p>Observability in microservices is like the comprehensive monitoring system in a modern smart city that helps city officials understand what's happening across all neighborhoods and infrastructure. The city has thousands of sensors collecting metrics (traffic flow, air quality, power consumption), detailed logs from various systems (police reports, emergency calls, maintenance records), and tracking systems that follow specific incidents from start to finish (following an ambulance from emergency call through hospital admission). When something goes wrong - like a power outage or traffic jam - officials can quickly correlate data from multiple sources to understand the scope, identify the cause, and coordinate response efforts. They don't just wait for citizens to complain; they proactively monitor trends and patterns to prevent problems. The system provides dashboards for different stakeholders: traffic managers see road conditions, utility managers monitor power grids, and city planners analyze long-term trends. This comprehensive visibility enables effective management of a complex, distributed system where problems in one area can cascade to others.</p>
 
@@ -982,3 +553,432 @@ public class MigrationMetrics {
     </script>
   </body>
 </html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 21 - Spring Boot Microservices Advanced Topics</title>
+    <meta name="description" content="Spring Boot microservices advanced topics: distributed data management, deployment strategies, monitoring, security patterns, and building production-ready microservices ecosystems." />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="lg:flex lg:gap-8">
+        <aside class="hidden lg:block lg:w-72">
+          <nav class="sticky top-8 rounded-xl border border-slate-200/60 bg-white/60 p-4 shadow-sm backdrop-blur dark:border-slate-800/60 dark:bg-slate-900/40" aria-label="Table of contents">
+            <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">On this page</h2>
+            <ol class="space-y-1 text-sm">
+              <li><a href="#introduction" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Introduction</a></li>
+              <li><a href="#distributed-data-management" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Distributed Data Management</a></li>
+              <li><a href="#saga-pattern" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Saga Pattern</a></li>
+              <li><a href="#event-sourcing" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Event Sourcing</a></li>
+              <li><a href="#cqrs-pattern" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">CQRS Pattern</a></li>
+              <li><a href="#container-orchestration" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Container Orchestration</a></li>
+              <li><a href="#blue-green-deployment" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Blue-Green Deployment</a></li>
+              <li><a href="#canary-releases" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Canary Releases</a></li>
+              <li><a href="#observability-patterns" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Observability Patterns</a></li>
+              <li><a href="#security-in-microservices" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Security in Microservices</a></li>
+              <li><a href="#testing-strategies" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Testing Strategies</a></li>
+              <li><a href="#organizational-patterns" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Organizational Patterns</a></li>
+              <li><a href="#migration-strategies" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Migration Strategies</a></li>
+              <li><a href="#summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Summary</a></li>
+              <li><a href="#programming-challenge" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Programming Challenge</a></li>
+            </ol>
+          </nav>
+        </aside>
+        <div class="min-w-0 flex-1">
+          <div class="mb-6">
+            <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Concepts</a>
+          </div>
+          <header class="mx-auto max-w-3xl text-center">
+            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 21: Spring Boot Microservices Advanced Topics</h1>
+            <p class="mt-2 text-slate-600 dark:text-slate-300">Master advanced microservices patterns: distributed data management, sophisticated deployment strategies, comprehensive observability, and building enterprise-grade distributed systems.</p>
+          </header>
+
+          <section id="introduction" class="prose prose-slate mt-6 max-w-none dark:prose-invert">
+            <h2>Introduction</h2>
+            <p>Building microservices that work in development is just the first step - creating production-ready distributed systems that scale to millions of users requires mastering advanced patterns and practices that address the complex challenges of distributed computing. You need sophisticated strategies for managing data consistency across services, deploying updates without downtime, maintaining observability across dozens of services, and ensuring security in a distributed environment where traditional perimeter-based approaches don't work. Advanced microservices topics cover the patterns and practices that separate toy applications from enterprise-grade systems: distributed transaction management through sagas, eventual consistency with event sourcing, zero-downtime deployments with blue-green and canary strategies, comprehensive observability through distributed tracing and metrics, and organizational patterns that enable teams to work effectively with microservices at scale. This final lesson completes your journey from Spring Boot basics to enterprise microservices mastery, providing the advanced knowledge needed to build and operate world-class distributed systems.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="distributed-data-management" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Distributed Data Management</h2>
+            <h3>Definition</h3>
+            <p>Distributed data management addresses the challenge of maintaining data consistency and integrity across multiple microservices, each with their own databases. Unlike monolithic applications where ACID transactions ensure consistency, microservices require new approaches like eventual consistency, distributed transactions, and data synchronization patterns. Key strategies include database-per-service patterns, shared data anti-patterns, and techniques for handling cross-service data dependencies while maintaining service autonomy.</p>
+
+            <h3>Analogy</h3>
+            <p>Distributed data management is like coordinating inventory across a large retail chain with multiple warehouses and stores, each maintaining their own stock records. In a single-store operation, you can instantly check inventory and update quantities in one system, but with multiple locations, you need sophisticated coordination. When a customer orders online, you might reserve items from different warehouses, coordinate shipping, and update inventory across multiple systems. Each location maintains its own inventory database for operational efficiency, but they need to synchronize information for accurate availability and prevent overselling. Sometimes you accept that inventory counts might be slightly off between locations for a few minutes (eventual consistency) rather than locking all systems during every transaction. The key is designing processes that maintain overall system integrity while allowing each location to operate independently and efficiently.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Database per service pattern:</strong></p>
+            <pre><code class="language-java">// Each service owns its data
+@Entity
+@Table(name = "users")
+public class User {
+    // User service database
+}
+
+@Entity
+@Table(name = "orders")
+public class Order {
+    private String userId;  // Reference by ID, not entity
+    // Order service database
+}
+</code></pre>
+
+            <p><strong>Data synchronization events:</strong></p>
+            <pre><code class="language-java">@EventListener
+public void onUserUpdated(UserUpdatedEvent event) {
+    // Sync user data to order service's read model
+    userReadModel.updateUser(event.getUser());
+}
+</code></pre>
+
+            <p><strong>Eventual consistency handling:</strong></p>
+            <pre><code class="language-java">@Service
+public class OrderService {
+    public Order createOrder(CreateOrderRequest request) {
+        // Create order immediately, validate user asynchronously
+        Order order = new Order(request.getUserId(), PENDING_VALIDATION);
+        publishEvent(new OrderCreatedEvent(order));
+        return order;
+    }
+}
+</code></pre>
+
+            <p><strong>Data anti-corruption layer:</strong></p>
+            <pre><code class="language-java">@Component
+public class UserDataAdapter {
+    public LocalUser adaptExternalUser(ExternalUser externalUser) {
+        // Transform external user format to local domain model
+        return LocalUser.builder()
+            .id(externalUser.getIdentifier())
+            .name(externalUser.getFullName())
+            .build();
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="saga-pattern" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Saga Pattern</h2>
+            <h3>Definition</h3>
+            <p>The Saga pattern manages distributed transactions by breaking them into a series of local transactions, each with a compensating action that can undo the work if later steps fail. Instead of traditional two-phase commit protocols that don't scale well in microservices, sagas coordinate long-running transactions through choreography (event-driven) or orchestration (centrally managed) approaches. Sagas maintain eventual consistency while providing mechanisms to handle failures and ensure system integrity across service boundaries.</p>
+
+            <h3>Analogy</h3>
+            <p>The Saga pattern is like planning a complex wedding where multiple vendors must coordinate their services, but if one vendor fails, you need a way to cancel or modify all the other arrangements. When booking a wedding, you might reserve the venue, book catering, hire photographers, and arrange flowers as separate transactions. If the venue cancels at the last minute, you need to systematically undo or modify all the other bookings - cancel catering, reschedule photography, and adjust flower delivery. Each vendor has their own booking system and policies, so you can't use a single "master transaction" that locks everything until confirmed. Instead, you coordinate through a series of individual bookings, each with a clear cancellation policy. The wedding planner (saga orchestrator) tracks the overall progress and executes the compensation plan if anything goes wrong, ensuring you don't end up with flowers for a cancelled wedding or catering for a venue you don't have.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Saga orchestrator pattern:</strong></p>
+            <pre><code class="language-java">@Component
+public class OrderSagaOrchestrator {
+    public void processOrder(Order order) {
+        try {
+            reserveInventory(order);
+            processPayment(order);
+            shipOrder(order);
+            order.complete();
+        } catch (Exception e) {
+            compensate(order, e);
+        }
+    }
+}
+</code></pre>
+
+            <p><strong>Choreography-based saga:</strong></p>
+            <pre><code class="language-java">@EventListener
+public void onOrderCreated(OrderCreatedEvent event) {
+    try {
+        inventoryService.reserve(event.getItems());
+        publishEvent(new InventoryReservedEvent(event.getOrderId()));
+    } catch (Exception e) {
+        publishEvent(new InventoryReservationFailedEvent(event.getOrderId()));
+    }
+}
+</code></pre>
+
+            <p><strong>Compensation actions:</strong></p>
+            <pre><code class="language-java">@Service
+public class PaymentService {
+    public void processPayment(PaymentRequest request) {
+        // Process payment
+    }
+
+    public void refundPayment(String paymentId) {
+        // Compensation action for payment
+    }
+}
+</code></pre>
+
+            <p><strong>Saga state management:</strong></p>
+            <pre><code class="language-java">@Entity
+public class OrderSaga {
+    private String orderId;
+    private SagaState state;
+    private List<SagaStep> completedSteps;
+
+    public void addCompletedStep(SagaStep step) {
+        completedSteps.add(step);
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="event-sourcing" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Event Sourcing</h2>
+            <h3>Definition</h3>
+            <p>Event sourcing stores the state of applications as a sequence of events rather than current state snapshots. Every change to application state is captured as an event that is appended to an event store. Current state is derived by replaying events from the beginning or from a snapshot. This approach provides a complete audit trail, enables temporal queries, supports event replay for debugging, and facilitates building multiple read models from the same event stream for different use cases.</p>
+
+            <h3>Analogy</h3>
+            <p>Event sourcing is like keeping a detailed bank account ledger that records every transaction instead of just showing your current balance. Traditional banking systems might only show "Current Balance: $1,543.21," but event sourcing keeps the complete history: "Started with $1,000, deposited $500 on Monday, paid $50 for groceries Tuesday, received $200 salary Wednesday, paid $106.79 for utilities Thursday." You can reconstruct your current balance by replaying all transactions, and more importantly, you can answer questions like "What was my balance last Tuesday?" or "How much did I spend on groceries this month?" The ledger becomes an authoritative history that enables you to build different views: monthly summaries, spending categories, or tax reports - all derived from the same underlying transaction history. If there's ever a dispute about a transaction, you have the complete, immutable record of exactly what happened and when.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Event store implementation:</strong></p>
+            <pre><code class="language-java">@Entity
+public class EventStore {
+    private String aggregateId;
+    private String eventType;
+    private String eventData;
+    private Long sequence;
+    private LocalDateTime timestamp;
+}
+</code></pre>
+
+            <p><strong>Domain events:</strong></p>
+            <pre><code class="language-java">public class OrderCreatedEvent implements DomainEvent {
+    private final String orderId;
+    private final String customerId;
+    private final List<OrderItem> items;
+    private final LocalDateTime timestamp;
+}
+</code></pre>
+
+            <p><strong>Event-sourced aggregate:</strong></p>
+            <pre><code class="language-java">public class Order {
+    private String id;
+    private OrderStatus status;
+    private List<DomainEvent> changes = new ArrayList<>();
+
+    public void apply(OrderCreatedEvent event) {
+        this.id = event.getOrderId();
+        this.status = OrderStatus.CREATED;
+    }
+
+    public static Order fromHistory(List<DomainEvent> events) {
+        Order order = new Order();
+        events.forEach(order::apply);
+        return order;
+    }
+}
+</code></pre>
+
+            <p><strong>Event replay for reconstruction:</strong></p>
+            <pre><code class="language-java">@Service
+public class EventSourcingRepository {
+    public Order findById(String orderId) {
+        List<DomainEvent> events = eventStore.getEvents(orderId);
+        return Order.fromHistory(events);
+    }
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="cqrs-pattern" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>CQRS Pattern</h2>
+            <h3>Definition</h3>
+            <p>Command Query Responsibility Segregation (CQRS) separates read and write operations into different models, allowing each to be optimized independently. Commands handle state changes and business logic, while queries provide optimized read models for different use cases. CQRS works particularly well with event sourcing, where events update multiple read models asynchronously. This pattern enables high-performance reads, complex reporting capabilities, and independent scaling of read and write workloads.</p>
+
+            <h3>Analogy</h3>
+            <p>CQRS is like how a modern newspaper operation separates news gathering and reporting from news reading and distribution. The newsroom (command side) focuses on investigating stories, conducting interviews, and writing articles - optimized for accuracy, fact-checking, and editorial workflow. Meanwhile, the distribution system (query side) creates different formats for different audiences: a website optimized for quick browsing, a mobile app for commuters, a print edition for detailed reading, and social media summaries for sharing. Each reading format is specifically designed for its audience and use case, but they all derive from the same underlying news content. The newsroom doesn't worry about website performance or mobile layouts - they focus on creating quality content. The distribution systems don't handle news gathering - they focus on presenting information effectively. This separation allows each side to excel at what it does best while serving the same overall purpose.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Command and query separation:</strong></p>
+            <pre><code class="language-java">// Command side - handles writes
+@RestController
+public class OrderCommandController {
+    @PostMapping("/orders")
+    public void createOrder(@RequestBody CreateOrderCommand command) {
+        orderCommandService.handle(command);
+    }
+}
+
+// Query side - handles reads
+@RestController
+public class OrderQueryController {
+    @GetMapping("/orders/{id}")
+    public OrderView getOrder(@PathVariable String id) {
+        return orderQueryService.findById(id);
+    }
+}
+</code></pre>
+
+            <p><strong>Command handler:</strong></p>
+            <pre><code class="language-java">@Component
+public class CreateOrderCommandHandler {
+    public void handle(CreateOrderCommand command) {
+        Order order = new Order(command);
+        orderRepository.save(order);
+        eventPublisher.publish(new OrderCreatedEvent(order));
+    }
+}
+</code></pre>
+
+            <p><strong>Read model projection:</strong></p>
+            <pre><code class="language-java">@EventListener
+public void on(OrderCreatedEvent event) {
+    OrderSummaryView summary = new OrderSummaryView(
+        event.getOrderId(),
+        event.getCustomerName(),
+        event.getTotalAmount()
+    );
+    orderSummaryRepository.save(summary);
+}
+</code></pre>
+
+            <p><strong>Specialized query models:</strong></p>
+            <pre><code class="language-java">public class CustomerOrderHistory {
+    private String customerId;
+    private int totalOrders;
+    private BigDecimal totalSpent;
+    private LocalDate lastOrderDate;
+}
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="container-orchestration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Container Orchestration</h2>
+            <h3>Definition</h3>
+            <p>Container orchestration manages the deployment, scaling, networking, and availability of containerized microservices across clusters of machines. Kubernetes is the dominant orchestration platform, providing automated deployment, service discovery, load balancing, rolling updates, and self-healing capabilities. Orchestration transforms individual containers into resilient, scalable distributed systems that can automatically respond to failures, traffic changes, and resource demands without manual intervention.</p>
+
+            <h3>Analogy</h3>
+            <p>Container orchestration is like having an intelligent logistics system for managing a fleet of food trucks across a large city. Instead of manually telling each truck where to go and what to do, the orchestration system (Kubernetes) automatically assigns trucks to locations based on demand, weather, events, and traffic patterns. If a truck breaks down, the system automatically dispatches a replacement. During lunch rush, more trucks are automatically deployed to business districts. If there's a festival in the park, the system scales up ice cream trucks in that area. The system handles all the complex coordination: tracking which trucks are where, routing customers to nearby trucks, balancing the workload across trucks, and ensuring there's always adequate coverage. Truck operators focus on serving customers while the orchestration system handles the logistics of where to be, when to scale up or down, and how to maintain service during equipment failures or maintenance periods.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Kubernetes deployment manifest:</strong></p>
+            <pre><code class="language-yaml">apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    spec:
+      containers:
+      - name: user-service
+        image: user-service:latest
+</code></pre>
+
+            <p><strong>Service discovery and load balancing:</strong></p>
+            <pre><code class="language-yaml">apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+spec:
+  selector:
+    app: user-service
+  ports:
+  - port: 80
+    targetPort: 8080
+</code></pre>
+
+            <p><strong>Auto-scaling configuration:</strong></p>
+            <pre><code class="language-yaml">apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: user-service-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: user-service
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+</code></pre>
+
+            <p><strong>Health checks and self-healing:</strong></p>
+            <pre><code class="language-yaml">livenessProbe:
+  httpGet:
+    path: /actuator/health
+    port: 8080
+  initialDelaySeconds: 30
+  periodSeconds: 10
+readinessProbe:
+  httpGet:
+    path: /actuator/health/readiness
+    port: 8080
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="blue-green-deployment" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Blue-Green Deployment</h2>
+            <h3>Definition</h3>
+            <p>Blue-green deployment maintains two identical production environments (blue and green), with only one serving live traffic at any time. When deploying updates, the new version is deployed to the inactive environment, tested thoroughly, then traffic is switched over instantly. This approach enables zero-downtime deployments, instant rollbacks if issues are discovered, and the ability to test the complete system under production conditions before going live. Blue-green deployments reduce deployment risk and provide confidence in release processes.</p>
+
+            <h3>Analogy</h3>
+            <p>Blue-green deployment is like how airlines manage aircraft maintenance and operations to ensure continuous service. An airline might have two identical aircraft serving the same route - while one plane (blue) carries passengers, the other (green) undergoes maintenance, upgrades, or testing. When it's time to introduce a new in-flight entertainment system or safety equipment, they install and test everything on the green aircraft while the blue aircraft continues normal operations. Once the green aircraft passes all safety checks and testing, they simply swap the aircraft assignments - passengers now board the upgraded green aircraft while the blue aircraft goes offline for its updates. If any problems are discovered with the upgrades, they can instantly switch back to the blue aircraft. This ensures passengers always have reliable service while allowing the airline to introduce improvements safely and test them thoroughly under real operating conditions before committing to the change.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Blue-green infrastructure setup:</strong></p>
+            <pre><code class="language-yaml"># Blue environment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service-blue
+  labels:
+    version: blue
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: user-service
+        version: blue
+</code></pre>
+

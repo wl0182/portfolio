@@ -81,7 +81,12 @@
           <section id="rest-controller-basics" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>REST Controller Basics</h2>
             <h3>Definition</h3>
-            <p>A REST controller in Spring Boot is a class that handles HTTP requests and returns responses, typically in JSON format. The @RestController annotation combines @Controller and @ResponseBody, automatically converting method return values to JSON. Controllers define endpoints (URLs) that clients can call to interact with your application's data and functionality. Each method in a controller can handle different HTTP operations and URL patterns.</p>
+            <ul>
+                <li>A REST controller in Spring Boot is a class that handles HTTP requests and returns responses, typically in JSON format.</li>
+                <li>The @RestController annotation combines @Controller and @ResponseBody, automatically converting method return values to JSON.</li>
+                <li>Controllers define endpoints (URLs) that clients can call to interact with your application's data and functionality.</li>
+                <li>Each method in a controller can handle different HTTP operations and URL patterns.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Think of a REST controller like a restaurant's ordering system. When customers (clients) want to interact with the restaurant, they don't go directly to the kitchen or storage room. Instead, they communicate through waiters (controller methods) who understand different types of requests: "I'd like to see the menu" (GET request), "I want to place an order" (POST request), "Can you change my order?" (PUT request), or "Cancel my dessert" (DELETE request). Each waiter specializes in handling specific types of requests and knows exactly how to communicate with the kitchen (business logic) and return the appropriate response to the customer. The waiter translates between the customer's natural language requests and the kitchen's operational procedures, just like a REST controller translates between HTTP requests and your application's business logic.</p>
@@ -127,7 +132,11 @@ public class BookController {
           <section id="http-methods-mapping" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>HTTP Methods Mapping</h2>
             <h3>Definition</h3>
-            <p>Different HTTP methods represent different types of operations: GET for retrieving data, POST for creating new resources, PUT for updating existing resources, DELETE for removing resources, and PATCH for partial updates. Spring Boot provides specific annotations (@GetMapping, @PostMapping, @PutMapping, @DeleteMapping) that map these HTTP methods to controller methods. This creates a clear, standardized way for clients to interact with your API.</p>
+            <ul>
+                <li>Different HTTP methods represent different types of operations: GET for retrieving data, POST for creating new resources, PUT for updating existing resources, DELETE for removing resources, and PATCH for partial updates.</li>
+                <li>Spring Boot provides specific annotations (@GetMapping, @PostMapping, @PutMapping, @DeleteMapping) that map these HTTP methods to controller methods.</li>
+                <li>This creates a clear, standardized way for clients to interact with your API.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>HTTP methods are like different types of interactions you have with a library system. When you want to browse available books, you use a catalog search (GET) - you're just looking, not changing anything. When you want to add a new book to your personal reading list, you submit a form (POST) to create a new entry. If you need to update your entire profile information, you fill out a complete update form (PUT) that replaces all your details. When you want to remove a book from your list, you use the delete function (DELETE). And if you just want to change your phone number without updating everything else, you use a quick edit feature (PATCH) for partial updates. Each interaction type serves a specific purpose and follows established conventions that everyone understands.</p>
@@ -168,7 +177,11 @@ public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
           <section id="request-data-handling" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Request Data Handling</h2>
             <h3>Definition</h3>
-            <p>Spring Boot provides various annotations to extract data from different parts of HTTP requests: @PathVariable for URL segments, @RequestParam for query parameters, @RequestBody for JSON payloads, and @RequestHeader for HTTP headers. These annotations automatically convert incoming data to Java objects and handle type conversion. Understanding how to capture and process request data is essential for building flexible APIs that can handle different client needs.</p>
+            <ul>
+                <li>Spring Boot provides various annotations to extract data from different parts of HTTP requests: @PathVariable for URL segments, @RequestParam for query parameters, @RequestBody for JSON payloads, and @RequestHeader for HTTP headers.</li>
+                <li>These annotations automatically convert incoming data to Java objects and handle type conversion.</li>
+                <li>Understanding how to capture and process request data is essential for building flexible APIs that can handle different client needs.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Handling request data is like processing different types of mail delivery at a busy office. Sometimes the important information is written directly on the envelope (path variables) - like "Deliver to Building 3, Floor 2, Room 15" where each part tells you where to go. Other times, you get additional instructions on sticky notes (query parameters) like "urgent" or "fragile." The main content might be inside the package (request body) containing documents, forms, or products. And sometimes special handling instructions are written in the delivery service's tracking information (headers) indicating priority level or delivery method. Your job as the mail processor (controller method) is to examine all these different sources of information and route everything to the right destination with the appropriate handling.</p>
@@ -210,7 +223,11 @@ public User getProfile(@RequestHeader("Authorization") String token) {
           <section id="response-handling" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Response Handling</h2>
             <h3>Definition</h3>
-            <p>Spring Boot automatically converts method return values to appropriate response formats (usually JSON) and sets HTTP status codes. You can customize responses using ResponseEntity to control status codes, headers, and body content. Different return types serve different purposes: simple objects for success cases, ResponseEntity for complete control, and specific status codes for different scenarios like created resources, not found errors, or no content responses.</p>
+            <ul>
+                <li>Spring Boot automatically converts method return values to appropriate response formats (usually JSON) and sets HTTP status codes.</li>
+                <li>You can customize responses using ResponseEntity to control status codes, headers, and body content.</li>
+                <li>Different return types serve different purposes: simple objects for success cases, ResponseEntity for complete control, and specific status codes for different scenarios like created resources, not found errors, or no content responses.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Response handling is like a customer service representative responding to different types of inquiries. For simple questions, they provide straightforward answers (returning objects directly). For complex situations, they craft carefully worded responses that include not just the answer, but also the appropriate tone, urgency level, and follow-up instructions (ResponseEntity with custom headers and status codes). When someone asks for something that doesn't exist, they politely explain the situation (404 Not Found). When a request is successfully processed, they confirm completion with enthusiasm (201 Created). And when everything goes as expected, they provide exactly what was requested with professional efficiency (200 OK). The representative knows how to match their response style to the situation, just like Spring Boot controllers match response format to the request outcome.</p>
@@ -255,7 +272,11 @@ public ResponseEntity<String> uploadFile(@RequestParam MultipartFile file) {
           <section id="data-validation" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Data Validation</h2>
             <h3>Definition</h3>
-            <p>Data validation ensures that incoming request data meets your application's requirements before processing. Spring Boot integrates with Bean Validation (JSR-303) using annotations like @Valid, @NotNull, @NotBlank, @Email, and @Size to automatically validate request bodies and parameters. When validation fails, Spring Boot automatically returns detailed error responses with specific field-level error messages, helping clients understand exactly what needs to be corrected.</p>
+            <ul>
+                <li>Data validation ensures that incoming request data meets your application's requirements before processing.</li>
+                <li>Spring Boot integrates with Bean Validation (JSR-303) using annotations like @Valid, @NotNull, @NotBlank, @Email, and @Size to automatically validate request bodies and parameters.</li>
+                <li>When validation fails, Spring Boot automatically returns detailed error responses with specific field-level error messages, helping clients understand exactly what needs to be corrected.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Data validation is like security checkpoints at an airport or event venue. Before allowing people to enter, security personnel check that everyone has proper identification (required fields), that tickets are valid and not expired (format validation), that carry-on items meet size restrictions (length limits), and that prohibited items aren't present (business rule validation). If someone doesn't meet the requirements, security politely but firmly explains exactly what's wrong and what needs to be corrected before they can proceed. They don't just say "access denied" - they provide specific, actionable feedback like "your ID is expired" or "liquids must be in containers smaller than 100ml." This systematic checking prevents problems later and ensures everyone entering meets the established safety and security standards.</p>
@@ -309,7 +330,11 @@ public List<User> getUsers(@RequestParam @Size(min = 3) String search) {
           <section id="error-handling" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Error Handling</h2>
             <h3>Definition</h3>
-            <p>Proper error handling provides meaningful responses when things go wrong, using @ControllerAdvice to handle exceptions globally across all controllers. You can create custom exception classes for specific business errors and return appropriate HTTP status codes with helpful error messages. Spring Boot automatically handles validation errors, but you can customize error responses to provide consistent formatting and better user experience across your entire API.</p>
+            <ul>
+                <li>Proper error handling provides meaningful responses when things go wrong, using @ControllerAdvice to handle exceptions globally across all controllers.</li>
+                <li>You can create custom exception classes for specific business errors and return appropriate HTTP status codes with helpful error messages.</li>
+                <li>Spring Boot automatically handles validation errors, but you can customize error responses to provide consistent formatting and better user experience across your entire API.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Error handling in web APIs is like having a well-trained customer service department that handles all problems consistently across different store locations. When issues occur - whether it's an out-of-stock item (resource not found), invalid payment information (validation error), or system maintenance (server error) - customers always receive professional, helpful responses that explain what happened and what they can do next. Instead of each store manager handling problems differently, there's a centralized customer service protocol that ensures everyone gets the same quality of support. The service representatives use clear, understandable language instead of technical jargon, provide specific error codes for tracking, and always suggest concrete next steps. This creates a reliable, professional experience regardless of what type of problem occurs or which part of the business the customer was interacting with.</p>
@@ -364,7 +389,11 @@ public ResponseEntity<Map<String, String>> handleValidationErrors(
           <section id="content-negotiation" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Content Negotiation</h2>
             <h3>Definition</h3>
-            <p>Content negotiation allows your API to return data in different formats (JSON, XML, plain text) based on client requests, typically using the Accept header. Spring Boot automatically handles JSON conversion by default, but you can configure additional formats and use the produces attribute in mapping annotations to specify supported response formats. This flexibility allows the same endpoint to serve different types of clients with their preferred data formats.</p>
+            <ul>
+                <li>Content negotiation allows your API to return data in different formats (JSON, XML, plain text) based on client requests, typically using the Accept header.</li>
+                <li>Spring Boot automatically handles JSON conversion by default, but you can configure additional formats and use the produces attribute in mapping annotations to specify supported response formats.</li>
+                <li>This flexibility allows the same endpoint to serve different types of clients with their preferred data formats.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Content negotiation is like a multilingual tourist information center that can provide the same information in different languages and formats based on what visitors need. Some tourists prefer detailed written guides in English, others want simple maps in Spanish, and some need audio instructions in French. The information desk staff listens to what each visitor requests (Accept header) and provides exactly the same helpful information about local attractions, just packaged in the format that works best for that person. A business traveler might want a concise PDF they can quickly scan, while a family might prefer a colorful brochure with pictures. The core information never changes - only the presentation format adapts to serve each visitor's specific needs and preferences most effectively.</p>
@@ -410,7 +439,11 @@ public ResponseEntity<?> getData(@RequestHeader("Accept") String acceptHeader) {
           <section id="cors-configuration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>CORS Configuration</h2>
             <h3>Definition</h3>
-            <p>Cross-Origin Resource Sharing (CORS) is a security mechanism that controls which domains can access your API from web browsers. By default, browsers block requests from different origins (different domain, port, or protocol) for security reasons. Spring Boot provides @CrossOrigin annotations and global CORS configuration to explicitly allow specific origins, methods, and headers, enabling your API to work with frontend applications hosted on different domains.</p>
+            <ul>
+                <li>Cross-Origin Resource Sharing (CORS) is a security mechanism that controls which domains can access your API from web browsers.</li>
+                <li>By default, browsers block requests from different origins (different domain, port, or protocol) for security reasons.</li>
+                <li>Spring Boot provides @CrossOrigin annotations and global CORS configuration to explicitly allow specific origins, methods, and headers, enabling your API to work with frontend applications hosted on different domains.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>CORS configuration is like setting up visitor access policies for a secure office building. By default, the building's security system (browser) only allows employees (same-origin requests) to access resources freely. However, you might need to allow business partners from other companies (different origins) to access specific meeting rooms or services. You create a visitor access list that specifies exactly which companies can visit, which floors they can access, what times they're allowed, and what type of identification they need to bring. This controlled access system maintains security while enabling necessary business collaboration. Without proper visitor policies, legitimate business partners would be turned away at the door, but with overly permissive policies, unauthorized people might gain access to sensitive areas.</p>
@@ -458,7 +491,11 @@ public class DevController {
           <section id="testing-web-apis" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Testing Web APIs</h2>
             <h3>Definition</h3>
-            <p>Spring Boot provides excellent testing support for web APIs using @WebMvcTest for controller-only tests and MockMvc for simulating HTTP requests. You can test different scenarios including successful operations, validation failures, error conditions, and edge cases without starting a full server. Testing ensures your API behaves correctly, handles errors gracefully, and maintains consistent behavior as your application evolves.</p>
+            <ul>
+                <li>Spring Boot provides excellent testing support for web APIs using @WebMvcTest for controller-only tests and MockMvc for simulating HTTP requests.</li>
+                <li>You can test different scenarios including successful operations, validation failures, error conditions, and edge cases without starting a full server.</li>
+                <li>Testing ensures your API behaves correctly, handles errors gracefully, and maintains consistent behavior as your application evolves.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Testing web APIs is like conducting fire drills and safety inspections in a building. You simulate various scenarios - normal operations (regular visitors), emergency situations (server errors), overcrowding (high load), and security breaches (invalid input) - to make sure all safety systems work correctly. During these drills, you don't need to create real emergencies; instead, you use simulation equipment that mimics real conditions. You test that fire alarms sound properly, emergency exits function, sprinkler systems activate, and staff respond appropriately. Similarly, API testing uses mock objects and simulated requests to verify that your controllers handle different situations correctly without needing real databases or external services. This systematic testing ensures your API will perform reliably when real users depend on it.</p>
@@ -509,7 +546,10 @@ void shouldReturn404WhenUserNotFound() throws Exception {
           <section id="best-practices" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Web API Best Practices</h2>
             <h3>Definition</h3>
-            <p>Professional web APIs follow consistent patterns: use appropriate HTTP methods and status codes, implement proper validation and error handling, return meaningful error messages, use consistent URL naming conventions, handle edge cases gracefully, and provide clear API documentation. These practices make your APIs easier to understand, integrate with, and maintain over time.</p>
+            <ul>
+                <li>Professional web APIs follow consistent patterns: use appropriate HTTP methods and status codes, implement proper validation and error handling, return meaningful error messages, use consistent URL naming conventions, handle edge cases gracefully, and provide clear API documentation.</li>
+                <li>These practices make your APIs easier to understand, integrate with, and maintain over time.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Web API best practices are like establishing professional standards for a customer service department across a large company. Every interaction should follow the same high-quality protocols: use clear, consistent language that customers understand; provide helpful, specific responses rather than vague errors; follow the same procedures whether handling simple requests or complex problems; maintain professional courtesy even when declining requests; and ensure that any customer can get the same quality of service regardless of which representative they speak with. These standards create predictable, reliable experiences that build trust and make it easy for customers to understand how to interact with your business effectively. Just as good customer service practices lead to satisfied customers and successful business relationships, good API practices lead to satisfied developers and successful integrations.</p>

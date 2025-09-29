@@ -81,7 +81,11 @@
           <section id="understanding-exceptions" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Understanding Exceptions</h2>
             <h3>Definition</h3>
-            <p>Exceptions in Spring Boot are events that disrupt the normal flow of your application, such as invalid user input, database errors, or missing resources. By default, Spring Boot returns generic error pages with status codes like 404 or 500, but proper exception handling allows you to customize these responses with meaningful messages and appropriate HTTP status codes. Understanding different exception types helps you handle various error scenarios appropriately - from client errors like validation failures to server errors like database connection issues.</p>
+            <ul>
+                <li>Exceptions in Spring Boot are events that disrupt the normal flow of your application, such as invalid user input, database errors, or missing resources.</li>
+                <li>By default, Spring Boot returns generic error pages with status codes like 404 or 500, but proper exception handling allows you to customize these responses with meaningful messages and appropriate HTTP status codes.</li>
+                <li>Understanding different exception types helps you handle various error scenarios appropriately - from client errors like validation failures to server errors like database connection issues.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Think of exceptions like different types of emergencies in a well-organized hotel. When a guest requests a room that doesn't exist (404 error), the front desk doesn't just say "computer says no" - they explain that the room number is invalid and offer alternatives. When the elevator breaks down (500 error), staff don't abandon guests between floors - they have backup procedures, apologize for the inconvenience, and guide guests to working elevators. Similarly, good exception handling in your application means intercepting these "emergency situations" and responding with helpful, professional messages that guide users toward solutions rather than displaying confusing technical error details that only developers understand.</p>
@@ -120,7 +124,11 @@ public User getUser(@PathVariable Long id) {
           <section id="global-exception-handling" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Global Exception Handling</h2>
             <h3>Definition</h3>
-            <p>Global exception handling using @ControllerAdvice allows you to centralize error handling logic across your entire application instead of repeating try-catch blocks in every controller. This annotation creates a global exception handler that intercepts exceptions from any controller and provides consistent error responses. You can handle specific exception types differently and ensure all errors return properly formatted responses with appropriate HTTP status codes and meaningful messages.</p>
+            <ul>
+                <li>Global exception handling using @ControllerAdvice allows you to centralize error handling logic across your entire application instead of repeating try-catch blocks in every controller.</li>
+                <li>This annotation creates a global exception handler that intercepts exceptions from any controller and provides consistent error responses.</li>
+                <li>You can handle specific exception types differently and ensure all errors return properly formatted responses with appropriate HTTP status codes and meaningful messages.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Global exception handling is like having a centralized customer service department in a large company instead of each department handling complaints individually. When a customer has a problem with billing, shipping, or technical support, they all get routed to the same professional customer service team that knows exactly how to handle different types of issues. The customer service team has standard procedures for each problem type - billing issues get one response template, shipping problems get another, and technical issues get escalated appropriately. This ensures every customer gets consistent, professional help regardless of which department caused the problem, and the company maintains its reputation for good customer service across all interactions.</p>
@@ -174,7 +182,11 @@ public ResponseEntity<ErrorResponse> handleException(Exception ex) {
           <section id="custom-exceptions" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Custom Exceptions</h2>
             <h3>Definition</h3>
-            <p>Custom exceptions allow you to create specific error types for your business logic that carry meaningful information about what went wrong. Instead of throwing generic exceptions, you can create domain-specific exceptions like UserNotFoundException, InsufficientFundsException, or DuplicateEmailException. Custom exceptions make your code more readable, easier to debug, and allow for more precise error handling where different exception types can be handled with different responses and status codes.</p>
+            <ul>
+                <li>Custom exceptions allow you to create specific error types for your business logic that carry meaningful information about what went wrong.</li>
+                <li>Instead of throwing generic exceptions, you can create domain-specific exceptions like UserNotFoundException, InsufficientFundsException, or DuplicateEmailException.</li>
+                <li>Custom exceptions make your code more readable, easier to debug, and allow for more precise error handling where different exception types can be handled with different responses and status codes.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Custom exceptions are like having specific emergency codes in a hospital instead of just saying "something's wrong." Instead of a generic "code blue" for every emergency, hospitals have "code red" for fire, "code silver" for weapons, "code pink" for infant abduction, and "code white" for pediatric emergency. Each code triggers a specific response protocol - the right people respond, they bring the right equipment, and they follow the right procedures. Similarly, custom exceptions like "UserNotFoundException" or "PaymentFailedException" tell your application exactly what type of problem occurred, so it can respond with the right error message, status code, and recovery actions rather than a generic "something went wrong" response.</p>
@@ -231,7 +243,11 @@ public class GlobalExceptionHandler {
           <section id="error-response-structure" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Error Response Structure</h2>
             <h3>Definition</h3>
-            <p>A well-structured error response provides consistent, informative feedback to API clients by including essential information like error codes, human-readable messages, timestamps, and request paths. Good error responses help developers integrate with your API and help users understand what went wrong and how to fix it. The structure should be consistent across all error types so clients can reliably parse and handle errors programmatically.</p>
+            <ul>
+                <li>A well-structured error response provides consistent, informative feedback to API clients by including essential information like error codes, human-readable messages, timestamps, and request paths.</li>
+                <li>Good error responses help developers integrate with your API and help users understand what went wrong and how to fix it.</li>
+                <li>The structure should be consistent across all error types so clients can reliably parse and handle errors programmatically.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Error response structure is like a standardized incident report form that emergency services use. Whether it's a car accident, medical emergency, or building fire, the report always includes the same key information: what happened (error type), when it happened (timestamp), where it happened (request path), who was involved (user context), and what actions were taken (status code). This standardized format means that anyone reading the report - whether it's a police officer, insurance agent, or court official - knows exactly where to find the information they need. Similarly, a well-structured API error response gives client applications a predictable format they can rely on to extract the information needed to handle the error appropriately.</p>
@@ -290,7 +306,11 @@ public class GlobalExceptionHandler {
           <section id="validation-handling" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Validation Handling</h2>
             <h3>Definition</h3>
-            <p>Validation handling captures and processes validation errors that occur when request data doesn't meet your defined constraints using annotations like @Valid, @NotNull, @Size, or @Email. Spring Boot automatically throws MethodArgumentNotValidException for request body validation failures and ConstraintViolationException for path variable or request parameter validation failures. Proper validation handling provides clear, field-specific error messages that help users correct their input.</p>
+            <ul>
+                <li>Validation handling captures and processes validation errors that occur when request data doesn't meet your defined constraints using annotations like @Valid, @NotNull, @Size, or @Email.</li>
+                <li>Spring Boot automatically throws MethodArgumentNotValidException for request body validation failures and ConstraintViolationException for path variable or request parameter validation failures.</li>
+                <li>Proper validation handling provides clear, field-specific error messages that help users correct their input.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Validation handling is like a bouncer at an exclusive club who checks everyone at the door against a specific list of requirements. The bouncer doesn't just say "you can't come in" - they explain exactly what's wrong: "you need to be 21 or older," "you need proper attire," or "you need to be on the guest list." They might check multiple things at once and give you a complete list of everything you need to fix before you can enter. Similarly, validation handling in your API checks incoming data against your rules and provides specific, helpful error messages for each field that doesn't meet the requirements, so users know exactly what to correct in their requests.</p>
@@ -342,7 +362,11 @@ public ResponseEntity<ValidationErrorResponse> handleValidation(MethodArgumentNo
           <section id="http-status-codes" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>HTTP Status Codes</h2>
             <h3>Definition</h3>
-            <p>HTTP status codes communicate the outcome of API requests using standardized numbers that clients can understand programmatically. Using appropriate status codes helps clients handle responses correctly - 200 for success, 400 for client errors, 404 for not found, 500 for server errors. Each status code has specific meaning and helps both developers and client applications understand whether the request succeeded, failed due to client issues, or failed due to server problems.</p>
+            <ul>
+                <li>HTTP status codes communicate the outcome of API requests using standardized numbers that clients can understand programmatically.</li>
+                <li>Using appropriate status codes helps clients handle responses correctly - 200 for success, 400 for client errors, 404 for not found, 500 for server errors.</li>
+                <li>Each status code has specific meaning and helps both developers and client applications understand whether the request succeeded, failed due to client issues, or failed due to server problems.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>HTTP status codes are like the standardized response signals that air traffic control uses with pilots. When a pilot requests permission to land, they don't get a long explanation - they get a clear, standardized response: "cleared to land" (200 OK), "runway occupied, circle and wait" (429 Too Many Requests), "airport closed" (503 Service Unavailable), or "invalid flight plan" (400 Bad Request). These codes are universally understood by all pilots and air traffic controllers worldwide, so there's no confusion about what action to take. Similarly, HTTP status codes provide a universal language that all web clients and servers understand, making it easy for applications to respond appropriately to different situations without needing to parse complex error messages.</p>
@@ -395,7 +419,11 @@ return ResponseEntity.noContent().build();</code></pre>
           <section id="exception-logging" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Exception Logging</h2>
             <h3>Definition</h3>
-            <p>Exception logging captures detailed information about errors for debugging and monitoring purposes while returning user-friendly messages to clients. Good logging includes the full stack trace, request context, user information, and timestamp, but client responses should only include appropriate information that helps users fix the problem. Different log levels (ERROR, WARN, INFO) help filter and prioritize log messages in production environments.</p>
+            <ul>
+                <li>Exception logging captures detailed information about errors for debugging and monitoring purposes while returning user-friendly messages to clients.</li>
+                <li>Good logging includes the full stack trace, request context, user information, and timestamp, but client responses should only include appropriate information that helps users fix the problem.</li>
+                <li>Different log levels (ERROR, WARN, INFO) help filter and prioritize log messages in production environments.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Exception logging is like the detailed incident reports that security guards write versus the brief announcements they make over the intercom. When there's a problem in a shopping mall, the security guard might announce "Attention shoppers, elevator 2 is temporarily out of service" (user-friendly client message), but their incident report includes much more detail: exact time, witness statements, possible causes, photos of the scene, and action steps taken (detailed logs for internal use). The public gets just enough information to adjust their behavior, while management gets the full picture needed to understand what happened, prevent it from happening again, and improve their procedures.</p>
@@ -447,7 +475,11 @@ public ResponseEntity<ErrorResponse> handleAuth(AuthenticationException ex) {
           <section id="error-page-customization" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Error Page Customization</h2>
             <h3>Definition</h3>
-            <p>Error page customization allows you to provide branded, user-friendly error pages for web applications instead of generic Spring Boot error pages. You can create custom error pages for different HTTP status codes, add helpful information and navigation, and maintain your application's look and feel even when errors occur. This improves user experience by providing consistent branding and helpful guidance when things go wrong.</p>
+            <ul>
+                <li>Error page customization allows you to provide branded, user-friendly error pages for web applications instead of generic Spring Boot error pages.</li>
+                <li>You can create custom error pages for different HTTP status codes, add helpful information and navigation, and maintain your application's look and feel even when errors occur.</li>
+                <li>This improves user experience by providing consistent branding and helpful guidance when things go wrong.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Error page customization is like having a professional, helpful receptionist handle problems in your office building instead of just posting generic "OUT OF ORDER" signs. When the elevator breaks down, instead of a basic sign that just says "broken," the receptionist puts up a professional notice that matches the building's branding, explains the situation clearly, provides alternative options (like directions to the stairs or other elevators), includes an estimated repair time, and offers to help with special accommodations. The message maintains the building's professional image while being genuinely helpful to visitors, rather than leaving them confused and frustrated by a bare-bones error message.</p>
@@ -503,7 +535,10 @@ server.error.include-binding-errors=always</code></pre>
           <section id="testing-exceptions" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Testing Exceptions</h2>
             <h3>Definition</h3>
-            <p>Testing exception handling ensures that your application responds correctly to error conditions by verifying that the right exceptions are thrown, appropriate HTTP status codes are returned, and error messages are formatted correctly. Good exception testing covers both the happy path and various error scenarios, ensuring your global exception handlers work as expected and that error responses match your specifications.</p>
+            <ul>
+                <li>Testing exception handling ensures that your application responds correctly to error conditions by verifying that the right exceptions are thrown, appropriate HTTP status codes are returned, and error messages are formatted correctly.</li>
+                <li>Good exception testing covers both the happy path and various error scenarios, ensuring your global exception handlers work as expected and that error responses match your specifications.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Testing exception handling is like conducting fire drills and emergency simulations in a building to make sure everyone knows what to do when real emergencies occur. You don't wait for an actual fire to see if your evacuation procedures work - you regularly test the alarm systems, practice evacuation routes, and verify that emergency responders can access the building and communicate effectively. Similarly, you shouldn't wait for users to encounter errors to discover that your exception handling doesn't work properly. You systematically test different error scenarios to ensure your application responds appropriately, provides helpful messages, and maintains security even when things go wrong.</p>
@@ -563,7 +598,11 @@ void globalExceptionHandlerShouldHandleUserNotFound() {
           <section id="best-practices" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Best Practices</h2>
             <h3>Definition</h3>
-            <p>Exception handling best practices ensure consistent, secure, and maintainable error management across your application. These include using specific exception types, providing helpful but not sensitive error messages, logging appropriately for debugging while protecting user privacy, using correct HTTP status codes, and testing all error scenarios. Following best practices makes your application more professional, easier to debug, and more secure.</p>
+            <ul>
+                <li>Exception handling best practices ensure consistent, secure, and maintainable error management across your application.</li>
+                <li>These include using specific exception types, providing helpful but not sensitive error messages, logging appropriately for debugging while protecting user privacy, using correct HTTP status codes, and testing all error scenarios.</li>
+                <li>Following best practices makes your application more professional, easier to debug, and more secure.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Exception handling best practices are like the professional standards that customer service representatives follow when dealing with complaints or problems. Good representatives are trained to listen carefully to understand the specific problem (use specific exception types), provide clear explanations without revealing confidential company information (helpful but secure messages), document the interaction properly for follow-up (appropriate logging), escalate to the right department based on the issue type (correct status codes), and follow up to ensure the problem was resolved (testing). These standards ensure every customer gets consistent, professional service regardless of which representative they speak with, and they protect both the customer and the company during difficult situations.</p>

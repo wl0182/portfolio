@@ -81,7 +81,12 @@
           <section id="reactive-programming" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Reactive Programming</h2>
             <h3>Definition</h3>
-            <p>Reactive programming is a paradigm that deals with asynchronous data streams and the propagation of changes. Instead of blocking threads while waiting for operations to complete, reactive programming uses non-blocking I/O and event-driven processing to handle multiple operations concurrently. This approach enables applications to remain responsive under high load and efficiently utilize system resources. Reactive programming is built around the concept of observables (data streams) and operators that transform and combine these streams.</p>
+            <ul>
+                <li>Reactive programming is a paradigm that deals with asynchronous data streams and the propagation of changes.</li>
+                <li>Instead of blocking threads while waiting for operations to complete, reactive programming uses non-blocking I/O and event-driven processing to handle multiple operations concurrently.</li>
+                <li>This approach enables applications to remain responsive under high load and efficiently utilize system resources.</li>
+                <li>Reactive programming is built around the concept of observables (data streams) and operators that transform and combine these streams.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Think of reactive programming like a modern smart restaurant kitchen during peak hours. Instead of having each chef wait for ingredients to be delivered before starting the next dish (blocking approach), the kitchen operates with an event-driven system where chefs continuously work on multiple orders simultaneously. When ingredients arrive, they're automatically routed to the chef who needs them, when a cooking step completes, the dish automatically moves to the next station, and when garnishes are ready, they're immediately applied to waiting plates. The entire kitchen flows like a stream of coordinated events, with everyone responding to changes as they happen rather than waiting for previous tasks to complete. This allows the kitchen to serve many more customers with the same number of staff because no one is idle waiting for something else to finish. The kitchen is reactive - it responds immediately to events and keeps everything flowing smoothly.</p>
@@ -121,7 +126,11 @@
           <section id="webflux-introduction" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>WebFlux Introduction</h2>
             <h3>Definition</h3>
-            <p>Spring WebFlux is Spring's reactive web framework that provides non-blocking, event-driven processing for web applications. Unlike traditional Spring MVC which uses blocking I/O, WebFlux can handle many more concurrent connections with fewer threads by using reactive streams and non-blocking operations. WebFlux supports both annotation-based programming (similar to Spring MVC) and functional programming styles, making it suitable for high-throughput applications and real-time data processing.</p>
+            <ul>
+                <li>Spring WebFlux is Spring's reactive web framework that provides non-blocking, event-driven processing for web applications.</li>
+                <li>Unlike traditional Spring MVC which uses blocking I/O, WebFlux can handle many more concurrent connections with fewer threads by using reactive streams and non-blocking operations.</li>
+                <li>WebFlux supports both annotation-based programming (similar to Spring MVC) and functional programming styles, making it suitable for high-throughput applications and real-time data processing.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>WebFlux is like upgrading from a traditional call center where each operator can only handle one call at a time, to a modern AI-powered communication center where operators can juggle multiple conversations simultaneously. In the old system (Spring MVC), when a customer puts you on hold to look for information, the operator sits idle waiting. In the new system (WebFlux), when one conversation pauses, the operator immediately switches to help other customers, seamlessly switching back when the first customer returns. The operators never sit idle because they're always working on whichever conversation is ready to proceed. This allows the same number of operators to handle many more customers simultaneously, and customers get faster service because someone is always available to help when they're ready to continue their conversation.</p>
@@ -167,7 +176,12 @@ public Flux<String> stream() {
           <section id="event-driven-architecture" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Event-Driven Architecture</h2>
             <h3>Definition</h3>
-            <p>Event-driven architecture is a design pattern where applications communicate through the production and consumption of events rather than direct service calls. Events represent significant state changes or occurrences in the system, and different components can react to these events independently. This approach promotes loose coupling between services, enables better scalability, and allows systems to be more responsive to changes. Event-driven systems are particularly useful for microservices architectures where services need to coordinate without tight dependencies.</p>
+            <ul>
+                <li>Event-driven architecture is a design pattern where applications communicate through the production and consumption of events rather than direct service calls.</li>
+                <li>Events represent significant state changes or occurrences in the system, and different components can react to these events independently.</li>
+                <li>This approach promotes loose coupling between services, enables better scalability, and allows systems to be more responsive to changes.</li>
+                <li>Event-driven systems are particularly useful for microservices architectures where services need to coordinate without tight dependencies.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Event-driven architecture is like how a modern smart city operates through its various automated systems. When a fire alarm goes off (event), it doesn't directly call the fire department - instead, it broadcasts an emergency signal that multiple systems can respond to: the fire department is automatically notified, nearby traffic lights change to clear emergency routes, building elevators go to ground floor positions, and security systems unlock emergency exits. Each system responds appropriately to the same event without needing to know about or directly communicate with the others. Similarly, when a user places an order in an e-commerce system, it generates an "order placed" event that triggers inventory updates, payment processing, shipping preparation, and customer notifications - all happening independently but coordinated through the shared event. This creates a resilient system where adding new capabilities (like fraud detection) just means subscribing to existing events rather than modifying existing services.</p>
@@ -213,7 +227,11 @@ public void processInventory(OrderPlacedEvent event) {
           <section id="custom-autoconfiguration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Custom Auto-Configuration</h2>
             <h3>Definition</h3>
-            <p>Custom auto-configuration allows you to create reusable Spring Boot starters that automatically configure beans and dependencies when certain conditions are met. This enables you to package common functionality into libraries that integrate seamlessly with Spring Boot applications. Auto-configuration uses conditional annotations to determine when to activate, making your libraries smart enough to configure themselves appropriately based on the presence of classes, properties, or other beans in the application context.</p>
+            <ul>
+                <li>Custom auto-configuration allows you to create reusable Spring Boot starters that automatically configure beans and dependencies when certain conditions are met.</li>
+                <li>This enables you to package common functionality into libraries that integrate seamlessly with Spring Boot applications.</li>
+                <li>Auto-configuration uses conditional annotations to determine when to activate, making your libraries smart enough to configure themselves appropriately based on the presence of classes, properties, or other beans in the application context.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Custom auto-configuration is like creating smart modular furniture that automatically adapts to different living spaces. When you buy a smart entertainment center, it detects what devices you have (TV, gaming console, sound system) and automatically configures itself with the right connections, settings, and interfaces. If you add a new device later, the entertainment center detects it and reconfigures itself without you having to manually adjust settings. Similarly, a custom Spring Boot starter detects what's available in an application (databases, message queues, security frameworks) and automatically sets up the appropriate configurations, connections, and integrations. The furniture is smart enough to know "if there's a gaming console, enable game mode; if there's a sound system, configure surround sound; if there's no internet, switch to offline mode." This intelligence is built into the furniture (starter) so every home (application) gets the perfect setup without manual configuration.</p>
@@ -256,7 +274,12 @@ public class EmailProperties {
           <section id="understanding-microservices" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Understanding Microservices</h2>
             <h3>Definition</h3>
-            <p>Microservices architecture structures applications as collections of small, independent services that communicate over well-defined APIs. Each microservice is responsible for a specific business capability, can be developed and deployed independently, and typically owns its data storage. This architectural style enables teams to work autonomously, choose appropriate technologies for each service, and scale different parts of the system independently based on demand. Microservices promote organizational scalability and technological diversity while requiring sophisticated coordination and operational practices.</p>
+            <ul>
+                <li>Microservices architecture structures applications as collections of small, independent services that communicate over well-defined APIs.</li>
+                <li>Each microservice is responsible for a specific business capability, can be developed and deployed independently, and typically owns its data storage.</li>
+                <li>This architectural style enables teams to work autonomously, choose appropriate technologies for each service, and scale different parts of the system independently based on demand.</li>
+                <li>Microservices promote organizational scalability and technological diversity while requiring sophisticated coordination and operational practices.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Microservices architecture is like transitioning from a traditional department store to a modern shopping mall with specialized boutique shops. In a department store (monolith), everything is under one roof with shared infrastructure, centralized management, and uniform policies, but changes require coordinating across the entire store, and if one section has problems, it can affect the whole operation. A shopping mall (microservices) has many independent stores, each specializing in what they do best - a bookstore, electronics shop, clothing boutique, and food court. Each store has its own management, inventory systems, operating hours, and customer service approach. They can renovate, change suppliers, or adjust pricing independently without affecting other stores. Customers can visit just the stores they need, and the mall can add new shops or remove failing ones without disrupting the entire complex. However, the mall needs shared infrastructure like parking, security, and directory systems, plus coordination for things like holiday hours and promotional events. This is more complex to manage than a single store, but it provides much more flexibility and resilience.</p>
@@ -298,7 +321,12 @@ public interface OrderServiceClient {
           <section id="monolith-vs-microservices" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Monolith vs Microservices</h2>
             <h3>Definition</h3>
-            <p>Monolithic architecture builds applications as single deployable units where all components are interconnected and interdependent, while microservices architecture decomposes applications into small, independent services. Monoliths are simpler to develop, test, and deploy initially, but become harder to scale and modify as they grow. Microservices offer greater flexibility and scalability but introduce complexity in service coordination, data consistency, and operational overhead. The choice depends on team size, scalability requirements, and organizational maturity.</p>
+            <ul>
+                <li>Monolithic architecture builds applications as single deployable units where all components are interconnected and interdependent, while microservices architecture decomposes applications into small, independent services.</li>
+                <li>Monoliths are simpler to develop, test, and deploy initially, but become harder to scale and modify as they grow.</li>
+                <li>Microservices offer greater flexibility and scalability but introduce complexity in service coordination, data consistency, and operational overhead.</li>
+                <li>The choice depends on team size, scalability requirements, and organizational maturity.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>The difference between monoliths and microservices is like comparing a Swiss Army knife to a professional toolbox. A Swiss Army knife (monolith) has everything you need in one compact, integrated unit - knife, scissors, screwdriver, and bottle opener all folded into a single tool. It's perfect for simple tasks, easy to carry, and you never lose pieces. However, each tool is smaller and less specialized than dedicated tools, and if one part breaks, the whole knife might be unusable. A professional toolbox (microservices) contains many specialized tools - each designed for specific tasks and potentially made by different manufacturers. You can replace individual tools, add new ones as needed, and use the best tool for each job. However, you need to organize the toolbox, might need multiple tools for complex tasks, and it requires more space and planning to transport. For simple home repairs, the Swiss Army knife is perfect, but for professional construction work, you need the specialized toolbox despite its complexity.</p>
@@ -335,7 +363,10 @@ kubectl apply -f microservices.yaml
           <section id="microservice-design-principles" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Microservice Design Principles</h2>
             <h3>Definition</h3>
-            <p>Microservice design follows key principles: single responsibility (each service does one thing well), autonomous teams (services owned by independent teams), decentralized governance (teams choose their own technologies), fault isolation (failures don't cascade), and evolutionary design (services can evolve independently). These principles ensure that microservices deliver their promised benefits of scalability, flexibility, and team autonomy while avoiding the pitfalls of distributed system complexity.</p>
+            <ul>
+                <li>Microservice design follows key principles: single responsibility (each service does one thing well), autonomous teams (services owned by independent teams), decentralized governance (teams choose their own technologies), fault isolation (failures don't cascade), and evolutionary design (services can evolve independently).</li>
+                <li>These principles ensure that microservices deliver their promised benefits of scalability, flexibility, and team autonomy while avoiding the pitfalls of distributed system complexity.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Microservice design principles are like the rules for organizing an effective food truck festival. Each truck (service) specializes in one type of cuisine and operates independently with its own menu, staff, and cooking equipment (single responsibility). Each truck owner makes their own decisions about ingredients, pricing, and operating hours without needing approval from festival organizers (decentralized governance). If one truck breaks down or runs out of food, customers can still eat at other trucks (fault isolation). Truck owners can experiment with new recipes, upgrade equipment, or change their concept without affecting other trucks (evolutionary design). The festival provides shared infrastructure like electricity and waste management, but each truck maintains its independence. This creates a diverse, resilient food scene where innovation thrives, popular concepts can expand, and poor performers can be replaced without disrupting the entire festival.</p>
@@ -378,7 +409,12 @@ public List<Product> getRecommendations(Long userId) {
           <section id="service-discovery" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Service Discovery</h2>
             <h3>Definition</h3>
-            <p>Service discovery is the mechanism by which services find and communicate with each other in a microservices architecture. Since services can be deployed on different servers and ports, and instances can start, stop, or move dynamically, services need a way to locate each other automatically. Service discovery systems maintain a registry of available services and their locations, enabling services to find dependencies without hardcoded addresses. This supports dynamic scaling, fault tolerance, and simplified configuration management.</p>
+            <ul>
+                <li>Service discovery is the mechanism by which services find and communicate with each other in a microservices architecture.</li>
+                <li>Since services can be deployed on different servers and ports, and instances can start, stop, or move dynamically, services need a way to locate each other automatically.</li>
+                <li>Service discovery systems maintain a registry of available services and their locations, enabling services to find dependencies without hardcoded addresses.</li>
+                <li>This supports dynamic scaling, fault tolerance, and simplified configuration management.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Service discovery is like the directory system in a large corporate campus with multiple buildings and departments that frequently reorganize. Instead of memorizing that the IT department is in Building 3, Floor 2, Room 205, you consult the dynamic directory system that always knows current locations. When the IT department moves to a new building or adds satellite offices, the directory updates automatically. Employees don't need to know physical addresses - they just look up "IT Support" and get directed to the right place. The directory system also knows if a department is temporarily unavailable (like during a move) and can redirect requests to backup locations. This allows the organization to reorganize, expand, or relocate departments without disrupting daily operations, because everyone always knows how to find the services they need through the central directory system.</p>
@@ -415,7 +451,10 @@ public RestTemplate restTemplate() {
           <section id="distributed-challenges" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Distributed Challenges</h2>
             <h3>Definition</h3>
-            <p>Microservices introduce distributed system challenges that don't exist in monolithic applications: network latency and failures, data consistency across services, distributed transactions, service versioning, monitoring and debugging across multiple services, and the complexity of testing distributed workflows. These challenges require new tools, patterns, and practices like circuit breakers, distributed tracing, eventual consistency, and comprehensive logging to build reliable distributed systems.</p>
+            <ul>
+                <li>Microservices introduce distributed system challenges that don't exist in monolithic applications: network latency and failures, data consistency across services, distributed transactions, service versioning, monitoring and debugging across multiple services, and the complexity of testing distributed workflows.</li>
+                <li>These challenges require new tools, patterns, and practices like circuit breakers, distributed tracing, eventual consistency, and comprehensive logging to build reliable distributed systems.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Distributed system challenges are like the complexities that arise when transitioning from a single-location restaurant to a restaurant chain across multiple cities. In a single restaurant, if the kitchen runs out of ingredients, they can quickly check the walk-in cooler or send someone to the local market. Communication is instant, inventory is visible, and coordination is simple. With a restaurant chain, each location has its own inventory, staff, and local conditions. If one location runs out of a key ingredient, they can't just walk to another kitchen - they need to coordinate deliveries, check availability across locations, and potentially modify menus independently. A power outage in one city doesn't affect other locations, but it complicates coordination. Customer orders might involve multiple locations (like catering from several branches), requiring careful orchestration. The chain needs sophisticated systems for inventory management, quality consistency, staff training, and performance monitoring across all locations. While this distributed approach enables serving more customers and resilience against local problems, it requires much more sophisticated management and coordination systems than a single restaurant.</p>
@@ -456,7 +495,11 @@ public void onOrderPlaced(OrderPlacedEvent event) {
           <section id="spring-cloud-introduction" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Spring Cloud Introduction</h2>
             <h3>Definition</h3>
-            <p>Spring Cloud is a collection of tools and frameworks that simplify building distributed systems and microservices. It provides solutions for common distributed system patterns like service discovery (Eureka), circuit breakers (Hystrix), API gateways (Gateway), distributed configuration (Config Server), and distributed tracing (Sleuth). Spring Cloud integrates seamlessly with Spring Boot, providing production-ready solutions for the challenges of microservices architecture while maintaining the simplicity and conventions that make Spring Boot popular.</p>
+            <ul>
+                <li>Spring Cloud is a collection of tools and frameworks that simplify building distributed systems and microservices.</li>
+                <li>It provides solutions for common distributed system patterns like service discovery (Eureka), circuit breakers (Hystrix), API gateways (Gateway), distributed configuration (Config Server), and distributed tracing (Sleuth).</li>
+                <li>Spring Cloud integrates seamlessly with Spring Boot, providing production-ready solutions for the challenges of microservices architecture while maintaining the simplicity and conventions that make Spring Boot popular.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Spring Cloud is like a comprehensive urban planning and infrastructure toolkit for building modern smart cities. Just as a city needs electricity grids, water systems, telecommunications, transportation networks, and emergency services to function properly, microservices need service discovery, communication protocols, monitoring systems, and coordination mechanisms. Spring Cloud provides pre-built, tested infrastructure components - like having standardized power grids, water treatment plants, and communication networks that you can deploy and connect rather than building from scratch. The toolkit includes blueprints for common city services: traffic management systems (API gateways), emergency response coordination (circuit breakers), city-wide communication networks (service discovery), and centralized utilities management (configuration servers). This allows city planners (developers) to focus on designing neighborhoods and buildings (business services) rather than figuring out how to distribute electricity or manage water pressure throughout the entire city.</p>

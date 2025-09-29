@@ -81,7 +81,11 @@
           <section id="understanding-security" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Understanding Security</h2>
             <h3>Definition</h3>
-            <p>Application security involves protecting your software from unauthorized access, data breaches, and malicious attacks. It encompasses authentication (verifying user identity), authorization (controlling access to resources), data protection (encrypting sensitive information), and secure communication (preventing eavesdropping and tampering). Security is not an afterthought but a fundamental aspect that should be built into every layer of your application from the ground up.</p>
+            <ul>
+                <li>Application security involves protecting your software from unauthorized access, data breaches, and malicious attacks.</li>
+                <li>It encompasses authentication (verifying user identity), authorization (controlling access to resources), data protection (encrypting sensitive information), and secure communication (preventing eavesdropping and tampering).</li>
+                <li>Security is not an afterthought but a fundamental aspect that should be built into every layer of your application from the ground up.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Think of application security like a multi-layered security system for a high-end office building. First, you need proper identification to enter the building (authentication) - showing your ID card to prove who you are. Once inside, different key cards give you access to different floors and rooms based on your role (authorization) - executives can access the boardroom, while interns can only access common areas. Security cameras monitor activities (logging and auditing), sensitive documents are kept in locked safes (data encryption), and all communications happen through secure channels (HTTPS). Guards patrol regularly (security monitoring), and there are emergency protocols for handling threats (incident response). Each layer works together to create a comprehensive security system that protects valuable assets while allowing legitimate business to continue smoothly.</p>
@@ -121,7 +125,12 @@ public User getUser(Long id) {
           <section id="spring-security-basics" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Spring Security Basics</h2>
             <h3>Definition</h3>
-            <p>Spring Security is a powerful framework that provides comprehensive security services for Java applications. It handles authentication, authorization, protection against common attacks, session management, and integration with various security standards. Spring Security uses a filter chain to intercept requests, check credentials, enforce access rules, and protect against security vulnerabilities. It integrates seamlessly with Spring Boot through auto-configuration while remaining highly customizable for specific security requirements.</p>
+            <ul>
+                <li>Spring Security is a powerful framework that provides comprehensive security services for Java applications.</li>
+                <li>It handles authentication, authorization, protection against common attacks, session management, and integration with various security standards.</li>
+                <li>Spring Security uses a filter chain to intercept requests, check credentials, enforce access rules, and protect against security vulnerabilities.</li>
+                <li>It integrates seamlessly with Spring Boot through auto-configuration while remaining highly customizable for specific security requirements.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Spring Security is like hiring a professional security company to protect your office building. Instead of you having to learn about security cameras, access control systems, threat detection, and emergency protocols, the security company provides a complete, integrated solution. They install a sophisticated system with multiple checkpoints (filter chain) that automatically screens everyone entering the building, verifies their credentials against a database, checks their authorization level for different areas, and logs all activities for auditing. The security team handles everything from basic door locks to advanced threat detection, using industry-standard procedures and equipment. You can customize the security level for different areas - some rooms might be open to everyone, others require special clearance, and the most sensitive areas need multiple forms of authentication. The beauty is that this comprehensive security operates transparently, protecting your business without interfering with normal operations.</p>
@@ -158,7 +167,12 @@ spring.security.user.roles=ADMIN</code></pre>
           <section id="authentication-vs-authorization" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Authentication vs Authorization</h2>
             <h3>Definition</h3>
-            <p>Authentication is the process of verifying who a user is by checking their credentials (username/password, tokens, biometrics). Authorization determines what an authenticated user is allowed to do by checking their permissions and roles. Authentication comes first - you must prove your identity before the system can decide what you're allowed to access. These two concepts work together to create a complete access control system that ensures the right people have the right level of access to your application's resources.</p>
+            <ul>
+                <li>Authentication is the process of verifying who a user is by checking their credentials (username/password, tokens, biometrics).</li>
+                <li>Authorization determines what an authenticated user is allowed to do by checking their permissions and roles.</li>
+                <li>Authentication comes first - you must prove your identity before the system can decide what you're allowed to access.</li>
+                <li>These two concepts work together to create a complete access control system that ensures the right people have the right level of access to your application's resources.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Think of the difference between authentication and authorization like the process of getting into a concert venue and then accessing different areas. Authentication is like showing your ID at the main entrance to prove you are who you claim to be - the security guard checks your driver's license against your face to verify your identity. Once inside, authorization determines where you can go based on your ticket type: general admission gets you to the main floor, VIP tickets let you access the backstage area, and press passes allow you into the media section. Your identity is verified once (authentication), but your access level (authorization) is checked every time you try to enter a new area. A regular ticket holder trying to access the VIP lounge would be turned away not because their identity is questioned, but because their authorization level doesn't permit that access.</p>
@@ -200,7 +214,12 @@ public void deletePost(@PathVariable Long id) {
           <section id="jwt-fundamentals" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>JWT Fundamentals</h2>
             <h3>Definition</h3>
-            <p>JWT (JSON Web Token) is a compact, self-contained token format that securely transmits information between parties. A JWT consists of three parts: header (algorithm info), payload (claims/data), and signature (verification). JWTs are stateless, meaning all necessary information is contained within the token itself, eliminating the need for server-side session storage. This makes them perfect for scalable applications, microservices, and single-page applications where you need to verify user identity and permissions without maintaining server state.</p>
+            <ul>
+                <li>JWT (JSON Web Token) is a compact, self-contained token format that securely transmits information between parties.</li>
+                <li>A JWT consists of three parts: header (algorithm info), payload (claims/data), and signature (verification).</li>
+                <li>JWTs are stateless, meaning all necessary information is contained within the token itself, eliminating the need for server-side session storage.</li>
+                <li>This makes them perfect for scalable applications, microservices, and single-page applications where you need to verify user identity and permissions without maintaining server state.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Think of a JWT like a special concert wristband that contains all the information security needs in one place. Unlike a simple ticket stub that requires staff to look up your details in a computer system, this smart wristband has everything embedded directly on it: your name, what sections you can access, when the wristband expires, and a special holographic seal that proves it's authentic and hasn't been tampered with. Security guards can instantly verify your access level just by scanning the wristband - no need to call the box office or check a central database. The wristband is self-contained and cryptographically signed, so guards know immediately if someone has tried to forge or modify it. This system works perfectly even if thousands of people are entering different venues simultaneously, because each wristband carries its own verification information.</p>
@@ -242,7 +261,12 @@ public void deletePost(@PathVariable Long id) {
           <section id="security-configuration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Security Configuration</h2>
             <h3>Definition</h3>
-            <p>Security configuration in Spring Boot involves creating a configuration class that customizes how Spring Security behaves. You define which endpoints require authentication, configure password encoding, set up authentication providers, and specify security filters. The SecurityFilterChain bean replaces the older WebSecurityConfigurerAdapter, providing a more functional approach to security configuration. Proper configuration ensures your application follows security best practices while remaining usable for legitimate users.</p>
+            <ul>
+                <li>Security configuration in Spring Boot involves creating a configuration class that customizes how Spring Security behaves.</li>
+                <li>You define which endpoints require authentication, configure password encoding, set up authentication providers, and specify security filters.</li>
+                <li>The SecurityFilterChain bean replaces the older WebSecurityConfigurerAdapter, providing a more functional approach to security configuration.</li>
+                <li>Proper configuration ensures your application follows security best practices while remaining usable for legitimate users.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Security configuration is like setting up the rules and procedures for a corporate office building's security system. You create a comprehensive security manual that specifies which areas are public (lobby, reception), which require employee badges (work floors), and which need special clearance (executive offices, server rooms). You define the authentication methods (ID cards, biometric scanners, security codes), set up different access levels for different employee types (intern, employee, manager, executive), and establish protocols for handling visitors. The manual also covers password policies (how often to change access codes), session management (how long badges remain active), and emergency procedures. Just like how security guards follow this manual to consistently enforce building security, Spring Security follows your configuration to protect your application endpoints and resources.</p>
@@ -284,7 +308,11 @@ public PasswordEncoder passwordEncoder() {
           <section id="jwt-authentication" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>JWT Authentication</h2>
             <h3>Definition</h3>
-            <p>JWT authentication involves creating a custom authentication filter that intercepts requests, extracts JWT tokens from headers, validates the tokens, and sets up the security context for authenticated users. The process includes generating tokens during login, including them in subsequent requests, and validating them on the server side. This stateless approach eliminates the need for server-side session storage, making your application more scalable and suitable for distributed environments.</p>
+            <ul>
+                <li>JWT authentication involves creating a custom authentication filter that intercepts requests, extracts JWT tokens from headers, validates the tokens, and sets up the security context for authenticated users.</li>
+                <li>The process includes generating tokens during login, including them in subsequent requests, and validating them on the server side.</li>
+                <li>This stateless approach eliminates the need for server-side session storage, making your application more scalable and suitable for distributed environments.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>JWT authentication is like using a smart keycard system in a modern office building. When you first arrive for work (login), you show your credentials to security and receive a smart keycard (JWT token) that contains all your access information encoded on it. This keycard has everything security needs to know: your name, department, clearance level, and when it expires. Throughout the day, whenever you approach a door (make a request), the card reader (JWT filter) scans your keycard, instantly verifies it's authentic and hasn't expired, and grants or denies access based on the information stored on the card. The beautiful thing is that each door can make decisions independently without calling the main security office - the keycard contains everything needed for verification. At the end of the day or when your employment status changes, the keycard expires automatically, and you'd need to get a new one to continue accessing the building.</p>
@@ -333,7 +361,11 @@ public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
           <section id="protecting-endpoints" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Protecting Endpoints</h2>
             <h3>Definition</h3>
-            <p>Protecting endpoints involves configuring which URLs require authentication, what roles or authorities are needed to access specific resources, and how to handle unauthorized access attempts. Spring Security provides multiple ways to secure endpoints: URL-based security in configuration classes, method-level security with annotations, and programmatic security checks within your business logic. Different endpoints may have different security requirements - some might be public, others require authentication, and sensitive operations might need specific roles or permissions.</p>
+            <ul>
+                <li>Protecting endpoints involves configuring which URLs require authentication, what roles or authorities are needed to access specific resources, and how to handle unauthorized access attempts.</li>
+                <li>Spring Security provides multiple ways to secure endpoints: URL-based security in configuration classes, method-level security with annotations, and programmatic security checks within your business logic.</li>
+                <li>Different endpoints may have different security requirements - some might be public, others require authentication, and sensitive operations might need specific roles or permissions.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Protecting endpoints is like designing access control for different areas of a large hospital. The lobby and information desk are open to everyone (public endpoints), but you need to show ID and sign in to visit patient rooms (authenticated endpoints). Only doctors can access the operating rooms (role-based access), and only authorized pharmacists can enter the medication storage area (permission-based access). The emergency room has special access rules during emergencies (conditional access), and the administrative offices require different credentials than medical areas (different authentication methods). Each area has security checkpoints appropriate to its sensitivity level, and the security system automatically enforces these rules, redirecting unauthorized people to appropriate areas or asking them to get proper clearance before proceeding.</p>
@@ -377,7 +409,11 @@ public Order getOrder(@PathVariable Long id, Authentication auth) {
           <section id="role-based-security" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Role-Based Security</h2>
             <h3>Definition</h3>
-            <p>Role-based security assigns users to roles (like ADMIN, USER, MANAGER) and grants permissions based on these roles rather than individual users. Roles simplify permission management by grouping related permissions together and make it easy to modify access levels by changing role assignments. Spring Security supports both role-based access control (RBAC) and more granular authority-based access control, allowing you to implement sophisticated permission systems that scale with your application's complexity and organizational structure.</p>
+            <ul>
+                <li>Role-based security assigns users to roles (like ADMIN, USER, MANAGER) and grants permissions based on these roles rather than individual users.</li>
+                <li>Roles simplify permission management by grouping related permissions together and make it easy to modify access levels by changing role assignments.</li>
+                <li>Spring Security supports both role-based access control (RBAC) and more granular authority-based access control, allowing you to implement sophisticated permission systems that scale with your application's complexity and organizational structure.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Role-based security is like how a restaurant operates with different staff positions, each having specific responsibilities and access levels. The dishwasher can access the kitchen and dish area but not the cash register or manager's office. Servers can access dining areas, place orders in the system, and handle payments, but can't modify menu prices or access employee records. Managers can access all areas, modify schedules, view sales reports, and handle customer complaints. The head chef can control kitchen operations and inventory but might not handle financial reports. Instead of giving each person individual keys to specific doors, you create master key sets for each role (DISHWASHER, SERVER, MANAGER, CHEF), and when someone gets promoted or changes positions, you just switch their key set rather than reconfiguring every individual permission. This system is much easier to manage and ensures consistent access levels for people in similar positions.</p>
@@ -431,7 +467,11 @@ public class CustomUserDetailsService implements UserDetailsService {
           <section id="security-testing" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Security Testing</h2>
             <h3>Definition</h3>
-            <p>Security testing verifies that your authentication and authorization mechanisms work correctly under various scenarios. This includes testing successful authentication, authorization failures, token validation, role-based access control, and security edge cases. Spring Security provides testing support through @WithMockUser, @WithUserDetails, and MockMvc integration that allows you to simulate different user contexts and verify that security rules are properly enforced without compromising test isolation or requiring complex setup.</p>
+            <ul>
+                <li>Security testing verifies that your authentication and authorization mechanisms work correctly under various scenarios.</li>
+                <li>This includes testing successful authentication, authorization failures, token validation, role-based access control, and security edge cases.</li>
+                <li>Spring Security provides testing support through @WithMockUser, @WithUserDetails, and MockMvc integration that allows you to simulate different user contexts and verify that security rules are properly enforced without compromising test isolation or requiring complex setup.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Security testing is like conducting comprehensive drills and audits for a building's security system. You test every scenario: legitimate employees accessing their authorized areas (positive authentication tests), unauthorized people being properly denied access (negative authorization tests), expired keycards being rejected (token expiration tests), and emergency procedures working correctly (edge case testing). Security auditors simulate different roles - they might pose as employees, contractors, visitors, or even potential intruders to ensure the system responds appropriately in each situation. They test not just that the right people get in, but also that the wrong people are kept out, that alarms work properly, and that security logs capture all the necessary information. These comprehensive tests ensure that when real security challenges arise, the system performs exactly as designed.</p>
@@ -476,7 +516,10 @@ void unauthenticatedUserCannotAccessProtectedEndpoint() throws Exception {
           <section id="security-best-practices" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Security Best Practices</h2>
             <h3>Definition</h3>
-            <p>Security best practices involve implementing multiple layers of defense, following the principle of least privilege, securing sensitive data, validating all inputs, implementing proper session management, and maintaining security through regular updates and monitoring. These practices include using strong password hashing, implementing proper error handling that doesn't leak sensitive information, enabling HTTPS for all communications, and following secure coding practices that prevent common vulnerabilities like injection attacks and cross-site scripting.</p>
+            <ul>
+                <li>Security best practices involve implementing multiple layers of defense, following the principle of least privilege, securing sensitive data, validating all inputs, implementing proper session management, and maintaining security through regular updates and monitoring.</li>
+                <li>These practices include using strong password hashing, implementing proper error handling that doesn't leak sensitive information, enabling HTTPS for all communications, and following secure coding practices that prevent common vulnerabilities like injection attacks and cross-site scripting.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Security best practices are like implementing comprehensive safety protocols for a nuclear power plant. You don't rely on just one safety measure - instead, you implement multiple independent layers of protection (defense in depth). Workers only have access to areas and information they absolutely need for their jobs (principle of least privilege). All safety-critical information is encrypted and stored securely (data protection). Every input into control systems is validated and sanitized (input validation). All communications happen through secure, monitored channels (secure communication). Regular safety drills, inspections, and system updates ensure that security measures remain effective over time (continuous monitoring and updates). Emergency procedures are in place to handle any security incidents quickly and effectively (incident response). The goal is to create a system so robust that even if one security measure fails, multiple backup systems prevent any serious problems.</p>

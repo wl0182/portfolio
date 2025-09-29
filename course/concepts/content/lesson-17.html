@@ -79,7 +79,12 @@
           <section id="understanding-caching" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Understanding Caching</h2>
             <h3>Definition</h3>
-            <p>Caching is a performance optimization technique that stores copies of frequently accessed data in fast-access storage to avoid repeated expensive operations. When data is requested, the cache is checked first; if found (cache hit), the cached data is returned immediately. If not found (cache miss), the expensive operation is performed, and the result is stored in the cache for future requests. Effective caching can reduce database load, improve response times, and enhance overall application scalability by orders of magnitude.</p>
+            <ul>
+              <li>Caching is a performance optimization technique that stores copies of frequently accessed data in fast-access storage to avoid repeated expensive operations.</li>
+              <li>When data is requested, the cache is checked first; if found (cache hit), the cached data is returned immediately.</li>
+              <li>If not found (cache miss), the expensive operation is performed, and the result is stored in the cache for future requests.</li>
+              <li>Effective caching can reduce database load, improve response times, and enhance overall application scalability by orders of magnitude.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Think of caching like the strategy a busy chef uses in a restaurant kitchen. Instead of going to the main storage room every time they need common ingredients like salt, pepper, or olive oil, the chef keeps frequently used items on the counter within arm's reach. When an order comes in for a dish that needs salt, the chef grabs it from the counter (cache hit) rather than walking to the storage room (database query). This saves time and effort for every dish prepared. Occasionally, an ingredient runs out and the chef must restock from the main storage (cache miss), but this happens much less frequently than if they fetched every ingredient from storage for every dish. The result is faster service and less wear on the chef (server).</p>
@@ -132,7 +137,11 @@ public class ProductService {
           <section id="spring-cache-abstraction" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Spring Cache Abstraction</h2>
             <h3>Definition</h3>
-            <p>Spring's cache abstraction provides a unified programming model for caching that works with different cache providers without changing your code. The abstraction uses annotations to declare caching behavior, automatically handling cache operations like storing, retrieving, and evicting data. This means you can switch between cache providers (from simple HashMap to Redis clusters) by changing configuration, not code, providing flexibility and vendor independence.</p>
+            <ul>
+              <li>Spring's cache abstraction provides a unified programming model for caching that works with different cache providers without changing your code.</li>
+              <li>The abstraction uses annotations to declare caching behavior, automatically handling cache operations like storing, retrieving, and evicting data.</li>
+              <li>This means you can switch between cache providers (from simple HashMap to Redis clusters) by changing configuration, not code, providing flexibility and vendor independence.</li>
+            </ul>
 
             <h3>Examples</h3>
             <p><strong>Enable caching in Spring Boot:</strong></p>
@@ -179,7 +188,11 @@ public CacheManager cacheManager() {
           <section id="cache-annotations" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Cache Annotations</h2>
             <h3>Definition</h3>
-            <p>Spring provides several cache annotations that declaratively define caching behavior without cluttering business logic with cache management code. @Cacheable caches method results, @CacheEvict removes cached data, @CachePut updates cache entries, and @Caching combines multiple cache operations. These annotations use SpEL (Spring Expression Language) for dynamic cache keys and conditions, providing fine-grained control over when and how caching occurs.</p>
+            <ul>
+              <li>Spring provides several cache annotations that declaratively define caching behavior without cluttering business logic with cache management code.</li>
+              <li>@Cacheable caches method results, @CacheEvict removes cached data, @CachePut updates cache entries, and @Caching combines multiple cache operations.</li>
+              <li>These annotations use SpEL (Spring Expression Language) for dynamic cache keys and conditions, providing fine-grained control over when and how caching occurs.</li>
+            </ul>
 
             <h3>Examples</h3>
             <p><strong>@Cacheable - cache method results:</strong></p>
@@ -244,7 +257,11 @@ public List<Product> searchProducts(String category, BigDecimal minPrice, BigDec
           <section id="cache-providers" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Cache Providers</h2>
             <h3>Definition</h3>
-            <p>Cache providers are the underlying storage mechanisms that actually hold cached data. Spring Boot supports various providers: ConcurrentHashMap for simple in-memory caching, Caffeine for high-performance local caching with advanced features like size-based eviction and time-based expiration, Redis for distributed caching across multiple servers, and Hazelcast for in-memory data grids. Each provider has different characteristics regarding performance, memory management, persistence, and distribution capabilities.</p>
+            <ul>
+              <li>Cache providers are the underlying storage mechanisms that actually hold cached data.</li>
+              <li>Spring Boot supports various providers: ConcurrentHashMap for simple in-memory caching, Caffeine for high-performance local caching with advanced features like size-based eviction and time-based expiration, Redis for distributed caching across multiple servers, and Hazelcast for in-memory data grids.</li>
+              <li>Each provider has different characteristics regarding performance, memory management, persistence, and distribution capabilities.</li>
+            </ul>
 
             <h3>Examples</h3>
             <p><strong>Caffeine high-performance cache:</strong></p>
@@ -311,7 +328,11 @@ public class MultiCacheConfig {
           <section id="cache-configuration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Cache Configuration</h2>
             <h3>Definition</h3>
-            <p>Cache configuration defines how caches behave regarding size limits, expiration policies, eviction strategies, and serialization. Configuration includes setting maximum cache sizes to prevent memory overflow, time-based expiration (TTL) to ensure data freshness, access-based expiration for unused data cleanup, and cache warming strategies for critical data. Proper configuration ensures optimal memory usage while maintaining the right balance between performance and data freshness.</p>
+            <ul>
+              <li>Cache configuration defines how caches behave regarding size limits, expiration policies, eviction strategies, and serialization.</li>
+              <li>Configuration includes setting maximum cache sizes to prevent memory overflow, time-based expiration (TTL) to ensure data freshness, access-based expiration for unused data cleanup, and cache warming strategies for critical data.</li>
+              <li>Proper configuration ensures optimal memory usage while maintaining the right balance between performance and data freshness.</li>
+            </ul>
 
             <h3>Examples</h3>
             <p><strong>Environment-specific cache configuration:</strong></p>
@@ -384,7 +405,11 @@ public RedisCacheManager redisCacheManager(RedisConnectionFactory factory) {
           <section id="cache-strategies" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Cache Strategies</h2>
             <h3>Definition</h3>
-            <p>Cache strategies define when and how data is loaded into and removed from the cache. Common strategies include Cache-Aside (application manages cache), Write-Through (write to cache and database simultaneously), Write-Behind (write to cache immediately, database later), and Read-Through (cache loads data automatically on miss). Each strategy has trade-offs between consistency, performance, and complexity, making strategy selection crucial for application requirements.</p>
+            <ul>
+              <li>Cache strategies define when and how data is loaded into and removed from the cache.</li>
+              <li>Common strategies include Cache-Aside (application manages cache), Write-Through (write to cache and database simultaneously), Write-Behind (write to cache immediately, database later), and Read-Through (cache loads data automatically on miss).</li>
+              <li>Each strategy has trade-offs between consistency, performance, and complexity, making strategy selection crucial for application requirements.</li>
+            </ul>
 
             <h3>Examples</h3>
             <p><strong>Cache-Aside pattern (most common):</strong></p>
@@ -469,7 +494,11 @@ public class MultiLevelCacheService {
           <section id="distributed-caching" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Distributed Caching</h2>
             <h3>Definition</h3>
-            <p>Distributed caching extends caching across multiple application instances or servers, providing shared cache storage that all instances can access. This enables horizontal scaling while maintaining cache consistency and eliminates cache warm-up requirements for new instances. Distributed caching is essential for microservices architectures and applications running on multiple servers or containers.</p>
+            <ul>
+              <li>Distributed caching extends caching across multiple application instances or servers, providing shared cache storage that all instances can access.</li>
+              <li>This enables horizontal scaling while maintaining cache consistency and eliminates cache warm-up requirements for new instances.</li>
+              <li>Distributed caching is essential for microservices architectures and applications running on multiple servers or containers.</li>
+            </ul>
 
             <h3>Examples</h3>
             <p><strong>Redis cluster configuration:</strong></p>
@@ -536,7 +565,11 @@ public class CacheSyncService {
           <section id="cache-best-practices" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Cache Best Practices</h2>
             <h3>Definition</h3>
-            <p>Cache best practices ensure optimal performance, memory usage, and data consistency while avoiding common pitfalls. These include choosing appropriate cache keys, setting reasonable TTL values, implementing cache warming for critical data, monitoring cache performance, handling cache failures gracefully, and avoiding cache stampedes. Following best practices prevents memory leaks, ensures cache effectiveness, and maintains application reliability.</p>
+            <ul>
+              <li>Cache best practices ensure optimal performance, memory usage, and data consistency while avoiding common pitfalls.</li>
+              <li>These include choosing appropriate cache keys, setting reasonable TTL values, implementing cache warming for critical data, monitoring cache performance, handling cache failures gracefully, and avoiding cache stampedes.</li>
+              <li>Following best practices prevents memory leaks, ensures cache effectiveness, and maintains application reliability.</li>
+            </ul>
 
             <h3>Examples</h3>
             <p><strong>Effective cache key design:</strong></p>

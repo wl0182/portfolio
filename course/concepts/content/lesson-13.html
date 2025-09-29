@@ -80,7 +80,11 @@
           <section id="understanding-jpa" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Understanding JPA</h2>
             <h3>Definition</h3>
-            <p>JPA (Java Persistence API) is a specification that defines how Java objects should be mapped to relational databases. It provides a standard set of annotations and interfaces that allow you to work with databases using object-oriented programming instead of writing SQL queries. JPA handles the translation between your Java objects and database tables automatically, managing the conversion of data types, relationships between objects, and the generation of appropriate SQL statements for different database operations.</p>
+            <ul>
+                <li>JPA (Java Persistence API) is a specification that defines how Java objects should be mapped to relational databases.</li>
+                <li>It provides a standard set of annotations and interfaces that allow you to work with databases using object-oriented programming instead of writing SQL queries.</li>
+                <li>JPA handles the translation between your Java objects and database tables automatically, managing the conversion of data types, relationships between objects, and the generation of appropriate SQL statements for different database operations.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Think of JPA like a universal translator at an international conference. You have speakers who only know Java (your objects) and an audience that only understands SQL (the database). The translator (JPA) sits between them, automatically converting everything the Java speaker says into perfect SQL that the database understands, and then translating the database's responses back into Java objects that your application can work with. Just like how the translator handles all the complexity of different languages and cultural nuances, JPA handles all the complexity of different database systems, SQL dialects, and data type conversions. You focus on your business logic in Java, and JPA takes care of making sure everything gets stored and retrieved correctly from the database.</p>
@@ -117,7 +121,11 @@ User found = userRepository.findById(1L);  // JPA generates SELECT</code></pre>
           <section id="hibernate-basics" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Hibernate Basics</h2>
             <h3>Definition</h3>
-            <p>Hibernate is the most popular implementation of the JPA specification, providing the actual functionality that makes object-relational mapping work. It acts as the bridge between your Java application and the database, handling connection management, SQL generation, caching, and transaction management. Spring Boot includes Hibernate by default when you add the JPA starter, and it automatically configures Hibernate with sensible defaults while allowing you to customize settings as needed.</p>
+            <ul>
+                <li>Hibernate is the most popular implementation of the JPA specification, providing the actual functionality that makes object-relational mapping work.</li>
+                <li>It acts as the bridge between your Java application and the database, handling connection management, SQL generation, caching, and transaction management.</li>
+                <li>Spring Boot includes Hibernate by default when you add the JPA starter, and it automatically configures Hibernate with sensible defaults while allowing you to customize settings as needed.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>If JPA is like the blueprint for building a universal translator, then Hibernate is the actual skilled translator who does the work. Imagine you have architectural plans (JPA specification) for building a bridge, but you need an experienced construction company (Hibernate) to actually build it. The construction company knows how to read the blueprints, has all the specialized equipment and expertise, handles all the permits and regulations, and deals with different types of terrain and weather conditions. Similarly, Hibernate knows how to implement the JPA specifications, has all the tools for database communication, handles different database vendors and their quirks, and optimizes performance through features like caching and lazy loading. You give Hibernate the JPA "blueprints" (your annotated entities), and it builds the entire data access infrastructure.</p>
@@ -150,7 +158,11 @@ public void updateUserProfile(Long id, String newName) {
           <section id="entity-mapping" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Entity Mapping</h2>
             <h3>Definition</h3>
-            <p>Entity mapping is the process of defining how Java classes correspond to database tables using JPA annotations. The @Entity annotation marks a class as a database entity, @Table specifies table details, @Column configures column properties, and various other annotations control how fields are mapped to database columns. Proper entity mapping ensures that your objects are stored correctly and efficiently in the database while maintaining data integrity and supporting the relationships between different entities.</p>
+            <ul>
+                <li>Entity mapping is the process of defining how Java classes correspond to database tables using JPA annotations.</li>
+                <li>The @Entity annotation marks a class as a database entity, @Table specifies table details, @Column configures column properties, and various other annotations control how fields are mapped to database columns.</li>
+                <li>Proper entity mapping ensures that your objects are stored correctly and efficiently in the database while maintaining data integrity and supporting the relationships between different entities.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Entity mapping is like creating a detailed floor plan for converting an office building into apartments. You need to specify which rooms (Java fields) become which apartments (database columns), how big each apartment should be (column size), which features are required (not null constraints), and how the apartments connect to shared facilities like hallways and elevators (relationships). The @Entity annotation is like putting up a sign saying "This building contains apartments," while @Column annotations are like the detailed specifications for each apartment: "This room becomes a 2-bedroom unit with hardwood floors and cannot be left empty." Just as the floor plan ensures the conversion happens correctly and all apartments meet building codes, entity mapping ensures your objects are stored properly and meet database constraints.</p>
@@ -216,7 +228,12 @@ public class Customer {
           <section id="primary-keys" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Primary Keys</h2>
             <h3>Definition</h3>
-            <p>Primary keys uniquely identify each record in a database table and are essential for JPA entities. The @Id annotation marks a field as the primary key, while @GeneratedValue specifies how the key should be automatically generated. Different generation strategies include AUTO (database decides), IDENTITY (auto-increment), SEQUENCE (database sequence), and TABLE (separate table for key generation). Choosing the right primary key strategy depends on your database type, performance requirements, and whether you need the key value immediately after saving.</p>
+            <ul>
+                <li>Primary keys uniquely identify each record in a database table and are essential for JPA entities.</li>
+                <li>The @Id annotation marks a field as the primary key, while @GeneratedValue specifies how the key should be automatically generated.</li>
+                <li>Different generation strategies include AUTO (database decides), IDENTITY (auto-increment), SEQUENCE (database sequence), and TABLE (separate table for key generation).</li>
+                <li>Choosing the right primary key strategy depends on your database type, performance requirements, and whether you need the key value immediately after saving.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Primary keys are like unique identification numbers that every citizen gets from the government. Just as no two people can have the same social security number, no two database records can have the same primary key. The government (database) has different systems for assigning these numbers: some countries use sequential numbering (IDENTITY strategy), others use complex algorithms that include regional codes (SEQUENCE strategy), and some maintain central registries (TABLE strategy). The key characteristic is that once assigned, these numbers never change and always uniquely identify that specific person, just like how primary keys permanently and uniquely identify database records. When you're born (entity is created), you automatically get assigned a unique number that follows you throughout your entire life in the system.</p>
@@ -259,7 +276,12 @@ public class User {
           <section id="database-configuration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Database Configuration</h2>
             <h3>Definition</h3>
-            <p>Spring Boot automatically configures database connections and JPA settings based on dependencies and properties you provide. You can use embedded databases like H2 for development and testing, or configure external databases like MySQL or PostgreSQL for production. Configuration involves setting up connection URLs, credentials, connection pooling, and JPA-specific settings like DDL generation and SQL logging. Spring Boot's auto-configuration means most settings work out of the box, but you can customize them through application properties.</p>
+            <ul>
+                <li>Spring Boot automatically configures database connections and JPA settings based on dependencies and properties you provide.</li>
+                <li>You can use embedded databases like H2 for development and testing, or configure external databases like MySQL or PostgreSQL for production.</li>
+                <li>Configuration involves setting up connection URLs, credentials, connection pooling, and JPA-specific settings like DDL generation and SQL logging.</li>
+                <li>Spring Boot's auto-configuration means most settings work out of the box, but you can customize them through application properties.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Database configuration is like setting up utilities for a new apartment. You need to specify which utility companies to use (database type), provide account information (connection credentials), set up service addresses (database URLs), and configure how much service you need (connection pool size). For a temporary setup, you might use portable generators and bottled water (H2 embedded database), but for permanent living, you connect to the city's power grid and water system (external databases like MySQL). Spring Boot is like a helpful building manager who already knows all the utility companies and can set up standard service automatically - you just need to tell them your apartment number (database URL) and account details (username/password), and they handle all the complex paperwork and connections.</p>
@@ -292,7 +314,12 @@ spring.datasource.hikari.connection-timeout=30000</code></pre>
           <section id="spring-data-repositories" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Spring Data Repositories</h2>
             <h3>Definition</h3>
-            <p>Spring Data repositories provide a high-level abstraction for data access, offering pre-built methods for common database operations without requiring you to write implementation code. By extending interfaces like JpaRepository or CrudRepository, you automatically get methods for saving, finding, updating, and deleting entities. Spring Data generates the actual implementation at runtime, handling all the complexity of SQL generation, transaction management, and result mapping. You can also define custom query methods using method naming conventions or custom queries.</p>
+            <ul>
+                <li>Spring Data repositories provide a high-level abstraction for data access, offering pre-built methods for common database operations without requiring you to write implementation code.</li>
+                <li>By extending interfaces like JpaRepository or CrudRepository, you automatically get methods for saving, finding, updating, and deleting entities.</li>
+                <li>Spring Data generates the actual implementation at runtime, handling all the complexity of SQL generation, transaction management, and result mapping.</li>
+                <li>You can also define custom query methods using method naming conventions or custom queries.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Spring Data repositories are like having a personal assistant who already knows how to handle all your common office tasks. When you hire this assistant (create a repository interface), they come with a predefined set of skills: filing documents (save), finding files (findById), organizing folders (findAll), updating records (save for updates), and disposing of old documents (delete). You don't need to train them on these basic tasks - they already know how to do them efficiently and correctly. If you need something special, you can give them specific instructions (custom query methods), and they'll figure out how to accomplish it. The assistant handles all the mundane details of where things are stored, how to organize them, and what procedures to follow, letting you focus on your actual work instead of data management logistics.</p>
@@ -335,7 +362,12 @@ userRepository.count();              // Count total records</code></pre>
           <section id="crud-operations" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>CRUD Operations</h2>
             <h3>Definition</h3>
-            <p>CRUD operations (Create, Read, Update, Delete) are the fundamental database operations that every data-driven application needs. Spring Data JPA makes these operations incredibly simple by providing ready-made methods that handle all the SQL generation and transaction management automatically. Create operations use the save() method, Read operations use findById() and findAll(), Update operations also use save() with existing entities, and Delete operations use delete() or deleteById(). These operations form the foundation of data persistence in your application.</p>
+            <ul>
+                <li>CRUD operations (Create, Read, Update, Delete) are the fundamental database operations that every data-driven application needs.</li>
+                <li>Spring Data JPA makes these operations incredibly simple by providing ready-made methods that handle all the SQL generation and transaction management automatically.</li>
+                <li>Create operations use the save() method, Read operations use findById() and findAll(), Update operations also use save() with existing entities, and Delete operations use delete() or deleteById().</li>
+                <li>These operations form the foundation of data persistence in your application.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>CRUD operations are like the basic actions you can perform with a filing cabinet in an office. Create is like adding a new file folder with documents - you organize the information and put it in the right place in the cabinet. Read is like looking up and retrieving files when you need to reference information. Update is like taking out an existing file, making changes to the documents inside, and putting it back in the same location. Delete is like removing a file folder completely when you no longer need it. Just as these filing operations keep your office organized and functional, CRUD operations keep your database organized and your application functional. The filing cabinet (database) stays consistent, you can always find what you're looking for, and you can modify information as your business needs change.</p>
@@ -375,7 +407,12 @@ if (userToDelete != null) {
           <section id="query-methods" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Query Methods</h2>
             <h3>Definition</h3>
-            <p>Query methods in Spring Data JPA allow you to create custom database queries by simply defining method names that follow specific naming conventions. Spring Data automatically generates the appropriate SQL based on the method name, entity properties, and parameters. You can find records by any field using patterns like findBy, filter with conditions like And/Or, sort results with OrderBy, and limit results with keywords like First or Top. This approach eliminates the need to write SQL queries for most common search scenarios.</p>
+            <ul>
+                <li>Query methods in Spring Data JPA allow you to create custom database queries by simply defining method names that follow specific naming conventions.</li>
+                <li>Spring Data automatically generates the appropriate SQL based on the method name, entity properties, and parameters.</li>
+                <li>You can find records by any field using patterns like findBy, filter with conditions like And/Or, sort results with OrderBy, and limit results with keywords like First or Top.</li>
+                <li>This approach eliminates the need to write SQL queries for most common search scenarios.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Query methods are like having a librarian who understands natural language requests for finding books. Instead of having to learn the complex library catalog system, you can ask in plain English: "Find books by author Shakespeare," "Find books written after 2000 and about programming," or "Find the first 5 books ordered by publication date." The librarian (Spring Data) automatically translates your natural language request into the specific catalog search procedures needed to find exactly what you want. The librarian knows the library's organization system intimately and can efficiently locate items based on any combination of criteria you specify, whether it's author, subject, publication date, or any other attribute in the catalog system.</p>
@@ -409,7 +446,12 @@ void deleteByName(String name);             // Delete matching users</code></pre
           <section id="testing-repositories" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Testing Repositories</h2>
             <h3>Definition</h3>
-            <p>Testing repositories ensures your data access layer works correctly with real database operations. Spring Boot provides @DataJpaTest annotation that sets up an in-memory database, configures JPA, and provides TestEntityManager for test data setup. Repository tests verify that your custom query methods return correct results, entities are saved and retrieved properly, and relationships between entities work as expected. Testing with a real database context catches issues that unit tests with mocks might miss.</p>
+            <ul>
+                <li>Testing repositories ensures your data access layer works correctly with real database operations.</li>
+                <li>Spring Boot provides @DataJpaTest annotation that sets up an in-memory database, configures JPA, and provides TestEntityManager for test data setup.</li>
+                <li>Repository tests verify that your custom query methods return correct results, entities are saved and retrieved properly, and relationships between entities work as expected.</li>
+                <li>Testing with a real database context catches issues that unit tests with mocks might miss.</li>
+            </ul>
 
             <h3>Analogy</h3>
             <p>Testing repositories is like conducting safety drills for a bank vault system. You create a complete replica of the vault (in-memory test database) with all the same security mechanisms and procedures, then practice different scenarios: storing valuable items (saving entities), retrieving specific items (query methods), updating inventory records (entity updates), and removing items (deletions). You test both normal operations and edge cases, like what happens when you try to store duplicate items or retrieve something that doesn't exist. These drills ensure that when the real vault is operational, all procedures work flawlessly and valuable items (your application data) remain safe and accessible. The test environment is isolated from the real vault, so you can safely test destructive operations without risking actual assets.</p>

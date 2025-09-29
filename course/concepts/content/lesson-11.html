@@ -1,94 +1,100 @@
 <!doctype html>
 <html lang="en" class="scroll-smooth">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Lesson 11 - Spring Boot Introduction</title>
-    <meta name="description" content="Spring Boot introduction: understanding the framework, project setup, auto-configuration, dependency injection basics, and building your first Spring Boot application with simple explanations and focused examples." />
-    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
-    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
-    <script>
-      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
-    </script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
-    <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
-  </head>
-  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
-    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Lesson 11 - Spring Boot Introduction</title>
+  <meta name="description" content="Spring Boot introduction: understanding the framework, project setup, auto-configuration, dependency injection basics, and building your first Spring Boot application with simple explanations and focused examples." />
+  <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+  <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+  <script>
+    tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+  </script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+  <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
+</head>
+<body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+<div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
 
-    <header class="z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
-      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
-        <a href="../../../" class="group inline-flex items-center gap-3">
-          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
-          <div class="leading-tight">
-            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
-            <div class="font-semibold">Wassim Lagnaoui</div>
-          </div>
-        </a>
-        <nav class="hidden items-center gap-6 md:flex">
-          <a href="../../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
-          <a href="../../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
-          <a href="../../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
-          <a href="../../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
-          <a href="../../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
-          <a href="../../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
-        </nav>
-        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
-          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
-          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        </button>
+<header class="z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+  <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+    <a href="../../../" class="group inline-flex items-center gap-3">
+      <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+      <div class="leading-tight">
+        <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+        <div class="font-semibold">Wassim Lagnaoui</div>
       </div>
-    </header>
+    </a>
+    <nav class="hidden items-center gap-6 md:flex">
+      <a href="../../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+      <a href="../../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+      <a href="../../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+      <a href="../../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+      <a href="../../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+      <a href="../../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
+    </nav>
+    <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+      <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+      <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+  </div>
+</header>
 
-    <main class="mx-auto max-w-7xl px-6 py-10">
-      <div class="lg:flex lg:gap-8">
-        <aside class="hidden lg:block lg:w-72">
-          <nav class="sticky top-8 rounded-xl border border-slate-200/60 bg-white/60 p-4 shadow-sm backdrop-blur dark:border-slate-800/60 dark:bg-slate-900/40" aria-label="Table of contents">
-            <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">On this page</h2>
-            <ol class="space-y-1 text-sm">
-              <li><a href="#introduction" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Introduction</a></li>
-              <li><a href="#what-is-spring-boot" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">What is Spring Boot</a></li>
-              <li><a href="#spring-boot-benefits" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Spring Boot Benefits</a></li>
-              <li><a href="#project-setup" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Project Setup</a></li>
-              <li><a href="#auto-configuration" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Auto-Configuration</a></li>
-              <li><a href="#dependency-injection-basics" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Dependency Injection Basics</a></li>
-              <li><a href="#application-structure" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Application Structure</a></li>
-              <li><a href="#first-rest-controller" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">First REST Controller</a></li>
-              <li><a href="#configuration-properties" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Configuration Properties</a></li>
-              <li><a href="#spring-boot-starter" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Spring Boot Starters</a></li>
-              <li><a href="#profiles-environments" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Profiles & Environments</a></li>
-              <li><a href="#summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Summary</a></li>
-              <li><a href="#programming-challenge" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Programming Challenge</a></li>
-            </ol>
-          </nav>
-        </aside>
-        <div class="min-w-0 flex-1">
-          <div class="mb-6">
-            <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Concepts</a>
-          </div>
-          <header class="mx-auto max-w-3xl text-center">
-            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 11: Spring Boot Introduction</h1>
-            <p class="mt-2 text-slate-600 dark:text-slate-300">Discover Spring Boot: the framework that simplifies Java web development with auto-configuration, dependency injection, and powerful conventions that help you build production-ready applications quickly.</p>
-          </header>
+<main class="mx-auto max-w-7xl px-6 py-10">
+  <div class="lg:flex lg:gap-8">
+    <aside class="hidden lg:block lg:w-72">
+      <nav class="sticky top-8 rounded-xl border border-slate-200/60 bg-white/60 p-4 shadow-sm backdrop-blur dark:border-slate-800/60 dark:bg-slate-900/40" aria-label="Table of contents">
+        <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">On this page</h2>
+        <ol class="space-y-1 text-sm">
+          <li><a href="#introduction" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Introduction</a></li>
+          <li><a href="#what-is-spring-boot" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">What is Spring Boot</a></li>
+          <li><a href="#spring-boot-benefits" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Spring Boot Benefits</a></li>
+          <li><a href="#project-setup" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Project Setup</a></li>
+          <li><a href="#auto-configuration" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Auto-Configuration</a></li>
+          <li><a href="#dependency-injection-basics" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Dependency Injection Basics</a></li>
+          <li><a href="#application-structure" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Application Structure</a></li>
+          <li><a href="#first-rest-controller" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">First REST Controller</a></li>
+          <li><a href="#configuration-properties" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Configuration Properties</a></li>
+          <li><a href="#spring-boot-starter" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Spring Boot Starters</a></li>
+          <li><a href="#profiles-environments" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Profiles & Environments</a></li>
+          <li><a href="#summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Summary</a></li>
+          <li><a href="#programming-challenge" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Programming Challenge</a></li>
+        </ol>
+      </nav>
+    </aside>
+    <div class="min-w-0 flex-1">
+      <div class="mb-6">
+        <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Concepts</a>
+      </div>
+      <header class="mx-auto max-w-3xl text-center">
+        <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 11: Spring Boot Introduction</h1>
+        <p class="mt-2 text-slate-600 dark:text-slate-300">Discover Spring Boot: the framework that simplifies Java web development with auto-configuration, dependency injection, and powerful conventions that help you build production-ready applications quickly.</p>
+      </header>
 
-          <section id="introduction" class="prose prose-slate mt-6 max-w-none dark:prose-invert">
-            <h2>Introduction</h2>
-            <p>Building enterprise Java applications traditionally required extensive configuration, complex setup procedures, and countless hours of boilerplate code before you could write your first meaningful line of business logic. Spring Boot revolutionizes this experience by providing smart defaults, automatic configuration, and powerful conventions that eliminate most of the tedious setup work. Think of Spring Boot as having a highly experienced Java developer sitting next to you, automatically handling all the mundane configuration tasks while you focus on solving business problems. It provides embedded web servers, production-ready features like health checks and metrics, and a rich ecosystem of starter dependencies that bring in exactly what you need with minimal effort. Whether you're building REST APIs, web applications, or microservices, Spring Boot accelerates development without sacrificing the power and flexibility that makes Java great for enterprise applications. This lesson introduces you to Spring Boot's core concepts and shows you how to build your first application with surprisingly little code.</p>
-          </section>
+      <section id="introduction" class="prose prose-slate mt-6 max-w-none dark:prose-invert">
+        <h2>Introduction</h2>
+        <p>Building enterprise Java applications traditionally required extensive configuration, complex setup procedures, and countless hours of boilerplate code before you could write your first meaningful line of business logic. Spring Boot revolutionizes this experience by providing smart defaults, automatic configuration, and powerful conventions that eliminate most of the tedious setup work. Think of Spring Boot as having a highly experienced Java developer sitting next to you, automatically handling all the mundane configuration tasks while you focus on solving business problems. It provides embedded web servers, production-ready features like health checks and metrics, and a rich ecosystem of starter dependencies that bring in exactly what you need with minimal effort. Whether you're building REST APIs, web applications, or microservices, Spring Boot accelerates development without sacrificing the power and flexibility that makes Java great for enterprise applications. This lesson introduces you to Spring Boot's core concepts and shows you how to build your first application with surprisingly little code.</p>
+      </section>
 
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+      <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
-          <section id="what-is-spring-boot" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>What is Spring Boot</h2>
-            <h3>Definition</h3>
-            <p>Spring Boot is an opinionated framework built on top of the Spring Framework that simplifies the creation of production-ready Java applications. It provides auto-configuration, embedded servers, and starter dependencies that eliminate most boilerplate configuration. Spring Boot follows the "convention over configuration" principle, making intelligent assumptions about what you want to do and configuring your application accordingly. It doesn't generate code or require XML configuration - instead, it uses annotations and sensible defaults to set everything up automatically. The framework includes production features like health checks, metrics, and externalized configuration out of the box.</p>
+      <section id="what-is-spring-boot" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+        <h2>What is Spring Boot</h2>
+        <h3>Definition</h3>
+        <ul>
+          <li>Spring Boot is an opinionated framework built on top of the Spring Framework that simplifies the creation of production-ready Java applications.</li>
+          <li>It provides auto-configuration, embedded servers, and starter dependencies that eliminate most boilerplate configuration.</li>
+          <li>Spring Boot follows the "convention over configuration" principle, making intelligent assumptions about what you want to do and configuring your application accordingly.</li>
+          <li>It doesn't generate code or require XML configuration - instead, it uses annotations and sensible defaults to set everything up automatically.</li>
+          <li>The framework includes production features like health checks, metrics, and externalized configuration out of the box.</li>
+        </ul>
 
-            <h3>Analogy</h3>
-            <p>Think of Spring Boot like a modern smart home system compared to building a house from scratch with individual electrical, plumbing, and security components. In the old days (traditional Spring), you had to manually wire every light switch, configure each outlet, set up the security system, and connect all the plumbing - a time-consuming process requiring deep knowledge of every system. Spring Boot is like a smart home kit that comes pre-configured: when you say "I want a three-bedroom house," it automatically includes appropriate lighting, standard plumbing, basic security, and climate control without you having to specify every detail. You can still customize everything if needed, but the smart defaults handle 90% of common requirements. The house is move-in ready much faster, yet you retain full control over customization when you need it. Both approaches result in a fully functional home, but Spring Boot gets you there much faster with much less manual work.</p>
+        <h3>Analogy</h3>
+        <p>Think of Spring Boot like a modern smart home system compared to building a house from scratch with individual electrical, plumbing, and security components. In the old days (traditional Spring), you had to manually wire every light switch, configure each outlet, set up the security system, and connect all the plumbing - a time-consuming process requiring deep knowledge of every system. Spring Boot is like a smart home kit that comes pre-configured: when you say "I want a three-bedroom house," it automatically includes appropriate lighting, standard plumbing, basic security, and climate control without you having to specify every detail. You can still customize everything if needed, but the smart defaults handle 90% of common requirements. The house is move-in ready much faster, yet you retain full control over customization when you need it. Both approaches result in a fully functional home, but Spring Boot gets you there much faster with much less manual work.</p>
 
-            <h3>Examples</h3>
-            <p><strong>Traditional Spring vs Spring Boot application startup:</strong></p>
-            <pre><code class="language-java">// Traditional Spring - lots of configuration required
+        <h3>Examples</h3>
+        <p><strong>Traditional Spring vs Spring Boot application startup:</strong></p>
+        <pre><code class="language-java">// Traditional Spring - lots of configuration required
 // Multiple XML files, manual server setup, dependency management
 
 // Spring Boot - minimal code needed
@@ -100,15 +106,15 @@ public class MyApplication {
 }
 </code></pre>
 
-            <p><strong>Automatic web server inclusion:</strong></p>
-            <pre><code class="language-java">// No need to deploy to external Tomcat
+        <p><strong>Automatic web server inclusion:</strong></p>
+        <pre><code class="language-java">// No need to deploy to external Tomcat
 // Embedded server starts automatically
 // Application runs on http://localhost:8080 by default
 mvn spring-boot:run  // Start the application
 </code></pre>
 
-            <p><strong>Database connectivity with zero configuration:</strong></p>
-            <pre><code class="language-java">// Add H2 database dependency to pom.xml
+        <p><strong>Database connectivity with zero configuration:</strong></p>
+        <pre><code class="language-java">// Add H2 database dependency to pom.xml
 // Spring Boot automatically configures database connection
 // No XML configuration files needed
 @Entity
@@ -119,8 +125,8 @@ public class User {
 }
 </code></pre>
 
-            <p><strong>REST endpoint in seconds:</strong></p>
-            <pre><code class="language-java">@RestController
+        <p><strong>REST endpoint in seconds:</strong></p>
+        <pre><code class="language-java">@RestController
 public class HelloController {
     @GetMapping("/hello")
     public String hello() {
@@ -128,21 +134,25 @@ public class HelloController {
     }
 }
 </code></pre>
-          </section>
+      </section>
 
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+      <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
-          <section id="spring-boot-benefits" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Spring Boot Benefits</h2>
-            <h3>Definition</h3>
-            <p>Spring Boot eliminates configuration overhead, provides embedded servers for easy deployment, includes production-ready features, offers extensive starter dependencies, and enables rapid prototyping and development. It reduces development time by up to 70% compared to traditional Spring applications while maintaining enterprise-grade robustness and scalability. The framework's opinionated approach means most applications work perfectly with default settings, but everything remains customizable when needed.</p>
+      <section id="spring-boot-benefits" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+        <h2>Spring Boot Benefits</h2>
+        <h3>Definition</h3>
+        <ul>
+          <li>Spring Boot eliminates configuration overhead, provides embedded servers for easy deployment, includes production-ready features, offers extensive starter dependencies, and enables rapid prototyping and development.</li>
+          <li>It reduces development time by up to 70% compared to traditional Spring applications while maintaining enterprise-grade robustness and scalability.</li>
+          <li>The framework's opinionated approach means most applications work perfectly with default settings, but everything remains customizable when needed.</li>
+        </ul>
 
-            <h3>Analogy</h3>
-            <p>Spring Boot benefits are like switching from cooking everything from scratch to having a well-equipped kitchen with smart appliances and pre-made quality ingredients. Instead of spending hours preparing basic components (grinding spices, making stock, preparing sauces), you can focus on creating the actual dish. The smart oven (auto-configuration) knows the right temperature for different foods, the refrigerator (embedded server) is already stocked with essentials, and you have access to premium ingredients (starter dependencies) that work perfectly together. You can still make everything from scratch when you want full control (custom configuration), but for most meals, the smart kitchen handles the tedious work while you focus on the creative cooking. The result is faster meal preparation without sacrificing quality, and your kitchen is always ready for dinner parties (production deployment) without additional setup.</p>
+        <h3>Analogy</h3>
+        <p>Spring Boot benefits are like switching from cooking everything from scratch to having a well-equipped kitchen with smart appliances and pre-made quality ingredients. Instead of spending hours preparing basic components (grinding spices, making stock, preparing sauces), you can focus on creating the actual dish. The smart oven (auto-configuration) knows the right temperature for different foods, the refrigerator (embedded server) is already stocked with essentials, and you have access to premium ingredients (starter dependencies) that work perfectly together. You can still make everything from scratch when you want full control (custom configuration), but for most meals, the smart kitchen handles the tedious work while you focus on the creative cooking. The result is faster meal preparation without sacrificing quality, and your kitchen is always ready for dinner parties (production deployment) without additional setup.</p>
 
-            <h3>Examples</h3>
-            <p><strong>Rapid development - working REST API in minutes:</strong></p>
-            <pre><code class="language-java">@RestController
+        <h3>Examples</h3>
+        <p><strong>Rapid development - working REST API in minutes:</strong></p>
+        <pre><code class="language-java">@RestController
 public class BookController {
     @GetMapping("/books")
     public List<String> getBooks() {
@@ -151,56 +161,61 @@ public class BookController {
 }
 </code></pre>
 
-            <p><strong>Zero deployment complexity:</strong></p>
-            <pre><code class="language-java">// Build fat JAR with embedded server
+        <p><strong>Zero deployment complexity:</strong></p>
+        <pre><code class="language-java">// Build fat JAR with embedded server
 mvn package
 // Run anywhere with Java installed
 java -jar myapp.jar
 // No Tomcat installation or configuration needed
 </code></pre>
 
-            <p><strong>Production features included:</strong></p>
-            <pre><code class="language-java">// Health check endpoint automatically available
+        <p><strong>Production features included:</strong></p>
+        <pre><code class="language-java">// Health check endpoint automatically available
 // GET /actuator/health returns application status
 // Metrics, logging, monitoring built-in
 management.endpoints.web.exposure.include=health,metrics
 </code></pre>
 
-            <p><strong>Database integration with minimal code:</strong></p>
-            <pre><code class="language-java">public interface BookRepository extends JpaRepository<Book, Long> {
+        <p><strong>Database integration with minimal code:</strong></p>
+        <pre><code class="language-java">public interface BookRepository extends JpaRepository<Book, Long> {
     List<Book> findByAuthor(String author);  // Query method automatically implemented
 }
 // Spring Boot auto-configures database, connection pool, transactions
 </code></pre>
 
-            <p><strong>External configuration without code changes:</strong></p>
-            <pre><code class="language-java">// application.properties automatically loaded
+        <p><strong>External configuration without code changes:</strong></p>
+        <pre><code class="language-java">// application.properties automatically loaded
 server.port=8081
 spring.datasource.url=jdbc:mysql://localhost/mydb
 // Values injected into application without rebuilding
 </code></pre>
-          </section>
+      </section>
 
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+      <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
-          <section id="project-setup" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Project Setup</h2>
-            <h3>Definition</h3>
-            <p>Spring Boot projects can be created using Spring Initializr (start.spring.io), IDE plugins, or command-line tools. The setup includes choosing the build tool (Maven or Gradle), Java version, dependencies, and project metadata. Spring Initializr generates a ready-to-run project with proper directory structure, build configuration, and starter dependencies. The generated project includes a main application class with @SpringBootApplication annotation and is immediately runnable.</p>
+      <section id="project-setup" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+        <h2>Project Setup</h2>
+        <h3>Definition</h3>
+        <ul>
+          <li>Spring Boot projects can be created using Spring Initializr (start.spring.io), IDE plugins, or command-line tools.</li>
+          <li>The setup includes choosing the build tool (Maven or Gradle), Java version, dependencies, and project metadata.</li>
+          <li>Spring Initializr generates a ready-to-run project with proper directory structure, build configuration, and starter dependencies.</li>
+          <li>The generated project includes a main application class with @SpringBootApplication annotation and is immediately runnable.</li>
+        </ul>
 
-            <h3>Analogy</h3>
-            <p>Creating a Spring Boot project is like using a modern app store to set up a new smartphone. Instead of manually installing an operating system, configuring drivers, and hunting down compatible apps, you choose your phone model (Java version), select the apps you want (dependencies), and everything is downloaded and configured automatically. Spring Initializr is like the app store - you specify what you need (web development, database access, security) and it creates a perfectly configured "phone" ready to use. Within minutes, you have a working device with all your chosen apps properly integrated and ready to use. You can always install more apps later (add dependencies) or customize settings (modify configuration), but you start with a fully functional setup rather than a blank device.</p>
+        <h3>Analogy</h3>
+        <p>Creating a Spring Boot project is like using a modern app store to set up a new smartphone. Instead of manually installing an operating system, configuring drivers, and hunting down compatible apps, you choose your phone model (Java version), select the apps you want (dependencies), and everything is downloaded and configured automatically. Spring Initializr is like the app store - you specify what you need (web development, database access, security) and it creates a perfectly configured "phone" ready to use. Within minutes, you have a working device with all your chosen apps properly integrated and ready to use. You can always install more apps later (add dependencies) or customize settings (modify configuration), but you start with a fully functional setup rather than a blank device.</p>
 
-            <h3>Examples</h3>
-            <p><strong>Creating project with Spring Initializr:</strong></p>
-            <pre><code class="language-java">// Visit start.spring.io
+        <h3>Examples</h3>
+        <p><strong>Creating project with Spring Initializr:</strong></p>
+        <pre><code class="language-java">// Visit start.spring.io
 // Choose: Maven, Java 17, Spring Boot 3.x
 // Add dependencies: Spring Web, Spring Data JPA
 // Generate and download zip file
 </code></pre>
 
-            <p><strong>Generated project structure:</strong></p>
-            <pre><code class="language-java">src/main/java/com/example/demo/
+        <p><strong>Generated project structure:</strong></p>
+        <pre><code class="language-java">src/main/java/com/example/demo/
 ├── DemoApplication.java          // Main application class
 ├── controller/                   // REST controllers
 ├── service/                      // Business logic
@@ -208,8 +223,8 @@ spring.datasource.url=jdbc:mysql://localhost/mydb
 └── model/                        // Entity classes
 </code></pre>
 
-            <p><strong>Main application class (auto-generated):</strong></p>
-            <pre><code class="language-java">@SpringBootApplication
+        <p><strong>Main application class (auto-generated):</strong></p>
+        <pre><code class="language-java">@SpringBootApplication
 public class DemoApplication {
     public static void main(String[] args) {
         SpringApplication.run(DemoApplication.class, args);
@@ -217,43 +232,49 @@ public class DemoApplication {
 }
 </code></pre>
 
-            <p><strong>Maven dependencies (auto-configured):</strong></p>
-            <pre><code class="language-xml"><!-- Web starter includes Tomcat, Spring MVC, JSON -->
+        <p><strong>Maven dependencies (auto-configured):</strong></p>
+        <pre><code class="language-xml"><!-- Web starter includes Tomcat, Spring MVC, JSON -->
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-web</artifactId>
 </dependency>
 </code></pre>
 
-            <p><strong>Running the application:</strong></p>
-            <pre><code class="language-java">// Command line
+        <p><strong>Running the application:</strong></p>
+        <pre><code class="language-java">// Command line
 ./mvnw spring-boot:run
 // IDE: Right-click DemoApplication.java -> Run
 // Application starts on http://localhost:8080
 </code></pre>
-          </section>
+      </section>
 
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+      <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
-          <section id="auto-configuration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Auto-Configuration</h2>
-            <h3>Definition</h3>
-            <p>Auto-configuration is Spring Boot's intelligent system that automatically configures your application based on the dependencies you've added to your classpath. It uses conditional logic to determine what beans to create and how to configure them. For example, if it finds H2 database on the classpath, it automatically configures an in-memory database. If it sees Spring MVC dependencies, it sets up web components. Auto-configuration can be customized or disabled when you need specific behavior, but it works perfectly for most common scenarios.</p>
+      <section id="auto-configuration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+        <h2>Auto-Configuration</h2>
+        <h3>Definition</h3>
+        <ul>
+          <li>Auto-configuration is Spring Boot's intelligent system that automatically configures your application based on the dependencies you've added to your classpath.</li>
+          <li>It uses conditional logic to determine what beans to create and how to configure them.</li>
+          <li>For example, if it finds H2 database on the classpath, it automatically configures an in-memory database.</li>
+          <li>If it sees Spring MVC dependencies, it sets up web components.</li>
+          <li>Auto-configuration can be customized or disabled when you need specific behavior, but it works perfectly for most common scenarios.</li>
+        </ul>
 
-            <h3>Analogy</h3>
-            <p>Auto-configuration is like a smart personal assistant who observes what tools you bring to work and automatically sets up your workspace accordingly. If you bring a laptop, they set up a desk with power outlet and wifi. If you bring art supplies, they arrange proper lighting and ventilation. If you bring cooking ingredients, they prepare a kitchen workspace with appropriate utensils and equipment. The assistant makes intelligent decisions based on what they see, but you can always override their choices or request specific arrangements. They don't ask you a hundred questions about every detail - they use experience and common sense to create a productive environment, while remaining flexible when you have special requirements. This is exactly how Spring Boot's auto-configuration works: it sees your dependencies (tools) and intelligently sets up the application environment.</p>
+        <h3>Analogy</h3>
+        <p>Auto-configuration is like a smart personal assistant who observes what tools you bring to work and automatically sets up your workspace accordingly. If you bring a laptop, they set up a desk with power outlet and wifi. If you bring art supplies, they arrange proper lighting and ventilation. If you bring cooking ingredients, they prepare a kitchen workspace with appropriate utensils and equipment. The assistant makes intelligent decisions based on what they see, but you can always override their choices or request specific arrangements. They don't ask you a hundred questions about every detail - they use experience and common sense to create a productive environment, while remaining flexible when you have special requirements. This is exactly how Spring Boot's auto-configuration works: it sees your dependencies (tools) and intelligently sets up the application environment.</p>
 
-            <h3>Examples</h3>
-            <p><strong>Database auto-configuration:</strong></p>
-            <pre><code class="language-java">// Add H2 dependency - Spring Boot automatically:
+        <h3>Examples</h3>
+        <p><strong>Database auto-configuration:</strong></p>
+        <pre><code class="language-java">// Add H2 dependency - Spring Boot automatically:
 // - Creates DataSource bean
 // - Configures in-memory database
 // - Sets up JPA entity manager
 // No configuration code needed
 </code></pre>
 
-            <p><strong>Web server auto-configuration:</strong></p>
-            <pre><code class="language-java">// Add spring-boot-starter-web - automatically configures:
+        <p><strong>Web server auto-configuration:</strong></p>
+        <pre><code class="language-java">// Add spring-boot-starter-web - automatically configures:
 // - Embedded Tomcat server
 // - Spring MVC framework
 // - JSON message converters
@@ -262,8 +283,8 @@ public class DemoApplication {
 public class ApiController { }
 </code></pre>
 
-            <p><strong>Conditional configuration in action:</strong></p>
-            <pre><code class="language-java">// Spring Boot checks: "Is there a DataSource bean?"
+        <p><strong>Conditional configuration in action:</strong></p>
+        <pre><code class="language-java">// Spring Boot checks: "Is there a DataSource bean?"
 // If no: Creates default DataSource
 // If yes: Uses your custom DataSource
 @ConditionalOnMissingBean(DataSource.class)
@@ -272,35 +293,40 @@ public DataSource defaultDataSource() {
 }
 </code></pre>
 
-            <p><strong>Viewing auto-configuration report:</strong></p>
-            <pre><code class="language-java">// Add to application.properties
+        <p><strong>Viewing auto-configuration report:</strong></p>
+        <pre><code class="language-java">// Add to application.properties
 logging.level.org.springframework.boot.autoconfigure=DEBUG
 // Shows what got auto-configured and why
 // Helps understand what Spring Boot is doing
 </code></pre>
 
-            <p><strong>Excluding auto-configuration when needed:</strong></p>
-            <pre><code class="language-java">@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+        <p><strong>Excluding auto-configuration when needed:</strong></p>
+        <pre><code class="language-java">@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 public class MyApp {
     // Disables automatic database configuration
     // Useful when you want full manual control
 }
 </code></pre>
-          </section>
+      </section>
 
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+      <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
-          <section id="dependency-injection-basics" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Dependency Injection Basics</h2>
-            <h3>Definition</h3>
-            <p>Dependency Injection (DI) is a design pattern where Spring Boot automatically provides (injects) objects that your classes need, rather than your classes creating them directly. You mark classes with @Component, @Service, or @Repository annotations, and Spring Boot manages their lifecycle and dependencies. When a class needs another object, you can inject it using @Autowired annotation or constructor injection. This creates loose coupling between components and makes testing easier because dependencies can be easily mocked or replaced.</p>
+      <section id="dependency-injection-basics" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+        <h2>Dependency Injection Basics</h2>
+        <h3>Definition</h3>
+        <ul>
+          <li>Dependency Injection (DI) is a design pattern where Spring Boot automatically provides (injects) objects that your classes need, rather than your classes creating them directly.</li>
+          <li>You mark classes with @Component, @Service, or @Repository annotations, and Spring Boot manages their lifecycle and dependencies.</li>
+          <li>When a class needs another object, you can inject it using @Autowired annotation or constructor injection.</li>
+          <li>This creates loose coupling between components and makes testing easier because dependencies can be easily mocked or replaced.</li>
+        </ul>
 
-            <h3>Analogy</h3>
-            <p>Dependency injection is like having a personal assistant who anticipates your needs and brings you exactly what you require for each task. Instead of you having to leave your desk to find a calculator, printer, or reference books every time you need them, your assistant observes what you're working on and silently places the right tools on your desk before you even ask. When you're writing a report, the assistant brings you a laptop, research materials, and a coffee. When you're doing math, they bring a calculator and graph paper. You don't have to know where these items are stored or how to set them up - you just use them. Similarly, Spring Boot's dependency injection observes what each part of your application needs and automatically provides the right objects (services, repositories, configurations) without your code having to create or find them manually.</p>
+        <h3>Analogy</h3>
+        <p>Dependency injection is like having a personal assistant who anticipates your needs and brings you exactly what you require for each task. Instead of you having to leave your desk to find a calculator, printer, or reference books every time you need them, your assistant observes what you're working on and silently places the right tools on your desk before you even ask. When you're writing a report, the assistant brings you a laptop, research materials, and a coffee. When you're doing math, they bring a calculator and graph paper. You don't have to know where these items are stored or how to set them up - you just use them. Similarly, Spring Boot's dependency injection observes what each part of your application needs and automatically provides the right objects (services, repositories, configurations) without your code having to create or find them manually.</p>
 
-            <h3>Examples</h3>
-            <p><strong>Creating injectable components:</strong></p>
-            <pre><code class="language-java">@Service
+        <h3>Examples</h3>
+        <p><strong>Creating injectable components:</strong></p>
+        <pre><code class="language-java">@Service
 public class BookService {
     public List<Book> getAllBooks() {
         return List.of(new Book("Spring Boot Guide"));
@@ -308,8 +334,8 @@ public class BookService {
 }
 </code></pre>
 
-            <p><strong>Constructor injection (recommended approach):</strong></p>
-            <pre><code class="language-java">@RestController
+        <p><strong>Constructor injection (recommended approach):</strong></p>
+        <pre><code class="language-java">@RestController
 public class BookController {
     private final BookService bookService;
 
@@ -319,8 +345,8 @@ public class BookController {
 }
 </code></pre>
 
-            <p><strong>Field injection with @Autowired:</strong></p>
-            <pre><code class="language-java">@RestController
+        <p><strong>Field injection with @Autowired:</strong></p>
+        <pre><code class="language-java">@RestController
 public class BookController {
     @Autowired
     private BookService bookService;  // Spring Boot injects automatically
@@ -332,8 +358,8 @@ public class BookController {
 }
 </code></pre>
 
-            <p><strong>Repository injection example:</strong></p>
-            <pre><code class="language-java">@Service
+        <p><strong>Repository injection example:</strong></p>
+        <pre><code class="language-java">@Service
 public class UserService {
     private final UserRepository userRepository;
 
@@ -347,28 +373,33 @@ public class UserService {
 }
 </code></pre>
 
-            <p><strong>Component scanning in action:</strong></p>
-            <pre><code class="language-java">@SpringBootApplication  // Automatically scans for @Component, @Service, @Repository
+        <p><strong>Component scanning in action:</strong></p>
+        <pre><code class="language-java">@SpringBootApplication  // Automatically scans for @Component, @Service, @Repository
 public class MyApp {
     // Spring Boot finds and manages all annotated classes
     // Creates dependency graph and injects as needed
 }
 </code></pre>
-          </section>
+      </section>
 
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+      <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
-          <section id="application-structure" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Application Structure</h2>
-            <h3>Definition</h3>
-            <p>Spring Boot applications follow a layered architecture with clear separation of concerns. Controllers handle HTTP requests and responses, Services contain business logic, Repositories manage data access, and Models represent data entities. The @SpringBootApplication annotation combines @Configuration, @EnableAutoConfiguration, and @ComponentScan to bootstrap the application. Package structure typically mirrors this layered approach, making the codebase easy to navigate and maintain.</p>
+      <section id="application-structure" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+        <h2>Application Structure</h2>
+        <h3>Definition</h3>
+        <ul>
+          <li>Spring Boot applications follow a layered architecture with clear separation of concerns.</li>
+          <li>Controllers handle HTTP requests and responses, Services contain business logic, Repositories manage data access, and Models represent data entities.</li>
+          <li>The @SpringBootApplication annotation combines @Configuration, @EnableAutoConfiguration, and @ComponentScan to bootstrap the application.</li>
+          <li>Package structure typically mirrors this layered approach, making the codebase easy to navigate and maintain.</li>
+        </ul>
 
-            <h3>Analogy</h3>
-            <p>A Spring Boot application structure is like organizing a well-run restaurant. The front-of-house staff (Controllers) interact with customers, take orders, and serve food - they handle all customer-facing activities. The kitchen staff (Services) prepare the actual meals using recipes and business rules - they contain the core cooking logic. The storage and inventory team (Repositories) manages all the ingredients, knows where everything is stored, and handles procurement - they deal with data storage and retrieval. The menu items and ingredients (Models) represent what the restaurant offers and works with. The restaurant manager (@SpringBootApplication) coordinates all departments, ensures everyone knows their role, and keeps the operation running smoothly. Each department has clear responsibilities and communicates through established protocols, just like the layers in a Spring Boot application.</p>
+        <h3>Analogy</h3>
+        <p>A Spring Boot application structure is like organizing a well-run restaurant. The front-of-house staff (Controllers) interact with customers, take orders, and serve food - they handle all customer-facing activities. The kitchen staff (Services) prepare the actual meals using recipes and business rules - they contain the core cooking logic. The storage and inventory team (Repositories) manages all the ingredients, knows where everything is stored, and handles procurement - they deal with data storage and retrieval. The menu items and ingredients (Models) represent what the restaurant offers and works with. The restaurant manager (@SpringBootApplication) coordinates all departments, ensures everyone knows their role, and keeps the operation running smoothly. Each department has clear responsibilities and communicates through established protocols, just like the layers in a Spring Boot application.</p>
 
-            <h3>Examples</h3>
-            <p><strong>Typical package structure:</strong></p>
-            <pre><code class="language-java">com.example.bookstore/
+        <h3>Examples</h3>
+        <p><strong>Typical package structure:</strong></p>
+        <pre><code class="language-java">com.example.bookstore/
 ├── BookstoreApplication.java     // Main application class
 ├── controller/                   // HTTP request handling
 ├── service/                      // Business logic
@@ -377,8 +408,8 @@ public class MyApp {
 └── config/                       // Configuration classes
 </code></pre>
 
-            <p><strong>Main application class structure:</strong></p>
-            <pre><code class="language-java">@SpringBootApplication
+        <p><strong>Main application class structure:</strong></p>
+        <pre><code class="language-java">@SpringBootApplication
 public class BookstoreApplication {
     public static void main(String[] args) {
         SpringApplication.run(BookstoreApplication.class, args);
@@ -386,8 +417,8 @@ public class BookstoreApplication {
 }
 </code></pre>
 
-            <p><strong>Controller layer example:</strong></p>
-            <pre><code class="language-java">@RestController
+        <p><strong>Controller layer example:</strong></p>
+        <pre><code class="language-java">@RestController
 @RequestMapping("/api/books")
 public class BookController {
     private final BookService bookService;
@@ -399,8 +430,8 @@ public class BookController {
 }
 </code></pre>
 
-            <p><strong>Service layer example:</strong></p>
-            <pre><code class="language-java">@Service
+        <p><strong>Service layer example:</strong></p>
+        <pre><code class="language-java">@Service
 public class BookService {
     private final BookRepository bookRepository;
 
@@ -410,27 +441,32 @@ public class BookService {
 }
 </code></pre>
 
-            <p><strong>Repository layer example:</strong></p>
-            <pre><code class="language-java">@Repository
+        <p><strong>Repository layer example:</strong></p>
+        <pre><code class="language-java">@Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
     List<Book> findByAuthor(String author);  // Spring Data provides implementation
 }
 </code></pre>
-          </section>
+      </section>
 
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+      <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
-          <section id="first-rest-controller" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>First REST Controller</h2>
-            <h3>Definition</h3>
-            <p>A REST Controller in Spring Boot handles HTTP requests and returns responses, typically in JSON format. The @RestController annotation combines @Controller and @ResponseBody, automatically converting return values to JSON. HTTP mapping annotations like @GetMapping, @PostMapping, @PutMapping, and @DeleteMapping map specific HTTP methods to controller methods. Path variables and request parameters can be easily extracted using @PathVariable and @RequestParam annotations.</p>
+      <section id="first-rest-controller" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+        <h2>First REST Controller</h2>
+        <h3>Definition</h3>
+        <ul>
+          <li>A REST Controller in Spring Boot handles HTTP requests and returns responses, typically in JSON format.</li>
+          <li>The @RestController annotation combines @Controller and @ResponseBody, automatically converting return values to JSON.</li>
+          <li>HTTP mapping annotations like @GetMapping, @PostMapping, @PutMapping, and @DeleteMapping map specific HTTP methods to controller methods.</li>
+          <li>Path variables and request parameters can be easily extracted using @PathVariable and @RequestParam annotations.</li>
+        </ul>
 
-            <h3>Analogy</h3>
-            <p>A REST controller is like a well-trained receptionist at a busy office building. When visitors arrive with different types of requests (GET data, POST new information, PUT updates, DELETE records), the receptionist understands exactly what each person needs and directs them appropriately. They can handle questions about specific departments (path variables), take detailed forms (request bodies), and always respond in a consistent, professional format (JSON responses). The receptionist doesn't do the actual work - they coordinate with the right departments (services) and then package the results in a clear, standardized format that visitors can easily understand. Whether someone wants a simple directory listing or needs to submit a complex application, the receptionist handles the interaction smoothly and consistently.</p>
+        <h3>Analogy</h3>
+        <p>A REST controller is like a well-trained receptionist at a busy office building. When visitors arrive with different types of requests (GET data, POST new information, PUT updates, DELETE records), the receptionist understands exactly what each person needs and directs them appropriately. They can handle questions about specific departments (path variables), take detailed forms (request bodies), and always respond in a consistent, professional format (JSON responses). The receptionist doesn't do the actual work - they coordinate with the right departments (services) and then package the results in a clear, standardized format that visitors can easily understand. Whether someone wants a simple directory listing or needs to submit a complex application, the receptionist handles the interaction smoothly and consistently.</p>
 
-            <h3>Examples</h3>
-            <p><strong>Basic REST controller:</strong></p>
-            <pre><code class="language-java">@RestController
+        <h3>Examples</h3>
+        <p><strong>Basic REST controller:</strong></p>
+        <pre><code class="language-java">@RestController
 public class WelcomeController {
     @GetMapping("/welcome")
     public String welcome() {
@@ -439,8 +475,8 @@ public class WelcomeController {
 }
 </code></pre>
 
-            <p><strong>Returning JSON objects:</strong></p>
-            <pre><code class="language-java">@RestController
+        <p><strong>Returning JSON objects:</strong></p>
+        <pre><code class="language-java">@RestController
 public class UserController {
     @GetMapping("/user")
     public User getUser() {
@@ -449,8 +485,8 @@ public class UserController {
 }
 </code></pre>
 
-            <p><strong>Handling path variables:</strong></p>
-            <pre><code class="language-java">@RestController
+        <p><strong>Handling path variables:</strong></p>
+        <pre><code class="language-java">@RestController
 public class BookController {
     @GetMapping("/books/{id}")
     public Book getBook(@PathVariable Long id) {
@@ -459,8 +495,8 @@ public class BookController {
 }
 </code></pre>
 
-            <p><strong>Processing request parameters:</strong></p>
-            <pre><code class="language-java">@RestController
+        <p><strong>Processing request parameters:</strong></p>
+        <pre><code class="language-java">@RestController
 public class SearchController {
     @GetMapping("/search")
     public List<Book> search(@RequestParam String title) {
@@ -469,8 +505,8 @@ public class SearchController {
 }
 </code></pre>
 
-            <p><strong>Handling POST requests with request body:</strong></p>
-            <pre><code class="language-java">@RestController
+        <p><strong>Handling POST requests with request body:</strong></p>
+        <pre><code class="language-java">@RestController
 public class BookController {
     @PostMapping("/books")
     public Book createBook(@RequestBody Book book) {
@@ -478,28 +514,33 @@ public class BookController {
     }
 }
 </code></pre>
-          </section>
+      </section>
 
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+      <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
-          <section id="configuration-properties" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Configuration Properties</h2>
-            <h3>Definition</h3>
-            <p>Spring Boot applications can be configured externally using properties files, YAML files, environment variables, or command-line arguments. The application.properties or application.yml files contain configuration settings that Spring Boot automatically loads and makes available throughout the application. You can inject these values using @Value annotation or create configuration classes with @ConfigurationProperties for type-safe configuration binding. This enables changing application behavior without modifying code.</p>
+      <section id="configuration-properties" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+        <h2>Configuration Properties</h2>
+        <h3>Definition</h3>
+        <ul>
+          <li>Spring Boot applications can be configured externally using properties files, YAML files, environment variables, or command-line arguments.</li>
+          <li>The application.properties or application.yml files contain configuration settings that Spring Boot automatically loads and makes available throughout the application.</li>
+          <li>You can inject these values using @Value annotation or create configuration classes with @ConfigurationProperties for type-safe configuration binding.</li>
+          <li>This enables changing application behavior without modifying code.</li>
+        </ul>
 
-            <h3>Analogy</h3>
-            <p>Configuration properties are like a settings panel on your smartphone or computer - they let you customize how your device behaves without needing to reprogram it. Just as you can change screen brightness, notification sounds, or default apps through settings rather than hiring a programmer, Spring Boot's configuration properties let you modify database connections, server ports, or feature flags by simply editing text files. The application reads these settings when it starts up and adjusts its behavior accordingly. You can even have different settings files for different environments (development, testing, production) just like how you might have different settings profiles on your device for work versus personal use. The beauty is that the same application code works everywhere - only the configuration changes.</p>
+        <h3>Analogy</h3>
+        <p>Configuration properties are like a settings panel on your smartphone or computer - they let you customize how your device behaves without needing to reprogram it. Just as you can change screen brightness, notification sounds, or default apps through settings rather than hiring a programmer, Spring Boot's configuration properties let you modify database connections, server ports, or feature flags by simply editing text files. The application reads these settings when it starts up and adjusts its behavior accordingly. You can even have different settings files for different environments (development, testing, production) just like how you might have different settings profiles on your device for work versus personal use. The beauty is that the same application code works everywhere - only the configuration changes.</p>
 
-            <h3>Examples</h3>
-            <p><strong>Basic application.properties configuration:</strong></p>
-            <pre><code class="language-java">server.port=8081
+        <h3>Examples</h3>
+        <p><strong>Basic application.properties configuration:</strong></p>
+        <pre><code class="language-java">server.port=8081
 spring.application.name=my-bookstore
 logging.level.com.example=DEBUG
 management.endpoints.web.exposure.include=health,info
 </code></pre>
 
-            <p><strong>Injecting single properties with @Value:</strong></p>
-            <pre><code class="language-java">@Component
+        <p><strong>Injecting single properties with @Value:</strong></p>
+        <pre><code class="language-java">@Component
 public class AppConfig {
     @Value("${spring.application.name}")
     private String appName;
@@ -509,8 +550,8 @@ public class AppConfig {
 }
 </code></pre>
 
-            <p><strong>Type-safe configuration with @ConfigurationProperties:</strong></p>
-            <pre><code class="language-java">@ConfigurationProperties(prefix = "app")
+        <p><strong>Type-safe configuration with @ConfigurationProperties:</strong></p>
+        <pre><code class="language-java">@ConfigurationProperties(prefix = "app")
 @Component
 public class AppProperties {
     private String name;
@@ -521,8 +562,8 @@ public class AppProperties {
 }
 </code></pre>
 
-            <p><strong>Using configuration properties in services:</strong></p>
-            <pre><code class="language-java">@Service
+        <p><strong>Using configuration properties in services:</strong></p>
+        <pre><code class="language-java">@Service
 public class NotificationService {
     private final AppProperties appProperties;
 
@@ -533,8 +574,8 @@ public class NotificationService {
 }
 </code></pre>
 
-            <p><strong>Environment-specific configuration:</strong></p>
-            <pre><code class="language-java">// application-dev.properties
+        <p><strong>Environment-specific configuration:</strong></p>
+        <pre><code class="language-java">// application-dev.properties
 spring.datasource.url=jdbc:h2:mem:devdb
 
 // application-prod.properties
@@ -542,45 +583,50 @@ spring.datasource.url=jdbc:mysql://prod-server/mydb
 
 // Activate with: --spring.profiles.active=prod
 </code></pre>
-          </section>
+      </section>
 
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+      <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
-          <section id="spring-boot-starter" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Spring Boot Starters</h2>
-            <h3>Definition</h3>
-            <p>Spring Boot Starters are dependency descriptors that bring in all the libraries needed for a specific functionality. Instead of manually adding dozens of compatible dependencies, you add one starter and get everything you need. Common starters include spring-boot-starter-web for web applications, spring-boot-starter-data-jpa for database access, and spring-boot-starter-security for authentication. Starters ensure all dependencies are compatible and properly versioned, eliminating dependency hell.</p>
+      <section id="spring-boot-starter" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+        <h2>Spring Boot Starters</h2>
+        <h3>Definition</h3>
+        <ul>
+          <li>Spring Boot Starters are dependency descriptors that bring in all the libraries needed for a specific functionality.</li>
+          <li>Instead of manually adding dozens of compatible dependencies, you add one starter and get everything you need.</li>
+          <li>Common starters include spring-boot-starter-web for web applications, spring-boot-starter-data-jpa for database access, and spring-boot-starter-security for authentication.</li>
+          <li>Starters ensure all dependencies are compatible and properly versioned, eliminating dependency hell.</li>
+        </ul>
 
-            <h3>Analogy</h3>
-            <p>Spring Boot Starters are like buying a complete home theater system versus purchasing each component separately. When you buy a "home theater starter," you get a receiver, speakers, subwoofer, cables, remote control, and setup guide - all guaranteed to work together perfectly. You don't have to research which speakers are compatible with which receiver, or worry about whether the cables will fit the connections. Everything is tested, matched, and ready to use. If you tried to build the same system by buying individual components, you'd spend weeks researching compatibility, dealing with version mismatches, and possibly ending up with components that don't work well together. Spring Boot Starters work the same way - when you add the "web starter," you get the web server, MVC framework, JSON converters, and all supporting libraries that are tested to work perfectly together.</p>
+        <h3>Analogy</h3>
+        <p>Spring Boot Starters are like buying a complete home theater system versus purchasing each component separately. When you buy a "home theater starter," you get a receiver, speakers, subwoofer, cables, remote control, and setup guide - all guaranteed to work together perfectly. You don't have to research which speakers are compatible with which receiver, or worry about whether the cables will fit the connections. Everything is tested, matched, and ready to use. If you tried to build the same system by buying individual components, you'd spend weeks researching compatibility, dealing with version mismatches, and possibly ending up with components that don't work well together. Spring Boot Starters work the same way - when you add the "web starter," you get the web server, MVC framework, JSON converters, and all supporting libraries that are tested to work perfectly together.</p>
 
-            <h3>Examples</h3>
-            <p><strong>Web application starter:</strong></p>
-            <pre><code class="language-xml"><!-- Includes Tomcat, Spring MVC, Jackson JSON, validation -->
+        <h3>Examples</h3>
+        <p><strong>Web application starter:</strong></p>
+        <pre><code class="language-xml"><!-- Includes Tomcat, Spring MVC, Jackson JSON, validation -->
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-web</artifactId>
 </dependency>
 </code></pre>
 
-            <p><strong>Database access starter:</strong></p>
-            <pre><code class="language-xml"><!-- Includes Spring Data JPA, Hibernate, connection pooling -->
+        <p><strong>Database access starter:</strong></p>
+        <pre><code class="language-xml"><!-- Includes Spring Data JPA, Hibernate, connection pooling -->
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-jpa</artifactId>
 </dependency>
 </code></pre>
 
-            <p><strong>Security starter:</strong></p>
-            <pre><code class="language-xml"><!-- Includes Spring Security, authentication, authorization -->
+        <p><strong>Security starter:</strong></p>
+        <pre><code class="language-xml"><!-- Includes Spring Security, authentication, authorization -->
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-security</artifactId>
 </dependency>
 </code></pre>
 
-            <p><strong>Testing starter:</strong></p>
-            <pre><code class="language-xml"><!-- Includes JUnit, Mockito, Spring Test, AssertJ -->
+        <p><strong>Testing starter:</strong></p>
+        <pre><code class="language-xml"><!-- Includes JUnit, Mockito, Spring Test, AssertJ -->
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-test</artifactId>
@@ -588,8 +634,8 @@ spring.datasource.url=jdbc:mysql://prod-server/mydb
 </dependency>
 </code></pre>
 
-            <p><strong>What you get with minimal dependencies:</strong></p>
-            <pre><code class="language-java">// Just adding spring-boot-starter-web gives you:
+        <p><strong>What you get with minimal dependencies:</strong></p>
+        <pre><code class="language-java">// Just adding spring-boot-starter-web gives you:
 // - Embedded Tomcat server
 // - Spring MVC framework
 // - JSON serialization/deserialization
@@ -597,21 +643,26 @@ spring.datasource.url=jdbc:mysql://prod-server/mydb
 // - Static resource serving
 // - Auto-configuration for all components
 </code></pre>
-          </section>
+      </section>
 
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+      <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
-          <section id="profiles-environments" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Profiles & Environments</h2>
-            <h3>Definition</h3>
-            <p>Spring Boot profiles allow you to segregate parts of your application configuration and make it available only in certain environments. You can define different configurations for development, testing, and production environments using profile-specific property files. Beans can be activated only for specific profiles using @Profile annotation. This enables deploying the same application code across different environments with appropriate configurations for each.</p>
+      <section id="profiles-environments" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+        <h2>Profiles & Environments</h2>
+        <h3>Definition</h3>
+        <ul>
+          <li>Spring Boot profiles allow you to segregate parts of your application configuration and make it available only in certain environments.</li>
+          <li>You can define different configurations for development, testing, and production environments using profile-specific property files.</li>
+          <li>Beans can be activated only for specific profiles using @Profile annotation.</li>
+          <li>This enables deploying the same application code across different environments with appropriate configurations for each.</li>
+        </ul>
 
-            <h3>Analogy</h3>
-            <p>Spring Boot profiles are like having different modes on a camera - portrait mode, landscape mode, night mode, and sports mode. The same camera (your application) behaves differently depending on which mode is active. In portrait mode, it focuses on faces and blurs the background. In sports mode, it uses faster shutter speeds to capture motion. The core camera functionality remains the same, but the settings automatically adjust to optimize for different situations. Similarly, your Spring Boot application might use an in-memory database and detailed logging in development mode, but switch to a production database and minimal logging in production mode. The same code runs everywhere, but the behavior adapts to the environment's needs.</p>
+        <h3>Analogy</h3>
+        <p>Spring Boot profiles are like having different modes on a camera - portrait mode, landscape mode, night mode, and sports mode. The same camera (your application) behaves differently depending on which mode is active. In portrait mode, it focuses on faces and blurs the background. In sports mode, it uses faster shutter speeds to capture motion. The core camera functionality remains the same, but the settings automatically adjust to optimize for different situations. Similarly, your Spring Boot application might use an in-memory database and detailed logging in development mode, but switch to a production database and minimal logging in production mode. The same code runs everywhere, but the behavior adapts to the environment's needs.</p>
 
-            <h3>Examples</h3>
-            <p><strong>Profile-specific property files:</strong></p>
-            <pre><code class="language-java">// application-dev.properties (development)
+        <h3>Examples</h3>
+        <p><strong>Profile-specific property files:</strong></p>
+        <pre><code class="language-java">// application-dev.properties (development)
 spring.datasource.url=jdbc:h2:mem:testdb
 logging.level.root=DEBUG
 
@@ -620,8 +671,8 @@ spring.datasource.url=jdbc:mysql://prod-server/app
 logging.level.root=WARN
 </code></pre>
 
-            <p><strong>Activating profiles:</strong></p>
-            <pre><code class="language-java">// Command line activation
+        <p><strong>Activating profiles:</strong></p>
+        <pre><code class="language-java">// Command line activation
 java -jar app.jar --spring.profiles.active=prod
 
 // Environment variable
@@ -631,8 +682,8 @@ export SPRING_PROFILES_ACTIVE=dev
 spring.profiles.active=dev
 </code></pre>
 
-            <p><strong>Profile-specific beans:</strong></p>
-            <pre><code class="language-java">@Profile("dev")
+        <p><strong>Profile-specific beans:</strong></p>
+        <pre><code class="language-java">@Profile("dev")
 @Component
 public class DevEmailService implements EmailService {
     public void sendEmail(String message) {
@@ -649,8 +700,8 @@ public class ProdEmailService implements EmailService {
 }
 </code></pre>
 
-            <p><strong>Conditional configuration based on profiles:</strong></p>
-            <pre><code class="language-java">@Configuration
+        <p><strong>Conditional configuration based on profiles:</strong></p>
+        <pre><code class="language-java">@Configuration
 public class DatabaseConfig {
 
     @Bean
@@ -666,83 +717,83 @@ public class DatabaseConfig {
     }
 }
 </code></pre>
-          </section>
+      </section>
 
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+      <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
-          <section id="summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Summary</h2>
-            <p>You've now discovered how Spring Boot revolutionizes Java development by eliminating configuration overhead and providing intelligent defaults that work out of the box. From auto-configuration that sets up your application based on dependencies, to dependency injection that manages object relationships automatically, Spring Boot handles the tedious infrastructure work so you can focus on business logic. You've learned to create REST controllers, configure applications externally, leverage powerful starter dependencies, and manage different environments with profiles. These fundamentals form the foundation for building production-ready applications quickly and efficiently. Next, you'll dive deeper into Spring Boot's web development capabilities, exploring advanced request handling, data validation, and building robust REST APIs that can handle real-world requirements.</p>
-          </section>
+      <section id="summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+        <h2>Summary</h2>
+        <p>You've now discovered how Spring Boot revolutionizes Java development by eliminating configuration overhead and providing intelligent defaults that work out of the box. From auto-configuration that sets up your application based on dependencies, to dependency injection that manages object relationships automatically, Spring Boot handles the tedious infrastructure work so you can focus on business logic. You've learned to create REST controllers, configure applications externally, leverage powerful starter dependencies, and manage different environments with profiles. These fundamentals form the foundation for building production-ready applications quickly and efficiently. Next, you'll dive deeper into Spring Boot's web development capabilities, exploring advanced request handling, data validation, and building robust REST APIs that can handle real-world requirements.</p>
+      </section>
 
-          <section id="programming-challenge" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Programming Challenge</h2>
-            <div class="rounded-lg border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800">
-              <h3 class="mt-0">Challenge: Personal Task Management API</h3>
-              <p><strong>Task:</strong> Build a Spring Boot application that manages personal tasks with different configurations for development and production environments.</p>
+      <section id="programming-challenge" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+        <h2>Programming Challenge</h2>
+        <div class="rounded-lg border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800">
+          <h3 class="mt-0">Challenge: Personal Task Management API</h3>
+          <p><strong>Task:</strong> Build a Spring Boot application that manages personal tasks with different configurations for development and production environments.</p>
 
-              <p><strong>Requirements:</strong></p>
-              <ol>
-                <li>Create a <code>Task</code> model class with: id, title, description, completed status, and creation date</li>
-                <li>Implement a <code>TaskService</code> that manages an in-memory list of tasks</li>
-                <li>Create a <code>TaskController</code> with REST endpoints:</li>
-                <ul>
-                  <li><code>GET /api/tasks</code> - Get all tasks</li>
-                  <li><code>GET /api/tasks/{id}</code> - Get task by ID</li>
-                  <li><code>POST /api/tasks</code> - Create new task</li>
-                  <li><code>PUT /api/tasks/{id}</code> - Update task</li>
-                  <li><code>DELETE /api/tasks/{id}</code> - Delete task</li>
-                </ul>
-                <li>Use @ConfigurationProperties to configure:</li>
-                <ul>
-                  <li>Application name and version</li>
-                  <li>Maximum tasks allowed</li>
-                  <li>Default task priority</li>
-                </ul>
-                <li>Create two profiles (dev and prod) with different configurations</li>
-                <li>Implement proper dependency injection throughout the application</li>
-                <li>Add a health check endpoint that shows app status and task count</li>
-              </ol>
+          <p><strong>Requirements:</strong></p>
+          <ol>
+            <li>Create a <code>Task</code> model class with: id, title, description, completed status, and creation date</li>
+            <li>Implement a <code>TaskService</code> that manages an in-memory list of tasks</li>
+            <li>Create a <code>TaskController</code> with REST endpoints:</li>
+            <ul>
+              <li><code>GET /api/tasks</code> - Get all tasks</li>
+              <li><code>GET /api/tasks/{id}</code> - Get task by ID</li>
+              <li><code>POST /api/tasks</code> - Create new task</li>
+              <li><code>PUT /api/tasks/{id}</code> - Update task</li>
+              <li><code>DELETE /api/tasks/{id}</code> - Delete task</li>
+            </ul>
+            <li>Use @ConfigurationProperties to configure:</li>
+            <ul>
+              <li>Application name and version</li>
+              <li>Maximum tasks allowed</li>
+              <li>Default task priority</li>
+            </ul>
+            <li>Create two profiles (dev and prod) with different configurations</li>
+            <li>Implement proper dependency injection throughout the application</li>
+            <li>Add a health check endpoint that shows app status and task count</li>
+          </ol>
 
-              <p><strong>Bonus features:</strong></p>
-              <ul>
-                <li>Add task search endpoint with query parameters</li>
-                <li>Implement task categories with profile-specific defaults</li>
-                <li>Create a simple statistics endpoint showing completed vs pending tasks</li>
-                <li>Add input validation for task creation and updates</li>
-              </ul>
+          <p><strong>Bonus features:</strong></p>
+          <ul>
+            <li>Add task search endpoint with query parameters</li>
+            <li>Implement task categories with profile-specific defaults</li>
+            <li>Create a simple statistics endpoint showing completed vs pending tasks</li>
+            <li>Add input validation for task creation and updates</li>
+          </ul>
 
-              <p><strong>Learning Goals:</strong> Practice Spring Boot fundamentals including auto-configuration, dependency injection, REST controllers, configuration properties, and profiles while building a complete, functional API.</p>
-            </div>
-          </section>
-
-          <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
-            <a href="lesson-10.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
-            <a href="lesson-12.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
-          </nav>
+          <p><strong>Learning Goals:</strong> Practice Spring Boot fundamentals including auto-configuration, dependency injection, REST controllers, configuration properties, and profiles while building a complete, functional API.</p>
         </div>
-      </div>
-    </main>
+      </section>
 
-    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
-      <div class="mx-auto max-w-7xl px-6">
-        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
-      </div>
-    </footer>
+      <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+        <a href="lesson-10.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
+        <a href="lesson-12.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
+      </nav>
+    </div>
+  </div>
+</main>
 
-    <script>
-      document.getElementById('themeToggle').addEventListener('click', function(){
-        const r=document.documentElement; const d=r.classList.toggle('dark');
-        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
-      });
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
-    <script>
-      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
-        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
-        Prism.highlightAll();
-      }
-    </script>
-  </body>
+<footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+  <div class="mx-auto max-w-7xl px-6">
+    <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('themeToggle').addEventListener('click', function(){
+    const r=document.documentElement; const d=r.classList.toggle('dark');
+    try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+  });
+</script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+<script>
+  if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+    Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+    Prism.highlightAll();
+  }
+</script>
+</body>
 </html>
