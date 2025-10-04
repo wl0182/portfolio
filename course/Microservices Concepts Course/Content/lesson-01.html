@@ -58,8 +58,7 @@
               <li><a href="#when-to_use" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">When to Use</a></li>
               <li><a href="#when-not-to-use" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">When Not to Use</a></li>
               <li><a href="#real-world-examples" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Real-world Examples</a></li>
-              <li><a href="#ecommerce-application" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">E-commerce Application</a></li>
-              <li><a href="#summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Summary</a></li>
+              <li><a href="#lesson-summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Lesson Summary</a></li>
             </ol>
           </nav>
         </aside>
@@ -68,7 +67,7 @@
             <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Microservices Concepts</a>
           </div>
           <header class="mx-auto max-w-3xl text-center">
-            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 01: Microservices Fundamentals</h1>
+            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Microservices Fundamentals</h1>
             <p class="mt-2 text-slate-600 dark:text-slate-300">Core ideas that shape microservices: what they are, why they matter, and when to adopt them.</p>
           </header>
 
@@ -503,33 +502,104 @@ public class Customer {
 
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
-          <section id="ecommerce-application" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>E-commerce Application - Hands-on Implementation</h2>
-            <p>Follow these steps to split the monolith into two microservices and verify they run independently.</p>
+          <section id="lesson-summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Lesson Summary</h2>
 
-            <h3>Steps</h3>
-            <ol>
-              <li>Create parent Maven project with modules: user-service and order-service [pom]</li>
-              <li>Add Spring Boot starter dependencies to user-service [pom]</li>
-              <li>Implement User entity, repository, service, and controller with GET /users/{id} and POST /users</li>
-              <li>Configure user-service port (8081) and H2 database [yml]</li>
-              <li>Add Spring Boot starter dependencies to order-service [pom]</li>
-              <li>Implement Order and OrderItem models</li>
-              <li>Implement Order repository, service, and controller with:
-                <ul>
-                  <li>GET /orders/{id}</li>
-                  <li>GET /orders/user/{userId}</li>
-                  <li>POST /orders</li>
-                  <li>PUT /orders/{id}/status</li>
-                </ul>
-              </li>
-              <li>Configure order-service port (8082) and H2 database [yml]</li>
-              <li>Build all modules</li>
-              <li>Run user-service on 8081</li>
-              <li>Run order-service on 8082</li>
-              <li>Test all endpoints with curl or Postman</li>
-              <li>Verify independent operation: different ports, separate databases, independent restarts</li>
-            </ol>
+            <p>In this lesson, we explored the fundamental concepts of microservices architecture and when to apply this architectural pattern. Here's a comprehensive summary of all the key concepts covered:</p>
+
+            <h3>Microservices Definition and Core Concepts</h3>
+            <ul>
+              <li><strong>Architecture style:</strong> Building applications as collections of small, loosely coupled services rather than monolithic applications</li>
+              <li><strong>Independent services:</strong> Each service runs in its own process, communicates through APIs, and can be developed and deployed independently</li>
+              <li><strong>Business capability focus:</strong> Services organized around business functions rather than technical layers</li>
+              <li><strong>Problem solved:</strong> Addresses scalability, deployment, and coordination challenges that emerge in large monolithic applications</li>
+            </ul>
+
+            <h3>Key Architectural Principles</h3>
+            <ul>
+              <li><strong>Single responsibility:</strong> Each service focuses on one business capability and does it well</li>
+              <li><strong>Autonomous development:</strong> Small teams own services completely from development to deployment to monitoring</li>
+              <li><strong>Data ownership:</strong> Each service owns its data completely with no direct database access from other services</li>
+              <li><strong>Smart endpoints, dumb pipes:</strong> Business logic contained in services, simple communication protocols between them</li>
+              <li><strong>Automation requirement:</strong> Sophisticated tooling needed for deployment, monitoring, and testing at scale</li>
+            </ul>
+
+            <h3>Major Advantages</h3>
+            <ul>
+              <li><strong>Independent deployment:</strong> Deploy changes to individual services without affecting the entire system</li>
+              <li><strong>Technology diversity:</strong> Choose optimal technology stack for each service's specific requirements</li>
+              <li><strong>Granular scalability:</strong> Scale only the services that need it, optimizing resource utilization</li>
+              <li><strong>Fault isolation:</strong> Service failures contained, enabling graceful degradation rather than complete system failure</li>
+              <li><strong>Team autonomy:</strong> Small teams can innovate and make decisions independently, improving velocity and ownership</li>
+            </ul>
+
+            <h3>Significant Challenges</h3>
+            <ul>
+              <li><strong>Operational complexity:</strong> Managing many services requires sophisticated infrastructure and tooling</li>
+              <li><strong>Distributed data management:</strong> Eventual consistency and coordination patterns replace simple database transactions</li>
+              <li><strong>Network communication:</strong> Latency, timeouts, and failure handling for service-to-service communication</li>
+              <li><strong>Cross-cutting concerns:</strong> Implementing security, logging, and configuration consistently across services</li>
+              <li><strong>Testing complexity:</strong> Integration testing and contract testing become crucial but more challenging</li>
+            </ul>
+
+            <h3>Bounded Contexts and Service Boundaries</h3>
+            <ul>
+              <li><strong>Domain-driven design:</strong> Service boundaries aligned with business domains where terms have consistent meaning</li>
+              <li><strong>Clear responsibilities:</strong> Each service owns complete business capability without overlap with other services</li>
+              <li><strong>Data model independence:</strong> Services define their own data models even for similar business concepts</li>
+              <li><strong>Anti-corruption layers:</strong> Translation between different service representations of shared concepts</li>
+            </ul>
+
+            <h3>Independent Deployment Models</h3>
+            <ul>
+              <li><strong>Deployment independence:</strong> Services deployed without coordination, enabling rapid iteration and reduced risk</li>
+              <li><strong>API evolution:</strong> Backward-compatible APIs and versioning strategies for gradual migration</li>
+              <li><strong>Automated pipelines:</strong> CI/CD processes that enable safe, frequent deployments with quick rollback capabilities</li>
+              <li><strong>Contract testing:</strong> Ensuring API compatibility between services during independent evolution</li>
+            </ul>
+
+            <h3>Monolith vs Microservices Trade-offs</h3>
+            <ul>
+              <li><strong>Monolith benefits:</strong> Simpler development, testing, and deployment for smaller teams and evolving domains</li>
+              <li><strong>Microservices benefits:</strong> Independent scaling, technology choice, and team autonomy for complex, stable domains</li>
+              <li><strong>Evolution path:</strong> Start with modular monolith, extract services when boundaries are clear and benefits justify complexity</li>
+              <li><strong>Decision factors:</strong> Team size, domain stability, operational maturity, and scalability requirements</li>
+            </ul>
+
+            <h3>Database per Service Principle</h3>
+            <ul>
+              <li><strong>Data ownership:</strong> Each service exclusively owns its data schema and storage with no shared database access</li>
+              <li><strong>Technology optimization:</strong> Services can choose optimal data storage solutions for their specific needs</li>
+              <li><strong>Consistency challenges:</strong> Saga patterns and event sourcing replace traditional database transactions</li>
+              <li><strong>Integration patterns:</strong> APIs and events for data sharing rather than direct database queries</li>
+            </ul>
+
+            <h3>When to Use Microservices</h3>
+            <ul>
+              <li><strong>Multiple teams:</strong> Organizations with several development teams wanting independent velocity</li>
+              <li><strong>Different scalability needs:</strong> System components with significantly different performance requirements</li>
+              <li><strong>Technology experimentation:</strong> Desire to use different technology stacks for different components</li>
+              <li><strong>Operational maturity:</strong> Strong DevOps capabilities for managing distributed system complexity</li>
+              <li><strong>Clear domain boundaries:</strong> Well-understood business capabilities that can be cleanly separated</li>
+            </ul>
+
+            <h3>When Not to Use Microservices</h3>
+            <ul>
+              <li><strong>Small teams:</strong> Organizations without sufficient size to manage multiple service teams</li>
+              <li><strong>New projects:</strong> Applications with evolving requirements where domain boundaries are unclear</li>
+              <li><strong>Operational immaturity:</strong> Lack of sophisticated tooling and practices for distributed system management</li>
+              <li><strong>Simple applications:</strong> Systems where monolithic complexity is manageable and benefits don't justify overhead</li>
+              <li><strong>Organizational problems:</strong> Using architecture to solve fundamental development practice issues</li>
+            </ul>
+
+            <h3>Key Takeaways</h3>
+            <ul>
+              <li>Microservices are primarily an organizational and operational pattern, not just a technical architecture choice</li>
+              <li>Success requires significant investment in automation, monitoring, and development practices</li>
+              <li>Start simple with monoliths and evolve to microservices when clear benefits emerge and complexity is justified</li>
+              <li>Service boundaries should align with business capabilities and team structures for maximum effectiveness</li>
+              <li>The database per service principle is fundamental to achieving true service independence and avoiding tight coupling</li>
+            </ul>
           </section>
 
           <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
