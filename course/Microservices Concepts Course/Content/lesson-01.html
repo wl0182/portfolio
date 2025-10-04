@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 01 - Microservices Fundamentals</title>
+    <meta name="description" content="Definition, principles, pros/cons, bounded contexts, independent deployments, monolith vs microservices, database-per-service, when to use or not, and real-world examples." />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="lg:flex lg:gap-8">
+        <aside class="hidden lg:block lg:w-72">
+          <nav class="sticky top-8 rounded-xl border border-slate-200/60 bg-white/60 p-4 shadow-sm backdrop-blur dark:border-slate-800/60 dark:bg-slate-900/40" aria-label="Table of contents">
+            <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">On this page</h2>
+            <ol class="space-y-1 text-sm">
+              <li><a href="#introduction" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Introduction</a></li>
+              <li><a href="#definition" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Definition of Microservices</a></li>
+              <li><a href="#principles" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Key Principles</a></li>
+              <li><a href="#advantages" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Advantages</a></li>
+              <li><a href="#challenges" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Challenges</a></li>
+              <li><a href="#bounded-contexts" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Bounded Contexts</a></li>
+              <li><a href="#independent-deployments" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Independent Deployments</a></li>
+              <li><a href="#monolith-vs-microservices" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Monolith vs Microservices</a></li>
+              <li><a href="#database-per-service" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Database per Service</a></li>
+              <li><a href="#when-to_use" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">When to Use</a></li>
+              <li><a href="#when-not-to-use" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">When Not to Use</a></li>
+              <li><a href="#real-world-examples" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Real-world Examples</a></li>
+              <li><a href="#ecommerce-application" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">E-commerce Application</a></li>
+              <li><a href="#summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Summary</a></li>
+            </ol>
+          </nav>
+        </aside>
+        <div class="min-w-0 flex-1">
+          <div class="mb-6">
+            <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Microservices Concepts</a>
+          </div>
+          <header class="mx-auto max-w-3xl text-center">
+            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Lesson 01: Microservices Fundamentals</h1>
+            <p class="mt-2 text-slate-600 dark:text-slate-300">Core ideas that shape microservices: what they are, why they matter, and when to adopt them.</p>
+          </header>
+
+          <section id="introduction" class="prose prose-slate mt-6 max-w-none dark:prose-invert">
+            <h2>Introduction</h2>
+            <p>Microservices represent a fundamental shift in how we design and build software applications. Instead of creating one large application that handles everything, microservices break down complex systems into smaller, independent services that work together to deliver the same functionality. Each service focuses on a specific business capability and can be developed, deployed, and scaled independently of the others.</p>
+
+            <p>This architectural approach has gained tremendous popularity because it addresses many of the challenges that arise when applications grow in size and complexity. As your application gets bigger, coordinating changes across different teams becomes difficult, deploying updates becomes risky, and scaling specific parts of your system becomes nearly impossible. Microservices solve these problems by creating clear boundaries between different parts of your system, allowing teams to work independently and deploy changes without affecting the entire application.</p>
+
+            <p>Understanding microservices is essential for modern software development because they enable organizations to move faster, scale more efficiently, and build more resilient systems. However, they also introduce new challenges around communication, data consistency, and operational complexity that you need to understand before adopting this approach.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="definition" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Definition of Microservices</h2>
+            <h3>What it is</h3>
+            <p>Microservices is an architectural style where you build a single application as a collection of small, loosely coupled services. Each service runs in its own process, communicates through well-defined APIs (usually HTTP/REST), and can be developed and deployed independently. Unlike traditional monolithic applications where all functionality is bundled together, microservices split functionality across multiple services, each responsible for a specific business capability.</p>
+
+            <p>Think of a microservices application like a small city where each building serves a specific purpose. You have a bank that handles financial transactions, a post office that manages mail delivery, and a restaurant that prepares food. Each building operates independently, has its own staff and resources, but they all work together to serve the city's residents. Similarly, in a microservices architecture, you might have an Order Service that handles purchase orders, a Payment Service that processes payments, and a Catalog Service that manages product information.</p>
+
+            <h3>Why we need it</h3>
+            <p>Traditional monolithic applications become increasingly difficult to manage as they grow. When everything is bundled together, a small change in one feature can potentially break other parts of the system. Deploying updates becomes risky because you have to deploy the entire application, even if you only changed a small piece of functionality. Scaling becomes inefficient because you have to scale the entire application, even if only one part is experiencing high load.</p>
+
+            <p>Microservices solve these problems by creating clear boundaries between different parts of your system. When you need to add a new feature or fix a bug in the payment processing logic, you only need to modify and deploy the Payment Service. The Order Service and Catalog Service continue running unchanged. If your product catalog experiences high traffic during a sale, you can scale just the Catalog Service without scaling the payment or order processing components.</p>
+
+            <h3>Analogy</h3>
+            <p>Imagine the difference between living in a studio apartment versus living in a house with separate rooms. In a studio apartment (monolith), everything is in one space - your kitchen, bedroom, office, and living room are all together. If you want to renovate the kitchen, you have to work around everything else, and the noise disrupts your entire living space. If you have guests over, they affect every aspect of your home.</p>
+
+            <p>In a house with separate rooms (microservices), each room has a specific purpose and can be modified independently. You can renovate the kitchen without affecting the bedroom, and guests in the living room don't disturb someone working in the office. Each room can be decorated differently and serve its specific function optimally. If one room needs more space, you can expand just that room without changing the entire house.</p>
+
+            <h3>Minimal Real-World Example</h3>
+            <p>Consider an e-commerce application that started as a monolith handling products, orders, and payments all in one codebase. As the business grows, the company decides to split this into microservices. They create three separate services: a Catalog Service that manages product information and search, an Order Service that handles shopping carts and order processing, and a Payment Service that processes credit card transactions and handles refunds.</p>
+
+            <p>Now when customers browse products, their requests go to the Catalog Service. When they add items to their cart and place an order, that goes to the Order Service. When they pay for their order, the Order Service communicates with the Payment Service to process the transaction. Each service can be updated independently, scaled based on demand, and even built using different technologies if needed.</p>
+
+            <h3>Implementation Glimpse (Spring Boot)</h3>
+            <pre><code class="language-java">// Catalog Service - manages product information
+@SpringBootApplication
+@RestController
+public class CatalogServiceApplication {
+
+    @GetMapping("/api/products/{id}")
+    public Product getProduct(@PathVariable Long id) {
+        // Fetch product details from the catalog database
+        return productRepository.findById(id);
+    }
+
+    public static void main(String[] args) {
+        SpringApplication.run(CatalogServiceApplication.class, args);
+    }
+}
+</code></pre>
+            <pre><code class="language-yaml"># application.yml for Catalog Service
+spring:
+  application:
+    name: catalog-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/catalog_db
+server:
+  port: 8081
+</code></pre>
+
+            <h3>Best Practices and Common Pitfalls</h3>
+            <p>When designing microservices, focus on business capabilities rather than technical layers. Instead of having a "Database Service" or "UI Service," create services around what your business does, like "Customer Management" or "Order Processing." This ensures that each service has a clear purpose and owns all the data and logic needed to fulfill that purpose.</p>
+
+            <p>Avoid creating too many tiny services (sometimes called "nano-services") as they can create unnecessary complexity and communication overhead. Each service should be substantial enough to warrant its own deployment and maintenance overhead. A good rule of thumb is that a service should be manageable by a small team (2-8 people) and represent a meaningful business capability.</p>
+
+            <p>Be cautious about sharing databases between services, as this creates tight coupling and defeats many of the benefits of microservices. Each service should own its data and provide access to it only through its API. This principle, known as "database per service," is crucial for maintaining service independence.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="principles" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Key Principles</h2>
+            <p>Microservices architecture is guided by several fundamental principles that ensure services remain truly independent and manageable. The first principle is single responsibility, where each service focuses on one business capability and does it well. This means your Order Service should only handle order-related functionality and shouldn't try to manage customer profiles or product catalogs.</p>
+
+            <p>The second principle is autonomous development and deployment. Each service should be owned by a small, cross-functional team that can make decisions about technology choices, deployment schedules, and feature development without needing approval from other teams. This autonomy enables teams to move quickly and innovate independently.</p>
+
+            <p>Data ownership is another crucial principle. Each service must own its data completely and never allow direct access to its database from other services. All data access should happen through the service's API. This ensures that services can evolve their data models independently and prevents the tight coupling that comes from shared databases.</p>
+
+            <p>Communication should happen through well-defined interfaces, typically REST APIs or messaging systems. Services should act as "smart endpoints" that contain their business logic, while the communication pipes between them should be "dumb" and simply transport data. This principle, known as "smart endpoints, dumb pipes," keeps complexity within services rather than in the infrastructure.</p>
+
+            <p>Finally, microservices require strong automation around deployment, monitoring, and testing. Since you're managing many services instead of one, manual processes become impossible to scale. You need automated CI/CD pipelines, comprehensive monitoring, and automated testing to maintain reliability across your distributed system.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="advantages" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Advantages</h2>
+            <p>One of the most significant advantages of microservices is the ability to deploy changes independently and frequently. In a monolithic application, even a small bug fix requires deploying the entire application, which is risky and slow. With microservices, you can deploy updates to individual services without affecting the rest of your system. This means you can ship new features faster, fix bugs more quickly, and reduce the risk of deployments.</p>
+
+            <p>Technology diversity is another major benefit. Since each service is independent, different teams can choose the best technology stack for their specific requirements. Your recommendation engine might work better with Python and machine learning libraries, while your payment processing might be more suitable for Java and established financial libraries. This flexibility allows you to optimize each service for its specific needs rather than forcing everything into one technology stack.</p>
+
+            <p>Scalability becomes much more granular and cost-effective with microservices. Instead of scaling your entire application when one part experiences high load, you can scale just the services that need it. During a flash sale, you might need to scale your catalog and order services while keeping your user management service at normal capacity. This targeted scaling saves resources and responds more effectively to actual demand patterns.</p>
+
+            <p>Fault isolation is a crucial advantage for system reliability. When one service fails in a microservices architecture, it doesn't necessarily bring down the entire system. If your recommendation service goes down, customers can still browse products, place orders, and make payments. Your system degrades gracefully rather than failing completely. This isolation also makes it easier to identify and fix problems because failures are contained within specific services.</p>
+
+            <p>Team autonomy and organizational scaling become possible with microservices. Small teams can own entire services from development to deployment to monitoring. This ownership leads to better code quality, faster decision-making, and higher team satisfaction. As your organization grows, you can add new teams and new services without existing teams having to coordinate every change.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="challenges" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Challenges</h2>
+            <p>The most immediate challenge with microservices is operational complexity. Instead of managing one application, you're now managing dozens or hundreds of services, each with its own deployment pipeline, monitoring setup, and potential failure modes. You need sophisticated tooling for service discovery, load balancing, configuration management, and distributed tracing. This operational overhead can be overwhelming if you don't have the right platform and expertise in place.</p>
+
+            <p>Distributed data management becomes significantly more complex when you split your data across multiple services. In a monolith, you can use database transactions to ensure data consistency across different parts of your system. With microservices, you need to embrace eventual consistency and use patterns like the Saga pattern to coordinate changes across multiple services. This shift requires a fundamental change in how you think about data consistency and application design.</p>
+
+            <p>Network communication introduces latency and potential failure points that don't exist in monolithic applications. When services communicate over the network, you need to handle network timeouts, service unavailability, and partial failures. What used to be a simple method call in a monolith becomes a network request that could fail in many different ways. You need to implement retry logic, circuit breakers, and fallback mechanisms to handle these failures gracefully.</p>
+
+            <p>Cross-cutting concerns like security, logging, and configuration become more complicated when spread across multiple services. Each service needs to authenticate requests, log activities, and manage configuration, but you want consistency across all services. Implementing these concerns consistently requires careful planning and often specialized infrastructure components like API gateways and service meshes.</p>
+
+            <p>Testing becomes more challenging because you need to test not just individual services, but also how they interact with each other. Integration testing becomes crucial, but also more complex because you need to coordinate multiple services. You might need to use techniques like contract testing and test environments that closely mirror production to catch integration issues early.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="bounded-contexts" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Boundaries and Bounded Contexts</h2>
+            <h3>What it is</h3>
+            <p>Bounded contexts come from Domain-Driven Design (DDD) and represent areas of your business domain where specific terms and concepts have consistent meaning. Within a bounded context, everyone uses the same language and understands concepts the same way. Different bounded contexts might use the same terms but with different meanings, and that's perfectly acceptable as long as the boundary is clear.</p>
+
+            <p>In microservices, these bounded contexts often map directly to service boundaries. Each service represents one bounded context and owns all the data and business logic within that context. This alignment ensures that services have clear responsibilities and reduces the confusion that comes from trying to share complex domain concepts across multiple services.</p>
+
+            <h3>Why we need it</h3>
+            <p>Without clear boundaries, you end up with services that share too much and become tightly coupled. When multiple services need to understand the same complex business rules or share the same data structures, they become difficult to change independently. Bounded contexts prevent this by ensuring that each service has a clear, focused responsibility that doesn't overlap with other services.</p>
+
+            <p>Consider the concept of an "Order" in an e-commerce system. To the Order Service, an order contains items, quantities, and pricing information. To the Shipping Service, an order contains delivery addresses and package dimensions. To the Analytics Service, an order represents a data point with timestamps and customer segments. Each service has a different view of what an "Order" means, and that's perfectly fine as long as each service owns its own representation.</p>
+
+            <h3>Analogy</h3>
+            <p>Think about different departments in a hospital. The Emergency Department, Surgery Department, and Billing Department all deal with patients, but they have very different perspectives and needs. The Emergency Department cares about immediate symptoms and triage priorities. Surgery cares about medical history and procedure details. Billing cares about insurance information and procedure codes.</p>
+
+            <p>Each department has its own way of organizing patient information and its own procedures for handling patients. They don't try to use exactly the same forms or follow the same processes because their needs are different. When departments need to communicate, they use standardized interfaces like patient transfers or billing codes, but they maintain their own internal organization and processes.</p>
+
+            <h3>Implementation Glimpse</h3>
+            <p>In practice, bounded contexts mean that each service defines its own data models and business logic, even if they represent similar concepts. Here's how different services might represent customer information:</p>
+
+            <pre><code class="language-java">// Order Service - cares about delivery and billing
+public class Customer {
+    private Long customerId;
+    private String billingAddress;
+    private String shippingAddress;
+    private PaymentMethod defaultPayment;
+}
+
+// Support Service - cares about communication and history
+public class Customer {
+    private Long customerId;
+    private String name;
+    private String email;
+    private String phoneNumber;
+    private List&lt;SupportTicket&gt; ticketHistory;
+}
+
+// Analytics Service - cares about behavior and segments
+public class Customer {
+    private Long customerId;
+    private LocalDate registrationDate;
+    private BigDecimal lifetimeValue;
+    private CustomerSegment segment;
+    private List&lt;PurchaseEvent&gt; purchaseHistory;
+}
+</code></pre>
+
+            <h3>Best Practices and Common Pitfalls</h3>
+            <p>When defining service boundaries, resist the temptation to share data models between services. Even if two services need similar information, they should define their own models that fit their specific needs. Use anti-corruption layers at service boundaries to translate between different representations of the same business concepts.</p>
+
+            <p>Avoid creating services based on technical layers like "Database Service" or "UI Service." Instead, focus on business capabilities and ensure each service owns a complete slice of functionality. A well-designed service should be able to fulfill its business purpose without depending on implementation details from other services.</p>
+
+            <p>Be careful about services that seem too small or too large. If a service only has one or two operations, it might be too granular and create unnecessary complexity. If a service handles many different business concepts, it might need to be split into multiple services with clearer boundaries.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="independent-deployments" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Independent Deployment Models</h2>
+            <h3>What it is</h3>
+            <p>Independent deployment means that each service can be built, tested, and deployed to production without coordinating with other services. This requires that services communicate through stable, backward-compatible interfaces and that changes to one service don't break other services that depend on it. Teams can ship new features and bug fixes on their own schedule without waiting for other teams or coordinating release windows.</p>
+
+            <p>True independence requires more than just separate deployment pipelines. It means that each service's API contracts are designed to evolve gracefully, that database schemas can change without affecting other services, and that the overall system continues to function even when individual services are being updated. This level of independence is what enables the speed and flexibility benefits of microservices.</p>
+
+            <h3>Why we need it</h3>
+            <p>In traditional monolithic applications, all teams have to coordinate their changes and deploy together. This coordination becomes a major bottleneck as teams grow and want to move at different speeds. Some teams might be ready to ship new features weekly, while others need more time for complex changes. Without independent deployment, everyone moves at the speed of the slowest team.</p>
+
+            <p>Independent deployment also reduces the risk of deployments. When you deploy a monolith, any bug in any part of the system can bring down the entire application. With independent deployments, problems are isolated to individual services, and rollbacks are quick and targeted. If the new version of your recommendation service has a bug, you can quickly rollback just that service while everything else continues running normally.</p>
+
+            <h3>Implementation Glimpse</h3>
+            <p>Independent deployment requires careful API design and automated deployment pipelines. Here's an example of how you might structure this:</p>
+
+            <pre><code class="language-yaml"># CI/CD Pipeline Configuration
+# Each service has its own build and deployment pipeline
+name: Order Service Deployment
+trigger:
+  paths:
+    - 'order-service/**'  # Only trigger when order service code changes
+
+stages:
+  - name: build
+    steps:
+      - run: mvn clean compile test
+      - run: docker build -t order-service:${BUILD_ID} .
+
+  - name: deploy-staging
+    steps:
+      - run: kubectl apply -f k8s/staging/
+      - run: run-integration-tests.sh
+
+  - name: deploy-production
+    condition: branch == 'main'
+    steps:
+      - run: kubectl apply -f k8s/production/
+      - run: health-check.sh
+</code></pre>
+
+            <pre><code class="language-java">// API versioning to maintain backward compatibility
+@RestController
+@RequestMapping("/api/v1/orders")  // Version the API
+public class OrderController {
+
+    @PostMapping
+    public ResponseEntity&lt;OrderResponse&gt; createOrder(@RequestBody OrderRequest request) {
+        // Handle both old and new request formats for backward compatibility
+        Order order = orderService.createOrder(request);
+        return ResponseEntity.ok(new OrderResponse(order));
+    }
+}
+</code></pre>
+
+            <h3>Best Practices and Common Pitfalls</h3>
+            <p>Design your APIs with evolution in mind from the beginning. Use semantic versioning for your APIs and maintain backward compatibility for at least one version. When you need to make breaking changes, introduce them as new versions while maintaining the old version until all consumers have migrated.</p>
+
+            <p>Implement comprehensive automated testing, especially contract testing that verifies your service still provides the interface that other services expect. Consumer-driven contract testing is particularly valuable because it ensures that changes don't break existing consumers, even if they seem backward compatible.</p>
+
+            <p>Monitor your deployments carefully and have quick rollback procedures in place. Independent deployment is only valuable if you can quickly recover from problems. Implement health checks, gradual rollouts, and automated monitoring that can detect issues and trigger rollbacks automatically.</p>
+
+            <p>Avoid tight coupling between deployment schedules. If your services require coordinated deployments, you've lost the independence benefit. This often happens when services share databases or when API changes require simultaneous updates across multiple services.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="monolith-vs-microservices" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Monolith vs Microservices</h2>
+            <h3>What it is</h3>
+            <p>A monolithic application is built as a single deployable unit where all components are interconnected and interdependent. All features, from user interface to business logic to data access, are part of one codebase and deployed together. Microservices, in contrast, split these components into separate, independently deployable services that communicate over a network.</p>
+
+            <p>The choice between monoliths and microservices isn't just about architecture—it's about team structure, deployment practices, and organizational maturity. Monoliths work well for smaller teams and simpler applications, while microservices shine when you have multiple teams working on complex systems that need to evolve independently.</p>
+
+            <h3>Why we need to understand the difference</h3>
+            <p>Understanding when to use each approach is crucial for project success. Many organizations rush into microservices without considering whether the complexity is justified by their actual needs. Starting with a well-designed monolith is often the right approach for new products or small teams, with the option to extract services later when the benefits become clear.</p>
+
+            <p>The transition from monolith to microservices (often called the "strangler fig" pattern) is a common evolution path. You start with a monolith to validate your business model and understand your domain, then gradually extract services as clear boundaries emerge and team size justifies the additional complexity.</p>
+
+            <h3>Practical Comparison</h3>
+            <p>Consider an e-commerce application. As a monolith, you would have one Spring Boot application with different packages for products, orders, payments, and users. All these components share the same database, and they communicate through direct method calls. Deployment means updating the entire application, and scaling means running more instances of the complete application.</p>
+
+            <p>As microservices, you would have separate Spring Boot applications for each domain: Product Service, Order Service, Payment Service, and User Service. Each has its own database and communicates with others through REST APIs or messaging. You can deploy and scale each service independently based on its specific needs.</p>
+
+            <pre><code class="language-java">// Monolith: Direct method calls between components
+@Service
+public class OrderService {
+    @Autowired
+    private PaymentService paymentService;  // Direct dependency
+    @Autowired
+    private ProductService productService;  // Direct dependency
+
+    public Order createOrder(OrderRequest request) {
+        Product product = productService.getProduct(request.getProductId());
+        PaymentResult payment = paymentService.processPayment(request.getPayment());
+        // Create order logic
+        return new Order(product, payment);
+    }
+}
+
+// Microservices: HTTP calls between services
+@Service
+public class OrderService {
+    @Autowired
+    private PaymentServiceClient paymentClient;  // HTTP client
+    @Autowired
+    private ProductServiceClient productClient;  // HTTP client
+
+    public Order createOrder(OrderRequest request) {
+        Product product = productClient.getProduct(request.getProductId());
+        PaymentResult payment = paymentClient.processPayment(request.getPayment());
+        // Create order logic with error handling for network calls
+        return new Order(product, payment);
+    }
+}
+</code></pre>
+
+            <h3>Decision Criteria</h3>
+            <p>Choose a monolith when you have a small team (less than 10 people), are building a new product with an evolving domain model, or lack the operational sophistication to manage distributed systems. Monoliths are simpler to develop, test, and deploy initially, and they avoid the complexity of network communication and distributed data management.</p>
+
+            <p>Consider microservices when you have multiple teams that want to work independently, have different parts of your system that need to scale differently, or want to use different technologies for different components. Microservices also make sense when you have a well-understood domain with clear service boundaries and the operational maturity to handle distributed system complexity.</p>
+
+            <p>Remember that you can start with a modular monolith—a single deployable application with clear internal boundaries—and extract services later when the benefits justify the complexity. This evolutionary approach often works better than trying to design perfect service boundaries upfront.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="database-per-service" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Database per Service Principle</h2>
+            <h3>What it is</h3>
+            <p>The database per service principle means that each microservice owns and manages its own data store completely. No other service can directly access another service's database—all data access must happen through the service's API. This principle ensures that services remain loosely coupled and can evolve their data models independently without affecting other services.</p>
+
+            <p>This doesn't necessarily mean each service needs a separate database server, although that's often the case. It means that each service has exclusive ownership of its data schema and tables. Other services cannot make direct SQL queries against another service's tables or share database connections.</p>
+
+            <h3>Why we need it</h3>
+            <p>Shared databases create tight coupling between services and eliminate many of the benefits of microservices. When services share a database, changes to the database schema can break multiple services simultaneously. One service's data access patterns can impact the performance of other services. Database migrations become complex coordination efforts across multiple teams.</p>
+
+            <p>More importantly, shared databases prevent services from choosing the right data storage technology for their specific needs. Your product catalog might work better with a document database like MongoDB, while your financial transactions require the ACID properties of PostgreSQL. The database per service principle allows each service to optimize its data storage for its specific requirements.</p>
+
+            <h3>Analogy</h3>
+            <p>Think about how different departments in a company manage their files and records. The HR department has its own filing system for employee records, organized in a way that makes sense for HR processes. The accounting department has its own system for financial records, with different organization and security requirements. The marketing department keeps customer data organized for campaigns and analytics.</p>
+
+            <p>If all departments had to share one giant filing system with the same organization scheme, it would be chaos. Changes to how files are organized would require coordination across all departments. One department's heavy usage could slow down access for everyone else. Instead, each department maintains its own filing system and shares information through official channels like reports and forms.</p>
+
+            <h3>Implementation Glimpse</h3>
+            <pre><code class="language-yaml"># Order Service Database Configuration
+# application.yml for Order Service
+spring:
+  datasource:
+    url: jdbc:h2:mem:orderdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+server:
+  port: 8082
+
+logging:
+  level:
+    com.ecommerce.order: DEBUG
+</code></pre>
+
+            <pre><code class="language-java">// Order Service - owns order data
+@Entity
+@Table(name = "orders")
+public class Order {
+    @Id
+    private Long orderId;
+    private String customerId;      // Reference to customer, not embedded data
+    private List&lt;OrderLine&gt; items;
+    private LocalDateTime orderDate;
+    // Order service defines its own view of order data
+}
+
+// Customer Service - owns customer data
+@Entity
+@Table(name = "customers")
+public class Customer {
+    @Id
+    private String customerId;
+    private String name;
+    private String email;
+    private Address billingAddress;
+    // Customer service defines its own complete customer model
+}
+</code></pre>
+
+            <h3>Handling Data Consistency</h3>
+            <p>One of the biggest challenges with database per service is maintaining data consistency across services. In a monolith, you can use database transactions to ensure that related changes either all succeed or all fail. With separate databases, you need different approaches like the Saga pattern or event sourcing to coordinate changes across multiple services.</p>
+
+            <p>For example, when a customer places an order, you need to reserve inventory, process payment, and create the order record. In a monolith, this would be one database transaction. With microservices, you might use a choreography-based saga where the Order Service publishes an "Order Created" event, the Inventory Service listens for this event to reserve items, and the Payment Service processes the payment. If any step fails, compensating actions are triggered to undo previous steps.</p>
+
+            <h3>Best Practices and Common Pitfalls</h3>
+            <p>Design your services around data consistency boundaries. Services that need to maintain strong consistency should probably be part of the same service. Services that can tolerate eventual consistency can be separate with asynchronous communication between them.</p>
+
+            <p>Use the outbox pattern when you need to update your database and send a message to another service atomically. Instead of trying to coordinate a database update and message send, write both the data change and the outbound message to your local database in a single transaction, then have a separate process read the outbox table and send the messages.</p>
+
+            <p>Avoid the temptation to create "shared master data" services that multiple other services depend on for reference data. This creates tight coupling and can become a bottleneck. Instead, allow services to maintain their own copies of reference data and keep them synchronized through events.</p>
+
+            <p>Be careful about services that need to query across multiple data sources. If you frequently need to join data from multiple services, it might indicate that your service boundaries are wrong, or you might need to denormalize some data to avoid complex cross-service queries.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="when-to-use" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>When to Use Microservices</h2>
+            <p>Microservices make sense when you have multiple development teams that want to work independently and release features on different schedules. If you have a large organization where coordination between teams becomes a bottleneck, microservices can help by allowing teams to own complete services from development to deployment to maintenance. Each team can choose their own technology stack, development practices, and release schedule.</p>
+
+            <p>Consider microservices when different parts of your system have significantly different scalability requirements. For example, in a social media application, the feed generation service might need to handle millions of requests per second, while the user profile service has much lower load. With microservices, you can scale each service independently and optimize them for their specific performance requirements.</p>
+
+            <p>Microservices are valuable when you want to experiment with new technologies or modernize legacy systems gradually. You can build new features as microservices using modern technology stacks while keeping existing functionality in place. This allows for incremental modernization without the risk of rewriting entire systems.</p>
+
+            <p>They also make sense when you have strong DevOps capabilities and can handle the operational complexity of managing many services. If your organization has mature practices around containerization, orchestration, monitoring, and automated deployment, the overhead of managing multiple services becomes manageable.</p>
+
+            <p>Finally, consider microservices when you have a well-understood domain with clear business capability boundaries. If you can clearly identify distinct business functions that don't overlap significantly, these boundaries can become natural service boundaries that enable independent development and deployment.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="when-not-to-use" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>When Not to Use Microservices</h2>
+            <p>Avoid microservices when you have a small team or are just starting a new project. The overhead of managing multiple services, deployment pipelines, and inter-service communication can slow down development significantly when you're trying to iterate quickly and validate your business model. Start with a well-structured monolith and extract services later when you understand your domain better.</p>
+
+            <p>Don't use microservices if your organization lacks the operational maturity to handle distributed systems. Managing microservices requires sophisticated tooling for service discovery, load balancing, distributed tracing, and monitoring. Without these capabilities, the complexity of microservices can overwhelm your team and lead to unreliable systems.</p>
+
+            <p>Microservices are not appropriate when your domain boundaries are unclear or constantly changing. If you're still figuring out what your application should do and how different pieces should work together, the rigid boundaries of microservices can hinder exploration and refactoring. It's much easier to move code between modules in a monolith than to reorganize service boundaries.</p>
+
+            <p>Avoid microservices when the overhead doesn't justify the benefits. If your application is simple, has a stable team, and doesn't need independent scaling or deployment, the complexity of microservices isn't worth it. Many successful applications run as well-designed monoliths and never need to be split into services.</p>
+
+            <p>Don't use microservices as a solution to organizational problems like poor code quality or lack of testing discipline. These problems will be amplified in a distributed system, not solved. Fix fundamental development practices first, then consider whether microservices add value.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="real-world-examples" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Real-world Examples</h2>
+            <p>Netflix is often cited as a microservices success story, but their journey illustrates both the benefits and challenges. They have over 1000 microservices handling everything from user authentication to content recommendation to video streaming. Each service is owned by a small team and can be deployed independently. This architecture allows them to innovate rapidly and handle massive scale, but it also requires sophisticated tooling for service discovery, fault tolerance, and monitoring.</p>
+
+            <p>Netflix's approach includes client-side load balancing, where each service instance discovers and connects directly to other services without going through a central load balancer. They use circuit breakers extensively to handle service failures gracefully, and they've built a culture of "chaos engineering" where they deliberately inject failures to test system resilience.</p>
+
+            <p>Uber's microservices architecture reflects their business model of connecting riders, drivers, and various services in real-time. They have separate services for trip management, driver location tracking, pricing calculation, payment processing, and fraud detection. Each service can scale independently based on demand patterns, and new features like food delivery can be built as new services that integrate with existing ones.</p>
+
+            <p>Amazon's service-oriented approach predates the microservices movement but embodies its principles. Each team owns services that map to specific business capabilities, from product catalog to recommendation engines to payment processing. Their "two-pizza team" rule ensures that each service can be owned by a small, autonomous team. This architecture has enabled Amazon to expand into new business areas by combining existing services in new ways.</p>
+
+            <p>However, these examples also show that microservices require significant investment in platform engineering. Netflix, Uber, and Amazon all have large teams dedicated to building and maintaining the infrastructure that makes microservices work. Smaller organizations might achieve similar benefits with fewer, larger services or well-designed modular monoliths.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="ecommerce-application" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>E-commerce Application - Hands-on Implementation</h2>
+            <p>Follow these steps to split the monolith into two microservices and verify they run independently.</p>
+
+            <h3>Steps</h3>
+            <ol>
+              <li>Create parent Maven project with modules: user-service and order-service [pom]</li>
+              <li>Add Spring Boot starter dependencies to user-service [pom]</li>
+              <li>Implement User entity, repository, service, and controller with GET /users/{id} and POST /users</li>
+              <li>Configure user-service port (8081) and H2 database [yml]</li>
+              <li>Add Spring Boot starter dependencies to order-service [pom]</li>
+              <li>Implement Order and OrderItem models</li>
+              <li>Implement Order repository, service, and controller with:
+                <ul>
+                  <li>GET /orders/{id}</li>
+                  <li>GET /orders/user/{userId}</li>
+                  <li>POST /orders</li>
+                  <li>PUT /orders/{id}/status</li>
+                </ul>
+              </li>
+              <li>Configure order-service port (8082) and H2 database [yml]</li>
+              <li>Build all modules</li>
+              <li>Run user-service on 8081</li>
+              <li>Run order-service on 8082</li>
+              <li>Test all endpoints with curl or Postman</li>
+              <li>Verify independent operation: different ports, separate databases, independent restarts</li>
+            </ol>
+          </section>
+
+          <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+              <a href="lesson-01.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
+              <a href="lesson-02.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
+          </nav>
+        </div>
+      </div>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('themeToggle')?.addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>
+

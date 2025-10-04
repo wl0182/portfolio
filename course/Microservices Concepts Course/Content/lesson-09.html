@@ -1,0 +1,827 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 09 - Data Consistency Patterns</title>
+    <meta name="description" content="Learn data consistency patterns in Spring Boot microservices: Saga pattern, Outbox/Inbox patterns, idempotency, and eventual consistency strategies." />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="lg:flex lg:gap-8">
+        <aside class="hidden lg:block lg:w-72">
+          <nav class="sticky top-8 rounded-xl border border-slate-200/60 bg-white/60 p-4 shadow-sm backdrop-blur dark:border-slate-800/60 dark:bg-slate-900/40" aria-label="Table of contents">
+            <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">On this page</h2>
+            <ol class="space-y-1 text-sm">
+              <li><a href="#introduction" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Introduction</a></li>
+              <li><a href="#saga-pattern" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Saga Pattern</a></li>
+              <li><a href="#outbox-inbox-patterns" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Outbox / Inbox Patterns</a></li>
+              <li><a href="#idempotency" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Idempotency</a></li>
+              <li><a href="#eventual-consistency" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Eventual Consistency</a></li>
+              <li><a href="#lesson-summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Lesson Summary</a></li>
+            </ol>
+          </nav>
+        </aside>
+        <div class="min-w-0 flex-1">
+          <div class="mb-6">
+            <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Microservices Concepts</a>
+          </div>
+          <header class="mx-auto max-w-3xl text-center">
+            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Data Consistency Patterns</h1>
+            <p class="mt-2 text-slate-600 dark:text-slate-300">Master data consistency patterns for reliable distributed transactions in microservices architectures.</p>
+          </header>
+
+          <section id="introduction" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Introduction</h2>
+
+            <h3>Data consistency challenges in microservices</h3>
+            <p>Data consistency in microservices becomes significantly more complex than in monolithic applications because data is distributed across multiple services, each with their own databases, making traditional ACID transactions impossible to maintain across service boundaries. When a business operation requires changes to data in multiple services, such as processing an order that affects inventory, payments, and shipping services, ensuring all changes succeed or fail together becomes a major challenge. Unlike monolithic applications where database transactions can guarantee consistency, microservices must coordinate state changes across network boundaries where failures, delays, and partial successes are common. This distributed nature means that at any given moment, different services might have slightly different views of the data, requiring careful design to maintain business rules and data integrity.</p>
+
+            <h3>Why distributed transactions are difficult</h3>
+            <p>Traditional distributed transactions using protocols like Two-Phase Commit (2PC) are problematic in microservices because they require all participating services to be available simultaneously and can lead to system-wide blocking when any service becomes unavailable. The CAP theorem demonstrates that in distributed systems, you must choose between consistency, availability, and partition tolerance, and most microservices architectures prioritize availability and partition tolerance over strict consistency. Network failures, service outages, and varying response times make it difficult to coordinate transactions across multiple services, often resulting in timeouts, deadlocks, or inconsistent states when some services commit while others fail. Additionally, distributed transactions create tight coupling between services and reduce system resilience, contradicting the core principles of microservices architecture that emphasize independence and fault tolerance.</p>
+
+            <h3>Trade-offs between strong and eventual consistency</h3>
+            <p>Strong consistency guarantees that all services see the same data at the same time, providing familiar ACID properties but at the cost of reduced availability, increased latency, and system complexity in distributed environments. This approach works well for critical operations like financial transactions where correctness is more important than performance, but it can make systems brittle and slow when network issues or service failures occur. Eventual consistency accepts that services may have temporarily inconsistent views of data but guarantees that all services will converge to the same state over time, enabling higher availability and better performance at the cost of increased application complexity. Most successful microservices architectures embrace eventual consistency for non-critical operations while maintaining strong consistency only where business requirements absolutely demand it, using patterns like sagas and event sourcing to manage the complexity of eventual consistency.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="saga-pattern" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Saga Pattern</h2>
+
+            <h3>What a Saga is and why it is used</h3>
+            <p>A Saga is a design pattern that manages distributed transactions by breaking them into a series of smaller, local transactions that can be executed independently and coordinated through events or a central orchestrator. Instead of trying to maintain a global transaction across multiple services, sagas ensure data consistency through a sequence of compensating actions that can undo previous steps if any part of the transaction fails. This pattern is essential in microservices because it provides a way to maintain business consistency across service boundaries without the complexity and brittleness of distributed transactions. Sagas enable long-running business processes that might involve multiple services and take significant time to complete, such as order processing workflows that involve inventory checks, payment processing, shipping arrangements, and customer notifications.</p>
+
+            <h3>Choreography vs orchestration approaches</h3>
+            <p>Choreography-based sagas use event-driven communication where each service publishes events about its activities and other services react to these events to continue the saga, creating a decentralized approach where no single service controls the entire flow. This approach promotes loose coupling and resilience because services only need to know about the events they care about, but it can be harder to understand and debug complex workflows since the business logic is distributed across multiple services. Orchestration-based sagas use a central coordinator (orchestrator) that explicitly manages the saga workflow by calling services in sequence and handling failures through compensation logic, providing better visibility and control over the business process. While orchestration creates a single point of control that's easier to monitor and debug, it can introduce coupling and become a bottleneck, so the choice between approaches depends on your specific requirements for complexity, maintainability, and performance.</p>
+
+            <h3>Example workflow (Order Processing Saga)</h3>
+            <pre><code class="language-java">// Orchestration-based Saga Example
+@Service
+@Slf4j
+public class OrderProcessingSaga {
+
+    private final PaymentService paymentService;
+    private final InventoryService inventoryService;
+    private final ShippingService shippingService;
+    private final SagaStateRepository sagaStateRepository;
+
+    public void processOrder(OrderCreatedEvent event) {
+        String sagaId = UUID.randomUUID().toString();
+        SagaState sagaState = new SagaState(sagaId, event.getOrderId());
+
+        try {
+            // Step 1: Reserve inventory
+            sagaState.setCurrentStep("INVENTORY_RESERVATION");
+            sagaStateRepository.save(sagaState);
+
+            InventoryReservationResult inventoryResult = inventoryService.reserveItems(
+                event.getOrderId(),
+                event.getItems()
+            );
+
+            if (!inventoryResult.isSuccessful()) {
+                throw new SagaException("Inventory reservation failed");
+            }
+
+            // Step 2: Process payment
+            sagaState.setCurrentStep("PAYMENT_PROCESSING");
+            sagaStateRepository.save(sagaState);
+
+            PaymentResult paymentResult = paymentService.processPayment(
+                event.getOrderId(),
+                event.getTotalAmount(),
+                event.getPaymentMethod()
+            );
+
+            if (!paymentResult.isSuccessful()) {
+                // Compensate: Release inventory
+                inventoryService.releaseItems(event.getOrderId(), event.getItems());
+                throw new SagaException("Payment processing failed");
+            }
+
+            // Step 3: Arrange shipping
+            sagaState.setCurrentStep("SHIPPING_ARRANGEMENT");
+            sagaStateRepository.save(sagaState);
+
+            ShippingResult shippingResult = shippingService.arrangeShipping(
+                event.getOrderId(),
+                event.getShippingAddress()
+            );
+
+            if (!shippingResult.isSuccessful()) {
+                // Compensate: Refund payment and release inventory
+                paymentService.refundPayment(event.getOrderId());
+                inventoryService.releaseItems(event.getOrderId(), event.getItems());
+                throw new SagaException("Shipping arrangement failed");
+            }
+
+            // Success: Mark saga as completed
+            sagaState.setCurrentStep("COMPLETED");
+            sagaState.setStatus(SagaStatus.SUCCESS);
+            sagaStateRepository.save(sagaState);
+
+            log.info("Order processing saga completed successfully: {}", event.getOrderId());
+
+        } catch (SagaException e) {
+            log.error("Saga failed at step: {} for order: {}",
+                     sagaState.getCurrentStep(), event.getOrderId(), e);
+            sagaState.setStatus(SagaStatus.FAILED);
+            sagaStateRepository.save(sagaState);
+        }
+    }
+}</code></pre>
+
+            <pre><code class="language-java">// Choreography-based Saga Example
+@Component
+public class OrderSagaEventHandlers {
+
+    @EventHandler
+    public void handleOrderCreated(OrderCreatedEvent event) {
+        // Publish inventory reservation request
+        eventPublisher.publishEvent(new InventoryReservationRequestedEvent(
+            event.getOrderId(),
+            event.getItems()
+        ));
+    }
+
+    @EventHandler
+    public void handleInventoryReserved(InventoryReservedEvent event) {
+        // Publish payment processing request
+        eventPublisher.publishEvent(new PaymentProcessingRequestedEvent(
+            event.getOrderId(),
+            event.getTotalAmount()
+        ));
+    }
+
+    @EventHandler
+    public void handlePaymentProcessed(PaymentProcessedEvent event) {
+        // Publish shipping arrangement request
+        eventPublisher.publishEvent(new ShippingArrangementRequestedEvent(
+            event.getOrderId(),
+            event.getShippingAddress()
+        ));
+    }
+
+    @EventHandler
+    public void handleInventoryReservationFailed(InventoryReservationFailedEvent event) {
+        // Cancel the order
+        eventPublisher.publishEvent(new OrderCancelledEvent(
+            event.getOrderId(),
+            "Insufficient inventory"
+        ));
+    }
+
+    @EventHandler
+    public void handlePaymentFailed(PaymentFailedEvent event) {
+        // Compensate: Release inventory
+        eventPublisher.publishEvent(new InventoryReleaseRequestedEvent(
+            event.getOrderId()
+        ));
+    }
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="outbox-inbox-patterns" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Outbox / Inbox Patterns</h2>
+
+            <h3>Outbox pattern: storing events to guarantee delivery</h3>
+            <p>The Outbox pattern ensures reliable event publishing by storing events in the same database transaction as the business data, guaranteeing that events are never lost even if the messaging system is unavailable when the transaction commits. Instead of directly publishing events to a message broker, services write events to an "outbox" table within their own database, then a separate process (publisher) reads these events and publishes them to the message broker. This approach leverages the local database's ACID properties to ensure that business state changes and event publishing are atomic, preventing scenarios where business data is updated but events are lost due to network failures or message broker outages. The pattern is crucial for maintaining data consistency in event-driven architectures because it guarantees that all state changes are eventually communicated to other services, even in the face of system failures.</p>
+
+            <h3>Inbox pattern: consuming events reliably</h3>
+            <p>The Inbox pattern ensures reliable event consumption by storing incoming events in a local database table before processing them, providing idempotency and exactly-once processing guarantees even when the same event is delivered multiple times. When a service receives an event, it first checks if the event has already been processed by looking for it in the inbox table, and only processes new events while ignoring duplicates. This pattern handles scenarios where message brokers deliver events multiple times due to retries, network issues, or acknowledgment failures, ensuring that business logic executes exactly once per unique event. The inbox pattern also enables services to process events in their own transaction context, allowing them to update their local state and mark the event as processed atomically, providing strong consistency guarantees for event processing workflows.</p>
+
+            <h3>Event publishing/consumption example</h3>
+            <pre><code class="language-java">// Outbox Pattern Implementation
+@Entity
+@Table(name = "outbox_events")
+public class OutboxEvent {
+    @Id
+    private String id;
+    private String aggregateId;
+    private String eventType;
+    @Column(columnDefinition = "json")
+    private String eventData;
+    private Instant createdAt;
+    private boolean published;
+
+    // constructors, getters, setters
+}
+
+@Service
+@Transactional
+public class OrderService {
+
+    private final OrderRepository orderRepository;
+    private final OutboxEventRepository outboxRepository;
+
+    public Order createOrder(CreateOrderRequest request) {
+        // Update business state
+        Order order = Order.builder()
+            .userId(request.getUserId())
+            .items(request.getItems())
+            .totalAmount(calculateTotal(request.getItems()))
+            .status(OrderStatus.PENDING)
+            .build();
+
+        Order savedOrder = orderRepository.save(order);
+
+        // Store event in outbox (same transaction)
+        OrderCreatedEvent event = new OrderCreatedEvent(
+            savedOrder.getId(),
+            savedOrder.getUserId(),
+            savedOrder.getItems(),
+            savedOrder.getTotalAmount()
+        );
+
+        OutboxEvent outboxEvent = OutboxEvent.builder()
+            .id(UUID.randomUUID().toString())
+            .aggregateId(savedOrder.getId())
+            .eventType("ORDER_CREATED")
+            .eventData(JsonUtils.toJson(event))
+            .createdAt(Instant.now())
+            .published(false)
+            .build();
+
+        outboxRepository.save(outboxEvent);
+
+        return savedOrder;
+    }
+}
+
+// Outbox Publisher (separate process)
+@Component
+@Slf4j
+public class OutboxEventPublisher {
+
+    private final OutboxEventRepository outboxRepository;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+
+    @Scheduled(fixedDelay = 5000) // Every 5 seconds
+    public void publishPendingEvents() {
+        List<OutboxEvent> unpublishedEvents = outboxRepository.findByPublishedFalse();
+
+        for (OutboxEvent event : unpublishedEvents) {
+            try {
+                Object eventData = JsonUtils.fromJson(event.getEventData(), Object.class);
+
+                kafkaTemplate.send("order-events", event.getAggregateId(), eventData)
+                    .addCallback(
+                        result -> markEventAsPublished(event.getId()),
+                        failure -> log.error("Failed to publish event: {}", event.getId(), failure)
+                    );
+
+            } catch (Exception e) {
+                log.error("Error publishing outbox event: {}", event.getId(), e);
+            }
+        }
+    }
+
+    @Transactional
+    public void markEventAsPublished(String eventId) {
+        outboxRepository.markAsPublished(eventId);
+    }
+}</code></pre>
+
+            <pre><code class="language-java">// Inbox Pattern Implementation
+@Entity
+@Table(name = "inbox_events")
+public class InboxEvent {
+    @Id
+    private String messageId;
+    private String eventType;
+    @Column(columnDefinition = "json")
+    private String eventData;
+    private Instant receivedAt;
+    private boolean processed;
+
+    // constructors, getters, setters
+}
+
+@Component
+@Slf4j
+public class OrderEventConsumer {
+
+    private final InboxEventRepository inboxRepository;
+    private final InventoryService inventoryService;
+
+    @KafkaListener(topics = "order-events", groupId = "inventory-service")
+    @Transactional
+    public void handleOrderEvent(OrderCreatedEvent event,
+                                @Header("kafka_receivedMessageKey") String messageId) {
+
+        // Check if event already processed (idempotency)
+        if (inboxRepository.existsByMessageId(messageId)) {
+            log.info("Event already processed: {}", messageId);
+            return;
+        }
+
+        try {
+            // Store event in inbox
+            InboxEvent inboxEvent = InboxEvent.builder()
+                .messageId(messageId)
+                .eventType("ORDER_CREATED")
+                .eventData(JsonUtils.toJson(event))
+                .receivedAt(Instant.now())
+                .processed(false)
+                .build();
+
+            inboxRepository.save(inboxEvent);
+
+            // Process business logic
+            inventoryService.reserveItems(event.getOrderId(), event.getItems());
+
+            // Mark as processed (same transaction)
+            inboxEvent.setProcessed(true);
+            inboxRepository.save(inboxEvent);
+
+            log.info("Order event processed successfully: {}", event.getOrderId());
+
+        } catch (Exception e) {
+            log.error("Failed to process order event: {}", event.getOrderId(), e);
+            throw e; // Will trigger retry
+        }
+    }
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="idempotency" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Idempotency</h2>
+
+            <h3>What idempotency means in distributed systems</h3>
+            <p>Idempotency in distributed systems means that performing the same operation multiple times produces the same result as performing it once, which is crucial for building reliable systems where network failures, retries, and duplicate messages are common. An idempotent operation can be safely repeated without changing the system state beyond the initial application, ensuring that even if a request is processed multiple times due to network issues or retry mechanisms, the business logic behaves correctly. This property is essential in microservices because distributed systems inherently face scenarios where operations might be executed multiple times, such as when a client retries a failed request or when message brokers deliver the same message multiple times. Without proper idempotency design, duplicate operations could lead to inconsistent data, duplicate charges, or incorrect business state, making systems unreliable and difficult to troubleshoot.</p>
+
+            <h3>Why it is important for retries</h3>
+            <p>Retries are fundamental to building resilient distributed systems, but they become dangerous without idempotency because each retry attempt could create additional side effects, leading to incorrect system behavior such as charging customers multiple times or creating duplicate orders. When a network timeout occurs, the client cannot distinguish between a request that failed before processing and one that was processed but the response was lost, making retries necessary but potentially harmful without idempotency. Idempotency enables safe retry mechanisms by ensuring that if a request succeeds on the first attempt but the response is lost, subsequent retries will not cause additional changes to the system state. This allows clients to implement aggressive retry strategies without fear of causing data corruption or unintended side effects, significantly improving system reliability and user experience in distributed environments.</p>
+
+            <h3>Example in Spring Boot REST and messaging context</h3>
+            <pre><code class="language-java">// REST API Idempotency Example
+@RestController
+public class PaymentController {
+
+    private final PaymentService paymentService;
+    private final IdempotencyKeyRepository idempotencyRepository;
+
+    @PostMapping("/payments")
+    public ResponseEntity<PaymentResponse> processPayment(
+            @RequestBody PaymentRequest request,
+            @RequestHeader("Idempotency-Key") String idempotencyKey) {
+
+        // Check if request already processed
+        Optional<IdempotencyRecord> existingRecord =
+            idempotencyRepository.findByKey(idempotencyKey);
+
+        if (existingRecord.isPresent()) {
+            log.info("Returning cached response for idempotency key: {}", idempotencyKey);
+            return ResponseEntity.ok(existingRecord.get().getResponse());
+        }
+
+        try {
+            // Process payment
+            PaymentResponse response = paymentService.processPayment(request);
+
+            // Store result for future idempotency checks
+            IdempotencyRecord record = IdempotencyRecord.builder()
+                .key(idempotencyKey)
+                .requestData(JsonUtils.toJson(request))
+                .response(response)
+                .createdAt(Instant.now())
+                .build();
+
+            idempotencyRepository.save(record);
+
+            return ResponseEntity.ok(response);
+
+        } catch (PaymentException e) {
+            // Store failed attempt to prevent retries of invalid requests
+            IdempotencyRecord record = IdempotencyRecord.builder()
+                .key(idempotencyKey)
+                .requestData(JsonUtils.toJson(request))
+                .errorMessage(e.getMessage())
+                .createdAt(Instant.now())
+                .build();
+
+            idempotencyRepository.save(record);
+            throw e;
+        }
+    }
+}
+
+// Messaging Idempotency Example
+@Component
+@Slf4j
+public class OrderEventProcessor {
+
+    private final ProcessedMessageRepository processedMessageRepository;
+    private final OrderService orderService;
+
+    @KafkaListener(topics = "order-events", groupId = "payment-service")
+    @Transactional
+    public void processOrderEvent(OrderCreatedEvent event,
+                                 @Header("kafka_receivedMessageKey") String messageKey,
+                                 @Header("kafka_offset") long offset,
+                                 @Header("kafka_receivedPartition") int partition) {
+
+        // Create unique message identifier
+        String messageId = String.format("%s-%d-%d", messageKey, partition, offset);
+
+        // Check if message already processed
+        if (processedMessageRepository.existsByMessageId(messageId)) {
+            log.info("Message already processed: {}", messageId);
+            return;
+        }
+
+        try {
+            // Process business logic
+            PaymentResult result = orderService.processOrderPayment(event);
+
+            // Record successful processing
+            ProcessedMessage processedMessage = ProcessedMessage.builder()
+                .messageId(messageId)
+                .eventType(event.getClass().getSimpleName())
+                .orderId(event.getOrderId())
+                .processedAt(Instant.now())
+                .result("SUCCESS")
+                .build();
+
+            processedMessageRepository.save(processedMessage);
+
+            log.info("Order payment processed successfully: {}", event.getOrderId());
+
+        } catch (Exception e) {
+            log.error("Failed to process order payment: {}", event.getOrderId(), e);
+
+            // Record failed processing to avoid reprocessing bad messages
+            ProcessedMessage processedMessage = ProcessedMessage.builder()
+                .messageId(messageId)
+                .eventType(event.getClass().getSimpleName())
+                .orderId(event.getOrderId())
+                .processedAt(Instant.now())
+                .result("FAILED")
+                .errorMessage(e.getMessage())
+                .build();
+
+            processedMessageRepository.save(processedMessage);
+            throw e;
+        }
+    }
+}
+
+// Database-level Idempotency with Unique Constraints
+@Entity
+@Table(name = "payments", uniqueConstraints = {
+    @UniqueConstraint(columnNames = {"order_id", "idempotency_key"})
+})
+public class Payment {
+    @Id
+    private String id;
+    private String orderId;
+    private String idempotencyKey;
+    private BigDecimal amount;
+    private PaymentStatus status;
+    private Instant createdAt;
+
+    // constructors, getters, setters
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="eventual-consistency" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Eventual Consistency</h2>
+
+            <h3>Concept of eventual consistency</h3>
+            <p>Eventual consistency is a consistency model used in distributed systems that guarantees that all nodes will eventually converge to the same state, but does not require them to be consistent at every moment in time. Unlike strong consistency which ensures all services see the same data simultaneously, eventual consistency accepts temporary inconsistencies while providing assurance that given enough time and no new updates, all services will reach the same final state. This model is particularly valuable in microservices architectures because it allows services to remain available and responsive even when network partitions or service failures occur, prioritizing system availability over immediate consistency. The "eventual" aspect means that while there may be a delay between when data changes in one service and when other services see those changes, the system will converge to a consistent state once all updates have been propagated and processed.</p>
+
+            <h3>How services can converge to the correct state over time</h3>
+            <p>Services converge to consistency through various mechanisms including event propagation, conflict resolution algorithms, and periodic synchronization processes that ensure all nodes eventually receive and apply the same set of updates. Event-driven architectures naturally support eventual consistency by propagating state changes through events that are eventually delivered to all interested services, allowing them to update their local state accordingly. When conflicts arise due to concurrent updates or out-of-order event delivery, systems use conflict resolution strategies such as last-writer-wins, vector clocks, or application-specific business rules to determine the final state. Background processes can also perform periodic reconciliation by comparing states across services and correcting any inconsistencies that may have arisen due to failed event deliveries or processing errors, ensuring that temporary inconsistencies are eventually resolved.</p>
+
+            <h3>Strategies to implement eventual consistency</h3>
+            <p>Event sourcing captures all changes as immutable events that can be replayed to reconstruct state, providing a natural foundation for eventual consistency where services can catch up by processing missed events. CQRS (Command Query Responsibility Segregation) separates read and write models, allowing write operations to be processed immediately while read models are updated asynchronously, enabling better performance and scalability while accepting temporary read inconsistencies. Distributed caching with time-based or event-based invalidation helps services maintain eventually consistent views of shared data while providing fast local access to frequently used information. Version vectors and conflict-free replicated data types (CRDTs) provide mathematical foundations for resolving conflicts in distributed updates, ensuring that concurrent modifications can be merged deterministically to achieve eventual consistency.</p>
+
+            <pre><code class="language-java">// Event Sourcing for Eventual Consistency
+@Entity
+@Table(name = "event_store")
+public class EventStoreEntry {
+    @Id
+    private String id;
+    private String aggregateId;
+    private String eventType;
+    private String eventData;
+    private long version;
+    private Instant timestamp;
+
+    // constructors, getters, setters
+}
+
+@Service
+public class OrderEventStore {
+
+    private final EventStoreRepository repository;
+    private final EventPublisher eventPublisher;
+
+    @Transactional
+    public void saveAndPublish(String aggregateId, DomainEvent event) {
+        // Save event to event store
+        EventStoreEntry entry = EventStoreEntry.builder()
+            .id(UUID.randomUUID().toString())
+            .aggregateId(aggregateId)
+            .eventType(event.getClass().getSimpleName())
+            .eventData(JsonUtils.toJson(event))
+            .version(getNextVersion(aggregateId))
+            .timestamp(Instant.now())
+            .build();
+
+        repository.save(entry);
+
+        // Publish event for eventual consistency
+        eventPublisher.publish(event);
+    }
+
+    public List<DomainEvent> getEvents(String aggregateId) {
+        return repository.findByAggregateIdOrderByVersion(aggregateId)
+            .stream()
+            .map(this::deserializeEvent)
+            .collect(Collectors.toList());
+    }
+}
+
+// Read Model Projection for CQRS
+@Component
+public class OrderSummaryProjection {
+
+    private final OrderSummaryRepository summaryRepository;
+
+    @EventHandler
+    public void handle(OrderCreatedEvent event) {
+        OrderSummary summary = OrderSummary.builder()
+            .orderId(event.getOrderId())
+            .userId(event.getUserId())
+            .totalAmount(event.getTotalAmount())
+            .status("PENDING")
+            .itemCount(event.getItems().size())
+            .lastUpdated(Instant.now())
+            .build();
+
+        summaryRepository.save(summary);
+    }
+
+    @EventHandler
+    public void handle(PaymentProcessedEvent event) {
+        OrderSummary summary = summaryRepository.findByOrderId(event.getOrderId());
+        if (summary != null) {
+            summary.setStatus("PAID");
+            summary.setLastUpdated(Instant.now());
+            summaryRepository.save(summary);
+        }
+    }
+
+    @EventHandler
+    public void handle(OrderShippedEvent event) {
+        OrderSummary summary = summaryRepository.findByOrderId(event.getOrderId());
+        if (summary != null) {
+            summary.setStatus("SHIPPED");
+            summary.setTrackingNumber(event.getTrackingNumber());
+            summary.setLastUpdated(Instant.now());
+            summaryRepository.save(summary);
+        }
+    }
+}
+
+// Conflict Resolution Strategy
+@Component
+public class UserProfileReconciliation {
+
+    @Scheduled(fixedDelay = 300000) // Every 5 minutes
+    public void reconcileUserProfiles() {
+        List<User> users = userRepository.findUsersModifiedInLastHour();
+
+        for (User user : users) {
+            try {
+                // Get user data from multiple sources
+                UserProfile authProfile = authService.getUserProfile(user.getId());
+                UserProfile preferencesProfile = preferencesService.getUserProfile(user.getId());
+                UserProfile orderProfile = orderService.getUserProfile(user.getId());
+
+                // Resolve conflicts using last-writer-wins or business rules
+                UserProfile reconciledProfile = resolveConflicts(
+                    authProfile, preferencesProfile, orderProfile
+                );
+
+                // Update with reconciled data
+                if (!user.getProfile().equals(reconciledProfile)) {
+                    user.setProfile(reconciledProfile);
+                    user.setLastReconciled(Instant.now());
+                    userRepository.save(user);
+
+                    // Publish reconciliation event
+                    eventPublisher.publish(new UserProfileReconciledEvent(
+                        user.getId(), reconciledProfile
+                    ));
+                }
+
+            } catch (Exception e) {
+                log.error("Failed to reconcile user profile: {}", user.getId(), e);
+            }
+        }
+    }
+
+    private UserProfile resolveConflicts(UserProfile... profiles) {
+        // Implement conflict resolution logic
+        // Could use timestamps, priority rules, or merge strategies
+        return Arrays.stream(profiles)
+            .filter(Objects::nonNull)
+            .max(Comparator.comparing(UserProfile::getLastModified))
+            .orElse(null);
+    }
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="lesson-summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Lesson Summary</h2>
+
+            <p>In this lesson, we explored data consistency patterns and distributed transaction management in microservices architectures. Here's a comprehensive summary of all the concepts and implementation approaches covered:</p>
+
+            <h3>Data Consistency Challenges</h3>
+            <ul>
+              <li><strong>Distributed data:</strong> Each microservice owns its database, making traditional ACID transactions impossible across services</li>
+              <li><strong>Network complexity:</strong> Service coordination across network boundaries introduces failures, delays, and partial successes</li>
+              <li><strong>CAP theorem implications:</strong> Must choose between consistency, availability, and partition tolerance in distributed systems</li>
+              <li><strong>Coordination problems:</strong> Business operations spanning multiple services require careful design to maintain data integrity</li>
+            </ul>
+
+            <h3>Distributed Transaction Problems</h3>
+            <ul>
+              <li><strong>Two-Phase Commit issues:</strong> System-wide blocking, reduced availability, and tight coupling between services</li>
+              <li><strong>Network failures:</strong> Timeouts, deadlocks, and inconsistent states when some services commit while others fail</li>
+              <li><strong>Availability trade-offs:</strong> Traditional distributed transactions prioritize consistency over availability</li>
+              <li><strong>Microservices principles:</strong> Distributed transactions contradict independence and fault tolerance goals</li>
+            </ul>
+
+            <h3>Consistency Models</h3>
+            <ul>
+              <li><strong>Strong consistency:</strong> All services see same data simultaneously, provides ACID properties but reduces availability</li>
+              <li><strong>Eventual consistency:</strong> Services converge to same state over time, enables higher availability and performance</li>
+              <li><strong>Design decisions:</strong> Choose strong consistency for critical operations, eventual consistency for non-critical workflows</li>
+              <li><strong>Hybrid approaches:</strong> Most successful architectures combine both models based on business requirements</li>
+            </ul>
+
+            <h3>Saga Pattern Fundamentals</h3>
+            <ul>
+              <li><strong>Purpose:</strong> Manage distributed transactions through series of smaller, local transactions with compensation</li>
+              <li><strong>Compensation logic:</strong> Undo previous steps when any part of transaction fails</li>
+              <li><strong>Long-running processes:</strong> Support complex workflows that span multiple services and take time to complete</li>
+              <li><strong>Business consistency:</strong> Maintain business rules without distributed transaction complexity</li>
+            </ul>
+
+            <h3>Saga Implementation Approaches</h3>
+            <ul>
+              <li><strong>Choreography:</strong> Event-driven communication where services react to events, promotes loose coupling</li>
+              <li><strong>Orchestration:</strong> Central coordinator manages workflow explicitly, provides better visibility and control</li>
+              <li><strong>Trade-offs:</strong> Choreography offers resilience vs orchestration provides easier debugging and monitoring</li>
+              <li><strong>Selection criteria:</strong> Choose based on complexity, maintainability, and operational requirements</li>
+            </ul>
+
+            <h3>Outbox Pattern</h3>
+            <ul>
+              <li><strong>Reliable publishing:</strong> Store events in same database transaction as business data</li>
+              <li><strong>ACID guarantees:</strong> Leverage local database properties to ensure atomic event publishing</li>
+              <li><strong>Failure resilience:</strong> Events never lost even when messaging system unavailable</li>
+              <li><strong>Separate publisher:</strong> Background process reads outbox and publishes events to message broker</li>
+            </ul>
+
+            <h3>Inbox Pattern</h3>
+            <ul>
+              <li><strong>Reliable consumption:</strong> Store incoming events before processing for idempotency and exactly-once guarantees</li>
+              <li><strong>Duplicate detection:</strong> Check inbox table to identify and ignore already-processed events</li>
+              <li><strong>Transactional processing:</strong> Update business state and mark event as processed atomically</li>
+              <li><strong>Message broker resilience:</strong> Handle multiple deliveries and acknowledgment failures gracefully</li>
+            </ul>
+
+            <h3>Idempotency Concepts</h3>
+            <ul>
+              <li><strong>Definition:</strong> Operations produce same result when executed multiple times</li>
+              <li><strong>Distributed system necessity:</strong> Essential for handling retries, duplicate messages, and network failures</li>
+              <li><strong>Safe retries:</strong> Enable aggressive retry strategies without fear of side effects</li>
+              <li><strong>System reliability:</strong> Prevent duplicate charges, orders, or other business-critical duplications</li>
+            </ul>
+
+            <h3>Idempotency Implementation</h3>
+            <ul>
+              <li><strong>REST APIs:</strong> Idempotency keys in headers with cached responses for duplicate requests</li>
+              <li><strong>Message processing:</strong> Unique message identifiers with processed message tracking</li>
+              <li><strong>Database constraints:</strong> Unique constraints preventing duplicate data insertion</li>
+              <li><strong>Error handling:</strong> Store failed attempts to prevent invalid request retries</li>
+            </ul>
+
+            <h3>Eventual Consistency Model</h3>
+            <ul>
+              <li><strong>Convergence guarantee:</strong> All nodes eventually reach same state given enough time</li>
+              <li><strong>Temporary inconsistencies:</strong> Accept short-term differences while ensuring final consistency</li>
+              <li><strong>Availability priority:</strong> Maintain system responsiveness during network partitions and failures</li>
+              <li><strong>Propagation mechanisms:</strong> Events, synchronization, and conflict resolution ensure convergence</li>
+            </ul>
+
+            <h3>Consistency Implementation Strategies</h3>
+            <ul>
+              <li><strong>Event sourcing:</strong> Immutable events that can be replayed to reconstruct and synchronize state</li>
+              <li><strong>CQRS:</strong> Separate read/write models with asynchronous projection updates</li>
+              <li><strong>Conflict resolution:</strong> Last-writer-wins, vector clocks, and business-specific rules</li>
+              <li><strong>Periodic reconciliation:</strong> Background processes comparing and correcting state differences</li>
+            </ul>
+
+            <h3>Production Implementation Patterns</h3>
+            <ul>
+              <li><strong>Event-driven architecture:</strong> Services communicate through domain events rather than direct calls</li>
+              <li><strong>Compensation workflows:</strong> Automated rollback procedures for failed distributed transactions</li>
+              <li><strong>State machine patterns:</strong> Explicit state tracking for complex multi-step business processes</li>
+              <li><strong>Monitoring and alerting:</strong> Operational visibility into saga execution and consistency violations</li>
+            </ul>
+
+            <h3>Operational Considerations</h3>
+            <ul>
+              <li><strong>Error handling:</strong> Comprehensive retry logic, dead letter queues, and manual intervention procedures</li>
+              <li><strong>Performance impact:</strong> Additional storage and processing overhead for consistency patterns</li>
+              <li><strong>Debugging complexity:</strong> Distributed state makes troubleshooting more challenging than monolithic systems</li>
+              <li><strong>Testing strategies:</strong> Chaos engineering and failure injection to validate consistency mechanisms</li>
+            </ul>
+
+            <h3>Key Takeaways</h3>
+            <ul>
+              <li>Data consistency in microservices requires fundamentally different approaches than monolithic applications</li>
+              <li>Saga patterns provide reliable distributed transaction management without traditional transaction complexity</li>
+              <li>Outbox and inbox patterns ensure reliable event publishing and consumption in distributed systems</li>
+              <li>Idempotency is essential for building robust systems that handle retries and duplicate operations safely</li>
+              <li>Eventual consistency enables scalable, available systems while requiring careful design and operational practices</li>
+            </ul>
+          </section>
+
+          <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+            <a href="lesson-08.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
+            <a href="lesson-10.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
+          </nav>
+        </div>
+      </div>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('themeToggle')?.addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>

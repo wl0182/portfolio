@@ -1,0 +1,819 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 04 - Sync vs Async Communication</title>
+    <meta name="description" content="Learn synchronous and asynchronous communication patterns in Spring Boot microservices with REST APIs, WebClient, Kafka, and RabbitMQ." />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="lg:flex lg:gap-8">
+        <aside class="hidden lg:block lg:w-72">
+          <nav class="sticky top-8 rounded-xl border border-slate-200/60 bg-white/60 p-4 shadow-sm backdrop-blur dark:border-slate-800/60 dark:bg-slate-900/40" aria-label="Table of contents">
+            <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">On this page</h2>
+            <ol class="space-y-1 text-sm">
+              <li><a href="#overview" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Overview</a></li>
+              <li><a href="#synchronous-communication" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Synchronous Communication</a></li>
+              <li><a href="#asynchronous-communication" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Asynchronous Communication</a></li>
+              <li><a href="#patterns-best-practices" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Patterns and Best Practices</a></li>
+              <li><a href="#order-processing-example" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Complete Example: Order Processing</a></li>
+              <li><a href="#resttemplate-example" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Complete Example: RestTemplate Integration</a></li>
+              <li><a href="#lesson-summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Lesson Summary</a></li>
+            </ol>
+          </nav>
+        </aside>
+        <div class="min-w-0 flex-1">
+          <div class="mb-6">
+            <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Microservices Concepts</a>
+          </div>
+          <header class="mx-auto max-w-3xl text-center">
+            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Sync vs Async Communication</h1>
+            <p class="mt-2 text-slate-600 dark:text-slate-300">Understand synchronous and asynchronous communication patterns in Spring Boot microservices.</p>
+          </header>
+
+          <section id="overview" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Overview</h2>
+
+            <h3>Difference between synchronous and asynchronous communication</h3>
+            <p>Synchronous communication means the calling service waits for a response from the called service before continuing execution, similar to making a phone call where you wait for the other person to answer. The caller is blocked until it receives a response, creating a direct request-response interaction. Asynchronous communication allows the calling service to send a message and continue processing without waiting for an immediate response, like sending an email where you don't expect an instant reply. This fundamental difference affects how services interact, scale, and handle failures in your microservices architecture.</p>
+
+            <h3>Pros and cons of each approach in microservices</h3>
+            <p>Synchronous communication provides immediate feedback and maintains strong consistency, making it easier to handle errors and validate results in real-time. However, it creates tight coupling between services, reduces system resilience when services are unavailable, and can lead to cascading failures where one slow service affects the entire request chain. Asynchronous communication offers better scalability, loose coupling, and resilience since services can operate independently and handle varying loads more gracefully. The downside is increased complexity in handling eventual consistency, error scenarios, and debugging distributed workflows where multiple services interact through messages.</p>
+
+            <h3>Scenarios where sync communication is preferred</h3>
+            <p>Synchronous communication works best for real-time operations that require immediate validation or response, such as user authentication, payment processing, or data validation where you need to know the result before proceeding. It's ideal for simple request-response scenarios where the calling service must wait for the result to continue its logic, like fetching user profile data to display on a web page. Interactive applications where users expect immediate feedback, such as search functionality or form submissions, also benefit from synchronous communication patterns.</p>
+
+            <h3>Scenarios where async communication is preferred</h3>
+            <p>Asynchronous communication excels in scenarios involving notifications, logging, analytics, or any operation that doesn't require immediate results, such as sending welcome emails or processing user activity for recommendations. It's perfect for batch processing, background jobs, or workflows that can be completed later without blocking the user experience. Event-driven architectures benefit greatly from async patterns, especially for cross-functional concerns like audit trails, reporting, or integrating with external systems where response times are unpredictable and failures shouldn't impact core business functionality.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="synchronous-communication" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Synchronous Communication</h2>
+
+            <h3>REST API calls between services</h3>
+            <p>REST API calls represent the most common form of synchronous communication in microservices, where one service makes HTTP requests to another service's endpoints and waits for the response. These calls follow standard HTTP methods (GET, POST, PUT, DELETE) and return structured data, typically in JSON format, allowing services to share information and trigger actions across service boundaries. REST calls provide a simple, well-understood communication mechanism that leverages existing web infrastructure and tooling. However, they create direct dependencies between services, requiring both the caller and callee to be available simultaneously for successful communication.</p>
+
+            <h3>Using RestTemplate for synchronous calls</h3>
+            <p>RestTemplate is Spring's traditional synchronous HTTP client that provides a simple, blocking API for making REST calls between microservices. It handles the underlying HTTP communication, JSON serialization/deserialization, and error handling while providing a straightforward programmatic interface. RestTemplate is easy to use and understand, making it suitable for simple service-to-service communication where you need immediate results. However, being a blocking client, it consumes one thread per request, which can limit scalability under high load conditions.</p>
+
+            <pre><code class="language-java">@Service
+public class UserService {
+
+    private final RestTemplate restTemplate;
+
+    public UserService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
+    public Order getUserOrders(Long userId) {
+        String url = "http://order-service/orders/user/" + userId;
+        return restTemplate.getForObject(url, Order.class);
+    }
+
+    public User createUser(User user) {
+        String url = "http://user-service/users";
+        return restTemplate.postForObject(url, user, User.class);
+    }
+}</code></pre>
+
+            <h3>Using WebClient for reactive synchronous calls</h3>
+            <p>WebClient is Spring's modern, reactive HTTP client that provides both synchronous and asynchronous capabilities with a non-blocking, functional API style. It's built on Spring WebFlux and Project Reactor, allowing for more efficient resource utilization by using fewer threads to handle many concurrent requests. WebClient integrates seamlessly with reactive Spring applications and provides better performance characteristics for high-throughput scenarios. Even when used synchronously, WebClient offers more flexibility and better resource management compared to RestTemplate, making it the recommended choice for new applications.</p>
+
+            <pre><code class="language-java">@Service
+public class OrderService {
+
+    private final WebClient webClient;
+
+    public OrderService(WebClient.Builder webClientBuilder) {
+        this.webClient = webClientBuilder
+            .baseUrl("http://payment-service")
+            .build();
+    }
+
+    public PaymentResponse processPayment(PaymentRequest request) {
+        return webClient.post()
+            .uri("/payments")
+            .bodyValue(request)
+            .retrieve()
+            .bodyToMono(PaymentResponse.class)
+            .block(); // Makes it synchronous
+    }
+
+    public Flux&lt;Order&gt; getOrdersReactive(String userId) {
+        return webClient.get()
+            .uri("/orders/user/{userId}", userId)
+            .retrieve()
+            .bodyToFlux(Order.class);
+    }
+}</code></pre>
+
+            <h3>OpenFeign client for declarative REST calls</h3>
+            <p>OpenFeign provides a declarative approach to HTTP client development where you define service interfaces using annotations, and Feign generates the implementation automatically. This eliminates boilerplate HTTP client code and makes service-to-service communication look like local method calls, improving code readability and maintainability. Feign integrates with Spring Cloud for service discovery, load balancing, and circuit breakers, providing enterprise-grade features out of the box. It's particularly useful for teams that prefer annotation-driven development and want to abstract away HTTP client complexity while maintaining type safety and IDE support.</p>
+
+            <pre><code class="language-java">@FeignClient(name = "notification-service", url = "http://notification-service")
+public interface NotificationClient {
+
+    @PostMapping("/notifications/email")
+    void sendEmail(@RequestBody EmailRequest request);
+
+    @GetMapping("/notifications/user/{userId}")
+    List&lt;Notification&gt; getUserNotifications(@PathVariable Long userId);
+
+    @PutMapping("/notifications/{id}/read")
+    void markAsRead(@PathVariable Long id);
+}
+
+@Service
+public class UserRegistrationService {
+
+    private final NotificationClient notificationClient;
+
+    public UserRegistrationService(NotificationClient notificationClient) {
+        this.notificationClient = notificationClient;
+    }
+
+    public void registerUser(User user) {
+        // Registration logic here
+
+        // Send welcome email using Feign client
+        EmailRequest emailRequest = new EmailRequest(
+            user.getEmail(),
+            "Welcome!",
+            "Welcome to our platform!"
+        );
+        notificationClient.sendEmail(emailRequest);
+    }
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="asynchronous-communication" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Asynchronous Communication</h2>
+
+            <h3>Event-driven architecture concepts</h3>
+            <p>Event-driven architecture is a design pattern where services communicate by producing and consuming events that represent something meaningful that happened in the system, such as "user registered" or "order placed." Services that produce events don't need to know which services will consume them, creating loose coupling and enabling new functionality to be added without modifying existing services. Events are typically immutable records that contain enough information for consumers to react appropriately, and they flow through messaging systems that provide reliable delivery, persistence, and scalability. This architecture enables reactive systems that can respond to changes in real-time while maintaining independence between components.</p>
+
+            <h3>Commands vs Events</h3>
+            <p>Commands represent instructions or requests for a service to perform an action, such as "create user" or "process payment," and are typically sent to a specific service that knows how to handle that command. Commands express intent and expectation that something should happen, often requiring acknowledgment or response from the receiving service. Events, on the other hand, represent facts about what has already occurred in the system, such as "user created" or "payment processed," and are broadcast to any interested services without expecting specific responses. Understanding this distinction helps design better messaging patterns where commands handle direct service interactions and events enable reactive, decoupled responses to system changes.</p>
+
+            <h3>Messaging with Kafka: topics, producers, consumers</h3>
+            <p>Apache Kafka is a distributed streaming platform that organizes messages into topics, where producers publish messages and consumers read them, providing high-throughput, fault-tolerant messaging for microservices. Topics act as categories or feeds where related messages are stored, and they can be partitioned for scalability and parallel processing. Kafka retains messages for a configurable period, allowing multiple consumers to read the same data and new consumers to catch up on historical events. The platform excels at handling high-volume data streams and provides features like message ordering, durability, and exactly-once processing semantics that are crucial for reliable microservices communication.</p>
+
+            <pre><code class="language-java">// Kafka Producer
+@Service
+public class OrderEventProducer {
+
+    private final KafkaTemplate&lt;String, OrderEvent&gt; kafkaTemplate;
+
+    public OrderEventProducer(KafkaTemplate&lt;String, OrderEvent&gt; kafkaTemplate) {
+        this.kafkaTemplate = kafkaTemplate;
+    }
+
+    public void publishOrderCreated(Order order) {
+        OrderEvent event = new OrderEvent(
+            order.getId(),
+            order.getUserId(),
+            order.getTotalAmount(),
+            "ORDER_CREATED"
+        );
+        kafkaTemplate.send("order-events", event);
+    }
+}
+
+// Kafka Consumer
+@Component
+public class OrderEventConsumer {
+
+    @KafkaListener(topics = "order-events", groupId = "inventory-service")
+    public void handleOrderEvent(OrderEvent event) {
+        if ("ORDER_CREATED".equals(event.getEventType())) {
+            // Update inventory
+            inventoryService.reserveItems(event.getOrderId());
+        }
+    }
+}</code></pre>
+
+            <h3>Messaging with RabbitMQ: queues, producers, consumers</h3>
+            <p>RabbitMQ is a message broker that implements the Advanced Message Queuing Protocol (AMQP) and provides reliable message delivery through queues, exchanges, and routing mechanisms. Producers send messages to exchanges, which route them to appropriate queues based on routing keys and binding rules, and consumers process messages from these queues. RabbitMQ offers features like message acknowledgments, dead letter queues, and various exchange types (direct, topic, fanout) that provide flexibility in designing messaging patterns. It's particularly well-suited for traditional messaging scenarios where you need guaranteed delivery, complex routing logic, and fine-grained control over message flow and processing.</p>
+
+            <pre><code class="language-java">// RabbitMQ Producer
+@Service
+public class EmailNotificationProducer {
+
+    private final RabbitTemplate rabbitTemplate;
+
+    public EmailNotificationProducer(RabbitTemplate rabbitTemplate) {
+        this.rabbitTemplate = rabbitTemplate;
+    }
+
+    public void sendEmailNotification(EmailNotification notification) {
+        rabbitTemplate.convertAndSend(
+            "notification.exchange",
+            "notification.email",
+            notification
+        );
+    }
+}
+
+// RabbitMQ Consumer
+@Component
+public class EmailNotificationConsumer {
+
+    @RabbitListener(queues = "email.notification.queue")
+    public void processEmailNotification(EmailNotification notification) {
+        try {
+            emailService.sendEmail(notification);
+            log.info("Email sent successfully to: {}", notification.getRecipient());
+        } catch (Exception e) {
+            log.error("Failed to send email: {}", e.getMessage());
+            throw new AmqpRejectAndRequeueException("Email sending failed");
+        }
+    }
+}</code></pre>
+
+            <h3>Retries and Dead Letter Queues (DLQs)</h3>
+            <p>Retries provide a mechanism to automatically reprocess failed messages a specified number of times before giving up, helping handle transient failures like network timeouts or temporary service unavailability. Most messaging systems allow configuring retry policies with exponential backoff to avoid overwhelming struggling services while giving them time to recover. Dead Letter Queues (DLQs) capture messages that have exhausted all retry attempts, providing a way to investigate and manually handle problematic messages without losing them entirely. DLQs are essential for maintaining system reliability because they prevent poison messages from blocking queue processing while preserving failed messages for analysis and potential reprocessing after fixing underlying issues.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="patterns-best-practices" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Patterns and Best Practices</h2>
+
+            <h3>Pub/Sub pattern in microservices</h3>
+            <p>The Publish/Subscribe pattern allows services to communicate through events where publishers emit messages without knowing who will receive them, and subscribers listen for messages they're interested in without knowing who sent them. This pattern creates maximum decoupling between services, enabling you to add new functionality by simply subscribing to existing events without modifying publisher services. Publishers focus on their core business logic and announce what happened, while subscribers can react to these events in ways that make sense for their specific domains. This pattern is particularly powerful for implementing cross-cutting concerns like logging, analytics, notifications, and integration with external systems that need to react to business events but shouldn't be directly coupled to core business services.</p>
+
+            <h3>When to choose sync vs async communication</h3>
+            <p>Choose synchronous communication when you need immediate feedback, strong consistency, or when the calling service cannot proceed without the response, such as user authentication, real-time validation, or fetching data required for immediate display. Synchronous calls are appropriate for simple, direct service interactions where failure should immediately impact the calling service. Choose asynchronous communication for operations that can be completed later, don't require immediate results, or when you want to improve system resilience and scalability, such as sending notifications, processing analytics, or integrating with external systems. Async patterns work best for event-driven workflows, batch processing, and scenarios where temporary service unavailability shouldn't block the primary user workflow.</p>
+
+            <h3>Tips for avoiding tight coupling in async messaging</h3>
+            <p>Design events to be self-contained with all necessary information for consumers to act without requiring additional service calls, reducing dependencies and improving performance. Use domain events that represent business concepts rather than technical implementation details, ensuring events remain stable even when internal service implementations change. Avoid including references to specific services or implementation details in event schemas, instead focusing on business facts and outcomes. Version your event schemas carefully and maintain backward compatibility to allow independent service deployments, and consider using event contracts or schema registries to manage evolution without breaking existing consumers.</p>
+
+            <h3>Handling failures and retries gracefully</h3>
+            <p>Implement exponential backoff strategies for retries to avoid overwhelming struggling services while giving them time to recover from temporary issues. Configure appropriate retry limits and timeout values based on your system's tolerance for latency and the criticality of the operation being performed. Use circuit breakers to detect when a service is consistently failing and temporarily stop sending requests to give it time to recover while providing fallback responses. Design idempotent operations that can be safely retried without causing duplicate effects, and implement proper logging and monitoring to track retry patterns and identify services that frequently require retries, which may indicate underlying issues that need architectural attention.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="order-processing-example" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Complete Example: Order Processing System</h2>
+
+            <p>This comprehensive example demonstrates how synchronous and asynchronous communication patterns work together in a real-world order processing system. The Order Service uses synchronous calls for immediate validation (payment verification) and asynchronous events for background processing (inventory management, notifications). This hybrid approach ensures data consistency for critical operations while maintaining system resilience and scalability for non-blocking workflows.</p>
+
+            <h3>Order Service Configuration</h3>
+            <pre><code class="language-yaml"># application.yml
+spring:
+  application:
+    name: order-service
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+  datasource:
+    url: jdbc:postgresql://localhost:5432/orderdb
+    username: orderuser
+    password: orderpass
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/</code></pre>
+
+            <h3>Order Service Implementation</h3>
+            <pre><code class="language-java">@Service
+@Transactional
+public class OrderService {
+
+    private final OrderRepository orderRepository;
+    private final KafkaTemplate&lt;String, OrderEvent&gt; kafkaTemplate;
+    private final PaymentClient paymentClient; // Synchronous Feign client
+
+    public OrderService(OrderRepository orderRepository,
+                       KafkaTemplate&lt;String, OrderEvent&gt; kafkaTemplate,
+                       PaymentClient paymentClient) {
+        this.orderRepository = orderRepository;
+        this.kafkaTemplate = kafkaTemplate;
+        this.paymentClient = paymentClient;
+    }
+
+    public Order createOrder(CreateOrderRequest request) {
+        // Step 1: Synchronous payment validation - must succeed immediately
+        PaymentValidation validation = paymentClient.validatePayment(request.getPaymentInfo());
+        if (!validation.isValid()) {
+            throw new InvalidPaymentException("Payment validation failed: " + validation.getReason());
+        }
+
+        // Step 2: Create and save order
+        Order order = Order.builder()
+            .userId(request.getUserId())
+            .items(request.getItems())
+            .totalAmount(calculateTotal(request.getItems()))
+            .status(OrderStatus.PENDING)
+            .createdAt(Instant.now())
+            .build();
+
+        Order savedOrder = orderRepository.save(order);
+
+        // Step 3: Publish asynchronous events - fire and forget
+        publishOrderCreatedEvent(savedOrder);
+
+        return savedOrder;
+    }
+
+    private void publishOrderCreatedEvent(Order order) {
+        OrderCreatedEvent event = OrderCreatedEvent.builder()
+            .orderId(order.getId())
+            .userId(order.getUserId())
+            .items(order.getItems())
+            .totalAmount(order.getTotalAmount())
+            .timestamp(Instant.now())
+            .build();
+
+        kafkaTemplate.send("order-events", order.getId().toString(), event)
+            .addCallback(
+                result -> log.info("Order event published successfully: {}", order.getId()),
+                failure -> log.error("Failed to publish order event: {}", order.getId(), failure)
+            );
+    }
+}</code></pre>
+
+            <h3>Inventory Service Event Handler</h3>
+            <pre><code class="language-java">@Component
+@Slf4j
+public class InventoryEventHandler {
+
+    private final InventoryService inventoryService;
+    private final KafkaTemplate&lt;String, InventoryEvent&gt; kafkaTemplate;
+
+    public InventoryEventHandler(InventoryService inventoryService,
+                                KafkaTemplate&lt;String, InventoryEvent&gt; kafkaTemplate) {
+        this.inventoryService = inventoryService;
+        this.kafkaTemplate = kafkaTemplate;
+    }
+
+    @KafkaListener(topics = "order-events", groupId = "inventory-service")
+    @Retryable(value = Exception.class, maxAttempts = 3, backoff = @Backoff(delay = 1000, multiplier = 2))
+    public void handleOrderCreated(OrderCreatedEvent event) {
+        try {
+            log.info("Processing inventory for order: {}", event.getOrderId());
+
+            // Reserve inventory items
+            List&lt;InventoryReservation&gt; reservations = inventoryService.reserveItems(event.getItems());
+
+            // Publish success event
+            InventoryReservedEvent reservedEvent = InventoryReservedEvent.builder()
+                .orderId(event.getOrderId())
+                .reservations(reservations)
+                .timestamp(Instant.now())
+                .build();
+
+            kafkaTemplate.send("inventory-events", event.getOrderId().toString(), reservedEvent);
+
+            log.info("Inventory reserved successfully for order: {}", event.getOrderId());
+
+        } catch (InsufficientStockException e) {
+            log.warn("Insufficient stock for order: {}", event.getOrderId());
+            publishInventoryReservationFailed(event.getOrderId(), e.getMessage());
+        }
+    }
+
+    @Recover
+    public void recover(Exception ex, OrderCreatedEvent event) {
+        log.error("Failed to process inventory after all retries for order: {}", event.getOrderId(), ex);
+        publishInventoryReservationFailed(event.getOrderId(), "Processing failed after retries");
+    }
+
+    private void publishInventoryReservationFailed(Long orderId, String reason) {
+        InventoryReservationFailedEvent failedEvent = InventoryReservationFailedEvent.builder()
+            .orderId(orderId)
+            .reason(reason)
+            .timestamp(Instant.now())
+            .build();
+
+        kafkaTemplate.send("inventory-events", orderId.toString(), failedEvent);
+    }
+}</code></pre>
+
+            <h3>Payment Client (Synchronous)</h3>
+            <pre><code class="language-java">@FeignClient(name = "payment-service", url = "${payment.service.url}")
+public interface PaymentClient {
+
+    @PostMapping("/payments/validate")
+    PaymentValidation validatePayment(@RequestBody PaymentInfo paymentInfo);
+
+    @PostMapping("/payments/process")
+    PaymentResponse processPayment(@RequestBody PaymentRequest request);
+}
+
+@Component
+public class PaymentFallback implements PaymentClient {
+
+    @Override
+    public PaymentValidation validatePayment(PaymentInfo paymentInfo) {
+        return PaymentValidation.builder()
+            .valid(false)
+            .reason("Payment service unavailable")
+            .build();
+    }
+
+    @Override
+    public PaymentResponse processPayment(PaymentRequest request) {
+        throw new PaymentServiceUnavailableException("Payment service is currently unavailable");
+    }
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="resttemplate-example" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Complete Example: RestTemplate Integration</h2>
+
+            <p>This example demonstrates a traditional Spring Boot microservices setup using RestTemplate for synchronous communication between services. The User Service coordinates with multiple downstream services to provide a complete user experience, showing how to handle configuration, error handling, timeouts, and service integration in a production-ready implementation.</p>
+
+            <h3>RestTemplate Configuration</h3>
+            <pre><code class="language-java">@Configuration
+public class RestTemplateConfig {
+
+    @Bean
+    @LoadBalanced // Enable service discovery with Eureka
+    public RestTemplate restTemplate() {
+        return new RestTemplate(clientHttpRequestFactory());
+    }
+
+    @Bean
+    public ClientHttpRequestFactory clientHttpRequestFactory() {
+        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
+        factory.setConnectTimeout(5000); // 5 seconds
+        factory.setReadTimeout(10000);   // 10 seconds
+        return factory;
+    }
+
+    @Bean
+    public RestTemplate externalRestTemplate() {
+        RestTemplate template = new RestTemplate(clientHttpRequestFactory());
+
+        // Add interceptors for logging
+        template.getInterceptors().add((request, body, execution) -> {
+            log.info("Making request to: {} {}", request.getMethod(), request.getURI());
+            ClientHttpResponse response = execution.execute(request, body);
+            log.info("Response status: {}", response.getStatusCode());
+            return response;
+        });
+
+        return template;
+    }
+}</code></pre>
+
+            <h3>User Service Implementation</h3>
+            <pre><code class="language-java">@Service
+@Slf4j
+public class UserService {
+
+    private final RestTemplate restTemplate;
+    private final UserRepository userRepository;
+
+    @Value("${services.order.url:http://order-service}")
+    private String orderServiceUrl;
+
+    @Value("${services.notification.url:http://notification-service}")
+    private String notificationServiceUrl;
+
+    public UserService(RestTemplate restTemplate, UserRepository userRepository) {
+        this.restTemplate = restTemplate;
+        this.userRepository = userRepository;
+    }
+
+    public UserProfile getUserProfile(Long userId) {
+        try {
+            // Fetch user basic info
+            User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found: " + userId));
+
+            // Fetch user orders synchronously
+            List&lt;Order&gt; orders = getUserOrders(userId);
+
+            // Fetch user preferences
+            UserPreferences preferences = getUserPreferences(userId);
+
+            // Build complete profile
+            return UserProfile.builder()
+                .user(user)
+                .orders(orders)
+                .preferences(preferences)
+                .lastLoginDate(user.getLastLoginDate())
+                .build();
+
+        } catch (Exception e) {
+            log.error("Error fetching user profile for user: {}", userId, e);
+            throw new UserProfileException("Unable to fetch complete user profile", e);
+        }
+    }
+
+    public User createUser(CreateUserRequest request) {
+        // Create user locally
+        User user = User.builder()
+            .username(request.getUsername())
+            .email(request.getEmail())
+            .firstName(request.getFirstName())
+            .lastName(request.getLastName())
+            .createdAt(Instant.now())
+            .build();
+
+        User savedUser = userRepository.save(user);
+
+        // Send welcome notification synchronously
+        sendWelcomeNotification(savedUser);
+
+        // Initialize user preferences
+        initializeUserPreferences(savedUser.getId());
+
+        return savedUser;
+    }
+
+    private List&lt;Order&gt; getUserOrders(Long userId) {
+        try {
+            String url = orderServiceUrl + "/orders/user/{userId}";
+
+            ResponseEntity&lt;Order[]&gt; response = restTemplate.getForEntity(
+                url,
+                Order[].class,
+                userId
+            );
+
+            return response.getBody() != null ? Arrays.asList(response.getBody()) : new ArrayList&lt;&gt;();
+
+        } catch (HttpClientErrorException.NotFound e) {
+            log.info("No orders found for user: {}", userId);
+            return new ArrayList&lt;&gt;();
+        } catch (Exception e) {
+            log.error("Error fetching orders for user: {}", userId, e);
+            return new ArrayList&lt;&gt;(); // Graceful degradation
+        }
+    }
+
+    private UserPreferences getUserPreferences(Long userId) {
+        try {
+            String url = "http://preference-service/preferences/user/{userId}";
+
+            return restTemplate.getForObject(url, UserPreferences.class, userId);
+
+        } catch (HttpClientErrorException.NotFound e) {
+            log.info("No preferences found for user: {}, returning defaults", userId);
+            return UserPreferences.getDefault();
+        } catch (Exception e) {
+            log.error("Error fetching preferences for user: {}", userId, e);
+            return UserPreferences.getDefault(); // Graceful degradation
+        }
+    }
+
+    private void sendWelcomeNotification(User user) {
+        try {
+            WelcomeNotificationRequest request = WelcomeNotificationRequest.builder()
+                .userId(user.getId())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .build();
+
+            String url = notificationServiceUrl + "/notifications/welcome";
+
+            restTemplate.postForObject(url, request, Void.class);
+
+            log.info("Welcome notification sent for user: {}", user.getId());
+
+        } catch (Exception e) {
+            log.error("Failed to send welcome notification for user: {}", user.getId(), e);
+            // Don't fail user creation if notification fails
+        }
+    }
+
+    private void initializeUserPreferences(Long userId) {
+        try {
+            UserPreferences defaultPreferences = UserPreferences.builder()
+                .userId(userId)
+                .emailNotifications(true)
+                .pushNotifications(false)
+                .theme("light")
+                .language("en")
+                .build();
+
+            String url = "http://preference-service/preferences";
+
+            restTemplate.postForObject(url, defaultPreferences, UserPreferences.class);
+
+            log.info("Default preferences initialized for user: {}", userId);
+
+        } catch (Exception e) {
+            log.error("Failed to initialize preferences for user: {}", userId, e);
+            // Continue without failing - preferences can be set later
+        }
+    }
+}</code></pre>
+
+            <h3>Error Handling and Circuit Breaker</h3>
+            <pre><code class="language-java">@Component
+public class RestTemplateErrorHandler implements ResponseErrorHandler {
+
+    @Override
+    public boolean hasError(ClientHttpResponse response) throws IOException {
+        return response.getStatusCode().series() == HttpStatus.Series.CLIENT_ERROR ||
+               response.getStatusCode().series() == HttpStatus.Series.SERVER_ERROR;
+    }
+
+    @Override
+    public void handleError(ClientHttpResponse response) throws IOException {
+        HttpStatus statusCode = response.getStatusCode();
+
+        switch (statusCode.series()) {
+            case CLIENT_ERROR:
+                if (statusCode == HttpStatus.NOT_FOUND) {
+                    throw new ResourceNotFoundException("Resource not found");
+                } else if (statusCode == HttpStatus.BAD_REQUEST) {
+                    throw new BadRequestException("Bad request");
+                }
+                break;
+            case SERVER_ERROR:
+                throw new ServiceUnavailableException("Service temporarily unavailable");
+        }
+    }
+}
+
+// Circuit Breaker Integration
+@Service
+public class ResilientUserService {
+
+    private final UserService userService;
+
+    @CircuitBreaker(name = "user-service", fallbackMethod = "fallbackUserProfile")
+    @TimeLimiter(name = "user-service")
+    @Retry(name = "user-service")
+    public CompletableFuture&lt;UserProfile&gt; getUserProfileWithResilience(Long userId) {
+        return CompletableFuture.supplyAsync(() -> userService.getUserProfile(userId));
+    }
+
+    public CompletableFuture&lt;UserProfile&gt; fallbackUserProfile(Long userId, Exception ex) {
+        log.warn("Fallback triggered for user profile: {}", userId, ex);
+
+        // Return basic profile from cache or database only
+        User user = userRepository.findById(userId)
+            .orElse(User.builder().id(userId).username("Unknown").build());
+
+        return CompletableFuture.completedFuture(
+            UserProfile.builder()
+                .user(user)
+                .orders(Collections.emptyList())
+                .preferences(UserPreferences.getDefault())
+                .build()
+        );
+    }
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="lesson-summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Lesson Summary</h2>
+
+            <p>In this lesson, we explored synchronous and asynchronous communication patterns in microservices architectures. Here's a comprehensive summary of all the concepts and implementation approaches covered:</p>
+
+            <h3>Communication Fundamentals</h3>
+            <ul>
+              <li><strong>Synchronous communication:</strong> Caller waits for response before continuing, creates direct request-response interactions</li>
+              <li><strong>Asynchronous communication:</strong> Caller sends message and continues processing without waiting for immediate response</li>
+              <li><strong>Trade-offs:</strong> Sync provides immediate feedback vs Async offers better scalability and loose coupling</li>
+              <li><strong>Decision factors:</strong> Choose based on consistency requirements, user experience needs, and system resilience goals</li>
+            </ul>
+
+            <h3>Synchronous Communication Patterns</h3>
+            <ul>
+              <li><strong>REST APIs:</strong> HTTP-based service-to-service communication using standard methods (GET, POST, PUT, DELETE)</li>
+              <li><strong>RestTemplate:</strong> Traditional blocking HTTP client with simple API, suitable for straightforward service calls</li>
+              <li><strong>WebClient:</strong> Modern reactive HTTP client offering both sync and async capabilities with better resource utilization</li>
+              <li><strong>OpenFeign:</strong> Declarative REST client using annotations, eliminates boilerplate and integrates with Spring Cloud features</li>
+            </ul>
+
+            <h3>Asynchronous Communication Patterns</h3>
+            <ul>
+              <li><strong>Event-driven architecture:</strong> Services communicate through events representing business facts, enabling loose coupling</li>
+              <li><strong>Commands vs Events:</strong> Commands request actions from specific services, events announce what happened to interested parties</li>
+              <li><strong>Message brokers:</strong> Kafka for high-throughput streaming and RabbitMQ for traditional queuing with complex routing</li>
+              <li><strong>Publisher-Subscriber:</strong> Decoupled communication where publishers emit events without knowing consumers</li>
+            </ul>
+
+            <h3>Apache Kafka Implementation</h3>
+            <ul>
+              <li><strong>Architecture:</strong> Distributed streaming platform with topics, partitions, producers, and consumers</li>
+              <li><strong>Topics:</strong> Categories for organizing related messages with configurable retention and partitioning strategies</li>
+              <li><strong>Producers:</strong> KafkaTemplate for publishing events with asynchronous callbacks and error handling</li>
+              <li><strong>Consumers:</strong> @KafkaListener annotation for processing messages with group-based load distribution</li>
+            </ul>
+
+            <h3>RabbitMQ Implementation</h3>
+            <ul>
+              <li><strong>AMQP protocol:</strong> Advanced Message Queuing Protocol with exchanges, queues, and routing keys</li>
+              <li><strong>Exchanges:</strong> Route messages to queues based on routing rules (direct, topic, fanout)</li>
+              <li><strong>Producers:</strong> RabbitTemplate for sending messages with exchange and routing key specifications</li>
+              <li><strong>Consumers:</strong> @RabbitListener annotation for processing messages from specific queues</li>
+            </ul>
+
+            <h3>Best Practices and Patterns</h3>
+            <ul>
+              <li><strong>Pub/Sub pattern:</strong> Maximum decoupling through event-based communication without direct service dependencies</li>
+              <li><strong>Sync vs Async choice:</strong> Use sync for immediate validation/feedback, async for background processing and notifications</li>
+              <li><strong>Avoiding tight coupling:</strong> Design self-contained events with business context, version schemas carefully</li>
+              <li><strong>Error handling:</strong> Implement retries with exponential backoff, circuit breakers, and idempotent operations</li>
+            </ul>
+
+            <h3>Resilience and Error Handling</h3>
+            <ul>
+              <li><strong>Retry strategies:</strong> Exponential backoff to handle transient failures without overwhelming struggling services</li>
+              <li><strong>Dead Letter Queues:</strong> Capture failed messages for investigation and manual reprocessing</li>
+              <li><strong>Circuit breakers:</strong> Detect failing services and provide fallback responses during outages</li>
+              <li><strong>Timeouts:</strong> Configure appropriate connection and read timeouts based on system requirements</li>
+            </ul>
+
+            <h3>Production Implementation Examples</h3>
+            <ul>
+              <li><strong>Order processing system:</strong> Hybrid approach using sync for payment validation and async for inventory/notifications</li>
+              <li><strong>RestTemplate integration:</strong> Complete configuration with load balancing, error handling, and service discovery</li>
+              <li><strong>Event sourcing:</strong> Publishing domain events for audit trails, analytics, and cross-service workflows</li>
+              <li><strong>Monitoring:</strong> Request logging, response timing, and failure tracking for operational visibility</li>
+            </ul>
+
+            <h3>Key Takeaways</h3>
+            <ul>
+              <li>Communication patterns fundamentally impact system scalability, reliability, and maintainability in microservices</li>
+              <li>Synchronous communication works best for immediate validation and user-facing operations requiring instant feedback</li>
+              <li>Asynchronous communication enables scalable, resilient systems through loose coupling and event-driven workflows</li>
+              <li>Modern applications typically use hybrid approaches, combining sync and async patterns based on specific use cases</li>
+              <li>Proper error handling, retries, and circuit breakers are essential for building robust communication between services</li>
+            </ul>
+          </section>
+
+          <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+            <a href="lesson-03.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
+            <a href="lesson-05.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
+          </nav>
+        </div>
+      </div>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('themeToggle')?.addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>

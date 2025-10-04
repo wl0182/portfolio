@@ -1,0 +1,646 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 08 - Observability & Tracing</title>
+    <meta name="description" content="Learn observability and distributed tracing in Spring Boot microservices with Micrometer, OpenTelemetry, and monitoring best practices." />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="lg:flex lg:gap-8">
+        <aside class="hidden lg:block lg:w-72">
+          <nav class="sticky top-8 rounded-xl border border-slate-200/60 bg-white/60 p-4 shadow-sm backdrop-blur dark:border-slate-800/60 dark:bg-slate-900/40" aria-label="Table of contents">
+            <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">On this page</h2>
+            <ol class="space-y-1 text-sm">
+              <li><a href="#introduction" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Introduction</a></li>
+              <li><a href="#metrics" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Metrics</a></li>
+              <li><a href="#logging" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Logging</a></li>
+              <li><a href="#distributed-tracing" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Distributed Tracing</a></li>
+              <li><a href="#lesson-summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Lesson Summary</a></li>
+            </ol>
+          </nav>
+        </aside>
+        <div class="min-w-0 flex-1">
+          <div class="mb-6">
+            <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Microservices Concepts</a>
+          </div>
+          <header class="mx-auto max-w-3xl text-center">
+            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Observability & Tracing</h1>
+            <p class="mt-2 text-slate-600 dark:text-slate-300">Master observability in microservices with comprehensive metrics, logging, and distributed tracing strategies.</p>
+          </header>
+
+          <section id="introduction" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Introduction</h2>
+
+            <h3>What is observability in microservices</h3>
+            <p>Observability is the ability to understand the internal state and behavior of your distributed system by examining its external outputs, primarily through metrics, logs, and traces. In microservices architectures, observability becomes critical because applications are distributed across multiple services, making it impossible to understand system behavior by looking at any single component in isolation. Unlike traditional monitoring which focuses on predefined alerts and dashboards, observability provides the tools and data needed to ask arbitrary questions about your system's behavior and debug unknown problems as they arise. Effective observability enables teams to quickly identify, understand, and resolve issues in complex distributed systems while also providing insights for performance optimization and capacity planning.</p>
+
+            <h3>Why metrics, logs, and tracing are essential</h3>
+            <p>Metrics provide quantitative measurements of system behavior over time, such as request rates, error counts, response times, and resource utilization, giving you a high-level view of system health and performance trends. Logs capture detailed records of individual events and transactions, providing the context needed to understand what happened during specific incidents or to debug complex business logic failures. Traces follow individual requests as they flow through multiple services, showing the complete journey of a transaction and enabling you to identify bottlenecks, failures, and dependencies across service boundaries. Together, these three pillars of observability provide complementary views into your system: metrics show you what's happening, logs explain why it's happening, and traces reveal how it's happening across your distributed architecture.</p>
+
+            <h3>Overview of monitoring and alerting</h3>
+            <p>Monitoring involves continuously collecting, storing, and analyzing observability data to maintain awareness of system health and performance, while alerting automatically notifies teams when predefined conditions indicate problems or anomalies. Effective monitoring strategies combine real-time dashboards for operational awareness, historical analysis for trend identification, and proactive alerting for incident response, creating a comprehensive view of system behavior that enables both reactive problem-solving and proactive optimization. Modern monitoring approaches focus on building observability into applications from the ground up rather than trying to monitor systems from the outside, ensuring that the data needed for effective troubleshooting and optimization is available when needed. The goal is to create monitoring systems that provide actionable insights without overwhelming teams with false positives or irrelevant alerts, enabling quick response to real issues while maintaining confidence in system reliability.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="metrics" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Metrics</h2>
+
+            <h3>Metrics collection with Micrometer</h3>
+            <p>Micrometer is Spring Boot's metrics facade that provides a vendor-neutral interface for collecting application metrics, automatically integrating with popular monitoring systems like Prometheus, Grafana, InfluxDB, and CloudWatch. It acts as a dimensional metrics library that abstracts away the differences between various metrics backends, allowing you to write metric collection code once and export to multiple monitoring systems without code changes. Micrometer automatically collects JVM metrics, HTTP request metrics, database connection pool metrics, and other infrastructure-level measurements out of the box, while providing APIs for custom business metrics. The library integrates seamlessly with Spring Boot's autoconfiguration, requiring minimal setup to start collecting comprehensive metrics about your application's behavior and performance.</p>
+
+            <h3>Example: exposing custom counters and gauges</h3>
+            <p>Custom counters track the number of times specific events occur in your application, such as user registrations, order completions, or payment failures, providing insights into business-level activities and operational patterns. Gauges represent current values that can go up or down, such as active user sessions, queue sizes, or cache hit rates, giving you real-time visibility into system state and resource utilization. Micrometer's fluent API makes it easy to create and manage custom metrics with proper tagging for dimensional analysis, enabling you to slice and dice metrics by various attributes like user type, geographic region, or service version. These custom metrics bridge the gap between technical infrastructure metrics and business KPIs, providing the data needed to understand both system performance and business impact.</p>
+
+            <pre><code class="language-java">@Service
+public class OrderService {
+
+    private final Counter orderCreatedCounter;
+    private final Counter orderFailedCounter;
+    private final Gauge activeOrdersGauge;
+    private final Timer orderProcessingTimer;
+    private final MeterRegistry meterRegistry;
+
+    public OrderService(MeterRegistry meterRegistry) {
+        this.meterRegistry = meterRegistry;
+
+        // Counter for successful orders
+        this.orderCreatedCounter = Counter.builder("orders.created")
+            .description("Number of orders successfully created")
+            .tag("service", "order-service")
+            .register(meterRegistry);
+
+        // Counter for failed orders with reason tags
+        this.orderFailedCounter = Counter.builder("orders.failed")
+            .description("Number of failed order attempts")
+            .tag("service", "order-service")
+            .register(meterRegistry);
+
+        // Gauge for active orders count
+        this.activeOrdersGauge = Gauge.builder("orders.active")
+            .description("Number of currently active orders")
+            .register(meterRegistry, this, OrderService::getActiveOrderCount);
+
+        // Timer for order processing duration
+        this.orderProcessingTimer = Timer.builder("orders.processing.duration")
+            .description("Time taken to process orders")
+            .register(meterRegistry);
+    }
+
+    public Order createOrder(CreateOrderRequest request) {
+        return Timer.Sample.start(meterRegistry)
+            .stop(orderProcessingTimer.timer("operation", "create"))
+            .recordCallable(() -> {
+                try {
+                    Order order = processOrder(request);
+                    orderCreatedCounter.increment(Tags.of(
+                        "user_type", request.getUserType(),
+                        "order_type", request.getOrderType()
+                    ));
+                    return order;
+                } catch (PaymentException e) {
+                    orderFailedCounter.increment(Tags.of("reason", "payment_failed"));
+                    throw e;
+                } catch (InventoryException e) {
+                    orderFailedCounter.increment(Tags.of("reason", "insufficient_inventory"));
+                    throw e;
+                }
+            });
+    }
+
+    @EventListener
+    public void handleUserLogin(UserLoginEvent event) {
+        meterRegistry.counter("user.logins",
+            "user_type", event.getUserType(),
+            "login_method", event.getLoginMethod())
+            .increment();
+    }
+
+    private double getActiveOrderCount() {
+        return orderRepository.countByStatus(OrderStatus.ACTIVE);
+    }
+}</code></pre>
+
+            <h3>Integrating metrics with Prometheus/Grafana dashboards</h3>
+            <p>Prometheus integration enables automatic scraping of Micrometer metrics through Spring Boot Actuator endpoints, providing a scalable time-series database for storing and querying metrics data with powerful PromQL query language capabilities. The integration exposes all application metrics in Prometheus format at the /actuator/prometheus endpoint, which Prometheus servers can scrape at regular intervals to build comprehensive time-series datasets. Grafana dashboards consume Prometheus data to create rich visualizations including graphs, heatmaps, and alerts that provide both real-time operational visibility and historical analysis capabilities. This combination creates a powerful observability stack where Micrometer handles metric collection, Prometheus provides storage and querying, and Grafana delivers visualization and alerting, enabling teams to build sophisticated monitoring solutions tailored to their specific needs.</p>
+
+            <pre><code class="language-yaml"># application.yml - Prometheus integration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+        orders.processing.duration: true
+      percentiles:
+        http.server.requests: 0.5, 0.95, 0.99
+        orders.processing.duration: 0.5, 0.95, 0.99
+    tags:
+      application: ${spring.application.name}
+      environment: ${spring.profiles.active}</code></pre>
+
+            <pre><code class="language-java">@Configuration
+public class MetricsConfig {
+
+    @Bean
+    public MeterRegistryCustomizer&lt;MeterRegistry&gt; metricsCommonTags() {
+        return registry -> registry.config()
+            .commonTags("application", "order-service")
+            .commonTags("version", getClass().getPackage().getImplementationVersion());
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "management.metrics.export.prometheus.enabled", havingValue = "true")
+    public TimedAspect timedAspect(MeterRegistry registry) {
+        return new TimedAspect(registry);
+    }
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="logging" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Logging</h2>
+
+            <h3>Logging strategies in microservices</h3>
+            <p>Effective logging strategies in microservices focus on creating consistent, searchable, and contextual log entries that can be correlated across service boundaries to understand complex distributed transactions. Each service should log at appropriate levels (ERROR, WARN, INFO, DEBUG) with consistent formatting and include correlation IDs that link related log entries across multiple services involved in the same business operation. Logging should capture not just errors and exceptions, but also important business events, performance milestones, and security-relevant activities, providing a comprehensive audit trail of system behavior. The strategy must balance providing sufficient detail for troubleshooting with avoiding log volume that overwhelms storage systems or makes analysis difficult, often achieved through careful level configuration and log sampling techniques.</p>
+
+            <h3>Centralized logging (ELK/EFK stack overview)</h3>
+            <p>The ELK (Elasticsearch, Logstash, Kibana) and EFK (Elasticsearch, Fluentd, Kibana) stacks provide centralized logging solutions where logs from all microservices are collected, processed, stored, and visualized in a unified system. Elasticsearch serves as the scalable search and analytics engine that stores log data and enables fast querying across massive datasets, while Logstash or Fluentd act as log processing pipelines that collect, parse, transform, and forward logs from various sources. Kibana provides the web-based interface for searching, filtering, and visualizing log data through dashboards, graphs, and real-time monitoring capabilities that enable teams to quickly find relevant information during incidents. This centralized approach eliminates the need to SSH into individual servers or containers to view logs, instead providing a single interface where operations teams can search across all services simultaneously and correlate activities across the entire distributed system.</p>
+
+            <h3>Structured logging for easier tracing</h3>
+            <p>Structured logging uses consistent formats like JSON to make log entries machine-readable and searchable, enabling automated analysis and correlation across distributed systems. Instead of writing free-form text messages, structured logging captures log data as key-value pairs that can be indexed and queried efficiently, including fields like timestamp, service name, correlation ID, user ID, and business context. This approach enables powerful log analysis capabilities such as filtering by specific users, tracing requests across services, aggregating error patterns, and building automated alerting based on log content patterns. Structured logs also integrate seamlessly with log processing pipelines and observability platforms, enabling automated parsing and enrichment that would be difficult or impossible with unstructured text logs.</p>
+
+            <pre><code class="language-java">@Slf4j
+@RestController
+public class OrderController {
+
+    private final OrderService orderService;
+    private final Logger structuredLogger = LoggerFactory.getLogger("STRUCTURED");
+
+    @PostMapping("/orders")
+    public ResponseEntity&lt;Order&gt; createOrder(@RequestBody CreateOrderRequest request,
+                                           HttpServletRequest httpRequest) {
+        String correlationId = UUID.randomUUID().toString();
+        String userId = extractUserId(httpRequest);
+
+        // Add correlation ID to MDC for all subsequent logs
+        MDC.put("correlationId", correlationId);
+        MDC.put("userId", userId);
+        MDC.put("operation", "createOrder");
+
+        try {
+            log.info("Creating order for user: {} with correlation: {}", userId, correlationId);
+
+            Order order = orderService.createOrder(request);
+
+            // Structured business event logging
+            structuredLogger.info("ORDER_CREATED",
+                kv("correlationId", correlationId),
+                kv("userId", userId),
+                kv("orderId", order.getId()),
+                kv("orderValue", order.getTotalAmount()),
+                kv("itemCount", order.getItems().size()),
+                kv("timestamp", Instant.now()),
+                kv("event", "ORDER_CREATED")
+            );
+
+            return ResponseEntity.ok(order);
+
+        } catch (PaymentException e) {
+            log.error("Payment failed for user: {} correlation: {}", userId, correlationId, e);
+
+            structuredLogger.error("PAYMENT_FAILED",
+                kv("correlationId", correlationId),
+                kv("userId", userId),
+                kv("errorType", "PAYMENT_FAILED"),
+                kv("errorMessage", e.getMessage()),
+                kv("timestamp", Instant.now())
+            );
+
+            throw new OrderCreationException("Order creation failed", e);
+        } finally {
+            MDC.clear(); // Clean up MDC
+        }
+    }
+}</code></pre>
+
+            <pre><code class="language-yaml"># logback-spring.xml configuration for structured logging
+logging:
+  level:
+    com.example.orderservice: INFO
+    STRUCTURED: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%X{correlationId:-}] %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%X{correlationId:-}] %logger{36} - %msg%n"
+
+# JSON structured logging with Logstash encoder
+management:
+  endpoints:
+    web:
+      exposure:
+        include: loggers</code></pre>
+
+            <pre><code class="language-java">@Component
+public class LoggingFilter implements Filter {
+
+    private static final Logger log = LoggerFactory.getLogger(LoggingFilter.class);
+
+    @Override
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
+
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
+
+        String correlationId = httpRequest.getHeader("X-Correlation-ID");
+        if (correlationId == null) {
+            correlationId = UUID.randomUUID().toString();
+        }
+
+        // Set correlation ID in response header and MDC
+        httpResponse.setHeader("X-Correlation-ID", correlationId);
+        MDC.put("correlationId", correlationId);
+        MDC.put("requestUri", httpRequest.getRequestURI());
+        MDC.put("httpMethod", httpRequest.getMethod());
+
+        long startTime = System.currentTimeMillis();
+
+        try {
+            chain.doFilter(request, response);
+        } finally {
+            long duration = System.currentTimeMillis() - startTime;
+            log.info("Request completed - Status: {} Duration: {}ms",
+                    httpResponse.getStatus(), duration);
+            MDC.clear();
+        }
+    }
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="distributed-tracing" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Distributed Tracing</h2>
+
+            <h3>What is distributed tracing and why it is important</h3>
+            <p>Distributed tracing tracks individual requests as they flow through multiple services in a microservices architecture, creating a complete picture of the request's journey including timing, dependencies, and any errors that occur along the way. Each trace represents a single transaction or operation initiated by a user or external system, while spans represent individual operations within that trace, such as database queries, HTTP calls, or business logic execution. This visibility is crucial in microservices because a single user action might trigger dozens of internal service calls, making it impossible to understand performance bottlenecks or failure points without seeing the complete request flow. Distributed tracing enables teams to quickly identify which service is causing latency, where errors are occurring, and how changes to one service affect the overall system performance.</p>
+
+            <h3>Using OpenTelemetry with Spring Boot</h3>
+            <p>OpenTelemetry is the industry-standard observability framework that provides APIs, libraries, and instrumentation for collecting traces, metrics, and logs from applications in a vendor-neutral way. Spring Boot integrates seamlessly with OpenTelemetry through auto-instrumentation that automatically creates spans for HTTP requests, database calls, messaging operations, and other common frameworks without requiring code changes. The integration captures detailed timing information, propagates trace context across service boundaries, and exports trace data to various backends like Jaeger, Zipkin, or cloud-native tracing services. OpenTelemetry's standardized approach ensures that tracing works consistently across different languages and frameworks, enabling end-to-end visibility even in polyglot microservices environments.</p>
+
+            <pre><code class="language-xml">&lt;!-- Maven dependencies for OpenTelemetry --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.opentelemetry&lt;/groupId&gt;
+    &lt;artifactId&gt;opentelemetry-api&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.opentelemetry.instrumentation&lt;/groupId&gt;
+    &lt;artifactId&gt;opentelemetry-spring-boot-starter&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;io.opentelemetry&lt;/groupId&gt;
+    &lt;artifactId&gt;opentelemetry-exporter-jaeger&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+
+            <pre><code class="language-java">@Service
+@Slf4j
+public class OrderService {
+
+    private final Tracer tracer;
+    private final PaymentService paymentService;
+    private final InventoryService inventoryService;
+
+    public OrderService(Tracer tracer, PaymentService paymentService, InventoryService inventoryService) {
+        this.tracer = tracer;
+        this.paymentService = paymentService;
+        this.inventoryService = inventoryService;
+    }
+
+    @WithSpan("order.create") // Automatic span creation
+    public Order createOrder(CreateOrderRequest request) {
+        Span span = tracer.nextSpan().name("order.processing")
+            .tag("user.id", request.getUserId())
+            .tag("order.type", request.getOrderType())
+            .start();
+
+        try (Tracer.SpanInScope ws = tracer.withSpanInScope(span)) {
+            log.info("Processing order for user: {}", request.getUserId());
+
+            // Validate inventory - creates child span automatically
+            validateInventory(request.getItems());
+
+            // Process payment - creates child span automatically
+            PaymentResult paymentResult = paymentService.processPayment(request.getPaymentInfo());
+
+            if (!paymentResult.isSuccessful()) {
+                span.tag("error", true);
+                span.tag("error.message", "Payment failed");
+                throw new PaymentException("Payment processing failed");
+            }
+
+            // Create order record
+            Order order = createOrderRecord(request, paymentResult);
+
+            span.tag("order.id", order.getId());
+            span.tag("order.total", order.getTotalAmount().toString());
+
+            // Send confirmation asynchronously - preserves trace context
+            sendOrderConfirmation(order);
+
+            return order;
+
+        } catch (Exception e) {
+            span.tag("error", true);
+            span.tag("error.message", e.getMessage());
+            log.error("Order creation failed", e);
+            throw e;
+        } finally {
+            span.end();
+        }
+    }
+
+    @NewSpan("inventory.validation") // Create custom span
+    private void validateInventory(List&lt;OrderItem&gt; items) {
+        Span span = tracer.nextSpan().name("inventory.check")
+            .tag("item.count", items.size())
+            .start();
+
+        try (Tracer.SpanInScope ws = tracer.withSpanInScope(span)) {
+            for (OrderItem item : items) {
+                boolean available = inventoryService.checkAvailability(item.getProductId(), item.getQuantity());
+                if (!available) {
+                    span.tag("error", true);
+                    span.tag("unavailable.product", item.getProductId());
+                    throw new InsufficientStockException("Product not available: " + item.getProductId());
+                }
+            }
+            span.tag("validation.result", "success");
+        } finally {
+            span.end();
+        }
+    }
+
+    @Async
+    @ContinueSpan // Preserve trace context in async operations
+    public void sendOrderConfirmation(Order order) {
+        Span span = tracer.nextSpan().name("order.confirmation")
+            .tag("order.id", order.getId())
+            .tag("notification.type", "email")
+            .start();
+
+        try (Tracer.SpanInScope ws = tracer.withSpanInScope(span)) {
+            // Send notification logic here
+            notificationService.sendOrderConfirmation(order);
+            span.tag("notification.sent", true);
+        } catch (Exception e) {
+            span.tag("error", true);
+            span.tag("error.message", e.getMessage());
+        } finally {
+            span.end();
+        }
+    }
+}</code></pre>
+
+            <h3>Visualizing traces across services</h3>
+            <p>Trace visualization tools like Jaeger and Zipkin provide web-based interfaces that display traces as interactive timelines showing the sequence and duration of operations across multiple services. These visualizations reveal the complete request flow including service dependencies, parallel operations, and bottlenecks, making it easy to identify which services contribute most to overall latency. The timeline view shows spans as bars with duration proportional to their execution time, while service maps display the overall architecture and communication patterns discovered from trace data. Advanced features include trace comparison for performance analysis, error highlighting, and drill-down capabilities that allow teams to examine specific operations in detail, enabling quick identification of performance issues and system inefficiencies.</p>
+
+            <h3>Detecting latency, bottlenecks, and errors</h3>
+            <p>Distributed tracing enables systematic detection of performance issues by analyzing span durations, identifying operations that consistently take longer than expected, and highlighting services that contribute disproportionately to overall request latency. Error detection becomes straightforward as failed spans are clearly marked in traces, showing exactly where in the request flow errors occur and providing context about the operations that were in progress when failures happened. Bottleneck analysis involves examining traces to find operations that block other operations or services that become overloaded under high traffic, while dependency analysis reveals critical paths and services that affect overall system performance. Teams can use trace data to establish performance baselines, set up alerting for anomalous latency patterns, and prioritize optimization efforts based on actual user impact rather than guessing about performance problems.</p>
+
+            <pre><code class="language-yaml"># application.yml - OpenTelemetry configuration
+management:
+  tracing:
+    sampling:
+      probability: 1.0 # Sample 100% for development, reduce in production
+
+otel:
+  exporter:
+    jaeger:
+      endpoint: http://localhost:14250
+  resource:
+    attributes:
+      service.name: order-service
+      service.version: 1.0.0
+      environment: ${spring.profiles.active}
+  instrumentation:
+    spring-webmvc:
+      enabled: true
+    jdbc:
+      enabled: true
+    kafka:
+      enabled: true</code></pre>
+
+            <pre><code class="language-java">@Configuration
+public class TracingConfig {
+
+    @Bean
+    public OpenTelemetry openTelemetry() {
+        return OpenTelemetrySDK.builder()
+            .setTracerProvider(
+                SdkTracerProvider.builder()
+                    .addSpanProcessor(BatchSpanProcessor.builder(
+                        JaegerGrpcSpanExporter.builder()
+                            .setEndpoint("http://localhost:14250")
+                            .build())
+                        .build())
+                    .setResource(Resource.getDefault()
+                        .merge(Resource.builder()
+                            .put(ResourceAttributes.SERVICE_NAME, "order-service")
+                            .put(ResourceAttributes.SERVICE_VERSION, "1.0.0")
+                            .build()))
+                    .build())
+            .build();
+    }
+
+    @Bean
+    public Tracer tracer(OpenTelemetry openTelemetry) {
+        return openTelemetry.getTracer("order-service");
+    }
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="lesson-summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Lesson Summary</h2>
+
+            <p>In this lesson, we explored observability and distributed tracing for microservices architectures. Here's a comprehensive summary of all the concepts and implementation approaches covered:</p>
+
+            <h3>Observability Fundamentals</h3>
+            <ul>
+              <li><strong>Definition:</strong> Ability to understand internal system state by examining external outputs through metrics, logs, and traces</li>
+              <li><strong>Importance in microservices:</strong> Critical for distributed systems where no single component provides complete visibility</li>
+              <li><strong>Three pillars:</strong> Metrics (what's happening), logs (why it's happening), traces (how it's happening across services)</li>
+              <li><strong>Benefits:</strong> Quick issue identification, debugging unknown problems, performance optimization, and capacity planning</li>
+            </ul>
+
+            <h3>Metrics Collection with Micrometer</h3>
+            <ul>
+              <li><strong>Purpose:</strong> Vendor-neutral metrics facade providing dimensional metrics for Spring Boot applications</li>
+              <li><strong>Integration:</strong> Seamless Spring Boot autoconfiguration with multiple monitoring backends (Prometheus, Grafana, InfluxDB)</li>
+              <li><strong>Built-in metrics:</strong> JVM metrics, HTTP requests, database connections, and infrastructure measurements</li>
+              <li><strong>Custom metrics:</strong> Counters for event counting, gauges for current values, timers for duration measurement</li>
+            </ul>
+
+            <h3>Custom Metrics Implementation</h3>
+            <ul>
+              <li><strong>Counters:</strong> Track business events like order completions, user registrations, and payment failures</li>
+              <li><strong>Gauges:</strong> Monitor real-time values like active sessions, queue sizes, and cache hit rates</li>
+              <li><strong>Timers:</strong> Measure operation durations with percentile distributions for performance analysis</li>
+              <li><strong>Tagging:</strong> Dimensional analysis with attributes like user type, geographic region, and service version</li>
+            </ul>
+
+            <h3>Prometheus and Grafana Integration</h3>
+            <ul>
+              <li><strong>Prometheus scraping:</strong> Automatic metric collection through /actuator/prometheus endpoint</li>
+              <li><strong>Time-series storage:</strong> Scalable data storage with powerful PromQL query language capabilities</li>
+              <li><strong>Grafana visualization:</strong> Rich dashboards with graphs, heatmaps, and real-time monitoring</li>
+              <li><strong>Alerting capabilities:</strong> Proactive notifications based on metric thresholds and anomaly detection</li>
+            </ul>
+
+            <h3>Logging Strategies</h3>
+            <ul>
+              <li><strong>Consistency:</strong> Uniform formatting and correlation IDs across all microservices</li>
+              <li><strong>Context preservation:</strong> Correlation IDs linking related log entries across service boundaries</li>
+              <li><strong>Appropriate levels:</strong> ERROR, WARN, INFO, DEBUG for different types of information</li>
+              <li><strong>Balance:</strong> Sufficient detail for troubleshooting without overwhelming storage systems</li>
+            </ul>
+
+            <h3>Centralized Logging</h3>
+            <ul>
+              <li><strong>ELK/EFK stacks:</strong> Elasticsearch for storage, Logstash/Fluentd for processing, Kibana for visualization</li>
+              <li><strong>Unified interface:</strong> Single location for searching logs across all microservices</li>
+              <li><strong>Correlation capabilities:</strong> Cross-service log analysis and real-time monitoring dashboards</li>
+              <li><strong>Operational benefits:</strong> Eliminates need for individual server access and enables automated analysis</li>
+            </ul>
+
+            <h3>Structured Logging</h3>
+            <ul>
+              <li><strong>Machine-readable format:</strong> JSON-based logging with consistent key-value pairs for automated analysis</li>
+              <li><strong>Enhanced searchability:</strong> Efficient filtering and querying capabilities across large datasets</li>
+              <li><strong>Integration benefits:</strong> Seamless processing with log pipelines and observability platforms</li>
+              <li><strong>Context enrichment:</strong> Correlation IDs, user IDs, and business context in structured format</li>
+            </ul>
+
+            <h3>Distributed Tracing Concepts</h3>
+            <ul>
+              <li><strong>Purpose:</strong> Track individual requests across multiple services showing complete journey and timing</li>
+              <li><strong>Traces and spans:</strong> Traces represent transactions, spans represent individual operations within traces</li>
+              <li><strong>Critical visibility:</strong> Essential for understanding performance bottlenecks and failure points in distributed systems</li>
+              <li><strong>Request flow analysis:</strong> Complete picture of service dependencies and interaction patterns</li>
+            </ul>
+
+            <h3>OpenTelemetry Implementation</h3>
+            <ul>
+              <li><strong>Industry standard:</strong> Vendor-neutral observability framework for traces, metrics, and logs</li>
+              <li><strong>Auto-instrumentation:</strong> Automatic span creation for HTTP, database, messaging without code changes</li>
+              <li><strong>Context propagation:</strong> Automatic trace context transmission across service boundaries</li>
+              <li><strong>Backend flexibility:</strong> Export to Jaeger, Zipkin, or cloud-native tracing services</li>
+            </ul>
+
+            <h3>Trace Visualization and Analysis</h3>
+            <ul>
+              <li><strong>Timeline views:</strong> Interactive displays showing operation sequence and duration across services</li>
+              <li><strong>Service maps:</strong> Architecture visualization and communication pattern discovery from trace data</li>
+              <li><strong>Performance analysis:</strong> Bottleneck identification and latency analysis tools</li>
+              <li><strong>Error detection:</strong> Clear marking of failed operations with context and error propagation</li>
+            </ul>
+
+            <h3>Observability Best Practices</h3>
+            <ul>
+              <li><strong>Sampling strategies:</strong> Balance between data completeness and system performance impact</li>
+              <li><strong>Correlation IDs:</strong> Consistent request tracking across all observability pillars</li>
+              <li><strong>Business metrics:</strong> Bridge technical metrics with business KPIs for comprehensive visibility</li>
+              <li><strong>Alerting hygiene:</strong> Actionable alerts without false positives for effective incident response</li>
+            </ul>
+
+            <h3>Production Deployment Considerations</h3>
+            <ul>
+              <li><strong>Performance impact:</strong> Minimal overhead from instrumentation and data collection</li>
+              <li><strong>Data retention:</strong> Appropriate storage policies for metrics, logs, and traces</li>
+              <li><strong>Security:</strong> Sensitive data handling in logs and traces with proper redaction</li>
+              <li><strong>Scalability:</strong> Observability infrastructure scaling with application growth</li>
+            </ul>
+
+            <h3>Key Takeaways</h3>
+            <ul>
+              <li>Observability is essential for understanding and operating complex microservices architectures effectively</li>
+              <li>Metrics, logs, and traces provide complementary views that together enable comprehensive system understanding</li>
+              <li>Micrometer and OpenTelemetry provide industry-standard, vendor-neutral observability instrumentation</li>
+              <li>Structured logging and correlation IDs are crucial for effective distributed system troubleshooting</li>
+              <li>Proper observability implementation enables proactive monitoring, quick incident response, and data-driven optimization</li>
+            </ul>
+          </section>
+
+          <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+            <a href="lesson-07.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
+            <a href="lesson-09.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
+          </nav>
+        </div>
+      </div>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('themeToggle')?.addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 03 - API Gateway & Edge Routing</title>
+    <meta name="description" content="API Gateway patterns with Spring Cloud Gateway: routing, load balancing, authentication offloading, rate limiting, predicates, and filters." />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="lg:flex lg:gap-8">
+        <aside class="hidden lg:block lg:w-72">
+          <nav class="sticky top-8 rounded-xl border border-slate-200/60 bg-white/60 p-4 shadow-sm backdrop-blur dark:border-slate-800/60 dark:bg-slate-900/40" aria-label="Table of contents">
+            <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">On this page</h2>
+            <ol class="space-y-1 text-sm">
+              <li><a href="#what-is-api-gateway" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">What is an API Gateway?</a></li>
+              <li><a href="#core-responsibilities" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Core Responsibilities</a></li>
+              <li><a href="#spring-cloud-gateway" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Spring Cloud Gateway Basics</a></li>
+              <li><a href="#route-predicates" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Route Predicates</a></li>
+              <li><a href="#filters" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Filters</a></li>
+              <li><a href="#auth-security" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Authentication & Security</a></li>
+              <li><a href="#putting-together" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Putting it All Together</a></li>
+              <li><a href="#lesson-summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Lesson Summary</a></li>
+            </ol>
+          </nav>
+        </aside>
+        <div class="min-w-0 flex-1">
+          <div class="mb-6">
+            <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Microservices Concepts</a>
+          </div>
+          <header class="mx-auto max-w-3xl text-center">
+            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">API Gateway & Edge Routing</h1>
+            <p class="mt-2 text-slate-600 dark:text-slate-300">Learn how API Gateway simplifies client-service communication with routing, authentication, and traffic management.</p>
+          </header>
+
+          <section id="what-is-api-gateway" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>What is an API Gateway?</h2>
+
+            <p>An API Gateway is a server that acts as the single entry point for all client requests to your microservices architecture. It sits between external clients (web apps, mobile apps, third-party services) and your backend microservices, routing requests to the appropriate service instances. The gateway essentially acts as a reverse proxy that receives requests from clients, forwards them to one or more backend services, and then returns the appropriate response back to the client.</p>
+
+            <p>The gateway handles cross-cutting concerns that would otherwise need to be implemented in every microservice, such as authentication, authorization, rate limiting, request/response transformation, and monitoring. This centralization reduces code duplication and ensures consistent behavior across all services. In microservices architecture, the API Gateway is crucial because it provides a unified interface to clients while keeping the internal service structure flexible and allowing services to evolve independently.</p>
+
+            <p>Direct client-to-service calls are problematic because they create tight coupling between clients and services. Clients would need to know the exact network locations of every service, handle service discovery, implement retry logic for failed requests, and manage authentication with each service separately. When services are scaled, moved, or replaced, all clients would need updates, making the system brittle and difficult to maintain.</p>
+
+            <p>Additionally, direct calls expose internal service structure to external clients, making it harder to refactor or reorganize services without breaking client applications. The API Gateway solves these problems by providing a stable, unified interface that shields clients from the complexity of the underlying microservices infrastructure.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="core-responsibilities" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Core Responsibilities</h2>
+
+            <h3>Routing</h3>
+            <p>The gateway examines incoming requests and determines which backend service should handle each request based on URL paths, HTTP methods, headers, or other request attributes. It maintains routing rules that map external API endpoints to internal service locations, allowing clients to use simple, consistent URLs while the gateway handles the complexity of finding and connecting to the appropriate service instances.</p>
+
+            <h3>Load Balancing</h3>
+            <p>When multiple instances of a service are running, the gateway distributes incoming requests across these instances to ensure optimal resource utilization and prevent any single instance from becoming overwhelmed. It can use various load balancing algorithms like round-robin, least connections, or weighted distribution to intelligently route traffic based on current system conditions.</p>
+
+            <h3>Authentication/Security Offloading</h3>
+            <p>The gateway centralizes authentication and authorization logic, validating user credentials and permissions before requests reach backend services. This means backend services can trust that all incoming requests are already authenticated and authorized, simplifying their implementation and ensuring consistent security policies across the entire system. The gateway can handle various authentication methods like JWT tokens, OAuth2, API keys, or session-based authentication.</p>
+
+            <h3>Rate Limiting</h3>
+            <p>To protect backend services from being overwhelmed by too many requests, the gateway implements rate limiting policies that control how frequently clients can make requests. It can set different limits for different types of clients (free vs premium users, internal vs external applications) and use various algorithms like token bucket or sliding window to provide both burst capacity and sustained rate control while returning appropriate error responses when limits are exceeded.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="spring-cloud-gateway" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Spring Cloud Gateway Basics</h2>
+
+            <p>Spring Cloud Gateway is preferred over traditional servlet-based gateways because it's built on Spring Framework 5's reactive stack with Project Reactor and Spring WebFlux. This reactive, non-blocking architecture allows it to handle thousands of concurrent connections with a small number of threads, making it highly efficient for gateway scenarios where you need to process many simultaneous requests and potentially aggregate responses from multiple backend services.</p>
+
+            <p>The gateway integrates seamlessly with the Spring ecosystem, including Spring Boot auto-configuration, Spring Security for authentication, Spring Cloud service discovery, and Spring Actuator for monitoring. This tight integration means you can leverage existing Spring knowledge and configuration patterns while getting enterprise-grade features out of the box.</p>
+
+            <h3>Basic Route Configuration (application.yml)</h3>
+            <pre><code class="language-yaml">spring:
+  cloud:
+    gateway:
+      routes:
+        - id: user-service-route
+          uri: lb://user-service
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - StripPrefix=1</code></pre>
+
+            <p>In this configuration, the <strong>id</strong> is a unique identifier for the route, the <strong>uri</strong> specifies the destination (lb:// indicates load-balanced service discovery), <strong>predicates</strong> define the conditions that must be met for this route to match a request, and <strong>filters</strong> specify transformations to apply to requests or responses passing through this route.</p>
+
+            <p>The StripPrefix=1 filter removes the first path segment (/api) before forwarding to the backend service, so a request to /api/users/123 becomes /users/123 when sent to the user-service. This allows the gateway to use different URL structures externally while maintaining clean, service-specific paths internally.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="route-predicates" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Route Predicates</h2>
+
+            <p>Route predicates are conditions that determine whether an incoming request matches a specific route. They act as the decision-making logic that examines request characteristics like path, method, headers, query parameters, or even the time of day, and decide if the request should be handled by a particular route. Predicates are essential because they allow you to create sophisticated routing rules that can handle complex scenarios like API versioning, feature flags, canary deployments, or geographic routing.</p>
+
+            <p>Spring Cloud Gateway provides many built-in predicates for common routing scenarios, and you can combine multiple predicates using logical AND operations to create precise routing rules. This flexibility allows you to implement advanced traffic management strategies without writing custom routing logic.</p>
+
+            <h3>Path Predicate Example</h3>
+            <pre><code class="language-yaml">spring:
+  cloud:
+    gateway:
+      routes:
+        - id: order-route
+          uri: lb://order-service
+          predicates:
+            - Path=/api/orders/**</code></pre>
+
+            <p>This Path predicate matches any request where the URL path starts with /api/orders/, including /api/orders/123, /api/orders/search, or /api/orders/user/456. The ** wildcard matches multiple path segments, making it perfect for routing entire API sections to specific services.</p>
+
+            <h3>Combining Multiple Predicates</h3>
+            <pre><code class="language-yaml">spring:
+  cloud:
+    gateway:
+      routes:
+        - id: admin-route
+          uri: lb://admin-service
+          predicates:
+            - Path=/api/admin/**
+            - Header=X-Admin-Token, .+
+            - Method=GET,POST</code></pre>
+
+            <p>When multiple predicates are specified, ALL conditions must be met for the route to match (logical AND). This example only routes requests that have a path starting with /api/admin/, contain an X-Admin-Token header with any value, and use either GET or POST methods. This allows you to create secure, method-specific routing rules that ensure only properly authenticated admin requests reach sensitive endpoints.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="filters" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Filters</h2>
+
+            <p>Filters in Spring Cloud Gateway provide a powerful way to modify requests and responses as they pass through the gateway. Pre-filters execute before the request is sent to the backend service and can modify request headers, validate input, add authentication context, or reject requests entirely. Post-filters execute after the backend service responds and can modify response headers, transform response bodies, add security headers, or collect metrics.</p>
+
+            <p>Filters enable you to implement cross-cutting concerns consistently across all your routes without duplicating code in backend services. They operate in a configurable order, allowing you to create processing pipelines that handle authentication, then authorization, then request transformation, then rate limiting, in the exact sequence your application requires.</p>
+
+            <h3>Adding Headers Filter</h3>
+            <pre><code class="language-yaml">spring:
+  cloud:
+    gateway:
+      routes:
+        - id: api-route
+          uri: lb://backend-service
+          filters:
+            - AddRequestHeader=X-Request-Source, gateway
+            - AddResponseHeader=X-Response-Time, #{T(System).currentTimeMillis()}</code></pre>
+
+            <p>The AddRequestHeader filter adds a custom header to every request before forwarding it to the backend service, which helps backend services identify that requests came through the gateway. The AddResponseHeader filter adds metadata to responses, such as processing timestamps that can be useful for performance monitoring and debugging.</p>
+
+            <h3>Rate Limiter Filter</h3>
+            <pre><code class="language-yaml">spring:
+  cloud:
+    gateway:
+      routes:
+        - id: rate-limited-route
+          uri: lb://api-service
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20</code></pre>
+
+            <p>The RequestRateLimiter filter implements token bucket algorithm using Redis to track request counts across multiple gateway instances. The replenishRate controls how many requests per second are allowed on average, while burstCapacity allows temporary spikes above the sustained rate, providing flexibility for realistic traffic patterns while protecting backend services from being overwhelmed.</p>
+
+            <h3>Java DSL Filter Example</h3>
+            <pre><code class="language-java">@Bean
+public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
+    return builder.routes()
+        .route("custom-route", r -> r.path("/api/**")
+            .filters(f -> f
+                .addRequestHeader("X-Gateway-Version", "1.0")
+                .circuitBreaker(config -> config.setName("myCircuitBreaker"))
+                .retry(3))
+            .uri("lb://backend-service"))
+        .build();
+}</code></pre>
+
+            <p>This Java DSL approach provides programmatic configuration with full IDE support and type safety. The example shows how to chain multiple filters including custom headers, circuit breaker for resilience, and retry logic for handling transient failures, all configured fluently in a single route definition.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="auth-security" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Authentication & Security Offloading</h2>
+
+            <p>The API Gateway handles authentication and security because it's much more efficient and secure to validate user credentials once at the edge rather than in every microservice. When the gateway validates authentication tokens, extracts user identity, and adds trusted headers to requests, backend services can focus on business logic instead of repeatedly implementing the same security checks. This pattern also ensures consistent security policies across all services and makes it easy to update authentication methods without changing every service.</p>
+
+            <p>Security offloading also enables sophisticated security policies like multi-factor authentication, geo-blocking, or dynamic authorization rules that would be complex and expensive to implement consistently across dozens of microservices. The gateway becomes the security enforcement point that protects your entire service mesh with centralized, auditable security policies.</p>
+
+            <h3>JWT Validation Example</h3>
+            <pre><code class="language-yaml">spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: https://auth-server.com/.well-known/jwks.json
+  cloud:
+    gateway:
+      routes:
+        - id: secure-route
+          uri: lb://protected-service
+          predicates:
+            - Path=/api/secure/**
+          filters:
+            - RemoveRequestHeader=Authorization</code></pre>
+
+            <p>This configuration sets up the gateway as an OAuth2 Resource Server that validates JWT tokens against the specified JSON Web Key Set endpoint. When a valid JWT is presented, the gateway extracts user information and can add trusted headers like X-User-ID or X-User-Roles before forwarding the request. The RemoveRequestHeader filter ensures that the original Authorization header is not passed to backend services, preventing potential security issues if those services have their own token validation logic.</p>
+
+            <h3>Custom Authentication Filter</h3>
+            <pre><code class="language-java">@Component
+public class JwtAuthenticationFilter implements GlobalFilter, Ordered {
+
+    @Override
+    public Mono&lt;Void&gt; filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        String token = extractToken(exchange.getRequest());
+
+        if (isValidToken(token)) {
+            String userId = extractUserId(token);
+            ServerHttpRequest mutatedRequest = exchange.getRequest().mutate()
+                .header("X-User-ID", userId)
+                .header("X-Authenticated", "true")
+                .build();
+
+            return chain.filter(exchange.mutate().request(mutatedRequest).build());
+        } else {
+            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+            return exchange.getResponse().setComplete();
+        }
+    }
+
+    @Override
+    public int getOrder() { return -100; }
+}</code></pre>
+
+            <p>This custom filter demonstrates how to implement authentication logic that validates tokens and enriches requests with user context. The filter extracts JWT tokens from request headers, validates them against your authentication service or local validation logic, and either adds trusted user information to the request or rejects unauthorized requests immediately. The low order value (-100) ensures this filter runs early in the filter chain, before business logic filters that might depend on authentication context.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="putting-together" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Putting it All Together</h2>
+
+            <p>The main benefits of API Gateway include <strong>simplicity</strong> for clients who only need to know one endpoint instead of tracking multiple service locations, <strong>security</strong> through centralized authentication and authorization that ensures consistent policies across all services, and <strong>traffic management</strong> capabilities like rate limiting, load balancing, and circuit breaking that protect your system from overload and failures while providing excellent observability into request patterns and system health.</p>
+
+            <p>By centralizing cross-cutting concerns, the gateway reduces code duplication, simplifies client development, and enables advanced deployment strategies like blue-green deployments or canary releases without requiring changes to client applications. The gateway becomes the operational control point for your entire API surface, providing unified monitoring, logging, and security enforcement.</p>
+
+            <h3>Spring Boot Implementation</h3>
+
+            <p>Creating a complete API Gateway with Spring Boot requires setting up dependencies, configuring routes, and implementing custom filters. Here's a minimal but production-ready gateway implementation that demonstrates all the key concepts we've covered.</p>
+
+            <h4>Maven Dependencies (pom.xml)</h4>
+            <pre><code class="language-xml">&lt;dependencies&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-cloud-starter-gateway&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-cloud-starter-netflix-eureka-client&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-data-redis-reactive&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;</code></pre>
+
+            <h4>Main Application Class</h4>
+            <pre><code class="language-java">@SpringBootApplication
+@EnableEurekaClient
+public class ApiGatewayApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(ApiGatewayApplication.class, args);
+    }
+
+    @Bean
+    public RouteLocator customRouteLocator(RouteLocatorBuilder builder) {
+        return builder.routes()
+            .route("user-service", r -> r.path("/api/users/**")
+                .filters(f -> f
+                    .stripPrefix(1)
+                    .addRequestHeader("X-Gateway-Source", "api-gateway")
+                    .requestRateLimiter(config -> config
+                        .setRateLimiter(redisRateLimiter())
+                        .setKeyResolver(userKeyResolver())))
+                .uri("lb://user-service"))
+            .route("order-service", r -> r.path("/api/orders/**")
+                .and().method(HttpMethod.GET, HttpMethod.POST)
+                .filters(f -> f
+                    .stripPrefix(1)
+                    .circuitBreaker(config -> config
+                        .setName("order-cb")
+                        .setFallbackUri("forward:/fallback/orders")))
+                .uri("lb://order-service"))
+            .build();
+    }
+
+    @Bean
+    public RedisRateLimiter redisRateLimiter() {
+        return new RedisRateLimiter(10, 20, 1);
+    }
+
+    @Bean
+    public KeyResolver userKeyResolver() {
+        return exchange -> exchange.getRequest().getHeaders()
+            .getFirst("X-User-ID") != null ?
+            Mono.just(exchange.getRequest().getHeaders().getFirst("X-User-ID")) :
+            Mono.just("anonymous");
+    }
+}</code></pre>
+
+            <h3>Complete Gateway Configuration</h3>
+            <pre><code class="language-yaml">spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - StripPrefix=1
+            - AddRequestHeader=X-Service-Source, gateway
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/api/orders/**
+            - Method=GET,POST
+          filters:
+            - StripPrefix=1
+            - name: CircuitBreaker
+              args:
+                name: order-cb
+                fallbackUri: forward:/fallback/orders
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+  endpoint:
+    gateway:
+      enabled: true</code></pre>
+
+            <p>This comprehensive example demonstrates a production-ready gateway configuration that routes requests to multiple services using service discovery, implements rate limiting to protect against overload, includes circuit breaker patterns for resilience against service failures, and adds tracking headers for observability. The configuration shows how routing, security, and operational concerns come together in a single, manageable configuration that provides robust, scalable API management for your microservices architecture.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="lesson-summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Lesson Summary</h2>
+
+            <p>In this lesson, we explored API Gateway patterns and Spring Cloud Gateway implementation for microservices architectures. Here's a comprehensive recap of all the key concepts covered:</p>
+
+            <h3>API Gateway Fundamentals</h3>
+            <ul>
+              <li><strong>Purpose:</strong> Single entry point for all client requests, acting as a reverse proxy between clients and microservices</li>
+              <li><strong>Problem solved:</strong> Eliminates direct client-to-service coupling, reduces complexity, and centralizes cross-cutting concerns</li>
+              <li><strong>Benefits:</strong> Unified interface, simplified client development, and flexible internal service architecture</li>
+              <li><strong>Architecture:</strong> Gateway shields clients from internal service structure and handles service evolution transparently</li>
+            </ul>
+
+            <h3>Core Gateway Responsibilities</h3>
+            <ul>
+              <li><strong>Routing:</strong> Examines requests and directs them to appropriate backend services based on URL paths, methods, or headers</li>
+              <li><strong>Load Balancing:</strong> Distributes requests across multiple service instances using various algorithms for optimal resource utilization</li>
+              <li><strong>Security Offloading:</strong> Centralizes authentication and authorization, ensuring consistent security policies across all services</li>
+              <li><strong>Rate Limiting:</strong> Protects backend services from overload using token bucket algorithms and configurable client-specific limits</li>
+            </ul>
+
+            <h3>Spring Cloud Gateway</h3>
+            <ul>
+              <li><strong>Architecture:</strong> Built on reactive Spring WebFlux for non-blocking, high-throughput request processing</li>
+              <li><strong>Configuration:</strong> Supports both YAML declarative and Java DSL programmatic route configuration</li>
+              <li><strong>Integration:</strong> Seamless integration with Spring ecosystem, Eureka service discovery, and Spring Security</li>
+              <li><strong>Dependencies:</strong> spring-cloud-starter-gateway with Spring Cloud BOM for version management</li>
+            </ul>
+
+            <h3>Route Predicates</h3>
+            <ul>
+              <li><strong>Function:</strong> Conditional logic that determines if a request matches a specific route based on request characteristics</li>
+              <li><strong>Types:</strong> Path, Method, Header, Query Parameter, Host, and Time-based predicates for flexible routing rules</li>
+              <li><strong>Combination:</strong> Multiple predicates use logical AND operations for precise routing control</li>
+              <li><strong>Use cases:</strong> API versioning, feature flags, canary deployments, and geographic routing strategies</li>
+            </ul>
+
+            <h3>Gateway Filters</h3>
+            <ul>
+              <li><strong>Pre-filters:</strong> Modify requests before forwarding to backend services - authentication, validation, header manipulation</li>
+              <li><strong>Post-filters:</strong> Modify responses after backend processing - response headers, metrics collection, response transformation</li>
+              <li><strong>Built-in filters:</strong> AddRequestHeader, RemoveRequestHeader, RequestRateLimiter, CircuitBreaker, and Retry filters</li>
+              <li><strong>Custom filters:</strong> GlobalFilter interface for cross-cutting concerns and AbstractGatewayFilterFactory for route-specific logic</li>
+            </ul>
+
+            <h3>Authentication & Security</h3>
+            <ul>
+              <li><strong>Centralized security:</strong> Single point for authentication validation eliminates duplication across microservices</li>
+              <li><strong>JWT integration:</strong> OAuth2 Resource Server configuration for token validation with JWK Set endpoints</li>
+              <li><strong>Header enrichment:</strong> Add trusted user context headers (X-User-ID, X-User-Roles) for backend services</li>
+              <li><strong>Custom filters:</strong> Implement sophisticated authentication logic with proper error handling and fallback mechanisms</li>
+            </ul>
+
+            <h3>Production Implementation</h3>
+            <ul>
+              <li><strong>Maven dependencies:</strong> Gateway starter, Eureka client, and reactive Redis for rate limiting functionality</li>
+              <li><strong>Resilience patterns:</strong> Circuit breakers, rate limiting, and retry logic for handling service failures gracefully</li>
+              <li><strong>Observability:</strong> Actuator endpoints for monitoring routes, health checks, and operational metrics</li>
+              <li><strong>Configuration management:</strong> Environment-specific settings for different deployment stages and service URLs</li>
+            </ul>
+
+            <h3>Key Takeaways</h3>
+            <ul>
+              <li>API Gateway is essential for managing complexity in microservices architectures and providing unified client interfaces</li>
+              <li>Spring Cloud Gateway offers production-ready features with reactive architecture for high-performance scenarios</li>
+              <li>Proper security offloading simplifies backend services while ensuring consistent authentication and authorization policies</li>
+              <li>Combining routing predicates and filters enables sophisticated traffic management and operational control</li>
+              <li>Gateway becomes the operational control point for monitoring, security, and traffic management across your entire API surface</li>
+            </ul>
+          </section>
+
+          <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+            <a href="lesson-02.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
+            <a href="lesson-04.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
+          </nav>
+        </div>
+      </div>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('themeToggle')?.addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,383 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Service Discovery & Registration</title>
+    <meta name="description" content="Learn service registration and discovery in Spring Boot microservices with Eureka and Consul: registration process, client-side vs server-side discovery, and practical implementations." />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="lg:flex lg:gap-8">
+        <aside class="hidden lg:block lg:w-72">
+          <nav class="sticky top-8 rounded-xl border border-slate-200/60 bg-white/60 p-4 shadow-sm backdrop-blur dark:border-slate-800/60 dark:bg-slate-900/40" aria-label="Table of contents">
+            <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">On this page</h2>
+            <ol class="space-y-1 text-sm">
+              <li><a href="#service-registration" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Service Registration</a></li>
+              <li><a href="#service-discovery" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Service Discovery</a></li>
+              <li><a href="#eureka-server-setup" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Eureka Server Setup</a></li>
+              <li><a href="#eureka-client-setup" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Eureka Client Setup</a></li>
+              <li><a href="#lesson-summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Lesson Summary</a></li>
+            </ol>
+          </nav>
+        </aside>
+        <div class="min-w-0 flex-1">
+          <div class="mb-6">
+            <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Microservices Concepts</a>
+          </div>
+          <header class="mx-auto max-w-3xl text-center">
+            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Service Discovery & Registration</h1>
+            <p class="mt-2 text-slate-600 dark:text-slate-300">Learn how services find and communicate with each other dynamically in microservices architectures.</p>
+          </header>
+
+          <section id="service-registration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>1. Service Registration</h2>
+
+            <h3>Definition</h3>
+            <p>Service registration is the process where a microservice announces its availability to a central registry when it starts up. The service provides essential information including its service name, IP address, port number, health status endpoint, and optional metadata that other services can use to locate and communicate with it. This registration acts like adding your phone number to a directory so others can find you when needed. The registry maintains a live inventory of all available service instances across your distributed system.</p>
+
+            <h3>What information is shared</h3>
+            <p>During registration, a service shares its service name (like "user-service"), its network location (IP address and port), health check URL for monitoring, and metadata such as version, environment, or zone information. This metadata helps with advanced routing decisions, such as directing traffic to services in the same data center or to specific versions during canary deployments. The health status indicates whether the service is ready to receive traffic, ensuring that only healthy instances are discoverable by other services. Additional custom metadata can include capacity information, supported protocols, or any business-specific attributes that influence routing decisions.</p>
+
+            <h3>When registration happens</h3>
+            <p>Registration occurs automatically when a Spring Boot service starts up and the web server becomes ready to accept requests. The service also updates its registration when its health status changes, such as when it becomes unhealthy due to database connectivity issues or when it recovers from problems. During graceful shutdown, services should deregister themselves to prevent other services from attempting to call instances that are no longer available. Some registries also require periodic heartbeat renewals to keep registrations active, automatically removing services that fail to check in within a specified time window.</p>
+
+            <h3>Spring Boot Example</h3>
+            <p>In Spring Boot, adding the @EnableEurekaClient annotation to your main application class automatically enables service registration with minimal configuration. The application.yml file needs to specify the service name and the Eureka server location, and Spring Cloud handles the rest of the registration process automatically. This approach eliminates boilerplate code and integrates seamlessly with Spring Boot's lifecycle management, ensuring proper registration timing and cleanup.</p>
+
+            <pre><code class="language-java">@SpringBootApplication
+@EnableEurekaClient
+public class UserServiceApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(UserServiceApplication.class, args);
+    }
+}</code></pre>
+
+            <pre><code class="language-yaml">spring:
+  application:
+    name: user-service
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+server:
+  port: 8080</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="service-discovery" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>2. Service Discovery</h2>
+
+            <h3>Definition</h3>
+            <p>Service discovery is the process by which a service finds and connects to other services dynamically at runtime without using hard-coded network addresses. Instead of knowing specific IP addresses and ports, services query a registry using logical service names to get a list of available, healthy instances. This enables services to adapt automatically to changes in the infrastructure, such as when instances are scaled up, moved, or replaced. Service discovery is essential for building resilient microservices that can handle the dynamic nature of cloud environments.</p>
+
+            <h3>Client-side vs Server-side Discovery</h3>
+            <p>In client-side discovery, the calling service directly queries the registry to get a list of available instances and then selects one using its own load balancing logic, giving the client full control over routing decisions but adding complexity to each service. This approach is commonly used with Eureka where services use DiscoveryClient to fetch instance lists and make direct calls to chosen instances. Server-side discovery uses an intermediary component like a load balancer or API gateway that queries the registry and routes requests automatically, simplifying client code but adding network hops and potential bottlenecks. The choice depends on your architecture: client-side discovery provides more control and eliminates single points of failure, while server-side discovery centralizes routing logic and simplifies service implementation.</p>
+
+            <h3>Why it matters</h3>
+            <p>Service discovery removes the brittleness of hard-coded URLs and enables true elasticity in microservices architectures. It allows services to scale horizontally without requiring configuration changes across all dependent services, and it provides automatic failover when instances become unhealthy or unavailable. This dynamic capability is crucial for cloud-native applications where infrastructure is treated as cattle rather than pets, and instances are frequently created, destroyed, and moved. Without service discovery, microservices would be tightly coupled to specific infrastructure, making them difficult to deploy, scale, and maintain in production environments.</p>
+
+            <h3>Spring Boot Example</h3>
+            <p>The DiscoveryClient.getInstances() method provides a programmatic way to retrieve available instances of a service, returning a list that includes network locations and metadata for each healthy instance. This approach gives you full control over instance selection and allows you to implement custom load balancing logic based on your specific requirements. You can filter instances based on metadata, implement sticky sessions, or route traffic based on geographic proximity or other business rules.</p>
+
+            <pre><code class="language-java">@RestController
+public class OrderController {
+
+    @Autowired
+    private DiscoveryClient discoveryClient;
+
+    @GetMapping("/orders/{userId}")
+    public List<Order> getUserOrders(@PathVariable String userId) {
+        // Discover user-service instances
+        List<ServiceInstance> instances = discoveryClient.getInstances("user-service");
+
+        if (instances.isEmpty()) {
+            throw new ServiceUnavailableException("User service not available");
+        }
+
+        // Select first available instance (or implement load balancing)
+        ServiceInstance instance = instances.get(0);
+        String url = "http://" + instance.getHost() + ":" + instance.getPort() + "/users/" + userId;
+
+        // Make the call (simplified - use RestTemplate in practice)
+        return callUserService(url);
+    }
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="eureka-server-setup" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>3. Eureka Server Setup</h2>
+
+            <h3>Maven Dependencies</h3>
+            <p>To create a Eureka Server, you need to add the Spring Cloud Netflix Eureka Server dependency to your pom.xml. This dependency includes all the necessary components to run a service registry. Make sure to include the Spring Cloud BOM (Bill of Materials) to manage compatible versions of Spring Cloud dependencies.</p>
+
+            <pre><code class="language-xml">&lt;dependencies&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-cloud-starter-netflix-eureka-server&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;
+
+&lt;dependencyManagement&gt;
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-cloud-dependencies&lt;/artifactId&gt;
+            &lt;version&gt;2023.0.0&lt;/version&gt;
+            &lt;type&gt;pom&lt;/type&gt;
+            &lt;scope&gt;import&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+&lt;/dependencyManagement&gt;</code></pre>
+
+            <h3>Creating a Eureka Server Project</h3>
+            <p>Setting up a Eureka Server requires creating a new Spring Boot project with the spring-cloud-starter-netflix-eureka-server dependency, which provides all the necessary components for running a service registry. The @EnableEurekaServer annotation on the main application class activates the Eureka Server functionality, transforming your Spring Boot application into a fully functional service registry. This server will handle service registrations, maintain the service directory, and provide discovery APIs for client applications. The setup is minimal and leverages Spring Boot's auto-configuration to handle most of the complex setup automatically.</p>
+
+            <h3>Basic Configuration</h3>
+            <p>The application.yml configuration disables the server's own registration with itself (since it's the registry) and sets up basic operational parameters like the port number. The registerWithEureka and fetchRegistry properties are set to false because the Eureka Server doesn't need to register with itself or fetch the registry. Additional configuration options allow you to tune heartbeat intervals, eviction policies, and self-preservation modes based on your network conditions and reliability requirements. These settings help optimize the balance between responsiveness to failures and stability during network partitions.</p>
+
+            <h3>Dashboard Access</h3>
+            <p>Eureka provides a built-in web dashboard accessible at http://localhost:8761 that displays all registered services, their instances, and health status in real-time. This dashboard is invaluable for debugging service discovery issues, monitoring service health, and understanding the current state of your microservices ecosystem. You can see which services are up, how many instances are running, and when they last renewed their leases, providing operational visibility into your distributed system. The dashboard also shows configuration details and can help identify issues like services failing to register or renew their leases properly.</p>
+
+            <pre><code class="language-java">@SpringBootApplication
+@EnableEurekaServer
+public class EurekaServerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(EurekaServerApplication.class, args);
+    }
+}</code></pre>
+
+            <pre><code class="language-yaml">server:
+  port: 8761
+
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+  server:
+    enable-self-preservation: true</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="eureka-client-setup" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>4. Eureka Client Setup</h2>
+
+            <h3>Maven Dependencies</h3>
+            <p>For services that need to register with Eureka and discover other services, add the Eureka Client dependency to your pom.xml. This dependency provides the client-side functionality for service registration and discovery. The starter-web dependency is included for REST endpoints, and the BOM ensures version compatibility.</p>
+
+            <pre><code class="language-xml">&lt;dependencies&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-cloud-starter-netflix-eureka-client&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+    &lt;dependency&gt;
+        &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+        &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+    &lt;/dependency&gt;
+&lt;/dependencies&gt;
+
+&lt;dependencyManagement&gt;
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-cloud-dependencies&lt;/artifactId&gt;
+            &lt;version&gt;2023.0.0&lt;/version&gt;
+            &lt;type&gt;pom&lt;/type&gt;
+            &lt;scope&gt;import&lt;/scope&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+&lt;/dependencyManagement&gt;</code></pre>
+
+            <h3>Adding @EnableEurekaClient</h3>
+            <p>The @EnableEurekaClient annotation on your Spring Boot application class automatically configures the service to register with Eureka and enables service discovery capabilities. This annotation triggers Spring Cloud's auto-configuration, which sets up the necessary beans for registration, heartbeat management, and service discovery without requiring manual configuration. The annotation also enables integration with other Spring Cloud components like load balancers and circuit breakers that rely on service discovery. Once added, your service will automatically handle the complete lifecycle of registration, renewal, and deregistration with the Eureka server.</p>
+
+            <h3>Service Configuration</h3>
+            <p>The application.yml file must specify the spring.application.name property, which becomes the service identifier used by other services for discovery - this name should be consistent across all instances of the same service. The eureka.client.service-url.defaultZone property tells the client where to find the Eureka server for registration and discovery operations. Additional configuration options allow you to customize instance metadata, health check URLs, and registration behavior to suit your specific deployment requirements. The server.port setting determines the port this service instance will run on and register with Eureka.</p>
+
+            <h3>Service-to-Service Communication Example</h3>
+            <p>This example shows how one service can discover and call another service using the DiscoveryClient, demonstrating the complete flow from discovery to invocation. The code handles the common scenario where a service might not be available by checking for empty instance lists and throwing appropriate exceptions. In production, you would typically use more sophisticated approaches like @LoadBalanced RestTemplate or OpenFeign clients that handle service discovery automatically, but this example illustrates the underlying mechanics. Error handling and retry logic should be added for production use to handle transient failures and service unavailability gracefully.</p>
+
+            <pre><code class="language-java">@SpringBootApplication
+@EnableEurekaClient
+public class OrderServiceApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(OrderServiceApplication.class, args);
+    }
+}</code></pre>
+
+            <pre><code class="language-yaml">spring:
+  application:
+    name: order-service
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+server:
+  port: 8081</code></pre>
+
+            <pre><code class="language-java">@RestController
+public class OrderController {
+
+    @Autowired
+    private DiscoveryClient discoveryClient;
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @GetMapping("/orders/user/{userId}")
+    public ResponseEntity<List<Order>> getOrdersForUser(@PathVariable String userId) {
+        // Discover user-service instances
+        List<ServiceInstance> userServiceInstances =
+            discoveryClient.getInstances("user-service");
+
+        if (userServiceInstances.isEmpty()) {
+            return ResponseEntity.status(503).build(); // Service Unavailable
+        }
+
+        // Get first available instance
+        ServiceInstance userService = userServiceInstances.get(0);
+        String userServiceUrl = "http://" + userService.getHost() +
+                               ":" + userService.getPort() + "/users/" + userId;
+
+        // Call user service to validate user exists
+        try {
+            User user = restTemplate.getForObject(userServiceUrl, User.class);
+            if (user != null) {
+                // Fetch orders for this user
+                List<Order> orders = orderRepository.findByUserId(userId);
+                return ResponseEntity.ok(orders);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(503).build(); // Service call failed
+        }
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
+    }
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="lesson-summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>5. Lesson Summary</h2>
+
+            <p>In this lesson, we covered the essential concepts of service discovery and registration in microservices architectures. Here's a recap of the key points:</p>
+
+            <h3>Service Registration</h3>
+            <ul>
+              <li><strong>Purpose:</strong> Services announce their availability to a central registry when they start up</li>
+              <li><strong>Information shared:</strong> Service name, IP address, port, health check endpoint, and metadata</li>
+              <li><strong>Timing:</strong> Occurs at startup, health status changes, and graceful shutdown</li>
+              <li><strong>Spring Boot:</strong> Enabled with @EnableEurekaClient annotation and minimal configuration</li>
+            </ul>
+
+            <h3>Service Discovery</h3>
+            <ul>
+              <li><strong>Purpose:</strong> Services find and connect to other services dynamically at runtime</li>
+              <li><strong>Client-side discovery:</strong> Services query the registry directly and handle load balancing</li>
+              <li><strong>Server-side discovery:</strong> Load balancer or gateway handles registry queries and routing</li>
+              <li><strong>Benefits:</strong> Eliminates hard-coded URLs, enables elasticity, and provides automatic failover</li>
+            </ul>
+
+            <h3>Eureka Server Setup</h3>
+            <ul>
+              <li><strong>Dependencies:</strong> spring-cloud-starter-netflix-eureka-server with Spring Cloud BOM</li>
+              <li><strong>Configuration:</strong> @EnableEurekaServer annotation and application.yml settings</li>
+              <li><strong>Features:</strong> Built-in dashboard at http://localhost:8761 for monitoring</li>
+              <li><strong>Settings:</strong> Disable self-registration and configure self-preservation mode</li>
+            </ul>
+
+            <h3>Eureka Client Setup</h3>
+            <ul>
+              <li><strong>Dependencies:</strong> spring-cloud-starter-netflix-eureka-client for registration and discovery</li>
+              <li><strong>Configuration:</strong> @EnableEurekaClient annotation and service name in application.yml</li>
+              <li><strong>Discovery:</strong> Use DiscoveryClient.getInstances() to find available service instances</li>
+              <li><strong>Communication:</strong> Retrieve instance details and make REST calls to discovered services</li>
+            </ul>
+
+            <h3>Key Takeaways</h3>
+            <ul>
+              <li>Service discovery is fundamental for building resilient, scalable microservices</li>
+              <li>Eureka provides a simple, battle-tested solution for service registry and discovery</li>
+              <li>Spring Cloud integration makes setup and usage straightforward with minimal boilerplate</li>
+              <li>Proper error handling and health checks are essential for production deployments</li>
+              <li>The Eureka dashboard provides valuable operational visibility into your service ecosystem</li>
+            </ul>
+          </section>
+
+          <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+            <a href="lesson-01.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
+            <a href="lesson-03.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
+          </nav>
+        </div>
+      </div>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('themeToggle')?.addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>

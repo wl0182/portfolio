@@ -1,0 +1,637 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lesson 06 - Configuration Management</title>
+    <meta name="description" content="Learn centralized configuration management with Spring Cloud Config Server: Git-backed configs, profiles, security, and high availability." />
+    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../../../tutorials/tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
+        </nav>
+        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
+          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
+          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="lg:flex lg:gap-8">
+        <aside class="hidden lg:block lg:w-72">
+          <nav class="sticky top-8 rounded-xl border border-slate-200/60 bg-white/60 p-4 shadow-sm backdrop-blur dark:border-slate-800/60 dark:bg-slate-900/40" aria-label="Table of contents">
+            <h2 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">On this page</h2>
+            <ol class="space-y-1 text-sm">
+              <li><a href="#introduction" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Introduction</a></li>
+              <li><a href="#spring-cloud-config-overview" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Spring Cloud Config Server Overview</a></li>
+              <li><a href="#config-clients" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Config Clients</a></li>
+              <li><a href="#security" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Security</a></li>
+              <li><a href="#high-availability" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">High Availability</a></li>
+              <li><a href="#lesson-summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Lesson Summary</a></li>
+            </ol>
+          </nav>
+        </aside>
+        <div class="min-w-0 flex-1">
+          <div class="mb-6">
+            <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Microservices Concepts</a>
+          </div>
+          <header class="mx-auto max-w-3xl text-center">
+            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Configuration Management</h1>
+            <p class="mt-2 text-slate-600 dark:text-slate-300">Master centralized configuration management with Spring Cloud Config Server for consistent, secure, and scalable microservices.</p>
+          </header>
+
+          <section id="introduction" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Introduction</h2>
+
+            <h3>Problems with local configuration files in microservices</h3>
+            <p>Local configuration files create significant management challenges in microservices architectures where you might have dozens or hundreds of services, each with their own application.properties or application.yml files. When configuration is scattered across individual services, making environment-specific changes requires updating and redeploying multiple services simultaneously, creating coordination nightmares and increasing deployment risk. Configuration drift becomes inevitable as different services end up with slightly different versions of what should be shared settings like database URLs, API keys, or feature flags. Additionally, managing sensitive information like passwords and API keys becomes a security liability when they're embedded in local files that must be distributed to every service instance.</p>
+
+            <h3>Why centralized configuration is needed</h3>
+            <p>Centralized configuration management addresses these challenges by providing a single source of truth for all application settings across your entire microservices ecosystem. Instead of hunting through dozens of repositories to change a database connection string, you update it once in the central configuration store and all affected services pick up the change automatically. This approach enables better security practices by keeping sensitive configurations in a secure, centralized location with proper access controls rather than scattered across multiple codebases. Centralized configuration also supports advanced deployment patterns like blue-green deployments and canary releases by allowing you to update configurations without rebuilding or redeploying services.</p>
+
+            <h3>Benefits: consistency, dynamic refresh, environment management</h3>
+            <p>Consistency is achieved because all services pull their configuration from the same centralized source, eliminating configuration drift and ensuring that shared settings remain synchronized across your entire system. Dynamic refresh capabilities allow you to update application behavior in real-time without service restarts, enabling features like emergency feature toggles, performance tuning, and quick fixes to production issues. Environment management becomes much simpler because you can maintain separate configuration sets for development, testing, staging, and production environments in a single repository, with automatic promotion pipelines that ensure configurations are tested and validated before reaching production. This centralized approach also provides better observability into configuration changes through audit trails and version control integration.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="spring-cloud-config-overview" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Spring Cloud Config Server Overview</h2>
+
+            <h3>What it is and why it is used</h3>
+            <p>Spring Cloud Config Server is a centralized configuration management solution that provides HTTP-based access to configuration properties for distributed Spring Boot applications. It acts as a configuration repository that serves application properties to multiple microservices from a single, manageable location, typically backed by Git for version control and audit trails. The Config Server integrates seamlessly with Spring Boot applications through simple annotations and provides features like environment-specific configurations, property encryption, and dynamic refresh capabilities. This approach eliminates the need to rebuild and redeploy services when configuration changes are needed, significantly improving operational efficiency and reducing deployment risks in production environments.</p>
+
+            <h3>Git-backed configuration repository</h3>
+            <p>The Config Server uses Git repositories as its backend storage, leveraging Git's powerful version control features to track configuration changes, enable rollbacks, and provide audit trails for compliance requirements. Configuration files are stored as standard Spring Boot property files (application.yml or application.properties) in Git repositories, making them easily manageable by development teams using familiar tools. Git's branching model allows you to maintain different configuration versions for different environments or feature branches, and changes can be reviewed through standard pull request workflows before being applied to production systems. The Git integration also enables automatic synchronization and backup of configuration data, ensuring high availability and disaster recovery capabilities for your configuration management system.</p>
+
+            <h3>Profiles support: dev, test, prod</h3>
+            <p>Spring Cloud Config Server provides comprehensive support for Spring profiles, allowing you to maintain environment-specific configurations in a structured, organized manner within the same Git repository. Configuration files follow Spring Boot naming conventions like application-dev.yml, application-test.yml, and application-prod.yml, where each file contains settings specific to that environment. The Config Server automatically serves the appropriate configuration based on the active profile specified by client applications, ensuring that services always receive the correct settings for their current environment. This profile-based approach eliminates the complexity of managing separate configuration repositories for different environments while maintaining clear separation of concerns and reducing the risk of accidentally applying development settings to production systems.</p>
+
+            <h3>Config Server Setup Example</h3>
+            <pre><code class="language-java">@SpringBootApplication
+@EnableConfigServer
+public class ConfigServerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(ConfigServerApplication.class, args);
+    }
+}</code></pre>
+
+            <pre><code class="language-yaml"># Config Server application.yml
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/your-org/config-repo.git
+          clone-on-start: true
+          default-label: main
+        health:
+          repositories:
+            microservices-config:
+              label: main
+              name: user-service,order-service
+              profiles: dev,test,prod
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,env</code></pre>
+
+            <h3>Git Repository Structure</h3>
+            <pre><code class="language-bash"># Config repository structure
+config-repo/
+├── application.yml              # Global defaults
+├── application-dev.yml          # Development environment
+├── application-test.yml         # Testing environment
+├── application-prod.yml         # Production environment
+├── user-service.yml            # Service-specific defaults
+├── user-service-dev.yml        # User service dev config
+├── user-service-prod.yml       # User service prod config
+├── order-service.yml           # Order service defaults
+└── order-service-prod.yml      # Order service prod config</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="config-clients" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Config Clients</h2>
+
+            <h3>Connecting microservices as Config Clients</h3>
+            <p>Microservices connect to Spring Cloud Config Server as clients by adding the spring-cloud-starter-config dependency and configuring the Config Server location in their bootstrap.yml or bootstrap.properties files. The client configuration includes the Config Server URL, application name, and active profiles, which the Config Server uses to determine which configuration files to serve. During application startup, Config Clients automatically fetch their configuration from the Config Server before initializing the Spring context, ensuring that all configuration properties are available when the application starts. This automatic integration means that existing Spring Boot applications can be converted to use centralized configuration with minimal code changes, requiring only dependency additions and bootstrap configuration.</p>
+
+            <h3>Service-specific configuration</h3>
+            <p>Each microservice can have its own dedicated configuration files in the Git repository, following naming conventions that combine the service name with environment profiles for maximum flexibility. Service-specific configurations override global defaults, allowing you to define common settings in application.yml while customizing specific services through files like user-service.yml or order-service-prod.yml. The Config Server applies a property resolution hierarchy where service-specific properties take precedence over global ones, and environment-specific properties override defaults, providing a flexible yet predictable configuration model. This approach enables you to maintain both shared configurations for cross-cutting concerns and service-specific settings for unique requirements without duplication or conflicts.</p>
+
+            <h3>Refreshing configuration at runtime (@RefreshScope and /actuator/refresh)</h3>
+            <p>The @RefreshScope annotation allows Spring beans to be reinitialized with new configuration values when a refresh event occurs, enabling dynamic configuration updates without application restarts. Beans annotated with @RefreshScope are recreated when the /actuator/refresh endpoint is called, picking up any configuration changes that have been made in the Config Server since the last refresh. This mechanism is particularly valuable for feature flags, operational parameters, and non-structural configuration changes that need to take effect immediately in production environments. However, not all configuration changes can be applied dynamically—structural changes like server ports or database connection pools typically still require application restarts, so the refresh mechanism works best for business logic parameters and feature toggles.</p>
+
+            <h3>Config Client Setup Example</h3>
+            <pre><code class="language-xml">&lt;!-- pom.xml dependencies --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-cloud-starter-config&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+
+            <pre><code class="language-yaml"># bootstrap.yml (loads before application.yml)
+spring:
+  application:
+    name: user-service
+  profiles:
+    active: dev
+  cloud:
+    config:
+      uri: http://localhost:8888
+      fail-fast: true
+      retry:
+        initial-interval: 1000
+        multiplier: 1.1
+        max-attempts: 6
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh,health,info</code></pre>
+
+            <h3>Using Configuration in Application</h3>
+            <pre><code class="language-java">@RestController
+@RefreshScope // Enables dynamic refresh of this bean
+public class UserController {
+    
+    @Value("${app.feature.user-registration:true}")
+    private boolean userRegistrationEnabled;
+    
+    @Value("${app.limits.max-users:1000}")
+    private int maxUsers;
+    
+    @Autowired
+    private UserServiceConfig config; // Configuration properties class
+    
+    @GetMapping("/users")
+    public ResponseEntity&lt;String&gt; getUsers() {
+        if (!userRegistrationEnabled) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                .body("User registration is currently disabled");
+        }
+        
+        // Use configuration in business logic
+        if (userRepository.count() >= maxUsers) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body("Maximum user limit reached");
+        }
+        
+        return ResponseEntity.ok("Users retrieved successfully");
+    }
+}
+
+@ConfigurationProperties(prefix = "app.user-service")
+@RefreshScope
+@Component
+public class UserServiceConfig {
+    
+    private boolean registrationEnabled = true;
+    private int maxUsers = 1000;
+    private String welcomeMessage = "Welcome to our platform!";
+    
+    // Getters and setters
+    public boolean isRegistrationEnabled() { return registrationEnabled; }
+    public void setRegistrationEnabled(boolean registrationEnabled) { 
+        this.registrationEnabled = registrationEnabled; 
+    }
+    
+    public int getMaxUsers() { return maxUsers; }
+    public void setMaxUsers(int maxUsers) { this.maxUsers = maxUsers; }
+    
+    public String getWelcomeMessage() { return welcomeMessage; }
+    public void setWelcomeMessage(String welcomeMessage) { 
+        this.welcomeMessage = welcomeMessage; 
+    }
+}</code></pre>
+
+            <h3>Configuration Files in Git Repository</h3>
+            <pre><code class="language-yaml"># user-service.yml (global defaults for user service)
+app:
+  user-service:
+    registration-enabled: true
+    max-users: 1000
+    welcome-message: "Welcome to our platform!"
+  
+logging:
+  level:
+    com.example.userservice: INFO
+
+# user-service-dev.yml (development overrides)
+app:
+  user-service:
+    max-users: 100
+    welcome-message: "Welcome to DEV environment!"
+
+logging:
+  level:
+    com.example.userservice: DEBUG
+    
+# user-service-prod.yml (production overrides)
+app:
+  user-service:
+    max-users: 10000
+    welcome-message: "Welcome to our production platform!"
+
+logging:
+  level:
+    com.example.userservice: WARN</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="security" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Security</h2>
+
+            <h3>Securing Config Server with Basic Auth</h3>
+            <p>Basic Authentication provides a simple but effective way to secure your Config Server by requiring clients to present valid username and password credentials before accessing configuration data. This approach is suitable for internal networks or development environments where you need basic access control without complex authentication infrastructure. The Config Server can be secured using Spring Security's HTTP Basic authentication, and clients authenticate by including credentials in their bootstrap configuration or through environment variables. While Basic Auth is easy to implement and understand, it should be combined with HTTPS/TLS encryption to protect credentials in transit, and credentials should be rotated regularly to maintain security.</p>
+
+            <h3>Securing Config Server with OAuth2</h3>
+            <p>OAuth2 integration provides enterprise-grade security for Config Servers by leveraging token-based authentication that integrates with existing identity providers and authorization servers. This approach is ideal for organizations that already have OAuth2 infrastructure in place, as it provides centralized authentication management, token expiration, and scope-based access control. Config Clients can authenticate using client credentials flow or other OAuth2 flows depending on your security requirements, and tokens can be automatically refreshed to maintain long-running connections. OAuth2 also enables fine-grained access control where different services can have different scopes or permissions for accessing specific configuration namespaces or profiles.</p>
+
+            <h3>Securing Config Server with JWT</h3>
+            <p>JWT (JSON Web Token) authentication provides a stateless, scalable security mechanism where Config Clients present signed tokens that contain identity and authorization information without requiring server-side session storage. This approach is particularly valuable in microservices environments because JWT tokens can carry service identity, environment information, and access permissions in a standardized format that can be validated without external dependencies. JWT tokens can be issued by your identity provider or authorization server and include expiration times, issuer information, and custom claims that determine which configurations a client can access. The stateless nature of JWT makes it ideal for horizontally scaled Config Server deployments where token validation doesn't require shared state between server instances.</p>
+
+            <h3>Encrypting sensitive properties and decrypting them in clients</h3>
+            <p>Property encryption protects sensitive information like database passwords, API keys, and certificates by storing them in encrypted form in the Git repository and automatically decrypting them when served to authorized clients. Spring Cloud Config supports both symmetric and asymmetric encryption, allowing you to choose the appropriate security level for your environment and compliance requirements. Encrypted properties are prefixed with {cipher} in configuration files and are transparently decrypted by the Config Server or client applications depending on your configuration. This approach ensures that sensitive data is never stored in plain text in version control systems while maintaining the convenience of centralized configuration management for security-critical applications.</p>
+
+            <h3>Basic Auth Security Example</h3>
+            <pre><code class="language-yaml"># Config Server with Basic Auth
+spring:
+  security:
+    user:
+      name: configadmin
+      password: ${CONFIG_SERVER_PASSWORD:secret123}
+      roles: ADMIN
+
+# Client configuration for Basic Auth
+spring:
+  cloud:
+    config:
+      uri: http://localhost:8888
+      username: configadmin
+      password: ${CONFIG_SERVER_PASSWORD:secret123}</code></pre>
+
+            <h3>OAuth2 Security Example</h3>
+            <pre><code class="language-yaml"># Config Server OAuth2 Resource Server
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://auth-server.com/auth/realms/microservices
+
+# Client OAuth2 configuration
+spring:
+  cloud:
+    config:
+      uri: http://localhost:8888
+  security:
+    oauth2:
+      client:
+        registration:
+          config-client:
+            client-id: config-client
+            client-secret: ${CLIENT_SECRET}
+            authorization-grant-type: client_credentials
+            scope: config.read
+        provider:
+          auth-server:
+            token-uri: https://auth-server.com/auth/realms/microservices/protocol/openid-connect/token</code></pre>
+
+            <h3>Property Encryption Example</h3>
+            <pre><code class="language-bash"># Encrypting a property value
+curl http://localhost:8888/encrypt -H "Content-Type: text/plain" -d "my-secret-password"
+# Returns: 682bc583fbc02f8c9f9ebcfcb6bb8a6c4b5a4f2d8c9f0e5b3d7a1e6c8f2b9d4a</code></pre>
+
+            <pre><code class="language-yaml"># Configuration file with encrypted properties
+database:
+  username: dbuser
+  password: '{cipher}682bc583fbc02f8c9f9ebcfcb6bb8a6c4b5a4f2d8c9f0e5b3d7a1e6c8f2b9d4a'
+
+api:
+  key: '{cipher}a7b3c9d2e5f8g1h4i7j0k3l6m9n2o5p8q1r4s7t0u3v6w9x2y5z8a1b4c7d0e3f6'</code></pre>
+
+            <pre><code class="language-yaml"># Config Server encryption configuration
+encrypt:
+  key: mySecretKey # Symmetric key (for development)
+  # For production, use asymmetric encryption:
+  # key-store:
+  #   location: classpath:config-server.jks
+  #   password: keystorePassword
+  #   alias: configServerKey
+  #   secret: keyPassword</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="high-availability" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>High Availability</h2>
+
+            <h3>Setting up multiple Config Server instances</h3>
+            <p>High availability for Config Servers requires running multiple instances across different availability zones or data centers to ensure configuration services remain available even during infrastructure failures or maintenance windows. Each Config Server instance should be configured identically with the same Git repository backend and security settings, allowing them to serve as perfect replicas that can handle client requests interchangeably. Container orchestration platforms like Kubernetes or Docker Swarm can automatically manage Config Server instances, including health checks, automatic restarts, and rolling deployments. Multiple instances also improve performance by distributing the load of configuration requests across several servers, reducing response times and improving overall system resilience during high-traffic periods.</p>
+
+            <h3>Load balancing between Config Servers</h3>
+            <p>Load balancing distributes configuration requests across multiple Config Server instances using strategies like round-robin, least connections, or health-based routing to ensure optimal resource utilization and response times. Client-side load balancing can be implemented using Spring Cloud LoadBalancer or Ribbon, allowing Config Clients to automatically discover and distribute requests among available Config Server instances. Server-side load balancing using tools like NGINX, HAProxy, or cloud load balancers provides additional benefits like SSL termination, request routing based on client characteristics, and centralized monitoring of Config Server health. Proper load balancing configuration should include health checks that remove unhealthy Config Server instances from the rotation and failover mechanisms that ensure clients can always reach at least one healthy server instance.</p>
+
+            <h3>Monitoring configuration refresh and errors</h3>
+            <p>Comprehensive monitoring of Config Server operations includes tracking configuration retrieval requests, refresh operations, Git repository synchronization status, and client connection patterns to ensure the system operates reliably. Metrics should cover response times, error rates, Git fetch operations, and the success/failure rates of configuration refresh attempts across all client services. Alerting should be configured for critical events like Config Server unavailability, Git repository access failures, configuration refresh errors, and unusual patterns in configuration requests that might indicate security issues. Log aggregation and analysis help identify trends in configuration usage, detect potential performance issues, and provide audit trails for compliance requirements, while application performance monitoring tools can track the end-to-end impact of configuration changes on service behavior.</p>
+
+            <h3>High Availability Setup Example</h3>
+            <pre><code class="language-yaml"># Config Server HA configuration
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/your-org/config-repo.git
+          clone-on-start: true
+          timeout: 10
+          refresh-rate: 30
+        health:
+          enabled: true
+          repositories:
+            config:
+              label: main
+              name: application
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka1:8761/eureka/,http://eureka2:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    health-check-url-path: /actuator/health
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,env,refresh,metrics
+  metrics:
+    export:
+      prometheus:
+        enabled: true</code></pre>
+
+            <h3>Client-Side Load Balancing</h3>
+            <pre><code class="language-yaml"># Client configuration for HA Config Servers
+spring:
+  application:
+    name: user-service
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        service-id: config-server
+      fail-fast: true
+      retry:
+        initial-interval: 1000
+        multiplier: 1.1
+        max-attempts: 6
+        max-interval: 2000
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka1:8761/eureka/,http://eureka2:8761/eureka/</code></pre>
+
+            <h3>Monitoring and Alerting Configuration</h3>
+            <pre><code class="language-yaml"># Prometheus monitoring for Config Server
+management:
+  metrics:
+    tags:
+      application: ${spring.application.name}
+      environment: ${spring.profiles.active}
+    export:
+      prometheus:
+        enabled: true
+    web:
+      server:
+        request:
+          autotime:
+            enabled: true
+
+logging:
+  level:
+    org.springframework.cloud.config: DEBUG
+    org.springframework.web: INFO
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+# Custom health indicators
+health:
+  config:
+    git:
+      timeout: 5s
+  diskspace:
+    threshold: 10MB</code></pre>
+
+            <h3>Docker Compose HA Example</h3>
+            <pre><code class="language-yaml"># docker-compose.yml for HA Config Server
+version: '3.8'
+services:
+  config-server-1:
+    image: config-server:latest
+    ports:
+      - "8888:8888"
+    environment:
+      - SPRING_PROFILES_ACTIVE=ha,peer1
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka:8761/eureka/
+    depends_on:
+      - eureka
+
+  config-server-2:
+    image: config-server:latest
+    ports:
+      - "8889:8888"
+    environment:
+      - SPRING_PROFILES_ACTIVE=ha,peer2
+      - EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE=http://eureka:8761/eureka/
+    depends_on:
+      - eureka
+
+  nginx-lb:
+    image: nginx:alpine
+    ports:
+      - "8890:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - config-server-1
+      - config-server-2</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="lesson-summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Lesson Summary</h2>
+
+            <p>In this lesson, we explored centralized configuration management with Spring Cloud Config Server for microservices architectures. Here's a comprehensive summary of all the concepts and implementation approaches covered:</p>
+
+            <h3>Configuration Management Fundamentals</h3>
+            <ul>
+              <li><strong>Local config problems:</strong> Configuration drift, coordination nightmares, security liabilities, and deployment complexity</li>
+              <li><strong>Centralized benefits:</strong> Single source of truth, better security practices, and support for advanced deployment patterns</li>
+              <li><strong>Core advantages:</strong> Consistency across services, dynamic refresh capabilities, and simplified environment management</li>
+              <li><strong>Operational benefits:</strong> Better observability, audit trails, and version control integration</li>
+            </ul>
+
+            <h3>Spring Cloud Config Server</h3>
+            <ul>
+              <li><strong>Purpose:</strong> Centralized configuration management with HTTP-based access for distributed Spring Boot applications</li>
+              <li><strong>Git integration:</strong> Uses Git repositories for version control, audit trails, and branching support</li>
+              <li><strong>Profile support:</strong> Environment-specific configurations (dev, test, prod) with automatic serving based on active profiles</li>
+              <li><strong>Setup:</strong> @EnableConfigServer annotation with Git URI configuration and health monitoring</li>
+            </ul>
+
+            <h3>Git Repository Structure</h3>
+            <ul>
+              <li><strong>Naming conventions:</strong> application.yml for global defaults, service-specific files, and environment overrides</li>
+              <li><strong>Hierarchy:</strong> Global defaults, service-specific configs, and environment-specific overrides</li>
+              <li><strong>Organization:</strong> Structured approach with clear separation between environments and services</li>
+              <li><strong>Version control:</strong> Leverages Git's branching, merging, and rollback capabilities for configuration management</li>
+            </ul>
+
+            <h3>Config Clients</h3>
+            <ul>
+              <li><strong>Integration:</strong> spring-cloud-starter-config dependency with bootstrap.yml configuration</li>
+              <li><strong>Service discovery:</strong> Can discover Config Server through Eureka for high availability scenarios</li>
+              <li><strong>Configuration priority:</strong> Service-specific properties override global ones, environment-specific override defaults</li>
+              <li><strong>Startup behavior:</strong> Config fetched before Spring context initialization ensures all properties are available</li>
+            </ul>
+
+            <h3>Dynamic Configuration Refresh</h3>
+            <ul>
+              <li><strong>@RefreshScope:</strong> Enables beans to be reinitialized with new configuration values during runtime</li>
+              <li><strong>Refresh endpoint:</strong> /actuator/refresh triggers configuration update without application restart</li>
+              <li><strong>Use cases:</strong> Feature flags, operational parameters, and business logic settings that need immediate updates</li>
+              <li><strong>Limitations:</strong> Structural changes like server ports typically still require application restarts</li>
+            </ul>
+
+            <h3>Configuration Properties</h3>
+            <ul>
+              <li><strong>@Value annotation:</strong> Simple property injection with default values and type conversion</li>
+              <li><strong>@ConfigurationProperties:</strong> Type-safe configuration binding with validation and structure</li>
+              <li><strong>Property hierarchy:</strong> Global application properties, service-specific overrides, and environment customizations</li>
+              <li><strong>Validation:</strong> Built-in validation support for configuration properties with custom constraints</li>
+            </ul>
+
+            <h3>Security Implementation</h3>
+            <ul>
+              <li><strong>Basic Authentication:</strong> Simple username/password protection suitable for internal networks</li>
+              <li><strong>OAuth2 integration:</strong> Enterprise-grade token-based authentication with existing identity providers</li>
+              <li><strong>JWT authentication:</strong> Stateless, scalable security with signed tokens containing identity and authorization</li>
+              <li><strong>Property encryption:</strong> Symmetric and asymmetric encryption for sensitive data with {cipher} prefix</li>
+            </ul>
+
+            <h3>Encryption and Sensitive Data</h3>
+            <ul>
+              <li><strong>Encryption keys:</strong> Symmetric keys for development, asymmetric keys for production security</li>
+              <li><strong>Transparent decryption:</strong> Config Server or clients automatically decrypt {cipher} prefixed values</li>
+              <li><strong>Security benefits:</strong> Sensitive data never stored in plain text in version control systems</li>
+              <li><strong>Key management:</strong> Secure storage and rotation of encryption keys for compliance requirements</li>
+            </ul>
+
+            <h3>High Availability Setup</h3>
+            <ul>
+              <li><strong>Multiple instances:</strong> Config Server instances across availability zones with identical configuration</li>
+              <li><strong>Load balancing:</strong> Client-side with Spring Cloud LoadBalancer or server-side with NGINX/HAProxy</li>
+              <li><strong>Service discovery:</strong> Eureka integration for automatic Config Server discovery and failover</li>
+              <li><strong>Health monitoring:</strong> Git repository synchronization status and instance health tracking</li>
+            </ul>
+
+            <h3>Monitoring and Operations</h3>
+            <ul>
+              <li><strong>Actuator integration:</strong> Health checks, metrics, and configuration refresh endpoints</li>
+              <li><strong>Metrics collection:</strong> Response times, error rates, Git operations, and client connection patterns</li>
+              <li><strong>Alerting:</strong> Critical events like server unavailability, Git access failures, and refresh errors</li>
+              <li><strong>Log aggregation:</strong> Configuration usage trends, performance analysis, and audit trails</li>
+            </ul>
+
+            <h3>Production Deployment</h3>
+            <ul>
+              <li><strong>Container orchestration:</strong> Kubernetes or Docker Swarm for automatic instance management</li>
+              <li><strong>Git repository:</strong> Secure access with SSH keys or access tokens for production repositories</li>
+              <li><strong>Environment separation:</strong> Different Config Server instances or profiles for different environments</li>
+              <li><strong>Backup and disaster recovery:</strong> Git's distributed nature provides automatic backup and recovery capabilities</li>
+            </ul>
+
+            <h3>Key Takeaways</h3>
+            <ul>
+              <li>Centralized configuration management is essential for maintaining consistency and operational efficiency in microservices</li>
+              <li>Spring Cloud Config Server provides production-ready features with Git integration for version control and audit trails</li>
+              <li>Dynamic refresh capabilities enable real-time configuration updates for feature flags and operational parameters</li>
+              <li>Comprehensive security options from Basic Auth to OAuth2 and property encryption meet various compliance requirements</li>
+              <li>High availability through multiple instances and load balancing ensures configuration services remain operational during failures</li>
+            </ul>
+          </section>
+
+          <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+            <a href="lesson-05.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
+            <a href="lesson-07.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
+          </nav>
+        </div>
+      </div>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById('themeToggle')?.addEventListener('click', function(){
+        const r=document.documentElement; const d=r.classList.toggle('dark');
+        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
+      });
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>
