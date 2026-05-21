@@ -1,0 +1,58 @@
+Lesson_Creation_Instruction:
+
+
+lesson teaching plan:
+
+Start with introduction: What and Why ( simple explanation 5-7 sentences) a java beginner would understand
+
+For each concept, explain it like this:
+
+1️⃣ What it is
+
+A short, precise definition.
+
+Keep it clear, no buzzwords.
+
+2️⃣ Why we need it
+
+The pain point it solves.
+
+What would go wrong if we didn’t have it.
+
+3️⃣ Analogy
+
+Real-world metaphor to make it stick in memory.
+
+Example: API Gateway → “bouncer at a nightclub checking IDs before letting people in.”
+
+4️⃣ Real-world Minimal Example
+
+Scenario: small use case (e.g., an e-commerce app with Orders + Payments).
+
+Implementation: minimal Spring Boot demo code (or config).
+
+Just enough to see it in action.
+
+
+
+
+End with Summary: Recap the key points covered in the lesson and create a transition  ( 3-5 sentences)
+Programming challenge: Provide a small coding challenge related to the concepts covered in the lesson  to reinforce learning.
+Quiz: 10 MCQ questions to test understanding of the concepts covered in the lesson.
+
+
+Style : Centred Title, Back to concept botton top right corner , next/previous button bottom, Thick visible Line Break between concepts
+ sticky table of content on the right side of the screen with all the concepts listed and highlighted as user scrolls through the lesson
+ non-sticky navigation header
+
+
+
+
+
+
+
+
+
+
+
+

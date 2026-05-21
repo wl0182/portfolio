@@ -1,0 +1,199 @@
+01. Microservices Fundamentals (Foundation)
+
+Definition of Microservices
+
+Key principles of Microservices
+
+Advantages of Microservices
+
+Challenges of Microservices
+
+Boundaries and Bounded Contexts
+
+Independent deployment models
+
+Monolith vs Microservices comparison
+
+Database per service principle
+
+When to use Microservices
+
+When not to use Microservices
+
+Real-world examples of Microservices (Netflix, Uber, Amazon)
+
+02. Service Discovery & Registration (Platform)
+
+Service registration overview
+
+Service discovery overview
+
+Client-side discovery concept
+
+Server-side discovery concept
+
+Eureka Server setup
+
+Eureka Client setup
+
+Consul Server setup
+
+Consul Client setup
+
+Comparing Eureka vs Consul
+
+Health checks and service status monitoring
+
+03. API Gateway & Edge Routing (Platform)
+
+API Gateway concept
+
+Routing requests through the gateway
+
+Request aggregation in gateway
+
+Authentication offloading at the gateway
+
+Rate limiting at the gateway
+
+Pre-processing filters
+
+Post-processing filters
+
+Spring Cloud Gateway setup
+
+Integrating gateway with microservices
+
+04. Sync vs Async Communication (Design)
+
+Synchronous communication overview
+
+REST API calls between services
+
+Using RestTemplate for synchronous calls
+
+Using WebClient for reactive synchronous calls
+
+OpenFeign client for declarative REST
+
+Asynchronous communication overview
+
+Messaging with Kafka
+
+Messaging with RabbitMQ
+
+Event-driven architecture concepts
+
+Commands vs Events
+
+Pub/Sub pattern
+
+When to use sync vs async communication
+
+05. Fault Tolerance with Resilience4j (Resilience)
+
+Importance of resilience in microservices
+
+Common failure scenarios
+
+Resilience4j overview
+
+Circuit breaker pattern
+
+Retry pattern
+
+Timeout pattern
+
+Bulkhead pattern
+
+Rate limiting pattern
+
+Fallback mechanism
+
+Graceful degradation
+
+Event-driven resilience (async handling)
+
+Monitoring resilience metrics
+
+06. Configuration Management (Platform)
+
+Problems with local configuration files
+
+Need for centralized configuration
+
+Spring Cloud Config Server overview
+
+Git-backed configuration repository
+
+Connecting microservices as Config Clients
+
+Profiles: dev, test, prod
+
+Service-specific configuration
+
+Refreshing configuration at runtime (@RefreshScope)
+
+/actuator/refresh endpoint usage
+
+Securing Config Server with Basic Auth
+
+Securing Config Server with OAuth2
+
+Encrypting sensitive properties
+
+Decrypting sensitive properties
+
+High availability Config Server setup
+
+07. Messaging with Kafka/RabbitMQ (Integration)
+
+Messaging overview in microservices
+
+Topics concept (Kafka)
+
+Queues concept (RabbitMQ)
+
+Producer implementation
+
+Consumer implementation
+
+Handling retries in messaging
+
+Dead Letter Queues (DLQs)
+
+Event-driven microservices patterns
+
+08. Observability & Tracing (Observability)
+
+Observability concept
+
+Metrics collection with Micrometer
+
+Logging strategies in microservices
+
+Distributed tracing overview
+
+OpenTelemetry setup
+
+Visualizing traces
+
+Metrics dashboards (Grafana)
+
+Alerting based on metrics
+
+09. Data Consistency Patterns (Design)
+
+Data consistency challenges in microservices
+
+Saga pattern
+
+Outbox pattern
+
+Inbox pattern
+
+Idempotency in operations
+
+Eventual consistency concept
+
+Transaction management in distributed systems

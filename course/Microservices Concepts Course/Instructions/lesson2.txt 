@@ -1,0 +1,36 @@
+# Lesson 2: Service Discovery & Registration
+
+## 1. Core Concepts
+- What is Service Registration?
+- What is Service Discovery?
+- Why static IPs/hostnames fail in microservices
+- Client-side discovery vs. Server-side discovery
+- Health checks & status monitoring
+
+## 2. Approaches to Service Discovery
+### A. Eureka (Spring Cloud Netflix)
+- Eureka Server setup
+- Eureka Client setup
+- How Spring Boot apps register/deregister
+- Discovering services with `DiscoveryClient`
+- Integrating with `LoadBalancerClient`
+
+### B. Consul (HashiCorp)
+- Consul Server overview
+- Consul Client agent & registration
+- Key/Value store for configuration
+- Health checks with Consul
+- Spring Cloud Consul integration
+
+### C. Kubernetes Native Discovery
+- Kubernetes Services & DNS
+- ClusterIP, NodePort, LoadBalancer
+- Service registration via `kube-dns`
+- Service discovery via DNS names
+- Spring Cloud Kubernetes DiscoveryClient
+
+## 3. Comparison & Best Practices
+- Eureka vs Consul vs Kubernetes DNS
+- When to use Eureka (legacy, non-K8s)
+- When to use Consul (multi-language, hybrid infra)
+- When to rely on Kubernetes Service Discovery (cloud-native apps)

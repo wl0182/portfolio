@@ -1,0 +1,62 @@
+
+Lesson 1: Java Basics
+
+Lesson 2: Methods & Functions
+
+Lesson 3: Object-Oriented Programming (OOP)
+
+Fields, constructors, this keyword.
+
+Lesson 4: OOP Deep Dive
+
+Lesson 5: Collections & Generics
+
+Lesson 6: Java Streams & Lambdas (Essentials)
+
+lesson 7 : Java Streams & Lambdas (Advanced)
+
+lesson 8 : Exception Handling
+
+lesson 9 : Threads & Concurrency
+
+lesson 10 : Java Core advanced algorithms and data structures :
+ -  Recursion, Sorting algorithms, Searching algorithms, Big O notation, when to use which data structure and why
+
+lesson 11 : Spring Boot Introduction
+
+lesson 12 : Spring Boot: Web Development Basics
+
+lesson 13 : Spring Boot Data Access with JPA and Hibernate part 1
+lesson 14 : Spring Boot Data Access with JPA and Hibernate part 2
+
+lesson 15 : Spring Boot Security Basics with JWT
+
+lesson 16 : Spring Boot Production actuators and Monitoring
+
+lesson 17 : Spring Boot cashing
+
+lesson 18 : Spring Boot Application: all components working together, project structure,  Step by step project building.
+
+lesson 19 : spring boot advanced topics and microservices introduction
+
+lesson 20 : Spring Boot Microservices Communication with REST and Feign Client
+
+lesson 21 : Spring Boot Microservices Fault Tolerance and Resilience
+
+
+lesson 22: Spring Boot Microservices : Configuration Management with Spring Cloud Config Server
+
+lesson 23: Spring Boot Async Programming and Messaging with Kafka part 1
+
+lesson 24: Spring Boot Async Programming and Messaging with Kafka part 2
+
+
+
+
+
+
+
+
+
+
+

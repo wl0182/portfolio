@@ -1,0 +1,28 @@
+- What is an API Gateway?
+  - Explain its definition and role in microservices (2–4 sentences).
+  - Explain why direct client-to-service calls are problematic.
+- Core Responsibilities
+  - Routing, load balancing, authentication/security offloading, rate limiting.
+  - Each responsibility gets its own bullet with 2–4 sentences.
+- Spring Cloud Gateway Basics
+  - Explain why it is preferred.
+  - Show minimal route example in application.yml or Java DSL.
+  - Explain id, uri, predicates, filters.
+- Route Predicates
+  - Define what predicates are and why they matter.
+  - Provide a YAML example with Path predicate.
+  - Explain combining multiple predicates.
+- Filters
+  - Explain filters (pre/post processing of requests/responses).
+  - Give short examples: add header, rate limiter.
+  - Provide minimal Java DSL snippet for filters.
+- Authentication & Security Offloading
+  - Explain why gateway handles auth.
+  - Show example for JWT or OAuth2 validation.
+- Putting it All Together
+  - Summarize main benefits: simplicity, security, traffic management.
+  - Provide a final minimal code snippet combining route + filter.
+
+
+
+

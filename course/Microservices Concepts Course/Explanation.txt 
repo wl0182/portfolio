@@ -1,0 +1,9 @@
+General Rules for All Lessons:
+- Each bullet point in the lesson outline must be expanded into 2–4 complete sentences.
+- Use teaching-slide style: concise, clear, beginner-friendly.
+- Always explain why the concept matters in microservices.
+- Include short Spring Boot / Spring Cloud examples where relevant.
+- Do NOT merge multiple concepts into a single bullet.
+- Do not write essays or extremely minimal one-liners.
+
+

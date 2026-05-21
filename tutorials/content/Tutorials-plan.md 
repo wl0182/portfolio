@@ -1,0 +1,13 @@
+### Plan
+1- Project setup
+2- Entities and JPA
+2- Repositories and understanding relationships and the concepts of DTO
+3- Building ednpoints: MenuItemController endpoints > for each method ( DTO, Service, Repository)
+4- Building endpoints: StaffController endpoints > for each method ( DTO, Service, ,Repository)
+5- Building endpoints: TableController endpoints > for each method ( DTO, Service, Repository)
+6- Building endpoints: OrderController endpoints part 1  > for each method ( DTO, Service, Repository)
+6- Building endpoints: OrderController endpoints part 2 > for each method ( DTO, Service, Repository)
+7- Building endpoints: Stats endpoints > for each method ( DTO, Service, Repository)
+8- Exception handling
+9- Security with JWT
+10- Dockerization and jenkins Automation
