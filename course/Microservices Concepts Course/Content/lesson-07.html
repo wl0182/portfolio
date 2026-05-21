@@ -1,11 +1,10 @@
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Lesson 07 - Messaging with Kafka/RabbitMQ</title>
-    <meta name="description" content="Learn messaging patterns with Kafka and RabbitMQ in Spring Boot microservices: producers, consumers, topics, queues, and reliable messaging patterns." />
-    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
+    <title>Messaging with Apache Kafka</title>
+    <meta name="description" content="Learn messaging patterns with Apache Kafka in Spring Boot microservices: producers, consumers, topics, and reliable messaging patterns." />
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <script>
       tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
@@ -21,7 +20,7 @@
         <a href="../../" class="group inline-flex items-center gap-3">
           <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
           <div class="leading-tight">
-            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="text-sm text-slate-500 dark:text-slate-400">Software Engineer</div>
             <div class="font-semibold">Wassim Lagnaoui</div>
           </div>
         </a>
@@ -33,10 +32,6 @@
           <a href="../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
           <a href="../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
         </nav>
-        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
-          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
-          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        </button>
       </div>
     </header>
 
@@ -48,7 +43,9 @@
             <ol class="space-y-1 text-sm">
               <li><a href="#introduction" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Introduction</a></li>
               <li><a href="#kafka-basics" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Kafka Basics</a></li>
-              <li><a href="#rabbitmq-basics" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">RabbitMQ Basics</a></li>
+              <li><a href="#kafka-configuration" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Kafka Configuration</a></li>
+              <li><a href="#kafka-producer" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Kafka Producer</a></li>
+              <li><a href="#kafka-consumer" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Kafka Consumer</a></li>
               <li><a href="#patterns-best-practices" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Patterns & Best Practices</a></li>
               <li><a href="#lesson-summary" class="block rounded-md px-3 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800/60">Lesson Summary</a></li>
             </ol>
@@ -59,8 +56,8 @@
             <a href="../index.html" class="inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Microservices Concepts</a>
           </div>
           <header class="mx-auto max-w-3xl text-center">
-            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Messaging with Kafka/RabbitMQ</h1>
-            <p class="mt-2 text-slate-600 dark:text-slate-300">Master asynchronous messaging patterns with Kafka and RabbitMQ for scalable, decoupled microservices communication.</p>
+            <h1 class="text-center text-3xl font-extrabold tracking-tight sm:text-4xl">Messaging with Apache Kafka</h1>
+            <p class="mt-2 text-slate-600 dark:text-slate-300">Master asynchronous messaging patterns with Apache Kafka for scalable, decoupled microservices communication.</p>
           </header>
 
           <section id="introduction" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
@@ -84,484 +81,797 @@
             <h3>Producer implementation example</h3>
             <p>Kafka producers are responsible for publishing messages to specific topics, and Spring Boot provides excellent integration through the KafkaTemplate class that simplifies message production with features like automatic serialization, error handling, and delivery confirmations. The producer configuration includes settings for Kafka broker connections, serialization formats for keys and values, and performance tuning parameters like batch size and compression. Producers can send messages synchronously for guaranteed delivery confirmation or asynchronously for higher throughput, and they automatically handle partitioning, retries, and connection management to ensure reliable message delivery to Kafka brokers.</p>
 
+            <h3>Consumer implementation example</h3>
+            <p>Kafka consumers subscribe to topics and process messages in real-time, with Spring Boot's @KafkaListener annotation providing a declarative way to create message consumers that automatically handle deserialization, offset management, and error handling. Consumer groups allow multiple consumer instances to share the workload of processing messages from a topic, with Kafka automatically distributing partitions among available consumers for parallel processing and load balancing. Consumers can be configured for different processing guarantees, from at-least-once delivery with automatic offset commits to exactly-once processing with manual offset management, depending on your application's consistency requirements.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="kafka-configuration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Kafka Configuration</h2>
+
             <h3>Maven Dependencies</h3>
-            <pre><code class="language-xml">&lt;!-- pom.xml dependencies --&gt;
+            <p>Add the minimal Kafka dependency to your Spring Boot project. Spring Boot will auto-configure most settings for you.</p>
+
+            <pre><code class="language-xml">&lt;!-- pom.xml --&gt;
 &lt;dependency&gt;
     &lt;groupId&gt;org.springframework.kafka&lt;/groupId&gt;
     &lt;artifactId&gt;spring-kafka&lt;/artifactId&gt;
-&lt;/dependency&gt;
-&lt;dependency&gt;
-    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-    &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;
 &lt;/dependency&gt;</code></pre>
+      batch-size: 16384
+            <h3>Basic Application Properties</h3>
+            <p>Configure the minimal required settings to connect to Kafka. Spring Boot will handle the rest with sensible defaults.</p>
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      max-poll-records: 500
+# Logging configuration for Kafka
+logging:
 
-            <h3>Producer Implementation</h3>
-            <pre><code class="language-java">@Service
-@Slf4j
-public class OrderEventProducer {
+    org.apache.kafka: INFO
+    org.springframework.kafka: DEBUG</code></pre>
 
-    private final KafkaTemplate&lt;String, OrderEvent&gt; kafkaTemplate;
 
-    public OrderEventProducer(KafkaTemplate&lt;String, OrderEvent&gt; kafkaTemplate) {
-        this.kafkaTemplate = kafkaTemplate;
-    }
+        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+      group-id: my-service
+        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
 
-    public void publishOrderCreated(OrderEvent orderEvent) {
-        try {
-            kafkaTemplate.send("order-events", orderEvent.getOrderId(), orderEvent)
-                .addCallback(
-                    result -> log.info("Order event sent successfully: {}", orderEvent.getOrderId()),
-                    failure -> log.error("Failed to send order event: {}", orderEvent.getOrderId(), failure)
-                );
+        return TopicBuilder.name("order-events.DLT")
+        spring.json.trusted.packages: "com.example.events"</code></pre>
+        configProps.put(ProducerConfig.BATCH_SIZE_CONFIG, 16384);
+            <h3>Simple Configuration Class (Optional)</h3>
+            <p>For basic usage, you don't need any additional configuration. Spring Boot auto-configuration will create all necessary beans. However, if you want to customize topic creation, here's a minimal config:</p>
+    private OrderStatus status;
+    private Map&lt;String, Object&gt; metadata;
+
+    private Instant timestamp;
+
+    // Optional: Create topics automatically
+    public void handlePaymentDeadLetterMessage(@Payload String message,
+                                              @Header Map&lt;String, Object&gt; headers,
+            log.warn("Processing generic dead letter message for topic: {}", expectedOriginalTopic);
+                .partitions(1)
+            // Extract common headers
+            Long offset = (Long) headers.get("kafka_offset");
+
+            // Process and store dead letter record
+            DeadLetterRecord record = DeadLetterRecord.builder()
+                    .id(UUID.randomUUID().toString())
+                    .originalTopic(originalTopic)
+                .partitions(1)
+            messageRecoveryService.saveDeadLetterRecord(record);
+            alertingService.sendDeadLetterAlert(record);
+
+            acknowledgment.acknowledge();
+
         } catch (Exception e) {
-            log.error("Error publishing order event: {}", orderEvent.getOrderId(), e);
+            log.error("Failed to process generic dead letter message", e);
+            acknowledgment.acknowledge();
         }
-    }
+                                               Acknowledgment acknowledgment,
+                                               String expectedOriginalTopic) {
+            <h3>Simple Event Model</h3>
+            <p>Create a basic event class to represent your business events.</p>
 
-    public void publishOrderStatusChanged(String orderId, OrderStatus newStatus) {
-        OrderEvent event = OrderEvent.builder()
-            .orderId(orderId)
-            .eventType("ORDER_STATUS_CHANGED")
-            .status(newStatus)
-            .timestamp(Instant.now())
-            .build();
+            acknowledgment.acknowledge();
+
+    public void handleDeadLetterMessage(@Payload String message,
+                                       @Header("kafka_receivedPartition") int partition,
+                                       @Header("kafka_offset") long offset,
+                                       @Header(value = "kafka_dlt-original-topic", required = false) String originalTopic,
+                                       @Header(value = "kafka_dlt-exception-message", required = false) String exceptionMessage,
+
+    private String status;
+
+            <pre><code class="language-java">@Configuration
+            <h3>Basic Producer Service</h3>
+            <p>Use Spring Boot's auto-configured KafkaTemplate to send messages easily.</p>
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory&lt;String, Object&gt; batchKafkaListenerContainerFactory(
+            ConsumerFactory&lt;String, Object&gt; consumerFactory) {
+
+        ConcurrentKafkaListenerContainerFactory&lt;String, Object&gt; factory =
+                new ConcurrentKafkaListenerContainerFactory&lt;&gt;();
+        factory.setBatchListener(true);
+    public OrderEventProducer(KafkaTemplate&lt;String, Object&gt; kafkaTemplate) {
+
+
+    @Bean
+    public void publishOrderCreated(String orderId, String userId, BigDecimal amount) {
+        OrderEvent event = new OrderEvent(orderId, userId, "ORDER_CREATED", amount, "PENDING");
+
+        kafkaTemplate.send("order-events", orderId, event)
+                .addCallback(
+                    result -> log.info("Order event sent successfully: {}", orderId),
+                    failure -> log.error("Failed to send order event: {}", orderId, failure)
+                );
+                    .tag("event.type", orderEvent.getEventType())
+                    .register(meterRegistry));
+    public void publishOrderStatusChanged(String orderId, String newStatus) {
+        OrderEvent event = new OrderEvent(orderId, null, "ORDER_STATUS_CHANGED", null, newStatus);
 
         kafkaTemplate.send("order-events", orderId, event);
-    }
-}</code></pre>
+        log.info("Order status change event sent for order: {}", orderId);
+                                .tag("status", throwable == null ? "success" : "error")
+                                .register(meterRegistry));
 
-            <h3>Consumer implementation example</h3>
-            <p>Kafka consumers subscribe to topics and process messages in real-time, with Spring Boot's @KafkaListener annotation providing a declarative way to create message consumers that automatically handle deserialization, offset management, and error handling. Consumer groups allow multiple consumer instances to share the workload of processing messages from a topic, with Kafka automatically distributing partitions among available consumers for parallel processing and load balancing. Consumers can be configured for different processing guarantees, from at-least-once delivery with automatic offset commits to exactly-once processing with manual offset management, depending on your application's consistency requirements.</p>
+            <h3>Simple Controller Example</h3>
+            <p>Here's how you would use the producer in a REST controller:</p>
+                                    eventType, key, topic, result.getRecordMetadata().offset());
+            <pre><code class="language-java">@RestController
+@RequestMapping("/orders")
+public class OrderController {
+                            log.error("Failed to publish {} event for key: {} to topic: {}",
+    private final OrderEventProducer eventProducer;
+                                    "topic", topic, "event.type", eventType).increment();
+    public OrderController(OrderEventProducer eventProducer) {
+        this.eventProducer = eventProducer;
+                    .tag("event.type", eventType)
+                    .tag("status", "error")
+    @PostMapping
+    public ResponseEntity&lt;String&gt; createOrder(@RequestBody CreateOrderRequest request) {
+        String orderId = UUID.randomUUID().toString();
 
-            <h3>Consumer Implementation</h3>
-            <pre><code class="language-java">@Component
-@Slf4j
-public class OrderEventConsumer {
+        // Publish event
+        eventProducer.publishOrderCreated(orderId, request.getUserId(), request.getAmount());
 
-    private final InventoryService inventoryService;
-    private final NotificationService notificationService;
-
-    public OrderEventConsumer(InventoryService inventoryService,
-                             NotificationService notificationService) {
-        this.inventoryService = inventoryService;
-        this.notificationService = notificationService;
-    }
-
-    @KafkaListener(topics = "order-events", groupId = "inventory-service")
-    public void handleOrderEvent(OrderEvent orderEvent,
-                                @Header("kafka_receivedMessageKey") String key,
-                                @Header("kafka_receivedPartition") int partition,
-                                @Header("kafka_offset") long offset) {
-
-        log.info("Received order event: {} from partition: {} offset: {}",
-                orderEvent.getOrderId(), partition, offset);
-
-        try {
-            switch (orderEvent.getEventType()) {
-                case "ORDER_CREATED":
-                    inventoryService.reserveItems(orderEvent.getItems());
-                    log.info("Inventory reserved for order: {}", orderEvent.getOrderId());
-                    break;
-                case "ORDER_CANCELLED":
-                    inventoryService.releaseItems(orderEvent.getItems());
-                    log.info("Inventory released for order: {}", orderEvent.getOrderId());
-                    break;
-                default:
-                    log.warn("Unknown event type: {}", orderEvent.getEventType());
+        return ResponseEntity.ok("Order created: " + orderId);
             }
-        } catch (Exception e) {
-            log.error("Error processing order event: {}", orderEvent.getOrderId(), e);
-            throw e; // Will trigger retry mechanism
-        }
-    }
 
-    @KafkaListener(topics = "order-events", groupId = "notification-service")
-    public void handleOrderNotification(OrderEvent orderEvent) {
-        try {
-            if ("ORDER_CREATED".equals(orderEvent.getEventType())) {
-                notificationService.sendOrderConfirmation(orderEvent);
-            }
-        } catch (Exception e) {
-            log.error("Failed to send notification for order: {}", orderEvent.getOrderId(), e);
-        }
-    }
-}</code></pre>
+            @Override
+            public void onAcknowledgement(RecordMetadata metadata, Exception exception) {
+                if (exception != null) {
+                    log.error("Failed to send message to topic: {}", metadata.topic(), exception);
+                } else {
+                    log.debug("Message sent successfully to topic: {} partition: {} offset: {}",
+                             metadata.topic(), metadata.partition(), metadata.offset());
+                }
+            <p>Create simple consumers using the @KafkaListener annotation. Spring Boot handles all the complex configuration automatically.</p>
 
-            <h3>Handling retries and Dead Letter Queues (DLQs)</h3>
-            <p>Kafka retry mechanisms handle transient failures by automatically reprocessing failed messages a configured number of times with exponential backoff delays, helping overcome temporary issues like network glitches or service unavailability without losing messages. When messages exceed the maximum retry attempts, they can be sent to Dead Letter Topics (DLT) for manual investigation and reprocessing, preventing poison messages from blocking the processing of subsequent valid messages. Spring Kafka provides comprehensive retry configuration including custom retry policies, backoff strategies, and DLT routing that can be tailored to different types of failures and business requirements. Proper DLT handling includes alerting mechanisms, message inspection tools, and reprocessing workflows that allow operations teams to investigate failures and recover from exceptional scenarios.</p>
+            @Override
+            public void close() {}
 
-            <h3>Kafka Configuration</h3>
-            <pre><code class="language-yaml"># application.yml - Kafka Configuration
-spring:
-  kafka:
-    bootstrap-servers: localhost:9092
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-      acks: all
-      retries: 3
-      properties:
-        spring.json.type.mapping: "orderEvent:com.example.events.OrderEvent"
-    consumer:
-      group-id: order-service
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
-      properties:
+            @Override
+        props.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
+    public void handleInventoryUpdate(OrderEvent orderEvent) {
+        log.info("Processing order event: {} for order: {}",
+                orderEvent.getEventType(), orderEvent.getOrderId());
+        return new DefaultKafkaConsumerFactory&lt;&gt;(props);
+        switch (orderEvent.getEventType()) {
+            case "ORDER_CREATED":
+                log.info("Reserving inventory for order: {}", orderEvent.getOrderId());
+                // Add your inventory logic here
+                break;
+            case "ORDER_STATUS_CHANGED":
+                log.info("Order status changed to: {} for order: {}",
+                        orderEvent.getStatus(), orderEvent.getOrderId());
+                // Add your status update logic here
+                break;
+            default:
+                log.warn("Unknown event type: {}", orderEvent.getEventType());
         spring.json.trusted.packages: "com.example.events"
-        spring.json.type.mapping: "orderEvent:com.example.events.OrderEvent"
-      enable-auto-commit: false
-      auto-offset-reset: earliest</code></pre>
+        spring.json.type.mapping: "orderEvent:com.example.events.OrderEvent,paymentEvent:com.example.events.PaymentEvent"
+        max.poll.interval.ms: 300000
+        spring.json.type.mapping: "orderEvent:com.example.events.OrderEvent,paymentEvent:com.example.events.PaymentEvent"
+    public void handleNotifications(OrderEvent orderEvent) {
+        log.info("Sending notification for order: {}", orderEvent.getOrderId());
+spring:
+        if ("ORDER_CREATED".equals(orderEvent.getEventType())) {
+            // Send order confirmation email
+            log.info("Sending order confirmation for: {}", orderEvent.getOrderId());
+      batch-size: 16384
+      linger-ms: 5
+      buffer-memory: 33554432
+    @KafkaListener(topics = "payment-events", groupId = "order-service")
+    public void handlePaymentEvents(String paymentEventJson) {
+        log.info("Received payment event: {}", paymentEventJson);
+        // Process payment events
+public class KafkaConfig {
 
-            <h3>Retry and Error Handling Configuration</h3>
-            <pre><code class="language-java">@Component
-public class KafkaRetryConfig {
+    @Value("${spring.kafka.bootstrap-servers}")
+            <h3>Error Handling</h3>
+            <p>Add basic error handling to your consumers:</p>
+                if (exception != null) {
+                    log.error("Failed to send message to topic: {}", metadata.topic(), exception);
+                } else {
+public class OrderEventConsumerWithErrorHandling {
 
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory&lt;String, OrderEvent&gt; kafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory&lt;String, OrderEvent&gt; factory =
-            new ConcurrentKafkaListenerContainerFactory&lt;&gt;();
+    @KafkaListener(topics = "order-events", groupId = "order-processor")
+    public void processOrderEvent(OrderEvent orderEvent) {
+        props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+            log.info("Processing order: {}", orderEvent.getOrderId());
 
-        factory.setConsumerFactory(consumerFactory());
+            // Your business logic here
+            processOrder(orderEvent);
+
+            log.info("Successfully processed order: {}", orderEvent.getOrderId());
+
+                new ConcurrentKafkaListenerContainerFactory&lt;&gt;();
+            log.error("Failed to process order: {}", orderEvent.getOrderId(), e);
+            // In production, you might want to send to a dead letter queue
+            // or implement retry logic
         factory.setCommonErrorHandler(errorHandler());
-        factory.setConcurrency(3);
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
-
-        return factory;
-    }
-
-    @Bean
-    public DefaultErrorHandler errorHandler() {
-        // Retry 3 times with exponential backoff
-        ExponentialBackOffWithMaxRetries backOff = new ExponentialBackOffWithMaxRetries(3);
         backOff.setInitialInterval(1000L);
-        backOff.setMultiplier(2.0);
-        backOff.setMaxInterval(10000L);
+    private void processOrder(OrderEvent orderEvent) {
+        // Simulate processing time
+                new DeadLetterPublishingRecoverer(kafkaTemplate(),
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
 
-        DefaultErrorHandler errorHandler = new DefaultErrorHandler(
-            new DeadLetterPublishingRecoverer(kafkaTemplate()), backOff);
-
-        // Don't retry for certain exceptions
-        errorHandler.addNotRetryableExceptions(IllegalArgumentException.class);
-
-        return errorHandler;
+        // Your actual business logic goes here
+        log.info("Order processed: {}", orderEvent.getOrderId());
     }
 
     @Bean
-    public ConsumerFactory&lt;String, OrderEvent&gt; consumerFactory() {
-        Map&lt;String, Object&gt; configProps = new HashMap&lt;&gt;();
-        configProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        configProps.put(ConsumerConfig.GROUP_ID_CONFIG, "order-service");
-        configProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        configProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        configProps.put(JsonDeserializer.TRUSTED_PACKAGES, "com.example.events");
+    public NewTopic paymentEventsTopic() {
+        return TopicBuilder.name("payment-events")
+                .partitions(3)
+                .replicas(1)
+                .build();
+    }
 
-        return new DefaultKafkaConsumerFactory&lt;&gt;(configProps);
+    @Bean
+    public NewTopic orderEventsDeadLetterTopic() {
+        return TopicBuilder.name("order-events.DLT")
+                .partitions(3)
+                .replicas(1)
+                .build();
     }
 }</code></pre>
           </section>
 
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
-          <section id="rabbitmq-basics" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>RabbitMQ Basics</h2>
+          <section id="kafka-producer" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Kafka Producer Implementation</h2>
 
-            <h3>Queues: purpose and usage</h3>
-            <p>RabbitMQ queues are message storage containers that hold messages until they can be consumed by applications, providing reliable message delivery through features like persistence, acknowledgments, and various routing mechanisms. Unlike Kafka topics, RabbitMQ queues are designed for point-to-point messaging where each message is typically consumed by only one consumer, making them ideal for work distribution, task queues, and request-response patterns. Queues can be configured as durable (survive broker restarts), exclusive (used by only one connection), or auto-delete (removed when no longer used), and they support various message routing patterns through exchanges that determine how messages reach specific queues. RabbitMQ's queue-based architecture excels at traditional messaging scenarios where you need guaranteed delivery, complex routing logic, and fine-grained control over message processing workflows.</p>
+            <h3>Event Models</h3>
+            <p>Define event classes that represent business domain events with proper serialization annotations for JSON conversion.</p>
 
-            <h3>Producer example</h3>
-            <p>RabbitMQ producers send messages to exchanges, which then route messages to appropriate queues based on routing keys and binding configurations, providing flexible message distribution patterns. Spring Boot's RabbitTemplate simplifies message production with automatic serialization, connection management, and integration with Spring's transaction management for reliable message publishing. Producers can use different exchange types (direct, topic, fanout, headers) to implement various messaging patterns, from simple point-to-point communication to complex pub-sub scenarios with sophisticated routing rules.</p>
+            <pre><code class="language-java">@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class OrderEvent {
+    private String orderId;
+    private String userId;
+    private String eventType;
+    private List&lt;OrderItem&gt; items;
+    private BigDecimal totalAmount;
+    private OrderStatus status;
+    private Map&lt;String, Object&gt; metadata;
 
-            <h3>Maven Dependencies</h3>
-            <pre><code class="language-xml">&lt;!-- pom.xml dependencies --&gt;
-&lt;dependency&gt;
-    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-    &lt;artifactId&gt;spring-boot-starter-amqp&lt;/artifactId&gt;
-&lt;/dependency&gt;
-&lt;dependency&gt;
-    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-    &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;
-&lt;/dependency&gt;</code></pre>
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
+    private Instant timestamp;
 
-            <h3>Producer Implementation</h3>
+    @JsonProperty("version")
+    private String eventVersion = "1.0";
+}
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class OrderItem {
+    private String productId;
+    private String productName;
+    private Integer quantity;
+    private BigDecimal price;
+    private String category;
+}
+
+public enum OrderStatus {
+    PENDING, CONFIRMED, CANCELLED, SHIPPED, DELIVERED, RETURNED
+}</code></pre>
+
+            <h3>Producer Service Implementation</h3>
+            <p>Create a robust producer service with comprehensive error handling, metrics, and callback mechanisms for reliable message publishing.</p>
+
             <pre><code class="language-java">@Service
 @Slf4j
-public class EmailNotificationProducer {
+public class OrderEventProducer {
 
-    private final RabbitTemplate rabbitTemplate;
+    private final KafkaTemplate&lt;String, Object&gt; kafkaTemplate;
+    private final MeterRegistry meterRegistry;
+    private final ObjectMapper objectMapper;
 
-    public EmailNotificationProducer(RabbitTemplate rabbitTemplate) {
-        this.rabbitTemplate = rabbitTemplate;
+    public OrderEventProducer(KafkaTemplate&lt;String, Object&gt; kafkaTemplate,
+                             MeterRegistry meterRegistry,
+                             ObjectMapper objectMapper) {
+        this.kafkaTemplate = kafkaTemplate;
+        this.meterRegistry = meterRegistry;
+        this.objectMapper = objectMapper;
     }
 
-    public void sendWelcomeEmail(String userId, String email) {
-        EmailNotification notification = EmailNotification.builder()
-            .userId(userId)
-            .email(email)
-            .templateType("WELCOME")
-            .priority("HIGH")
-            .timestamp(Instant.now())
-            .build();
+    public CompletableFuture&lt;SendResult&lt;String, Object&gt;&gt; publishOrderCreated(OrderEvent orderEvent) {
+        return publishEvent("order-events", orderEvent.getOrderId(), orderEvent, "ORDER_CREATED");
+    }
+
+    public CompletableFuture&lt;SendResult&lt;String, Object&gt;&gt; publishOrderStatusChanged(String orderId,
+                                                                                  OrderStatus newStatus,
+                                                                                  Map&lt;String, Object&gt; metadata) {
+        OrderEvent event = OrderEvent.builder()
+                .orderId(orderId)
+                .eventType("ORDER_STATUS_CHANGED")
+                .status(newStatus)
+                .metadata(metadata)
+                .timestamp(Instant.now())
+                .build();
+
+        return publishEvent("order-events", orderId, event, "ORDER_STATUS_CHANGED");
+    }
+
+    public CompletableFuture&lt;SendResult&lt;String, Object&gt;&gt; publishOrderCancelled(String orderId, String reason) {
+        Map&lt;String, Object&gt; metadata = Map.of(
+                "cancellationReason", reason,
+                "cancelledAt", Instant.now().toString()
+        );
+
+        OrderEvent event = OrderEvent.builder()
+                .orderId(orderId)
+                .eventType("ORDER_CANCELLED")
+                .status(OrderStatus.CANCELLED)
+                .metadata(metadata)
+                .timestamp(Instant.now())
+                .build();
+
+        return publishEvent("order-events", orderId, event, "ORDER_CANCELLED");
+    }
+
+    private CompletableFuture&lt;SendResult&lt;String, Object&gt;&gt; publishEvent(String topic,
+                                                                        String key,
+                                                                        Object event,
+                                                                        String eventType) {
+        Timer.Sample sample = Timer.start(meterRegistry);
 
         try {
-            rabbitTemplate.convertAndSend(
-                "notification.exchange",
-                "email.welcome",
-                notification
-            );
-            log.info("Welcome email notification sent for user: {}", userId);
+            // Add correlation ID and tracking headers
+            ProducerRecord&lt;String, Object&gt; record = new ProducerRecord&lt;&gt;(topic, key, event);
+            record.headers().add("eventType", eventType.getBytes());
+            record.headers().add("correlationId", UUID.randomUUID().toString().getBytes());
+            record.headers().add("source", "order-service".getBytes());
+            record.headers().add("timestamp", Instant.now().toString().getBytes());
+
+            log.info("Publishing {} event for key: {} to topic: {}", eventType, key, topic);
+
+            return kafkaTemplate.send(record)
+                    .completable()
+                    .whenComplete((result, throwable) -> {
+                        sample.stop(Timer.builder("kafka.producer.duration")
+                                .tag("topic", topic)
+                                .tag("event.type", eventType)
+                                .tag("status", throwable == null ? "success" : "error")
+                                .register(meterRegistry));
+
+                        if (throwable == null) {
+                            log.info("Successfully published {} event for key: {} to topic: {} at offset: {}",
+                                    eventType, key, topic, result.getRecordMetadata().offset());
+
+                            meterRegistry.counter("kafka.producer.messages.sent",
+                                    "topic", topic, "event.type", eventType).increment();
+                        } else {
+                            log.error("Failed to publish {} event for key: {} to topic: {}",
+                                    eventType, key, topic, throwable);
+
+                            meterRegistry.counter("kafka.producer.messages.failed",
+                                    "topic", topic, "event.type", eventType).increment();
+                        }
+                    });
+
         } catch (Exception e) {
-            log.error("Failed to send welcome email notification: {}", userId, e);
+            sample.stop(Timer.builder("kafka.producer.duration")
+                    .tag("topic", topic)
+                    .tag("event.type", eventType)
+                    .tag("status", "error")
+                    .register(meterRegistry));
+
+            log.error("Exception while publishing {} event for key: {} to topic: {}", eventType, key, topic, e);
+            meterRegistry.counter("kafka.producer.messages.failed",
+                    "topic", topic, "event.type", eventType).increment();
+
+            return CompletableFuture.failedFuture(e);
         }
     }
 
-    public void sendOrderConfirmation(String orderId, String customerEmail) {
-        EmailNotification notification = EmailNotification.builder()
-            .orderId(orderId)
-            .email(customerEmail)
-            .templateType("ORDER_CONFIRMATION")
-            .priority("MEDIUM")
-            .timestamp(Instant.now())
-            .build();
+    @EventListener
+    public void handleOrderCreatedDomainEvent(OrderCreatedDomainEvent domainEvent) {
+        OrderEvent kafkaEvent = OrderEvent.builder()
+                .orderId(domainEvent.getOrderId())
+                .userId(domainEvent.getUserId())
+                .eventType("ORDER_CREATED")
+                .items(domainEvent.getItems())
+                .totalAmount(domainEvent.getTotalAmount())
+                .status(OrderStatus.PENDING)
+                .timestamp(domainEvent.getOccurredAt())
+                .build();
 
-        rabbitTemplate.convertAndSend(
-            "notification.exchange",
-            "email.order",
-            notification
-        );
-    }
-
-    public void sendBulkPromotionalEmail(List&lt;String&gt; emailList, String campaignId) {
-        BulkEmailNotification bulkNotification = BulkEmailNotification.builder()
-            .emails(emailList)
-            .campaignId(campaignId)
-            .templateType("PROMOTIONAL")
-            .priority("LOW")
-            .build();
-
-        rabbitTemplate.convertAndSend(
-            "notification.exchange",
-            "email.bulk",
-            bulkNotification
-        );
+        publishOrderCreated(kafkaEvent)
+                .exceptionally(throwable -> {
+                    log.error("Failed to publish order created event for order: {}",
+                             domainEvent.getOrderId(), throwable);
+                    // Could trigger compensation or retry mechanisms here
+                    return null;
+                });
     }
 }</code></pre>
 
-            <h3>Consumer example</h3>
-            <p>RabbitMQ consumers use the @RabbitListener annotation to declaratively process messages from specific queues, with Spring Boot handling message deserialization, acknowledgment, and error scenarios automatically. Consumers can be configured for different acknowledgment modes, from automatic acknowledgment for fire-and-forget scenarios to manual acknowledgment for guaranteed processing, ensuring messages aren't lost when processing fails. Multiple consumers can listen to the same queue for load balancing, or different consumers can listen to different queues bound to the same exchange for implementing complex workflow patterns.</p>
+            <h3>Transactional Producer</h3>
+            <p>Implement transactional messaging to ensure exactly-once delivery semantics and maintain data consistency across database and Kafka operations.</p>
 
-            <h3>Consumer Implementation</h3>
+            <pre><code class="language-java">@Service
+@Transactional
+@Slf4j
+public class TransactionalOrderEventProducer {
+
+    private final KafkaTransactionManager transactionManager;
+    private final KafkaTemplate&lt;String, Object&gt; kafkaTemplate;
+    private final OrderRepository orderRepository;
+
+    public TransactionalOrderEventProducer(KafkaTransactionManager transactionManager,
+                                          KafkaTemplate&lt;String, Object&gt; kafkaTemplate,
+                                          OrderRepository orderRepository) {
+        this.transactionManager = transactionManager;
+        this.kafkaTemplate = kafkaTemplate;
+        this.orderRepository = orderRepository;
+    }
+
+    @KafkaTransactional
+    public void createOrderWithEvent(CreateOrderRequest request) {
+        try {
+            // Database operation
+            Order order = Order.builder()
+                    .userId(request.getUserId())
+                    .items(request.getItems())
+                    .totalAmount(calculateTotal(request.getItems()))
+                    .status(OrderStatus.PENDING)
+                    .createdAt(Instant.now())
+                    .build();
+
+            Order savedOrder = orderRepository.save(order);
+            log.info("Order saved to database: {}", savedOrder.getId());
+
+            // Kafka operation (within same transaction)
+            OrderEvent event = OrderEvent.builder()
+                    .orderId(savedOrder.getId())
+                    .userId(savedOrder.getUserId())
+                    .eventType("ORDER_CREATED")
+                    .items(savedOrder.getItems())
+                    .totalAmount(savedOrder.getTotalAmount())
+                    .status(savedOrder.getStatus())
+                    .timestamp(Instant.now())
+                    .build();
+
+            kafkaTemplate.send("order-events", savedOrder.getId(), event)
+                    .addCallback(
+                            result -> log.info("Order event sent in transaction: {}", savedOrder.getId()),
+                            failure -> {
+                                log.error("Failed to send order event in transaction: {}",
+                                         savedOrder.getId(), failure);
+                                throw new RuntimeException("Kafka send failed", failure);
+                            }
+                    );
+
+            log.info("Order creation transaction completed successfully: {}", savedOrder.getId());
+
+        } catch (Exception e) {
+            log.error("Order creation transaction failed", e);
+            throw new RuntimeException("Transaction failed", e);
+        }
+    }
+
+    private BigDecimal calculateTotal(List&lt;OrderItem&gt; items) {
+        return items.stream()
+                .map(item -> item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+}</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="kafka-consumer" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Kafka Consumer Implementation</h2>
+
+            <h3>Basic Consumer Service</h3>
+            <p>Implement consumer services with proper error handling, message acknowledgment, and processing logic for different event types.</p>
+
             <pre><code class="language-java">@Component
 @Slf4j
-public class EmailNotificationConsumer {
+public class OrderEventConsumer {
 
-    private final EmailService emailService;
-    private final NotificationRepository notificationRepository;
+    private final InventoryService inventoryService;
+    private final NotificationService notificationService;
+    private final OrderService orderService;
+    private final MeterRegistry meterRegistry;
 
-    public EmailNotificationConsumer(EmailService emailService,
-                                   NotificationRepository notificationRepository) {
-        this.emailService = emailService;
-        this.notificationRepository = notificationRepository;
+    public OrderEventConsumer(InventoryService inventoryService,
+                             NotificationService notificationService,
+                             OrderService orderService,
+                             MeterRegistry meterRegistry) {
+        this.inventoryService = inventoryService;
+        this.notificationService = notificationService;
+        this.orderService = orderService;
+        this.meterRegistry = meterRegistry;
     }
 
-    @RabbitListener(queues = "email.welcome.queue")
-    public void processWelcomeEmail(EmailNotification notification) {
+    @KafkaListener(topics = "order-events", groupId = "inventory-service")
+    public void handleInventoryReservation(OrderEvent orderEvent,
+                                          @Header("kafka_receivedMessageKey") String key,
+                                          @Header("kafka_receivedPartition") int partition,
+                                          @Header("kafka_offset") long offset,
+                                          @Header(value = "eventType", required = false) String eventType,
+                                          Acknowledgment acknowledgment) {
+
+        Timer.Sample sample = Timer.start(meterRegistry);
+
         try {
-            log.info("Processing welcome email for user: {}", notification.getUserId());
+            log.info("Processing order event: {} from partition: {} offset: {} eventType: {}",
+                    orderEvent.getOrderId(), partition, offset, eventType);
 
-            emailService.sendWelcomeEmail(
-                notification.getEmail(),
-                notification.getUserId()
-            );
-
-            // Save notification record
-            notificationRepository.save(NotificationRecord.builder()
-                .userId(notification.getUserId())
-                .type("WELCOME_EMAIL")
-                .status("SENT")
-                .sentAt(Instant.now())
-                .build());
-
-            log.info("Welcome email sent successfully to: {}", notification.getEmail());
-
-        } catch (Exception e) {
-            log.error("Failed to process welcome email: {}", notification.getUserId(), e);
-            throw new AmqpRejectAndRequeueException("Email processing failed", e);
-        }
-    }
-
-    @RabbitListener(queues = "email.order.queue")
-    public void processOrderConfirmation(EmailNotification notification) {
-        try {
-            emailService.sendOrderConfirmation(
-                notification.getEmail(),
-                notification.getOrderId()
-            );
-            log.info("Order confirmation sent for order: {}", notification.getOrderId());
-        } catch (Exception e) {
-            log.error("Failed to send order confirmation: {}", notification.getOrderId(), e);
-            throw new AmqpRejectAndRequeueException("Order confirmation failed", e);
-        }
-    }
-
-    @RabbitListener(queues = "email.bulk.queue", concurrency = "3-5")
-    public void processBulkEmails(BulkEmailNotification bulkNotification) {
-        try {
-            for (String email : bulkNotification.getEmails()) {
-                emailService.sendPromotionalEmail(email, bulkNotification.getCampaignId());
-                Thread.sleep(100); // Rate limiting for bulk emails
+            switch (orderEvent.getEventType()) {
+                case "ORDER_CREATED":
+                    inventoryService.reserveItems(orderEvent.getOrderId(), orderEvent.getItems());
+                    log.info("Inventory reserved for order: {}", orderEvent.getOrderId());
+                    break;
+                case "ORDER_CANCELLED":
+                    inventoryService.releaseReservation(orderEvent.getOrderId());
+                    log.info("Inventory reservation released for order: {}", orderEvent.getOrderId());
+                    break;
+                case "ORDER_CONFIRMED":
+                    inventoryService.confirmReservation(orderEvent.getOrderId());
+                    log.info("Inventory reservation confirmed for order: {}", orderEvent.getOrderId());
+                    break;
+                default:
+                    log.warn("Unknown event type for inventory processing: {}", orderEvent.getEventType());
             }
-            log.info("Bulk emails processed for campaign: {}", bulkNotification.getCampaignId());
+
+            acknowledgment.acknowledge();
+            meterRegistry.counter("kafka.consumer.messages.processed",
+                    "topic", "order-events",
+                    "group", "inventory-service",
+                    "event.type", orderEvent.getEventType(),
+                    "status", "success").increment();
+
+        } catch (InventoryException e) {
+            log.error("Inventory processing failed for order: {}, will retry",
+                     orderEvent.getOrderId(), e);
+            meterRegistry.counter("kafka.consumer.messages.processed",
+                    "topic", "order-events",
+                    "group", "inventory-service",
+                    "event.type", orderEvent.getEventType(),
+                    "status", "retry").increment();
+            throw e; // Will trigger retry mechanism
+
         } catch (Exception e) {
-            log.error("Failed to process bulk emails: {}", bulkNotification.getCampaignId(), e);
+            log.error("Unexpected error processing order event: {}", orderEvent.getOrderId(), e);
+            acknowledgment.acknowledge(); // Acknowledge to prevent infinite retries
+            meterRegistry.counter("kafka.consumer.messages.processed",
+                    "topic", "order-events",
+                    "group", "inventory-service",
+                    "event.type", orderEvent.getEventType(),
+                    "status", "error").increment();
+        } finally {
+            sample.stop(Timer.builder("kafka.consumer.duration")
+                    .tag("topic", "order-events")
+                    .tag("group", "inventory-service")
+                    .tag("event.type", orderEvent.getEventType())
+                    .register(meterRegistry));
         }
+    }
+
+    @KafkaListener(topics = "order-events", groupId = "notification-service")
+    public void handleNotifications(OrderEvent orderEvent, Acknowledgment acknowledgment) {
+        try {
+            log.info("Processing notification for order event: {} type: {}",
+                    orderEvent.getOrderId(), orderEvent.getEventType());
+
+            switch (orderEvent.getEventType()) {
+                case "ORDER_CREATED":
+                    notificationService.sendOrderConfirmation(orderEvent);
+                    break;
+                case "ORDER_SHIPPED":
+                    notificationService.sendShippingNotification(orderEvent);
+                    break;
+                case "ORDER_DELIVERED":
+                    notificationService.sendDeliveryConfirmation(orderEvent);
+                    break;
+                case "ORDER_CANCELLED":
+                    notificationService.sendCancellationNotification(orderEvent);
+                    break;
+                default:
+                    log.debug("No notification required for event type: {}", orderEvent.getEventType());
+            }
+
+            acknowledgment.acknowledge();
+            log.debug("Notification processed successfully for order: {}", orderEvent.getOrderId());
+
+        } catch (NotificationException e) {
+            log.warn("Notification failed for order: {}, will be retried",
+                    orderEvent.getOrderId(), e);
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error in notification processing for order: {}",
+                     orderEvent.getOrderId(), e);
+            acknowledgment.acknowledge(); // Skip problematic messages
+        }
+    }
+
+    @KafkaListener(topics = "order-events", groupId = "analytics-service",
+                  concurrency = "3",
+                  containerFactory = "batchKafkaListenerContainerFactory")
+    public void handleAnalytics(List&lt;OrderEvent&gt; orderEvents,
+                               List&lt;Acknowledgment&gt; acknowledgments) {
+        try {
+            log.info("Processing batch of {} order events for analytics", orderEvents.size());
+
+            List&lt;AnalyticsEvent&gt; analyticsEvents = orderEvents.stream()
+                    .map(this::convertToAnalyticsEvent)
+                    .collect(Collectors.toList());
+
+            analyticsService.processBatch(analyticsEvents);
+
+            // Acknowledge all messages in batch
+            acknowledgments.forEach(Acknowledgment::acknowledge);
+
+            log.info("Analytics batch processing completed for {} events", orderEvents.size());
+
+        } catch (Exception e) {
+            log.error("Analytics batch processing failed", e);
+            throw e; // Will retry entire batch
+        }
+    }
+
+    private AnalyticsEvent convertToAnalyticsEvent(OrderEvent orderEvent) {
+        return AnalyticsEvent.builder()
+                .eventId(UUID.randomUUID().toString())
+                .orderId(orderEvent.getOrderId())
+                .userId(orderEvent.getUserId())
+                .eventType(orderEvent.getEventType())
+                .totalAmount(orderEvent.getTotalAmount())
+                .itemCount(orderEvent.getItems() != null ? orderEvent.getItems().size() : 0)
+                .timestamp(orderEvent.getTimestamp())
+                .build();
     }
 }</code></pre>
 
-            <h3>Handling retries and DLQs</h3>
-            <p>RabbitMQ provides sophisticated retry and dead letter queue mechanisms through message TTL (time-to-live), exchange configurations, and Spring Boot's retry templates that can handle various failure scenarios with different retry strategies. When messages fail processing, they can be automatically retried with exponential backoff delays, and after exceeding retry limits, they're routed to dead letter exchanges and queues for manual investigation and reprocessing. Spring AMQP integrates retry logic with RabbitMQ's native features like message republishing, TTL-based delays, and custom error handling strategies that ensure robust message processing even in the face of systematic failures. Dead letter queues serve as safety nets that preserve failed messages with full context information, enabling operations teams to analyze failure patterns and implement fixes without losing critical business data.</p>
+            <h3>Batch Consumer Configuration</h3>
+            <p>Configure batch consumption for high-throughput scenarios where processing multiple messages together is more efficient.</p>
 
-            <h3>RabbitMQ Configuration</h3>
-            <pre><code class="language-yaml"># application.yml - RabbitMQ Configuration
-spring:
-  rabbitmq:
-    host: localhost
-    port: 5672
-    username: guest
-    password: guest
-    listener:
-      simple:
-        retry:
-          enabled: true
-          initial-interval: 1000ms
-          max-attempts: 3
-          multiplier: 2
-        default-requeue-rejected: false
-        acknowledge-mode: auto
-    template:
-      retry:
-        enabled: true
-        initial-interval: 1000ms
-        max-attempts: 3</code></pre>
-
-            <h3>Queue and Exchange Configuration</h3>
             <pre><code class="language-java">@Configuration
-public class RabbitMQConfig {
+public class BatchConsumerConfig {
 
     @Bean
-    public TopicExchange notificationExchange() {
-        return new TopicExchange("notification.exchange", true, false);
-    }
+    public ConcurrentKafkaListenerContainerFactory&lt;String, Object&gt; batchKafkaListenerContainerFactory(
+            ConsumerFactory&lt;String, Object&gt; consumerFactory) {
 
-    @Bean
-    public Queue emailWelcomeQueue() {
-        return QueueBuilder.durable("email.welcome.queue")
-            .withArgument("x-dead-letter-exchange", "notification.dlx")
-            .withArgument("x-dead-letter-routing-key", "email.welcome.failed")
-            .withArgument("x-message-ttl", 60000) // 1 minute TTL
-            .build();
-    }
+        ConcurrentKafkaListenerContainerFactory&lt;String, Object&gt; factory =
+                new ConcurrentKafkaListenerContainerFactory&lt;&gt;();
 
-    @Bean
-    public Queue emailOrderQueue() {
-        return QueueBuilder.durable("email.order.queue")
-            .withArgument("x-dead-letter-exchange", "notification.dlx")
-            .withArgument("x-dead-letter-routing-key", "email.order.failed")
-            .build();
-    }
+        factory.setConsumerFactory(consumerFactory);
+        factory.setBatchListener(true);
+        factory.setConcurrency(3);
+        factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
+        factory.getContainerProperties().setPollTimeout(3000);
 
-    @Bean
-    public Queue emailBulkQueue() {
-        return QueueBuilder.durable("email.bulk.queue")
-            .withArgument("x-dead-letter-exchange", "notification.dlx")
-            .withArgument("x-dead-letter-routing-key", "email.bulk.failed")
-            .build();
-    }
+        // Batch configuration
+        factory.getContainerProperties().setIdleBetweenPolls(100);
+        factory.setCommonErrorHandler(batchErrorHandler());
 
-    @Bean
-    public Queue emailWelcomeDLQ() {
-        return QueueBuilder.durable("email.welcome.dlq").build();
-    }
-
-    @Bean
-    public Queue emailOrderDLQ() {
-        return QueueBuilder.durable("email.order.dlq").build();
-    }
-
-    @Bean
-    public Queue emailBulkDLQ() {
-        return QueueBuilder.durable("email.bulk.dlq").build();
-    }
-
-    @Bean
-    public TopicExchange deadLetterExchange() {
-        return new TopicExchange("notification.dlx", true, false);
-    }
-
-    // Bindings for main queues
-    @Bean
-    public Binding emailWelcomeBinding() {
-        return BindingBuilder
-            .bind(emailWelcomeQueue())
-            .to(notificationExchange())
-            .with("email.welcome");
-    }
-
-    @Bean
-    public Binding emailOrderBinding() {
-        return BindingBuilder
-            .bind(emailOrderQueue())
-            .to(notificationExchange())
-            .with("email.order");
-    }
-
-    @Bean
-    public Binding emailBulkBinding() {
-        return BindingBuilder
-            .bind(emailBulkQueue())
-            .to(notificationExchange())
-            .with("email.bulk");
-    }
-
-    // Dead letter queue bindings
-    @Bean
-    public Binding emailWelcomeDLQBinding() {
-        return BindingBuilder
-            .bind(emailWelcomeDLQ())
-            .to(deadLetterExchange())
-            .with("email.welcome.failed");
-    }
-
-    @Bean
-    public Binding emailOrderDLQBinding() {
-        return BindingBuilder
-            .bind(emailOrderDLQ())
-            .to(deadLetterExchange())
-            .with("email.order.failed");
-    }
-
-    @Bean
-    public Binding emailBulkDLQBinding() {
-        return BindingBuilder
-            .bind(emailBulkDLQ())
-            .to(deadLetterExchange())
-            .with("email.bulk.failed");
-    }
-
-    @Bean
-    public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(
-            ConnectionFactory connectionFactory) {
-        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
-        factory.setConnectionFactory(connectionFactory);
-        factory.setDefaultRequeueRejected(false);
-        factory.setErrorHandler(new ConditionalRejectingErrorHandler());
         return factory;
     }
 
     @Bean
-    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
-        RabbitTemplate template = new RabbitTemplate(connectionFactory);
-        template.setMessageConverter(new Jackson2JsonMessageConverter());
-        return template;
+    public DefaultErrorHandler batchErrorHandler() {
+        ExponentialBackOffWithMaxRetries backOff = new ExponentialBackOffWithMaxRetries(2);
+        backOff.setInitialInterval(1000L);
+        backOff.setMultiplier(2.0);
+        backOff.setMaxInterval(5000L);
+
+        return new DefaultErrorHandler(backOff);
+    }
+}</code></pre>
+
+            <h3>Dead Letter Topic Consumer</h3>
+            <p>Implement consumers for dead letter topics to handle failed messages and enable manual recovery processes.</p>
+
+            <pre><code class="language-java">@Component
+@Slf4j
+public class DeadLetterTopicConsumer {
+
+    private final AlertingService alertingService;
+    private final MessageRecoveryService messageRecoveryService;
+
+    public DeadLetterTopicConsumer(AlertingService alertingService,
+                                  MessageRecoveryService messageRecoveryService) {
+        this.alertingService = alertingService;
+        this.messageRecoveryService = messageRecoveryService;
+    }
+
+    @KafkaListener(topics = "order-events.DLT", groupId = "dead-letter-processor")
+    public void handleDeadLetterMessage(@Payload String message,
+                                       @Header("kafka_receivedTopic") String topic,
+                                       @Header("kafka_receivedPartition") int partition,
+                                       @Header("kafka_offset") long offset,
+                                       @Header(value = "kafka_dlt-original-topic", required = false) String originalTopic,
+                                       @Header(value = "kafka_dlt-exception-message", required = false) String exceptionMessage,
+                                       Acknowledgment acknowledgment) {
+
+        try {
+            log.error("Processing dead letter message from topic: {} partition: {} offset: {} originalTopic: {} error: {}",
+                     topic, partition, offset, originalTopic, exceptionMessage);
+
+            DeadLetterRecord record = DeadLetterRecord.builder()
+                    .id(UUID.randomUUID().toString())
+                    .originalTopic(originalTopic)
+                    .message(message)
+                    .errorMessage(exceptionMessage)
+                    .receivedAt(Instant.now())
+                    .partition(partition)
+                    .offset(offset)
+                    .status(DeadLetterStatus.RECEIVED)
+                    .build();
+
+            messageRecoveryService.saveDeadLetterRecord(record);
+
+            // Send alert for dead letter message
+            alertingService.sendDeadLetterAlert(record);
+
+            acknowledgment.acknowledge();
+            log.info("Dead letter message processed and saved with ID: {}", record.getId());
+
+        } catch (Exception e) {
+            log.error("Failed to process dead letter message from topic: {} partition: {} offset: {}",
+                     topic, partition, offset, e);
+            acknowledgment.acknowledge(); // Prevent infinite loop
+        }
+    }
+
+    @KafkaListener(topics = "payment-events.DLT", groupId = "dead-letter-processor")
+    public void handlePaymentDeadLetterMessage(@Payload String message,
+                                              @Header Map&lt;String, Object&gt; headers,
+                                              Acknowledgment acknowledgment) {
+        // Similar processing for payment dead letter messages
+        handleGenericDeadLetterMessage(message, headers, acknowledgment, "payment-events");
+    }
+
+    private void handleGenericDeadLetterMessage(String message,
+                                               Map&lt;String, Object&gt; headers,
+                                               Acknowledgment acknowledgment,
+                                               String expectedOriginalTopic) {
+        try {
+            log.warn("Processing generic dead letter message for topic: {}", expectedOriginalTopic);
+
+            // Extract common headers
+            String originalTopic = (String) headers.get("kafka_dlt-original-topic");
+            String exceptionMessage = (String) headers.get("kafka_dlt-exception-message");
+            Integer partition = (Integer) headers.get("kafka_receivedPartition");
+            Long offset = (Long) headers.get("kafka_offset");
+
+            // Process and store dead letter record
+            DeadLetterRecord record = DeadLetterRecord.builder()
+                    .id(UUID.randomUUID().toString())
+                    .originalTopic(originalTopic)
+                    .message(message)
+                    .errorMessage(exceptionMessage)
+                    .receivedAt(Instant.now())
+                    .partition(partition != null ? partition : -1)
+                    .offset(offset != null ? offset : -1L)
+                    .status(DeadLetterStatus.RECEIVED)
+                    .metadata(headers)
+                    .build();
+
+            messageRecoveryService.saveDeadLetterRecord(record);
+            alertingService.sendDeadLetterAlert(record);
+
+            acknowledgment.acknowledge();
+
+        } catch (Exception e) {
+            log.error("Failed to process generic dead letter message", e);
+            acknowledgment.acknowledge();
+        }
     }
 }</code></pre>
           </section>
@@ -772,14 +1082,14 @@ public class PaymentEventHandler {
           <section id="lesson-summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Lesson Summary</h2>
 
-            <p>In this lesson, we explored asynchronous messaging patterns with Kafka and RabbitMQ for microservices communication. Here's a comprehensive summary of all the concepts and implementation approaches covered:</p>
+            <p>In this lesson, we explored comprehensive Apache Kafka implementation for microservices messaging. Here's a complete summary of all concepts and implementation approaches covered:</p>
 
             <h3>Messaging Fundamentals</h3>
             <ul>
-              <li><strong>Purpose:</strong> Communication pattern using intermediary message brokers for asynchronous, decoupled service interaction</li>
+              <li><strong>Purpose:</strong> Asynchronous communication pattern using message brokers for decoupled service interaction</li>
               <li><strong>Benefits:</strong> Eliminates tight coupling, enables better scalability, and provides built-in buffering for traffic spikes</li>
               <li><strong>Message types:</strong> Commands (instruct actions), events (notify occurrences), and data sharing across service boundaries</li>
-              <li><strong>Resilience:</strong> Fault tolerance through message persistence, retries, and dead letter queues</li>
+              <li><strong>Resilience:</strong> Fault tolerance through message persistence, retries, and dead letter topics</li>
             </ul>
 
             <h3>Kafka Architecture and Concepts</h3>
@@ -790,93 +1100,101 @@ public class PaymentEventHandler {
               <li><strong>Consumers:</strong> Applications that subscribe to topics and process messages with group-based load distribution</li>
             </ul>
 
-            <h3>Kafka Implementation</h3>
+            <h3>Kafka Configuration</h3>
             <ul>
-              <li><strong>Producer setup:</strong> KafkaTemplate for message publishing with async callbacks and error handling</li>
-              <li><strong>Consumer setup:</strong> @KafkaListener annotation for declarative message consumption with automatic deserialization</li>
-              <li><strong>Configuration:</strong> Bootstrap servers, serializers/deserializers, acknowledgment settings, and auto-offset management</li>
-              <li><strong>Performance:</strong> Batch processing, compression, and concurrent consumers for high-throughput scenarios</li>
+              <li><strong>Maven dependencies:</strong> Spring Kafka starter, actuator, validation, and Jackson for JSON serialization</li>
+              <li><strong>Application properties:</strong> Bootstrap servers, serialization settings, and performance tuning parameters</li>
+              <li><strong>Java configuration:</strong> Producer factory, consumer factory, and listener container factory with custom settings</li>
+              <li><strong>Topic management:</strong> Automatic topic creation with partition count, replication, and retention policies</li>
             </ul>
 
-            <h3>Kafka Reliability Patterns</h3>
+            <h3>Advanced Kafka Configuration</h3>
             <ul>
-              <li><strong>Retry mechanisms:</strong> Exponential backoff for transient failures with configurable maximum attempts</li>
-              <li><strong>Dead Letter Topics:</strong> Capture failed messages for investigation and manual reprocessing</li>
-              <li><strong>Error handling:</strong> DefaultErrorHandler with custom retry policies and exception classification</li>
-              <li><strong>Offset management:</strong> Manual vs automatic commit strategies for different consistency requirements</li>
+              <li><strong>Performance settings:</strong> Batch size, linger time, compression, and memory buffer configuration</li>
+              <li><strong>Reliability settings:</strong> Acknowledgment modes, retries, idempotence, and timeout configurations</li>
+              <li><strong>Error handling:</strong> Dead letter topic routing, retry policies, and exception classification</li>
+              <li><strong>Monitoring integration:</strong> Metrics collection, producer interceptors, and operational visibility</li>
             </ul>
 
-            <h3>RabbitMQ Architecture and Concepts</h3>
+            <h3>Kafka Producer Implementation</h3>
             <ul>
-              <li><strong>Queues:</strong> Message storage containers for point-to-point messaging with persistence and acknowledgment features</li>
-              <li><strong>Exchanges:</strong> Message routing components (direct, topic, fanout, headers) for flexible distribution patterns</li>
-              <li><strong>Routing keys:</strong> Message attributes used by exchanges to determine queue destinations</li>
-              <li><strong>Bindings:</strong> Connections between exchanges and queues with routing rule specifications</li>
+              <li><strong>Event models:</strong> JSON-serializable domain events with proper annotations and versioning</li>
+              <li><strong>Producer service:</strong> Robust message publishing with error handling, metrics, and callback mechanisms</li>
+              <li><strong>Message headers:</strong> Correlation IDs, event types, source identification, and timestamp tracking</li>
+              <li><strong>Asynchronous publishing:</strong> CompletableFuture-based APIs for non-blocking message production</li>
             </ul>
 
-            <h3>RabbitMQ Implementation</h3>
+            <h3>Transactional Messaging</h3>
             <ul>
-              <li><strong>Producer setup:</strong> RabbitTemplate for message publishing with exchange and routing key specifications</li>
-              <li><strong>Consumer setup:</strong> @RabbitListener annotation for queue-specific message processing with concurrency control</li>
-              <li><strong>Queue configuration:</strong> Durable queues, dead letter exchanges, and TTL settings for reliable messaging</li>
-              <li><strong>Connection management:</strong> Connection factories, retry policies, and acknowledgment modes</li>
+              <li><strong>Exactly-once semantics:</strong> Transactional producers for consistent database and Kafka operations</li>
+              <li><strong>Transaction management:</strong> Kafka transaction manager integration with Spring's transaction support</li>
+              <li><strong>Atomic operations:</strong> Combined database writes and message publishing in single transactions</li>
+              <li><strong>Rollback handling:</strong> Automatic compensation when either database or Kafka operations fail</li>
             </ul>
 
-            <h3>RabbitMQ Reliability Patterns</h3>
+            <h3>Kafka Consumer Implementation</h3>
             <ul>
-              <li><strong>Dead Letter Queues:</strong> Automatic routing of failed messages to designated queues for investigation</li>
-              <li><strong>Message TTL:</strong> Time-to-live settings for automatic message expiration and cleanup</li>
-              <li><strong>Acknowledgments:</strong> Manual vs automatic acknowledgment for guaranteed message processing</li>
-              <li><strong>Retry logic:</strong> Spring AMQP retry templates with exponential backoff and circuit breaker integration</li>
+              <li><strong>Consumer services:</strong> @KafkaListener annotation for declarative message consumption</li>
+              <li><strong>Message processing:</strong> Event type switching, business logic execution, and acknowledgment handling</li>
+              <li><strong>Error handling:</strong> Retry mechanisms, dead letter routing, and graceful failure management</li>
+              <li><strong>Metrics integration:</strong> Processing duration, success rates, and error counters for monitoring</li>
             </ul>
 
-            <h3>Messaging Patterns</h3>
+            <h3>Advanced Consumer Patterns</h3>
             <ul>
-              <li><strong>Pub/Sub pattern:</strong> One-to-many communication for broadcasting events to multiple interested subscribers</li>
-              <li><strong>Event-driven architecture:</strong> Services react to domain events rather than being directly invoked</li>
-              <li><strong>Command patterns:</strong> Request-response messaging for directing specific actions to target services</li>
+              <li><strong>Manual acknowledgment:</strong> Precise control over message acknowledgment timing and conditions</li>
+              <li><strong>Batch consumption:</strong> Processing multiple messages together for improved throughput</li>
+              <li><strong>Multiple consumer groups:</strong> Different services processing same events with different business logic</li>
+              <li><strong>Concurrency control:</strong> Parallel consumer instances with partition-based load distribution</li>
+            </ul>
+
+            <h3>Dead Letter Topic Handling</h3>
+            <ul>
+              <li><strong>Failed message capture:</strong> Automatic routing of permanently failed messages to dead letter topics</li>
+              <li><strong>Recovery mechanisms:</strong> Manual investigation, message reprocessing, and system debugging capabilities</li>
+              <li><strong>Alerting integration:</strong> Notification systems for operational teams when messages fail</li>
+              <li><strong>Metadata preservation:</strong> Original message context, error details, and processing history</li>
+            </ul>
+
+            <h3>Event-Driven Architecture Patterns</h3>
+            <ul>
+              <li><strong>Domain events:</strong> Business-meaningful events that represent state changes in the system</li>
               <li><strong>Event sourcing:</strong> Storing state changes as events for audit trails and system reconstruction</li>
+              <li><strong>CQRS integration:</strong> Separate read and write models connected through event streams</li>
+              <li><strong>Saga patterns:</strong> Distributed transaction management through event-driven compensation</li>
             </ul>
 
-            <h3>Event-Driven Microservices</h3>
+            <h3>Reliability and Best Practices</h3>
             <ul>
-              <li><strong>Temporal decoupling:</strong> Services don't need to be available simultaneously for communication</li>
-              <li><strong>Spatial decoupling:</strong> Services don't need to know each other's locations or endpoints</li>
-              <li><strong>Logical decoupling:</strong> Services react to business events rather than implementation details</li>
-              <li><strong>System evolution:</strong> Services can be added, modified, or removed without affecting other services</li>
-            </ul>
-
-            <h3>Reliability Best Practices</h3>
-            <ul>
-              <li><strong>Idempotency:</strong> Ensure processing same message multiple times produces same result</li>
+              <li><strong>Idempotency:</strong> Safe message reprocessing using unique IDs and deduplication logic</li>
               <li><strong>Retry strategies:</strong> Exponential backoff with maximum limits and circuit breaker patterns</li>
-              <li><strong>Dead letter handling:</strong> Safety nets for poison messages with investigation and reprocessing capabilities</li>
-              <li><strong>Message deduplication:</strong> Unique message IDs and application-level deduplication logic</li>
-            </ul>
-
-            <h3>Complete Event-Driven Example</h3>
-            <ul>
-              <li><strong>Order processing:</strong> Event-driven workflow spanning order, payment, and inventory services</li>
-              <li><strong>Event publishing:</strong> Transactional outbox pattern for reliable event publishing</li>
-              <li><strong>Event consumption:</strong> Multiple services reacting to same events with different business logic</li>
-              <li><strong>Compensation patterns:</strong> Handling failures through compensating events and saga patterns</li>
+              <li><strong>Message ordering:</strong> Partition key strategies for maintaining processing order when required</li>
+              <li><strong>Schema evolution:</strong> Forward and backward compatibility for event structure changes</li>
             </ul>
 
             <h3>Monitoring and Operations</h3>
             <ul>
-              <li><strong>Message metrics:</strong> Throughput, latency, error rates, and queue depths for operational visibility</li>
-              <li><strong>Consumer lag:</strong> Monitoring processing delays and scaling consumer instances accordingly</li>
-              <li><strong>Dead letter monitoring:</strong> Alerting on failed messages and automated reprocessing workflows</li>
+              <li><strong>Producer metrics:</strong> Message throughput, latency, error rates, and delivery confirmations</li>
+              <li><strong>Consumer metrics:</strong> Processing duration, consumer lag, error rates, and partition distribution</li>
+              <li><strong>Operational alerts:</strong> Dead letter messages, consumer lag thresholds, and system health indicators</li>
               <li><strong>Performance tuning:</strong> Batch sizes, concurrency levels, and resource allocation optimization</li>
+            </ul>
+
+            <h3>Production Considerations</h3>
+            <ul>
+              <li><strong>Capacity planning:</strong> Topic partitioning, retention policies, and cluster sizing strategies</li>
+              <li><strong>Security:</strong> Authentication, authorization, and encryption for production deployments</li>
+              <li><strong>Disaster recovery:</strong> Cross-cluster replication, backup strategies, and failover procedures</li>
+              <li><strong>Performance optimization:</strong> JVM tuning, network configuration, and storage optimization</li>
             </ul>
 
             <h3>Key Takeaways</h3>
             <ul>
-              <li>Asynchronous messaging enables scalable, resilient microservices through decoupled communication patterns</li>
-              <li>Kafka excels at high-throughput event streaming with strong ordering guarantees and horizontal scalability</li>
-              <li>RabbitMQ provides sophisticated routing and traditional queuing patterns with complex workflow support</li>
-              <li>Event-driven architectures promote loose coupling and enable system evolution through domain event communication</li>
-              <li>Proper error handling, idempotency, and monitoring are essential for reliable production messaging systems</li>
+              <li>Apache Kafka provides high-throughput, distributed messaging for scalable microservices architectures</li>
+              <li>Event-driven communication enables loose coupling and promotes system evolution and resilience</li>
+              <li>Proper configuration of producers and consumers is critical for reliability and performance</li>
+              <li>Comprehensive error handling, monitoring, and dead letter management ensure production reliability</li>
+              <li>Transactional messaging and idempotency patterns provide consistency in distributed systems</li>
             </ul>
           </section>
 

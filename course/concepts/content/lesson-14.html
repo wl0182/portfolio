@@ -1,11 +1,10 @@
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Lesson 14 - Spring Boot Data Access with JPA and Hibernate part 2</title>
     <meta name="description" content="Spring Boot JPA and Hibernate part 2: entity relationships, custom queries, performance optimization, and advanced mapping techniques with practical examples." />
-    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <script>
       tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
@@ -21,7 +20,7 @@
         <a href="../../../" class="group inline-flex items-center gap-3">
           <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
           <div class="leading-tight">
-            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="text-sm text-slate-500 dark:text-slate-400">Software Engineer</div>
             <div class="font-semibold">Wassim Lagnaoui</div>
           </div>
         </a>
@@ -33,10 +32,6 @@
           <a href="../../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
           <a href="../../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
         </nav>
-        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
-          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
-          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        </button>
       </div>
     </header>
 
@@ -123,48 +118,30 @@
                 <li>This relationship type is perfect for splitting large entities into logical pieces or for optional extensions where not every record needs the additional data.</li>
             </ul>
 
-            <h3>Analogy</h3>
-            <p>Think of a one-to-one relationship like the connection between a person and their driver's license. Each person can have at most one valid driver's license, and each driver's license belongs to exactly one person. You can't share a license, and you can't have multiple valid licenses at the same time. In a government database, the person's basic information (name, address, birth date) might be stored in one table, while driving-specific information (license number, restrictions, expiration date) is stored in a separate but connected table. This separation keeps the main person record clean while allowing detailed driving information for those who need it, just like how user profiles extend basic user accounts with additional personal details.</p>
-
             <h3>Examples</h3>
             <p><strong>User and Profile relationship:</strong></p>
             <pre><code class="language-java">@Entity
 public class User {
-    @Id @GeneratedValue
-    private Long id;
-
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "profile_id")
     private Profile profile;
 }
 </code></pre>
-
-            <p><strong>Profile side of relationship:</strong></p>
-            <pre><code class="language-java">@Entity
 public class Profile {
     @Id @GeneratedValue
     private Long id;
 
     @OneToOne(mappedBy = "profile")
-    private User user;  // Non-owning side
-}
-</code></pre>
 
             <p><strong>Creating and linking entities:</strong></p>
             <pre><code class="language-java">User user = new User("alice@example.com");
 Profile profile = new Profile("Alice", "Smith", "Software Developer");
 user.setProfile(profile);
-userRepository.save(user);  // Saves both user and profile
-</code></pre>
-
             <p><strong>Querying with joins:</strong></p>
             <pre><code class="language-java">@Query("SELECT u FROM User u JOIN FETCH u.profile WHERE u.email = ?1")
 Optional&lt;User&gt; findUserWithProfile(String email);</code></pre>
           </section>
 
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="onetomany-mapping" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>One-to-Many Mapping</h2>
             <h3>Definition</h3>
             <ul>
@@ -175,50 +152,29 @@ Optional&lt;User&gt; findUserWithProfile(String email);</code></pre>
             </ul>
 
             <h3>Analogy</h3>
-            <p>Imagine a library where each author can write multiple books, but each book has only one primary author. The library's computer system links all of Stephen King's novels to his author record, so when you look up Stephen King, you can see his entire catalog. Conversely, when you pick up any Stephen King book, you can immediately see who wrote it. This is exactly how one-to-many relationships work in databases - the author entity connects to multiple book entities, while each book connects back to its one author. The relationship is like invisible threads connecting related items, maintained automatically by the database so you can easily navigate from parents to children and back again.</p>
-
-            <h3>Examples</h3>
             <p><strong>Author with many Books:</strong></p>
             <pre><code class="language-java">@Entity
 public class Author {
     @Id @GeneratedValue
     private Long id;
-
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private List&lt;Book&gt; books = new ArrayList&lt;&gt;();</code></pre>
 
             <p><strong>Book belongs to one Author:</strong></p>
             <pre><code class="language-java">@Entity
 public class Book {
-    @Id @GeneratedValue
-    private Long id;
-
     @ManyToOne
     @JoinColumn(name = "author_id")
     private Author author;  // Owning side with foreign key
 }
 </code></pre>
 
-            <p><strong>Adding books to author:</strong></p>
-            <pre><code class="language-java">Author author = new Author("Stephen King");
-Book book1 = new Book("The Shining");
-Book book2 = new Book("It");
-
-author.addBook(book1);  // Helper method sets both sides
-author.addBook(book2);
-authorRepository.save(author);
-</code></pre>
-
-            <p><strong>Helper method for bidirectional consistency:</strong></p>
             <pre><code class="language-java">public void addBook(Book book) {
     books.add(book);
     book.setAuthor(this);  // Keep both sides in sync
 }
 </code></pre>
           </section>
-
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
           <section id="manytomany-mapping" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Many-to-Many Mapping</h2>
             <h3>Definition</h3>
@@ -229,30 +185,17 @@ authorRepository.save(author);
             </ul>
 
             <h3>Analogy</h3>
-            <p>Think of many-to-many relationships like the connection between actors and movies. Each actor can appear in multiple movies, and each movie features multiple actors. To track these relationships, Hollywood maintains detailed records (like a join table) that list every actor-movie combination. When you look up Tom Hanks, you see all his movies; when you look up Forrest Gump, you see all its actors. This cross-referencing system lets you navigate relationships in both directions without storing duplicate information. The join table acts like a sophisticated address book that maintains all the connections, automatically updated when actors join new projects or leave old ones, ensuring the relationships stay accurate and current.</p>
-
-            <h3>Examples</h3>
-            <p><strong>Student and Course relationship:</strong></p>
-            <pre><code class="language-java">@Entity
-public class Student {
-    @Id @GeneratedValue
-    private Long id;
-
-    @ManyToMany
-    @JoinTable(name = "student_course",
                joinColumns = @JoinColumn(name = "student_id"),
                inverseJoinColumns = @JoinColumn(name = "course_id"))
     private Set&lt;Course&gt; courses = new HashSet&lt;&gt;();</code></pre>
 
             <p><strong>Course side of relationship:</strong></p>
             <pre><code class="language-java">@Entity
-public class Course {
     @Id @GeneratedValue
     private Long id;
 
     @ManyToMany(mappedBy = "courses")
     private Set&lt;Student&gt; students = new HashSet&lt;&gt;();  // Non-owning side
-}
 </code></pre>
 
             <p><strong>Enrolling students in courses:</strong></p>
@@ -263,49 +206,27 @@ studentRepository.save(alice);  // Updates join table
 </code></pre>
 
             <p><strong>Query for courses with student count:</strong></p>
-            <pre><code class="language-java">@Query("SELECT c, SIZE(c.students) FROM Course c")
-List&lt;Object[]&gt; findCoursesWithEnrollmentCount();</code></pre>
-          </section>
-
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="custom-queries" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Custom Queries</h2>
-            <h3>Definition</h3>
             <ul>
                 <li>Custom queries let you write specific database operations that go beyond the automatic query methods provided by Spring Data JPA.</li>
                 <li>Using the @Query annotation, you can write JPQL (Java Persistence Query Language) or native SQL queries directly in your repository interfaces.</li>
                 <li>Custom queries are essential when you need complex filtering, joins across multiple tables, aggregate functions, or specific performance optimizations that simple method names can't express.</li>
             </ul>
-
             <h3>Analogy</h3>
             <p>Think of custom queries like having a conversation with a librarian who speaks your language fluently. While the library's catalog system can handle simple requests like "find books by author X" or "show me all science fiction books," sometimes you need to ask more complex questions: "Show me all mystery novels published after 2000 by authors who have written at least three books, ordered by publication date." For these sophisticated requests, you need to speak the librarian's specialized language (JPQL or SQL) to get exactly what you want. The librarian understands both casual English (method names) and technical library science terminology (custom queries), using whichever approach best serves your specific information needs.</p>
 
             <h3>Examples</h3>
             <p><strong>JPQL query with parameters:</strong></p>
             <pre><code class="language-java">@Query("SELECT u FROM User u WHERE u.age BETWEEN :minAge AND :maxAge")
-List&lt;User&gt; findUsersByAgeRange(@Param("minAge") int min, @Param("maxAge") int max);</code></pre>
 
             <p><strong>Complex join query:</strong></p>
             <pre><code class="language-java">@Query("SELECT DISTINCT a FROM Author a JOIN a.books b WHERE b.category = :category")
 List&lt;Author&gt; findAuthorsByBookCategory(@Param("category") String category);</code></pre>
-
-            <p><strong>Aggregate query with grouping:</strong></p>
-            <pre><code class="language-java">@Query("SELECT a.name, COUNT(b) FROM Author a JOIN a.books b GROUP BY a.name")
-List&lt;Object[]&gt; findAuthorBookCounts();</code></pre>
 
             <p><strong>Update query:</strong></p>
             <pre><code class="language-java">@Modifying
 @Query("UPDATE User u SET u.lastLogin = CURRENT_TIMESTAMP WHERE u.id = :id")
 int updateLastLogin(@Param("id") Long userId);
 </code></pre>
-          </section>
-
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="jpql-queries" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>JPQL Queries</h2>
-            <h3>Definition</h3>
             <ul>
                 <li>JPQL (Java Persistence Query Language) is an object-oriented query language that works with entity objects rather than database tables.</li>
                 <li>It looks similar to SQL but operates on your Java entity classes and their relationships.</li>
@@ -316,52 +237,32 @@ int updateLastLogin(@Param("id") Long userId);
             <h3>Analogy</h3>
             <p>JPQL is like having a universal translator that speaks "business language" instead of "database language." When you want to find information, you speak in terms of the business concepts you understand - customers, orders, products - rather than having to think about foreign keys, table joins, and column names. You say "find all customers who have placed orders worth more than $100" instead of "SELECT c.* FROM customers c INNER JOIN orders o ON c.id = o.customer_id WHERE o.total > 100." The translator (JPQL) understands your business-focused request and converts it into whatever technical database language is needed, whether it's MySQL, PostgreSQL, or Oracle, letting you focus on what you want rather than how the database stores it.</p>
 
-            <h3>Examples</h3>
-            <p><strong>Basic JPQL syntax:</strong></p>
-            <pre><code class="language-java">@Query("SELECT u FROM User u WHERE u.email LIKE :pattern")
 List&lt;User&gt; findByEmailPattern(@Param("pattern") String pattern);</code></pre>
 
             <p><strong>JPQL with relationships:</strong></p>
             <pre><code class="language-java">@Query("SELECT o FROM Order o JOIN o.customer c WHERE c.name = :customerName")
 List&lt;Order&gt; findOrdersByCustomerName(@Param("customerName") String name);</code></pre>
-
-            <p><strong>JPQL functions and expressions:</strong></p>
-            <pre><code class="language-java">@Query("SELECT u FROM User u WHERE UPPER(u.name) = UPPER(:name) AND u.createdDate > :date")
-List&lt;User&gt; findRecentUsersByName(@Param("name") String name, @Param("date") LocalDate date);</code></pre>
-
-            <p><strong>JPQL with subqueries:</strong></p>
-            <pre><code class="language-java">@Query("SELECT u FROM User u WHERE u.id IN (SELECT o.customer.id FROM Order o WHERE o.total > :amount)")
-List&lt;User&gt; findCustomersWithLargeOrders(@Param("amount") BigDecimal amount);</code></pre>
           </section>
 
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
           <section id="native-queries" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Native Queries</h2>
-            <h3>Definition</h3>
             <ul>
                 <li>Native queries use raw SQL specific to your database vendor, giving you access to database-specific features, optimizations, or complex operations that JPQL can't express.</li>
                 <li>While they sacrifice database independence, native queries are powerful for performance-critical operations, complex reporting, or when you need database-specific functions.</li>
                 <li>Use native queries sparingly and only when JPQL isn't sufficient for your needs.</li>
             </ul>
-
             <h3>Analogy</h3>
             <p>Native queries are like speaking directly to a specialist in their technical language instead of using a translator. While the universal translator (JPQL) handles most conversations perfectly, sometimes you need to communicate complex, specialized concepts that require the precision and power of speaking the expert's native language. A database specialist might understand advanced optimization techniques, specific performance tricks, or specialized functions that don't translate well through the universal system. You lose the convenience of automatic translation to other languages, but you gain access to the full depth and sophistication that comes with direct, expert-level communication.</p>
 
             <h3>Examples</h3>
             <p><strong>Native SQL query:</strong></p>
-            <pre><code class="language-java">@Query(value = "SELECT * FROM users WHERE created_date > NOW() - INTERVAL 30 DAY",
-       nativeQuery = true)
-List&lt;User&gt; findRecentUsers();</code></pre>
 
             <p><strong>Native query with complex joins:</strong></p>
             <pre><code class="language-java">@Query(value = """
     SELECT u.name, COUNT(o.id) as order_count, SUM(o.total) as total_spent
     FROM users u LEFT JOIN orders o ON u.id = o.customer_id
     GROUP BY u.id, u.name HAVING COUNT(o.id) > :minOrders
-    """, nativeQuery = true)
-List&lt;Object[]&gt; findTopCustomers(@Param("minOrders") int minOrders);</code></pre>
-
             <p><strong>Database-specific functions:</strong></p>
             <pre><code class="language-java">@Query(value = "SELECT * FROM products WHERE MATCH(name, description) AGAINST(:search)",
        nativeQuery = true)
@@ -372,26 +273,16 @@ List&lt;Product&gt; fullTextSearch(@Param("search") String searchTerm);</code></
 
           <section id="pagination-sorting" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Pagination & Sorting</h2>
-            <h3>Definition</h3>
             <ul>
                 <li>Pagination breaks large result sets into smaller, manageable chunks, while sorting organizes data in meaningful order.</li>
                 <li>Spring Data JPA provides Pageable and Sort parameters that automatically generate LIMIT/OFFSET clauses and ORDER BY statements.</li>
                 <li>This is essential for applications that handle large datasets, providing better performance and user experience by loading only the data currently needed rather than overwhelming users with thousands of results at once.</li>
             </ul>
-
             <h3>Analogy</h3>
             <p>Pagination and sorting are like organizing a massive library catalog into manageable sections with a logical order. Instead of presenting visitors with a overwhelming dump of all 50,000 books at once, the library creates a user-friendly browsing system: books are sorted alphabetically by title or author, then divided into pages showing 20 books each. Visitors can easily navigate through "Page 1 of 2,500" to find what they want, jumping to specific sections or browsing systematically. The library's computer system handles the complex work of organizing and dividing the collection, while visitors enjoy a smooth, responsive experience that doesn't overwhelm them with information or make them wait for massive lists to load.</p>
 
             <h3>Examples</h3>
             <p><strong>Repository with pagination support:</strong></p>
-            <pre><code class="language-java">public interface BookRepository extends JpaRepository&lt;Book, Long&gt; {
-    Page&lt;Book&gt; findByAuthorName(String authorName, Pageable pageable);
-    Page&lt;Book&gt; findByCategory(String category, Pageable pageable);
-}</code></pre>
-
-            <p><strong>Using pagination in service:</strong></p>
-            <pre><code class="language-java">Pageable pageable = PageRequest.of(0, 10, Sort.by("title"));
-Page&lt;Book&gt; bookPage = bookRepository.findByCategory("Fiction", pageable);
 List&lt;Book&gt; books = bookPage.getContent();  // Current page items
 </code></pre>
 
@@ -401,18 +292,11 @@ Pageable pageable = PageRequest.of(0, 20, sort);
 </code></pre>
 
             <p><strong>Getting pagination information:</strong></p>
-            <pre><code class="language-java">Page&lt;Book&gt; page = bookRepository.findAll(pageable);
-int totalPages = page.getTotalPages();
 long totalElements = page.getTotalElements();
 boolean hasNext = page.hasNext();
 </code></pre>
           </section>
 
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="lazy-eager-loading" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Lazy vs Eager Loading</h2>
-            <h3>Definition</h3>
             <ul>
                 <li>Loading strategies control when related entities are fetched from the database.</li>
                 <li>Lazy loading (default for collections) fetches related data only when accessed, while eager loading fetches everything immediately.</li>
@@ -420,17 +304,11 @@ boolean hasNext = page.hasNext();
                 <li>Understanding and controlling fetch strategies is crucial for application performance.</li>
             </ul>
 
-            <h3>Analogy</h3>
-            <p>Think of lazy vs eager loading like two different approaches to packing for a family vacation. Eager loading is like packing everyone's suitcases completely before leaving the house - you grab all the clothes, toiletries, and accessories for every family member right away. This takes longer upfront, and you might pack things you won't need, but once you're at your destination, everything is immediately available. Lazy loading is like packing just the essentials initially, then going back to get specific items only when someone asks for them. This gets you out the door faster, but you might end up making multiple trips back home when different family members realize they need their favorite shirt or special shoes. The best approach depends on your trip length, packing space, and how often people will need their extra items.</p>
-
             <h3>Examples</h3>
             <p><strong>Default lazy loading for collections:</strong></p>
             <pre><code class="language-java">@Entity
 public class Author {
     @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)  // Default
-    private List&lt;Book&gt; books;  // Loaded only when accessed
-}
-</code></pre>
 
             <p><strong>Eager loading for immediate access:</strong></p>
             <pre><code class="language-java">@Entity
@@ -445,13 +323,11 @@ public class Order {
 Optional&lt;Author&gt; findAuthorWithBooks(@Param("id") Long id);</code></pre>
 
             <p><strong>Entity graph for complex fetching:</strong></p>
-            <pre><code class="language-java">@EntityGraph(attributePaths = {"books", "profile"})
 @Query("SELECT a FROM Author a WHERE a.name = :name")
 List&lt;Author&gt; findAuthorWithBooksAndProfile(@Param("name") String name);</code></pre>
           </section>
 
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
           <section id="n-plus-one-problem" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>N+1 Query Problem</h2>
             <h3>Definition</h3>
@@ -461,49 +337,28 @@ List&lt;Author&gt; findAuthorWithBooksAndProfile(@Param("name") String name);</c
                 <li>The problem severely impacts performance as the number of parent records grows, turning what should be 2 queries into potentially hundreds or thousands of queries.</li>
             </ul>
 
-            <h3>Analogy</h3>
-            <p>The N+1 query problem is like a inefficient mail delivery system in a large apartment building. Instead of the mail carrier making one trip to collect all mail for the building (1 query) and then delivering everything in a single efficient route through all floors (1 more query), imagine if the carrier made one trip to get the list of residents (1 query), then made a separate round trip back to the post office for each individual resident's mail (N additional queries). So for a 100-unit building, instead of 2 trips total, the carrier makes 101 trips! This becomes exponentially more wasteful as the building gets larger. The residents get their mail eventually, but the system is incredibly inefficient, causing traffic jams, wasted fuel, and frustrated postal workers. A smart mail system would gather all the information needed in just a couple of efficient trips, just like how proper database query optimization should work.</p>
-
-            <h3>Examples</h3>
-            <p><strong>N+1 Problem Example - The Bad Way:</strong></p>
-            <pre><code class="language-java">// This triggers N+1 queries!
-List&lt;Author&gt; authors = authorRepository.findAll();  // 1 query to get authors
-for (Author author : authors) {
-    System.out.println(author.getBooks().size());   // N queries (one per author)
-}
 // Result: 1 + N queries instead of 2 queries</code></pre>
 
             <p><strong>Solution 1: JOIN FETCH in JPQL:</strong></p>
             <pre><code class="language-java">@Query("SELECT DISTINCT a FROM Author a JOIN FETCH a.books")
 List&lt;Author&gt; findAllAuthorsWithBooks();
-
-// Usage - only 1 query total!
-List&lt;Author&gt; authors = authorRepository.findAllAuthorsWithBooks();
-for (Author author : authors) {
     System.out.println(author.getBooks().size());  // No additional queries
 }</code></pre>
 
             <p><strong>Solution 2: @EntityGraph annotation:</strong></p>
             <pre><code class="language-java">@EntityGraph(attributePaths = {"books"})
-@Query("SELECT a FROM Author a")
 List&lt;Author&gt; findAllWithBooks();
 
 // This eagerly fetches books with authors in 1 query</code></pre>
 
             <p><strong>Solution 3: @BatchSize for collections:</strong></p>
             <pre><code class="language-java">@Entity
-public class Author {
-    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
-    @BatchSize(size = 10)  // Fetches up to 10 collections at once
     private List&lt;Book&gt; books;
 }
 // Reduces N+1 to 1 + (N/10) queries</code></pre>
           </section>
 
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="transaction-management" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Transaction Management</h2>
             <h3>Definition</h3>
             <ul>
                 <li>Transaction management in JPA ensures a sequence of operations either complete successfully as a group or have no effect at all, maintaining data integrity.</li>
@@ -514,9 +369,6 @@ public class Author {
             <h3>Analogy</h3>
             <p>Think of transaction management like a safety net for a high-wire performer. The performer (your application) carefully walks the tightrope (executes operations), knowing that if they stumble (an error occurs), the safety net (transaction management) will catch them, preventing a dangerous fall (data corruption). Just as the safety net ensures the performer can complete their act safely, transaction management ensures your application's operations complete successfully, preserving the integrity and consistency of your data.</p>
 
-            <h3>Examples</h3>
-            <p><strong>Basic transaction management:</strong></p>
-            <pre><code class="language-java">@Service
 public class UserService {
     @Autowired
     private UserRepository userRepository;
@@ -531,7 +383,6 @@ public class UserService {
 
             <p><strong>Rollback on runtime exception:</strong></p>
             <pre><code class="language-java">@Service
-public class OrderService {
     @Autowired
     private OrderRepository orderRepository;
 
@@ -541,23 +392,11 @@ public class OrderService {
         if (order.getTotal() > 1000) {
             throw new RuntimeException("Order too expensive");  // Triggers rollback
         }
-    }
-}
-</code></pre>
-
             <p><strong>Read-only transactions:</strong></p>
             <pre><code class="language-java">@Transactional(readOnly = true)
 public List&lt;User&gt; getAllUsers() {
     return userRepository.findAll();
 }
-</code></pre>
-          </section>
-
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="connection-management" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Connection Management</h2>
-            <h3>Definition</h3>
             <ul>
                 <li>Connection management in JPA involves configuring and optimizing how your application connects to and communicates with the database.</li>
                 <li>This includes managing connection pools, setting connection timeouts, configuring connection validation, and monitoring connection health.</li>
@@ -732,10 +571,6 @@ public class Author {
     </footer>
 
     <script>
-      document.getElementById('themeToggle').addEventListener('click', function(){
-        const r=document.documentElement; const d=r.classList.toggle('dark');
-        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
-      });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
@@ -747,3 +582,159 @@ public class Author {
     </script>
   </body>
 </html>
+
+            <p><strong>Helper method for bidirectional consistency:</strong></p>
+            <p>One-to-many relationships connect one entity to multiple related entities, like an author having many books, or a blog post having many comments. The @OneToMany annotation on the parent side pairs with @ManyToOne on the child side. The child entity typically holds the foreign key that points back to the parent. This relationship type is fundamental for modeling hierarchical data and parent-child structures that appear throughout business applications.</p>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+            <p>One-to-many relationships connect one entity to multiple related entities, like an author having many books, or a blog post having many comments. The @OneToMany annotation on the parent side pairs with @ManyToOne on the child side. The child entity typically holds the foreign key that points back to the parent. This relationship type is fundamental for modeling hierarchical data and parent-child structures that appear throughout business applications.</p>
+            <p>Think of many-to-many relationships like the connection between actors and movies. Each actor can appear in multiple movies, and each movie features multiple actors. To track these relationships, Hollywood maintains detailed records (like a join table) that list every actor-movie combination. When you look up Tom Hanks, you see all his movies; when you look up Forrest Gump, you see all its actors. This cross-referencing system lets you navigate relationships in both directions without storing duplicate information. The join table acts like a sophisticated address book that maintains all the connections, automatically updated when actors join new projects or leave old ones, ensuring the relationships stay accurate and current.</p>
+
+            <h3>Examples</h3>
+            <p><strong>Student and Course relationship:</strong></p>
+            <pre><code class="language-java">@Entity
+public class Student {
+    @Id @GeneratedValue
+    private Long id;
+
+    @ManyToMany
+    @JoinTable(name = "student_course",
+            <p>One-to-many relationships connect one entity to multiple related entities, like an author having many books, or a blog post having many comments. The @OneToMany annotation on the parent side pairs with @ManyToOne on the child side. The child entity typically holds the foreign key that points back to the parent. This relationship type is fundamental for modeling hierarchical data and parent-child structures that appear throughout business applications.</p>
+public class Course {
+            <p>Many-to-many relationships allow multiple entities on both sides to be associated with each other, like students enrolling in courses, or products belonging to multiple categories. JPA uses a join table (junction table) to store these relationships, with the @ManyToMany annotation managing the complexity. One side must be designated as the owning side using the @JoinTable annotation, while the other side uses mappedBy to indicate it's the non-owning side.</p>
+}
+            <p>One-to-many relationships connect one entity to multiple related entities, like an author having many books, or a blog post having many comments. The @OneToMany annotation on the parent side pairs with @ManyToOne on the child side. The child entity typically holds the foreign key that points back to the parent. This relationship type is fundamental for modeling hierarchical data and parent-child structures that appear throughout business applications.</p>
+            <pre><code class="language-java">@Query("SELECT c, SIZE(c.students) FROM Course c")
+List&lt;Object[]&gt; findCoursesWithEnrollmentCount();</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="custom-queries" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Custom Queries</h2>
+            <h3>Definition</h3>
+            <p>Custom queries let you write specific database operations that go beyond the automatic query methods provided by Spring Data JPA. Using the @Query annotation, you can write JPQL (Java Persistence Query Language) or native SQL queries directly in your repository interfaces. Custom queries are essential when you need complex filtering, joins across multiple tables, aggregate functions, or specific performance optimizations that simple method names can't express.</p>
+
+            <p>One-to-many relationships connect one entity to multiple related entities, like an author having many books, or a blog post having many comments. The @OneToMany annotation on the parent side pairs with @ManyToOne on the child side. The child entity typically holds the foreign key that points back to the parent. This relationship type is fundamental for modeling hierarchical data and parent-child structures that appear throughout business applications.</p>
+List&lt;User&gt; findUsersByAgeRange(@Param("minAge") int min, @Param("maxAge") int max);</code></pre>
+            <p>Many-to-many relationships allow multiple entities on both sides to be associated with each other, like students enrolling in courses, or products belonging to multiple categories. JPA uses a join table (junction table) to store these relationships, with the @ManyToMany annotation managing the complexity. One side must be designated as the owning side using the @JoinTable annotation, while the other side uses mappedBy to indicate it's the non-owning side.</p>
+            <p><strong>Aggregate query with grouping:</strong></p>
+            <pre><code class="language-java">@Query("SELECT a.name, COUNT(b) FROM Author a JOIN a.books b GROUP BY a.name")
+List&lt;Object[]&gt; findAuthorBookCounts();</code></pre>
+
+            <p>Many-to-many relationships allow multiple entities on both sides to be associated with each other, like students enrolling in courses, or products belonging to multiple categories. JPA uses a join table (junction table) to store these relationships, with the @ManyToMany annotation managing the complexity. One side must be designated as the owning side using the @JoinTable annotation, while the other side uses mappedBy to indicate it's the non-owning side.</p>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="jpql-queries" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>JPQL Queries</h2>
+            <h3>Definition</h3>
+            <p>Custom queries let you write specific database operations that go beyond the automatic query methods provided by Spring Data JPA. Using the @Query annotation, you can write JPQL (Java Persistence Query Language) or native SQL queries directly in your repository interfaces. Custom queries are essential when you need complex filtering, joins across multiple tables, aggregate functions, or specific performance optimizations that simple method names can't express.</p>
+            <h3>Examples</h3>
+            <p><strong>Basic JPQL syntax:</strong></p>
+            <pre><code class="language-java">@Query("SELECT u FROM User u WHERE u.email LIKE :pattern")
+            <p>Custom queries let you write specific database operations that go beyond the automatic query methods provided by Spring Data JPA. Using the @Query annotation, you can write JPQL (Java Persistence Query Language) or native SQL queries directly in your repository interfaces. Custom queries are essential when you need complex filtering, joins across multiple tables, aggregate functions, or specific performance optimizations that simple method names can't express.</p>
+
+            <p><strong>JPQL functions and expressions:</strong></p>
+            <pre><code class="language-java">@Query("SELECT u FROM User u WHERE UPPER(u.name) = UPPER(:name) AND u.createdDate > :date")
+List&lt;User&gt; findRecentUsersByName(@Param("name") String name, @Param("date") LocalDate date);</code></pre>
+
+            <p><strong>JPQL with subqueries:</strong></p>
+            <pre><code class="language-java">@Query("SELECT u FROM User u WHERE u.id IN (SELECT o.customer.id FROM Order o WHERE o.total > :amount)")
+List&lt;User&gt; findCustomersWithLargeOrders(@Param("amount") BigDecimal amount);</code></pre>
+            <p>Many-to-many relationships allow multiple entities on both sides to be associated with each other, like students enrolling in courses, or products belonging to multiple categories. JPA uses a join table (junction table) to store these relationships, with the @ManyToMany annotation managing the complexity. One side must be designated as the owning side using the @JoinTable annotation, while the other side uses mappedBy to indicate it's the non-owning side.</p>
+            <h2>Native Queries</h2>
+            <h3>Definition</h3>
+            <p>Native queries use raw SQL specific to your database vendor, giving you access to database-specific features, optimizations, or complex operations that JPQL can't express. While they sacrifice database independence, native queries are powerful for performance-critical operations, complex reporting, or when you need database-specific functions. Use native queries sparingly and only when JPQL isn't sufficient for your needs.</p>
+
+            <p>Many-to-many relationships allow multiple entities on both sides to be associated with each other, like students enrolling in courses, or products belonging to multiple categories. JPA uses a join table (junction table) to store these relationships, with the @ManyToMany annotation managing the complexity. One side must be designated as the owning side using the @JoinTable annotation, while the other side uses mappedBy to indicate it's the non-owning side.</p>
+            <pre><code class="language-java">@Query(value = "SELECT * FROM users WHERE created_date > NOW() - INTERVAL 30 DAY",
+       nativeQuery = true)
+List&lt;User&gt; findRecentUsers();</code></pre>
+            <p>JPQL (Java Persistence Query Language) is an object-oriented query language that works with entity objects rather than database tables. It looks similar to SQL but operates on your Java entity classes and their relationships. JPQL queries are database-independent and automatically translate to the appropriate SQL dialect for your database. This abstraction lets you write queries that focus on your business objects while JPA handles the database-specific details.</p>
+    """, nativeQuery = true)
+List&lt;Object[]&gt; findTopCustomers(@Param("minOrders") int minOrders);</code></pre>
+
+            <p>Custom queries let you write specific database operations that go beyond the automatic query methods provided by Spring Data JPA. Using the @Query annotation, you can write JPQL (Java Persistence Query Language) or native SQL queries directly in your repository interfaces. Custom queries are essential when you need complex filtering, joins across multiple tables, aggregate functions, or specific performance optimizations that simple method names can't express.</p>
+            <h3>Definition</h3>
+            <p>Pagination breaks large result sets into smaller, manageable chunks, while sorting organizes data in meaningful order. Spring Data JPA provides Pageable and Sort parameters that automatically generate LIMIT/OFFSET clauses and ORDER BY statements. This is essential for applications that handle large datasets, providing better performance and user experience by loading only the data currently needed rather than overwhelming users with thousands of results at once.</p>
+
+            <p>Custom queries let you write specific database operations that go beyond the automatic query methods provided by Spring Data JPA. Using the @Query annotation, you can write JPQL (Java Persistence Query Language) or native SQL queries directly in your repository interfaces. Custom queries are essential when you need complex filtering, joins across multiple tables, aggregate functions, or specific performance optimizations that simple method names can't express.</p>
+            <pre><code class="language-java">public interface BookRepository extends JpaRepository&lt;Book, Long&gt; {
+    Page&lt;Book&gt; findByAuthorName(String authorName, Pageable pageable);
+    Page&lt;Book&gt; findByCategory(String category, Pageable pageable);
+}</code></pre>
+
+            <p><strong>Using pagination in service:</strong></p>
+            <pre><code class="language-java">Pageable pageable = PageRequest.of(0, 10, Sort.by("title"));
+Page&lt;Book&gt; bookPage = bookRepository.findByCategory("Fiction", pageable);
+            <p>Many-to-many relationships allow multiple entities on both sides to be associated with each other, like students enrolling in courses, or products belonging to multiple categories. JPA uses a join table (junction table) to store these relationships, with the @ManyToMany annotation managing the complexity. One side must be designated as the owning side using the @JoinTable annotation, while the other side uses mappedBy to indicate it's the non-owning side.</p>
+            <pre><code class="language-java">Page&lt;Book&gt; page = bookRepository.findAll(pageable);
+int totalPages = page.getTotalPages();
+            <p>Native queries use raw SQL specific to your database vendor, giving you access to database-specific features, optimizations, or complex operations that JPQL can't express. While they sacrifice database independence, native queries are powerful for performance-critical operations, complex reporting, or when you need database-specific functions. Use native queries sparingly and only when JPQL isn't sufficient for your needs.</p>
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="lazy-eager-loading" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Lazy vs Eager Loading</h2>
+            <h3>Definition</h3>
+            <p>Loading strategies control when related entities are fetched from the database. Lazy loading (default for collections) fetches related data only when accessed, while eager loading fetches everything immediately. The choice affects performance significantly: lazy loading reduces initial query time but can cause N+1 query problems, while eager loading may fetch unnecessary data but guarantees everything is available. Understanding and controlling fetch strategies is crucial for application performance.</p>
+
+            <h3>Analogy</h3>
+            <p>Think of lazy vs eager loading like two different approaches to packing for a family vacation. Eager loading is like packing everyone's suitcases completely before leaving the house - you grab all the clothes, toiletries, and accessories for every family member right away. This takes longer upfront, and you might pack things you won't need, but once you're at your destination, everything is immediately available. Lazy loading is like packing just the essentials initially, then going back to get specific items only when someone asks for them. This gets you out the door faster, but you might end up making multiple trips back home when different family members realize they need their favorite shirt or special shoes. The best approach depends on your trip length, packing space, and how often people will need their extra items.</p>
+            <p>JPQL (Java Persistence Query Language) is an object-oriented query language that works with entity objects rather than database tables. It looks similar to SQL but operates on your Java entity classes and their relationships. JPQL queries are database-independent and automatically translate to the appropriate SQL dialect for your database. This abstraction lets you write queries that focus on your business objects while JPA handles the database-specific details.</p>
+    private List&lt;Book&gt; books;  // Loaded only when accessed
+}
+</code></pre>
+            <p>Custom queries let you write specific database operations that go beyond the automatic query methods provided by Spring Data JPA. Using the @Query annotation, you can write JPQL (Java Persistence Query Language) or native SQL queries directly in your repository interfaces. Custom queries are essential when you need complex filtering, joins across multiple tables, aggregate functions, or specific performance optimizations that simple method names can't express.</p>
+            <pre><code class="language-java">@EntityGraph(attributePaths = {"books", "profile"})
+            <p>Pagination breaks large result sets into smaller, manageable chunks, while sorting organizes data in meaningful order. Spring Data JPA provides Pageable and Sort parameters that automatically generate LIMIT/OFFSET clauses and ORDER BY statements. This is essential for applications that handle large datasets, providing better performance and user experience by loading only the data currently needed rather than overwhelming users with thousands of results at once.</p>
+
+            <p>Custom queries let you write specific database operations that go beyond the automatic query methods provided by Spring Data JPA. Using the @Query annotation, you can write JPQL (Java Persistence Query Language) or native SQL queries directly in your repository interfaces. Custom queries are essential when you need complex filtering, joins across multiple tables, aggregate functions, or specific performance optimizations that simple method names can't express.</p>
+            <h3>Analogy</h3>
+            <p>The N+1 query problem is like a inefficient mail delivery system in a large apartment building. Instead of the mail carrier making one trip to collect all mail for the building (1 query) and then delivering everything in a single efficient route through all floors (1 more query), imagine if the carrier made one trip to get the list of residents (1 query), then made a separate round trip back to the post office for each individual resident's mail (N additional queries). So for a 100-unit building, instead of 2 trips total, the carrier makes 101 trips! This becomes exponentially more wasteful as the building gets larger. The residents get their mail eventually, but the system is incredibly inefficient, causing traffic jams, wasted fuel, and frustrated postal workers. A smart mail system would gather all the information needed in just a couple of efficient trips, just like how proper database query optimization should work.</p>
+
+            <h3>Examples</h3>
+            <p><strong>N+1 Problem Example - The Bad Way:</strong></p>
+            <pre><code class="language-java">// This triggers N+1 queries!
+List&lt;Author&gt; authors = authorRepository.findAll();  // 1 query to get authors
+for (Author author : authors) {
+    System.out.println(author.getBooks().size());   // N queries (one per author)
+}
+            <p>Native queries use raw SQL specific to your database vendor, giving you access to database-specific features, optimizations, or complex operations that JPQL can't express. While they sacrifice database independence, native queries are powerful for performance-critical operations, complex reporting, or when you need database-specific functions. Use native queries sparingly and only when JPQL isn't sufficient for your needs.</p>
+
+// Usage - only 1 query total!
+List&lt;Author&gt; authors = authorRepository.findAllAuthorsWithBooks();
+for (Author author : authors) {
+            <p>Native queries use raw SQL specific to your database vendor, giving you access to database-specific features, optimizations, or complex operations that JPQL can't express. While they sacrifice database independence, native queries are powerful for performance-critical operations, complex reporting, or when you need database-specific functions. Use native queries sparingly and only when JPQL isn't sufficient for your needs.</p>
+@Query("SELECT a FROM Author a")
+            <p>Loading strategies control when related entities are fetched from the database. Lazy loading (default for collections) fetches related data only when accessed, while eager loading fetches everything immediately. The choice affects performance significantly: lazy loading reduces initial query time but can cause N+1 query problems, while eager loading may fetch unnecessary data but guarantees everything is available. Understanding and controlling fetch strategies is crucial for application performance.</p>
+public class Author {
+    @OneToMany(mappedBy = "author", fetch = FetchType.LAZY)
+    @BatchSize(size = 10)  // Fetches up to 10 collections at once
+            <p>Loading strategies control when related entities are fetched from the database. Lazy loading (default for collections) fetches related data only when accessed, while eager loading fetches everything immediately. The choice affects performance significantly: lazy loading reduces initial query time but can cause N+1 query problems, while eager loading may fetch unnecessary data but guarantees everything is available. Understanding and controlling fetch strategies is crucial for application performance.</p>
+
+          <section id="transaction-management" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Transaction Management</h2>
+            <p>JPQL (Java Persistence Query Language) is an object-oriented query language that works with entity objects rather than database tables. It looks similar to SQL but operates on your Java entity classes and their relationships. JPQL queries are database-independent and automatically translate to the appropriate SQL dialect for your database. This abstraction lets you write queries that focus on your business objects while JPA handles the database-specific details.</p>
+            <h3>Examples</h3>
+            <p><strong>Basic transaction management:</strong></p>
+            <pre><code class="language-java">@Service
+            <p>Custom queries let you write specific database operations that go beyond the automatic query methods provided by Spring Data JPA. Using the @Query annotation, you can write JPQL (Java Persistence Query Language) or native SQL queries directly in your repository interfaces. Custom queries are essential when you need complex filtering, joins across multiple tables, aggregate functions, or specific performance optimizations that simple method names can't express.</p>
+public class OrderService {
+            <p>Pagination breaks large result sets into smaller, manageable chunks, while sorting organizes data in meaningful order. Spring Data JPA provides Pageable and Sort parameters that automatically generate LIMIT/OFFSET clauses and ORDER BY statements. This is essential for applications that handle large datasets, providing better performance and user experience by loading only the data currently needed rather than overwhelming users with thousands of results at once.</p>
+    }
+}
+</code></pre>
+
+            <p>The N+1 query problem occurs when your application executes one query to fetch N parent records, then executes N additional queries to fetch related data for each parent record, resulting in N+1 total database queries instead of a more efficient approach. This happens commonly with lazy loading when you iterate over a collection of entities and access their lazy-loaded relationships. The problem severely impacts performance as the number of parent records grows, turning what should be 2 queries into potentially hundreds or thousands of queries.</p>
+</code></pre>
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="connection-management" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Connection Management</h2>
+            <h3>Definition</h3>
+            <p>Connection management in JPA involves configuring and managing the database connections used by your application. This includes setting connection parameters, managing connection pools, and ensuring efficient use of database resources. Proper connection management is essential for application performance and stability, especially under load, as it affects how quickly and reliably your application can access the database.</p>

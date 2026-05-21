@@ -1,11 +1,10 @@
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Lesson 17 - Spring Boot Caching</title>
     <meta name="description" content="Master Spring Boot caching: cache abstraction, annotations, providers, configuration, and performance optimization strategies for high-performance applications." />
-    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <script>
       tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
@@ -21,7 +20,7 @@
         <a href="../../../" class="group inline-flex items-center gap-3">
           <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
           <div class="leading-tight">
-            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="text-sm text-slate-500 dark:text-slate-400">Software Engineer</div>
             <div class="font-semibold">Wassim Lagnaoui</div>
           </div>
         </a>
@@ -33,10 +32,6 @@
           <a href="../../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
           <a href="../../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
         </nav>
-        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
-          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
-          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        </button>
       </div>
     </header>
 
@@ -120,55 +115,21 @@ public class ProductService {
     }
 }</code></pre>
 
-            <p><strong>Performance impact comparison:</strong></p>
-            <pre><code class="language-java">// Without cache:
-// - Database query: 200ms per request
-// - 1000 requests = 200 seconds total
-
-// With cache:
-// - First request: 200ms (cache miss)
-// - Next 999 requests: 2ms each (cache hits)
-// - Total: 200ms + (999 × 2ms) = 2.2 seconds
-// 90x performance improvement!</code></pre>
-          </section>
-
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="spring-cache-abstraction" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Spring Cache Abstraction</h2>
-            <h3>Definition</h3>
             <ul>
               <li>Spring's cache abstraction provides a unified programming model for caching that works with different cache providers without changing your code.</li>
               <li>The abstraction uses annotations to declare caching behavior, automatically handling cache operations like storing, retrieving, and evicting data.</li>
               <li>This means you can switch between cache providers (from simple HashMap to Redis clusters) by changing configuration, not code, providing flexibility and vendor independence.</li>
             </ul>
-
-            <h3>Examples</h3>
-            <p><strong>Enable caching in Spring Boot:</strong></p>
-            <pre><code class="language-java">@SpringBootApplication
 @EnableCaching  // Enables Spring's caching support
 public class Application {
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
-}</code></pre>
-
-            <p><strong>Basic cache configuration:</strong></p>
-            <pre><code class="language-java">@Configuration
 @EnableCaching
 public class CacheConfig {
 
     @Bean
     public CacheManager cacheManager() {
-        // Simple in-memory cache manager
-        SimpleCacheManager manager = new SimpleCacheManager();
-        manager.setCaches(Arrays.asList(
-            new ConcurrentMapCache("products"),
-            new ConcurrentMapCache("users"),
-            new ConcurrentMapCache("categories")
-        ));
-        return manager;
-    }
 }</code></pre>
 
             <p><strong>Cache manager with multiple caches:</strong></p>
@@ -179,84 +140,46 @@ public CacheManager cacheManager() {
     manager.setCaffeine(Caffeine.newBuilder()
         .maximumSize(1000)
         .expireAfterWrite(10, TimeUnit.MINUTES));
-    return manager;
-}</code></pre>
-          </section>
 
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
           <section id="cache-annotations" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Cache Annotations</h2>
-            <h3>Definition</h3>
             <ul>
               <li>Spring provides several cache annotations that declaratively define caching behavior without cluttering business logic with cache management code.</li>
               <li>@Cacheable caches method results, @CacheEvict removes cached data, @CachePut updates cache entries, and @Caching combines multiple cache operations.</li>
               <li>These annotations use SpEL (Spring Expression Language) for dynamic cache keys and conditions, providing fine-grained control over when and how caching occurs.</li>
             </ul>
-
-            <h3>Examples</h3>
             <p><strong>@Cacheable - cache method results:</strong></p>
             <pre><code class="language-java">@Service
 public class ProductService {
 
     @Cacheable(value = "products", key = "#id")
-    public Product findProduct(Long id) {
-        System.out.println("Fetching product from database: " + id);
-        return productRepository.findById(id);
-    }
-
-    @Cacheable(value = "products", key = "#name", condition = "#name.length() > 2")
     public Product findByName(String name) {
         return productRepository.findByName(name);
     }
 }</code></pre>
 
-            <p><strong>@CacheEvict - remove cached data:</strong></p>
-            <pre><code class="language-java">@CacheEvict(value = "products", key = "#product.id")
-public Product updateProduct(Product product) {
-    Product updated = productRepository.save(product);
-    System.out.println("Cache evicted for product: " + product.getId());
-    return updated;
-}
 
 @CacheEvict(value = "products", allEntries = true)
 public void clearAllProducts() {
     System.out.println("All product cache entries cleared");
 }</code></pre>
-
-            <p><strong>@CachePut - update cache:</strong></p>
-            <pre><code class="language-java">@CachePut(value = "products", key = "#result.id")
-public Product createProduct(Product product) {
-    Product saved = productRepository.save(product);
     System.out.println("Product saved and cached: " + saved.getId());
     return saved;
 }</code></pre>
 
             <p><strong>@Caching - combine multiple cache operations:</strong></p>
-            <pre><code class="language-java">@Caching(
-    evict = {
-        @CacheEvict(value = "products", key = "#product.id"),
         @CacheEvict(value = "categories", key = "#product.categoryId")
     }
 )
 public void deleteProduct(Product product) {
     productRepository.delete(product);
-}</code></pre>
-
-            <p><strong>Complex cache key expressions:</strong></p>
-            <pre><code class="language-java">@Cacheable(value = "search-results",
-           key = "#category + '_' + #minPrice + '_' + #maxPrice",
-           unless = "#result.isEmpty()")
-public List<Product> searchProducts(String category, BigDecimal minPrice, BigDecimal maxPrice) {
-    return productRepository.findByCategoryAndPriceBetween(category, minPrice, maxPrice);
-}</code></pre>
           </section>
 
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
           <section id="cache-providers" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Cache Providers</h2>
-            <h3>Definition</h3>
             <ul>
               <li>Cache providers are the underlying storage mechanisms that actually hold cached data.</li>
               <li>Spring Boot supports various providers: ConcurrentHashMap for simple in-memory caching, Caffeine for high-performance local caching with advanced features like size-based eviction and time-based expiration, Redis for distributed caching across multiple servers, and Hazelcast for in-memory data grids.</li>
@@ -267,6 +190,231 @@ public List<Product> searchProducts(String category, BigDecimal minPrice, BigDec
             <p><strong>Caffeine high-performance cache:</strong></p>
             <pre><code class="language-xml">&lt;!-- Add Caffeine dependency --&gt;
 &lt;dependency&gt;
+            <pre><code class="language-xml">&lt;!-- Add Redis dependency --&gt;
+&lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-data-redis&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+
+            <pre><code class="language-java">@Bean
+public CacheManager redisCacheManager(RedisConnectionFactory factory) {
+    RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
+        .entryTtl(Duration.ofMinutes(30))    // 30-minute TTL
+    public CacheManager localCacheManager() {
+        // Fast local cache for frequently accessed data
+        return new CaffeineCacheManager("products", "users");
+    }
+
+    @Bean
+    public CacheManager distributedCacheManager(RedisConnectionFactory factory) {
+        // Distributed cache for shared data across instances
+        return RedisCacheManager.builder(factory).build();
+          </section>
+
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="cache-configuration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <ul>
+              <li>Cache configuration defines how caches behave regarding size limits, expiration policies, eviction strategies, and serialization.</li>
+              <li>Configuration includes setting maximum cache sizes to prevent memory overflow, time-based expiration (TTL) to ensure data freshness, access-based expiration for unused data cleanup, and cache warming strategies for critical data.</li>
+              <li>Proper configuration ensures optimal memory usage while maintaining the right balance between performance and data freshness.</li>
+            </ul>
+
+    @Bean
+    public CacheManager cacheManager() {
+        CaffeineCacheManager manager = new CaffeineCacheManager();
+
+                .expireAfterAccess(30, TimeUnit.MINUTES)
+                .maximumSize(5000)
+                .build());
+
+        // Long-lived reference data cache
+                .expireAfterWrite(4, TimeUnit.HOURS)
+                .maximumSize(1000)
+                .build());
+
+        // Frequently accessed products with refresh ahead
+    cacheConfigs.put("products", config.entryTtl(Duration.ofMinutes(30)));
+    cacheConfigs.put("users", config.entryTtl(Duration.ofHours(2)));
+    cacheConfigs.put("reference-data", config.entryTtl(Duration.ofDays(1)));
+
+    return RedisCacheManager.builder(factory)
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="cache-strategies" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Cache Strategies</h2>
+            <h3>Definition</h3>
+            <ul>
+              <li>Cache strategies define when and how data is loaded into and removed from the cache.</li>
+              <li>Common strategies include Cache-Aside (application manages cache), Write-Through (write to cache and database simultaneously), Write-Behind (write to cache immediately, database later), and Read-Through (cache loads data automatically on miss).</li>
+              <li>Each strategy has trade-offs between consistency, performance, and complexity, making strategy selection crucial for application requirements.</li>
+            </ul>
+            <p><strong>Cache-Aside pattern (most common):</strong></p>
+            <pre><code class="language-java">@Service
+public class ProductService {
+
+    @Cacheable("products")
+public class UserService {
+
+    @CachePut(value = "users", key = "#user.id")
+    public User saveUser(User user) {
+        // Write-through: save to database and update cache
+            <p><strong>Cache warming strategy:</strong></p>
+            <pre><code class="language-java">@Component
+public class CacheWarmupService {
+
+    @Autowired
+    private ProductService productService;
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void warmupCache() {
+        logger.info("Starting cache warmup...");
+        List<Long> popularProductIds = productRepository.findPopularProductIds();
+        popularProductIds.forEach(id -> {
+            try {
+                productService.getProduct(id); // This will populate the cache
+            } catch (Exception e) {
+            <h2>Distributed Caching</h2>
+            <h3>Definition</h3>
+            <ul>
+              <li>Distributed caching extends caching across multiple application instances or servers, providing shared cache storage that all instances can access.</li>
+              <li>This enables horizontal scaling while maintaining cache consistency and eliminates cache warm-up requirements for new instances.</li>
+              <li>Distributed caching is essential for microservices architectures and applications running on multiple servers or containers.</li>
+            </ul>
+
+            <h3>Examples</h3>
+            <p><strong>Redis cluster configuration:</strong></p>
+            <pre><code class="language-properties"># application.properties
+spring.redis.cluster.nodes=redis1:6379,redis2:6379,redis3:6379
+spring.redis.cluster.max-redirects=3
+spring.redis.timeout=2000ms
+spring.redis.lettuce.pool.max-active=8
+spring.redis.lettuce.pool.max-idle=8</code></pre>
+
+            <p><strong>Distributed cache with fallback:</strong></p>
+            <p><strong>Cache synchronization across instances:</strong></p>
+            <pre><code class="language-java">@Component
+public class CacheSyncService {
+
+    @EventListener
+    public void handleProductUpdate(ProductUpdateEvent event) {
+        // Notify other instances to evict cache
+        messagingService.broadcast("cache.evict.product", event.getProductId());
+    }
+
+    @RabbitListener(queues = "cache.evict.product")
+    public void handleCacheEviction(Long productId) {
+        cacheManager.getCache("products").evict(productId);
+        logger.info("Evicted product {} from local cache due to remote update", productId);
+    }
+}</code></pre>
+          </section>
+
+            <ul>
+              <li>Cache best practices ensure optimal performance, memory usage, and data consistency while avoiding common pitfalls.</li>
+              <li>These include choosing appropriate cache keys, setting reasonable TTL values, implementing cache warming for critical data, monitoring cache performance, handling cache failures gracefully, and avoiding cache stampedes.</li>
+              <li>Following best practices prevents memory leaks, ensures cache effectiveness, and maintains application reliability.</li>
+            </ul>
+
+    @EventListener
+    public void onCacheHit(CacheHitEvent event) {
+        meterRegistry.counter("cache.hits",
+            "cache", event.getCacheName()).increment();
+    @EventListener
+    public void onCacheMiss(CacheMissEvent event) {
+        meterRegistry.counter("cache.misses",
+            "cache", event.getCacheName()).increment();
+    }
+
+    @Scheduled(fixedRate = 60000) // Every minute
+    public void logCacheStatistics() {
+        cacheManager.getCacheNames().forEach(cacheName -> {
+                logger.info("Cache {}: hit rate={:.2f}%, size={}, evictions={}",
+                    cacheName, stats.hitRate() * 100,
+                    cache.getNativeCache().size(), stats.evictionCount());
+            }
+        });
+    @Bean
+    public CacheManager cacheManager() {
+        CaffeineCacheManager manager = new CaffeineCacheManager();
+
+        // Configure based on data characteristics
+                .maximumSize(10000)           // Limit memory usage
+                .expireAfterWrite(1, TimeUnit.HOURS)    // Data freshness
+                .refreshAfterWrite(45, TimeUnit.MINUTES) // Proactive refresh
+                .recordStats()                // Monitor performance
+                .build());
+
+        manager.registerCustomCache("session-data",
+            Caffeine.newBuilder()
+                .maximumSize(50000)
+          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
+
+          <section id="summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <h2>Summary</h2>
+            <p>You've now mastered Spring Boot's comprehensive caching capabilities, from basic cache annotations to sophisticated distributed caching strategies. You understand how caching transforms application performance by storing frequently accessed data in fast-access storage, reducing expensive operations and improving response times dramatically. You've learned to implement cache annotations for declarative caching behavior, configure different cache providers from simple in-memory solutions to enterprise-grade distributed systems, and design effective cache strategies that balance performance with data consistency. The concepts of cache keys, TTL configuration, eviction policies, and cache warming ensure your caching implementation is both performant and reliable. You've also explored distributed caching for scalable applications, multi-level caching strategies for optimal performance, and best practices for monitoring and maintaining cache health in production environments. These skills enable you to build applications that can handle high loads efficiently while providing excellent user experience through optimized data access patterns. Your next lesson will integrate caching with comprehensive monitoring and application performance optimization techniques.</p>
+            <h2>Programming Challenge</h2>
+            <div class="rounded-lg border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800">
+              <h3 class="mt-0">Challenge: High-Performance E-commerce Caching System</h3>
+              <p><strong>Task:</strong> Build a Spring Boot e-commerce application with a sophisticated multi-level caching strategy that demonstrates various caching patterns, performance optimization, and intelligent cache management.</p>
+
+                  <li>Conditional caching based on product popularity and user behavior</li>
+                  <li>Cache compression for large objects (product catalogs, order history)</li>
+                  <li>Cache partitioning by user segments or geographic regions</li>
+                  <li>Async cache refresh to prevent cache stampedes</li>
+                </ul>
+                  <li>Cross-instance cache invalidation messaging</li>
+                </ul>
+              </ol>
+
+              <p><strong>Bonus features:</strong></p>
+                <li>Cache versioning system for rolling updates without cache misses</li>
+                <li>A/B testing framework for different caching strategies</li>
+                <li>Real-time cache analytics dashboard with performance metrics</li>
+                <li>Intelligent cache eviction based on business value and access patterns</li>
+              </ul>
+    </script>
+  </body>
+</html>
+    public Product findProduct(Long id) {
+        System.out.println("Fetching product from database: " + id);
+        return productRepository.findById(id);
+    }
+
+    @Cacheable(value = "products", key = "#name", condition = "#name.length() > 2")
+            <p>Spring provides several cache annotations that declaratively define caching behavior without cluttering business logic with cache management code. @Cacheable caches method results, @CacheEvict removes cached data, @CachePut updates cache entries, and @Caching combines multiple cache operations. These annotations use SpEL (Spring Expression Language) for dynamic cache keys and conditions, providing fine-grained control over when and how caching occurs.</p>
+            <p><strong>@CacheEvict - remove cached data:</strong></p>
+            <pre><code class="language-java">@CacheEvict(value = "products", key = "#product.id")
+public Product updateProduct(Product product) {
+    Product updated = productRepository.save(product);
+    System.out.println("Cache evicted for product: " + product.getId());
+    return updated;
+}
+            <p>Spring's cache abstraction provides a unified programming model for caching that works with different cache providers without changing your code. The abstraction uses annotations to declare caching behavior, automatically handling cache operations like storing, retrieving, and evicting data. This means you can switch between cache providers (from simple HashMap to Redis clusters) by changing configuration, not code, providing flexibility and vendor independence.</p>
+
+            <p><strong>@CachePut - update cache:</strong></p>
+            <pre><code class="language-java">@CachePut(value = "products", key = "#result.id")
+public Product createProduct(Product product) {
+    Product saved = productRepository.save(product);
+            <p>Spring provides several cache annotations that declaratively define caching behavior without cluttering business logic with cache management code. @Cacheable caches method results, @CacheEvict removes cached data, @CachePut updates cache entries, and @Caching combines multiple cache operations. These annotations use SpEL (Spring Expression Language) for dynamic cache keys and conditions, providing fine-grained control over when and how caching occurs.</p>
+            <pre><code class="language-java">@Caching(
+    evict = {
+        @CacheEvict(value = "products", key = "#product.id"),
+            <p>Spring provides several cache annotations that declaratively define caching behavior without cluttering business logic with cache management code. @Cacheable caches method results, @CacheEvict removes cached data, @CachePut updates cache entries, and @Caching combines multiple cache operations. These annotations use SpEL (Spring Expression Language) for dynamic cache keys and conditions, providing fine-grained control over when and how caching occurs.</p>
+}</code></pre>
+
+            <p><strong>Complex cache key expressions:</strong></p>
+            <pre><code class="language-java">@Cacheable(value = "search-results",
+           key = "#category + '_' + #minPrice + '_' + #maxPrice",
+           unless = "#result.isEmpty()")
+public List<Product> searchProducts(String category, BigDecimal minPrice, BigDecimal maxPrice) {
+    return productRepository.findByCategoryAndPriceBetween(category, minPrice, maxPrice);
+}</code></pre>
+            <p>Spring provides several cache annotations that declaratively define caching behavior without cluttering business logic with cache management code. @Cacheable caches method results, @CacheEvict removes cached data, @CachePut updates cache entries, and @Caching combines multiple cache operations. These annotations use SpEL (Spring Expression Language) for dynamic cache keys and conditions, providing fine-grained control over when and how caching occurs.</p>
+            <h2>Cache Providers</h2>
+            <h3>Definition</h3>
+            <p>Cache providers are the underlying storage mechanisms that actually hold cached data. Spring Boot supports various providers: ConcurrentHashMap for simple in-memory caching, Caffeine for high-performance local caching with advanced features like size-based eviction and time-based expiration, Redis for distributed caching across multiple servers, and Hazelcast for in-memory data grids. Each provider has different characteristics regarding performance, memory management, persistence, and distribution capabilities.</p>
+            <p>Spring provides several cache annotations that declaratively define caching behavior without cluttering business logic with cache management code. @Cacheable caches method results, @CacheEvict removes cached data, @CachePut updates cache entries, and @Caching combines multiple cache operations. These annotations use SpEL (Spring Expression Language) for dynamic cache keys and conditions, providing fine-grained control over when and how caching occurs.</p>
     &lt;groupId&gt;com.github.ben-manes.caffeine&lt;/groupId&gt;
     &lt;artifactId&gt;caffeine&lt;/artifactId&gt;
 &lt;/dependency&gt;</code></pre>
@@ -283,16 +431,8 @@ public CacheManager caffeineCacheManager() {
 }</code></pre>
 
             <p><strong>Redis distributed cache:</strong></p>
-            <pre><code class="language-xml">&lt;!-- Add Redis dependency --&gt;
-&lt;dependency&gt;
-    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
-    &lt;artifactId&gt;spring-boot-starter-data-redis&lt;/artifactId&gt;
-&lt;/dependency&gt;</code></pre>
-
-            <pre><code class="language-java">@Bean
-public CacheManager redisCacheManager(RedisConnectionFactory factory) {
-    RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
-        .entryTtl(Duration.ofMinutes(30))    // 30-minute TTL
+            <p>Cache providers are the underlying storage mechanisms that actually hold cached data. Spring Boot supports various providers: ConcurrentHashMap for simple in-memory caching, Caffeine for high-performance local caching with advanced features like size-based eviction and time-based expiration, Redis for distributed caching across multiple servers, and Hazelcast for in-memory data grids. Each provider has different characteristics regarding performance, memory management, persistence, and distribution capabilities.</p>
+            <p>Spring provides several cache annotations that declaratively define caching behavior without cluttering business logic with cache management code. @Cacheable caches method results, @CacheEvict removes cached data, @CachePut updates cache entries, and @Caching combines multiple cache operations. These annotations use SpEL (Spring Expression Language) for dynamic cache keys and conditions, providing fine-grained control over when and how caching occurs.</p>
         .serializeKeysWith(RedisSerializationContext.SerializationPair
             .fromSerializer(new StringRedisSerializer()))
         .serializeValuesWith(RedisSerializationContext.SerializationPair
@@ -310,29 +450,13 @@ public class MultiCacheConfig {
 
     @Bean
     @Primary
-    public CacheManager localCacheManager() {
-        // Fast local cache for frequently accessed data
-        return new CaffeineCacheManager("products", "users");
-    }
-
-    @Bean
-    public CacheManager distributedCacheManager(RedisConnectionFactory factory) {
-        // Distributed cache for shared data across instances
-        return RedisCacheManager.builder(factory).build();
+            <p>Spring provides several cache annotations that declaratively define caching behavior without cluttering business logic with cache management code. @Cacheable caches method results, @CacheEvict removes cached data, @CachePut updates cache entries, and @Caching combines multiple cache operations. These annotations use SpEL (Spring Expression Language) for dynamic cache keys and conditions, providing fine-grained control over when and how caching occurs.</p>
     }
 }</code></pre>
-          </section>
-
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="cache-configuration" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+            <p>Cache providers are the underlying storage mechanisms that actually hold cached data. Spring Boot supports various providers: ConcurrentHashMap for simple in-memory caching, Caffeine for high-performance local caching with advanced features like size-based eviction and time-based expiration, Redis for distributed caching across multiple servers, and Hazelcast for in-memory data grids. Each provider has different characteristics regarding performance, memory management, persistence, and distribution capabilities.</p>
             <h2>Cache Configuration</h2>
             <h3>Definition</h3>
-            <ul>
-              <li>Cache configuration defines how caches behave regarding size limits, expiration policies, eviction strategies, and serialization.</li>
-              <li>Configuration includes setting maximum cache sizes to prevent memory overflow, time-based expiration (TTL) to ensure data freshness, access-based expiration for unused data cleanup, and cache warming strategies for critical data.</li>
-              <li>Proper configuration ensures optimal memory usage while maintaining the right balance between performance and data freshness.</li>
-            </ul>
+            <p>Cache configuration defines how caches behave regarding size limits, expiration policies, eviction strategies, and serialization. Configuration includes setting maximum cache sizes to prevent memory overflow, time-based expiration (TTL) to ensure data freshness, access-based expiration for unused data cleanup, and cache warming strategies for critical data. Proper configuration ensures optimal memory usage while maintaining the right balance between performance and data freshness.</p>
 
             <h3>Examples</h3>
             <p><strong>Environment-specific cache configuration:</strong></p>
@@ -347,26 +471,14 @@ spring.cache.redis.time-to-live=1800000</code></pre>
             <p><strong>Advanced cache configurations:</strong></p>
             <pre><code class="language-java">@Configuration
 public class CacheConfig {
-
-    @Bean
-    public CacheManager cacheManager() {
-        CaffeineCacheManager manager = new CaffeineCacheManager();
-
+            <p>Cache providers are the underlying storage mechanisms that actually hold cached data. Spring Boot supports various providers: ConcurrentHashMap for simple in-memory caching, Caffeine for high-performance local caching with advanced features like size-based eviction and time-based expiration, Redis for distributed caching across multiple servers, and Hazelcast for in-memory data grids. Each provider has different characteristics regarding performance, memory management, persistence, and distribution capabilities.</p>
         // Short-lived user sessions cache
         manager.registerCustomCache("user-sessions",
             Caffeine.newBuilder()
-                .expireAfterAccess(30, TimeUnit.MINUTES)
-                .maximumSize(5000)
-                .build());
-
-        // Long-lived reference data cache
+            <p>Cache providers are the underlying storage mechanisms that actually hold cached data. Spring Boot supports various providers: ConcurrentHashMap for simple in-memory caching, Caffeine for high-performance local caching with advanced features like size-based eviction and time-based expiration, Redis for distributed caching across multiple servers, and Hazelcast for in-memory data grids. Each provider has different characteristics regarding performance, memory management, persistence, and distribution capabilities.</p>
         manager.registerCustomCache("reference-data",
             Caffeine.newBuilder()
-                .expireAfterWrite(4, TimeUnit.HOURS)
-                .maximumSize(1000)
-                .build());
-
-        // Frequently accessed products with refresh ahead
+            <p>Cache configuration defines how caches behave regarding size limits, expiration policies, eviction strategies, and serialization. Configuration includes setting maximum cache sizes to prevent memory overflow, time-based expiration (TTL) to ensure data freshness, access-based expiration for unused data cleanup, and cache warming strategies for critical data. Proper configuration ensures optimal memory usage while maintaining the right balance between performance and data freshness.</p>
         manager.registerCustomCache("hot-products",
             Caffeine.newBuilder()
                 .expireAfterWrite(1, TimeUnit.HOURS)
@@ -389,34 +501,18 @@ public RedisCacheManager redisCacheManager(RedisConnectionFactory factory) {
 
     // Different TTL for different caches
     Map<String, RedisCacheConfiguration> cacheConfigs = new HashMap<>();
-    cacheConfigs.put("products", config.entryTtl(Duration.ofMinutes(30)));
-    cacheConfigs.put("users", config.entryTtl(Duration.ofHours(2)));
-    cacheConfigs.put("reference-data", config.entryTtl(Duration.ofDays(1)));
-
-    return RedisCacheManager.builder(factory)
+            <p>Cache providers are the underlying storage mechanisms that actually hold cached data. Spring Boot supports various providers: ConcurrentHashMap for simple in-memory caching, Caffeine for high-performance local caching with advanced features like size-based eviction and time-based expiration, Redis for distributed caching across multiple servers, and Hazelcast for in-memory data grids. Each provider has different characteristics regarding performance, memory management, persistence, and distribution capabilities.</p>
         .cacheDefaults(config)
         .withInitialCacheConfigurations(cacheConfigs)
         .build();
 }</code></pre>
           </section>
 
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="cache-strategies" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Cache Strategies</h2>
-            <h3>Definition</h3>
-            <ul>
-              <li>Cache strategies define when and how data is loaded into and removed from the cache.</li>
-              <li>Common strategies include Cache-Aside (application manages cache), Write-Through (write to cache and database simultaneously), Write-Behind (write to cache immediately, database later), and Read-Through (cache loads data automatically on miss).</li>
-              <li>Each strategy has trade-offs between consistency, performance, and complexity, making strategy selection crucial for application requirements.</li>
-            </ul>
+            <p>Cache configuration defines how caches behave regarding size limits, expiration policies, eviction strategies, and serialization. Configuration includes setting maximum cache sizes to prevent memory overflow, time-based expiration (TTL) to ensure data freshness, access-based expiration for unused data cleanup, and cache warming strategies for critical data. Proper configuration ensures optimal memory usage while maintaining the right balance between performance and data freshness.</p>
+            <p>Cache strategies define when and how data is loaded into and removed from the cache. Common strategies include Cache-Aside (application manages cache), Write-Through (write to cache and database simultaneously), Write-Behind (write to cache immediately, database later), and Read-Through (cache loads data automatically on miss). Each strategy has trade-offs between consistency, performance, and complexity, making strategy selection crucial for application requirements.</p>
 
             <h3>Examples</h3>
-            <p><strong>Cache-Aside pattern (most common):</strong></p>
-            <pre><code class="language-java">@Service
-public class ProductService {
-
-    @Cacheable("products")
+            <p>Cache configuration defines how caches behave regarding size limits, expiration policies, eviction strategies, and serialization. Configuration includes setting maximum cache sizes to prevent memory overflow, time-based expiration (TTL) to ensure data freshness, access-based expiration for unused data cleanup, and cache warming strategies for critical data. Proper configuration ensures optimal memory usage while maintaining the right balance between performance and data freshness.</p>
     public Product getProduct(Long id) {
         // Cache-aside: check cache first, load from DB on miss
         return productRepository.findById(id);
@@ -431,34 +527,18 @@ public class ProductService {
 
             <p><strong>Write-Through pattern:</strong></p>
             <pre><code class="language-java">@Service
-public class UserService {
-
-    @CachePut(value = "users", key = "#user.id")
-    public User saveUser(User user) {
-        // Write-through: save to database and update cache
+            <p>Cache providers are the underlying storage mechanisms that actually hold cached data. Spring Boot supports various providers: ConcurrentHashMap for simple in-memory caching, Caffeine for high-performance local caching with advanced features like size-based eviction and time-based expiration, Redis for distributed caching across multiple servers, and Hazelcast for in-memory data grids. Each provider has different characteristics regarding performance, memory management, persistence, and distribution capabilities.</p>
         User saved = userRepository.save(user);
         logger.info("User saved to database and cache: {}", saved.getId());
         return saved;
     }
 }</code></pre>
 
-            <p><strong>Cache warming strategy:</strong></p>
-            <pre><code class="language-java">@Component
-public class CacheWarmupService {
-
-    @Autowired
-    private ProductService productService;
-
-    @EventListener(ApplicationReadyEvent.class)
-    public void warmupCache() {
-        logger.info("Starting cache warmup...");
+            <p>Cache configuration defines how caches behave regarding size limits, expiration policies, eviction strategies, and serialization. Configuration includes setting maximum cache sizes to prevent memory overflow, time-based expiration (TTL) to ensure data freshness, access-based expiration for unused data cleanup, and cache warming strategies for critical data. Proper configuration ensures optimal memory usage while maintaining the right balance between performance and data freshness.</p>
+            <p>Cache strategies define when and how data is loaded into and removed from the cache. Common strategies include Cache-Aside (application manages cache), Write-Through (write to cache and database simultaneously), Write-Behind (write to cache immediately, database later), and Read-Through (cache loads data automatically on miss). Each strategy has trade-offs between consistency, performance, and complexity, making strategy selection crucial for application requirements.</p>
 
         // Warm up with popular products
-        List<Long> popularProductIds = productRepository.findPopularProductIds();
-        popularProductIds.forEach(id -> {
-            try {
-                productService.getProduct(id); // This will populate the cache
-            } catch (Exception e) {
+            <p>Cache configuration defines how caches behave regarding size limits, expiration policies, eviction strategies, and serialization. Configuration includes setting maximum cache sizes to prevent memory overflow, time-based expiration (TTL) to ensure data freshness, access-based expiration for unused data cleanup, and cache warming strategies for critical data. Proper configuration ensures optimal memory usage while maintaining the right balance between performance and data freshness.</p>
                 logger.warn("Failed to warm cache for product: {}", id, e);
             }
         });
@@ -492,24 +572,8 @@ public class MultiLevelCacheService {
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
           <section id="distributed-caching" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Distributed Caching</h2>
-            <h3>Definition</h3>
-            <ul>
-              <li>Distributed caching extends caching across multiple application instances or servers, providing shared cache storage that all instances can access.</li>
-              <li>This enables horizontal scaling while maintaining cache consistency and eliminates cache warm-up requirements for new instances.</li>
-              <li>Distributed caching is essential for microservices architectures and applications running on multiple servers or containers.</li>
-            </ul>
-
-            <h3>Examples</h3>
-            <p><strong>Redis cluster configuration:</strong></p>
-            <pre><code class="language-properties"># application.properties
-spring.redis.cluster.nodes=redis1:6379,redis2:6379,redis3:6379
-spring.redis.cluster.max-redirects=3
-spring.redis.timeout=2000ms
-spring.redis.lettuce.pool.max-active=8
-spring.redis.lettuce.pool.max-idle=8</code></pre>
-
-            <p><strong>Distributed cache with fallback:</strong></p>
+            <p>Cache configuration defines how caches behave regarding size limits, expiration policies, eviction strategies, and serialization. Configuration includes setting maximum cache sizes to prevent memory overflow, time-based expiration (TTL) to ensure data freshness, access-based expiration for unused data cleanup, and cache warming strategies for critical data. Proper configuration ensures optimal memory usage while maintaining the right balance between performance and data freshness.</p>
+            <p>Cache strategies define when and how data is loaded into and removed from the cache. Common strategies include Cache-Aside (application manages cache), Write-Through (write to cache and database simultaneously), Write-Behind (write to cache immediately, database later), and Read-Through (cache loads data automatically on miss). Each strategy has trade-offs between consistency, performance, and complexity, making strategy selection crucial for application requirements.</p>
             <pre><code class="language-java">@Service
 public class RobustCacheService {
 
@@ -542,34 +606,14 @@ public class RobustCacheService {
     }
 }</code></pre>
 
-            <p><strong>Cache synchronization across instances:</strong></p>
-            <pre><code class="language-java">@Component
-public class CacheSyncService {
-
-    @EventListener
-    public void handleProductUpdate(ProductUpdateEvent event) {
-        // Notify other instances to evict cache
-        messagingService.broadcast("cache.evict.product", event.getProductId());
-    }
-
-    @RabbitListener(queues = "cache.evict.product")
-    public void handleCacheEviction(Long productId) {
-        cacheManager.getCache("products").evict(productId);
-        logger.info("Evicted product {} from local cache due to remote update", productId);
-    }
-}</code></pre>
-          </section>
-
+            <p>Cache configuration defines how caches behave regarding size limits, expiration policies, eviction strategies, and serialization. Configuration includes setting maximum cache sizes to prevent memory overflow, time-based expiration (TTL) to ensure data freshness, access-based expiration for unused data cleanup, and cache warming strategies for critical data. Proper configuration ensures optimal memory usage while maintaining the right balance between performance and data freshness.</p>
+            <p>Cache strategies define when and how data is loaded into and removed from the cache. Common strategies include Cache-Aside (application manages cache), Write-Through (write to cache and database simultaneously), Write-Behind (write to cache immediately, database later), and Read-Through (cache loads data automatically on miss). Each strategy has trade-offs between consistency, performance, and complexity, making strategy selection crucial for application requirements.</p>
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
           <section id="cache-best-practices" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Cache Best Practices</h2>
             <h3>Definition</h3>
-            <ul>
-              <li>Cache best practices ensure optimal performance, memory usage, and data consistency while avoiding common pitfalls.</li>
-              <li>These include choosing appropriate cache keys, setting reasonable TTL values, implementing cache warming for critical data, monitoring cache performance, handling cache failures gracefully, and avoiding cache stampedes.</li>
-              <li>Following best practices prevents memory leaks, ensures cache effectiveness, and maintains application reliability.</li>
-            </ul>
+            <p>Cache best practices ensure optimal performance, memory usage, and data consistency while avoiding common pitfalls. These include choosing appropriate cache keys, setting reasonable TTL values, implementing cache warming for critical data, monitoring cache performance, handling cache failures gracefully, and avoiding cache stampedes. Following best practices prevents memory leaks, ensures cache effectiveness, and maintains application reliability.</p>
 
             <h3>Examples</h3>
             <p><strong>Effective cache key design:</strong></p>
@@ -602,32 +646,16 @@ public class CacheKeyService {
 public class CachePerformanceMonitor {
 
     private final MeterRegistry meterRegistry;
-
-    @EventListener
-    public void onCacheHit(CacheHitEvent event) {
-        meterRegistry.counter("cache.hits",
-            "cache", event.getCacheName()).increment();
+            <p>Distributed caching extends caching across multiple application instances or servers, providing shared cache storage that all instances can access. This enables horizontal scaling while maintaining cache consistency and eliminates cache warm-up requirements for new instances. Distributed caching is essential for microservices architectures and applications running on multiple servers or containers.</p>
     }
 
-    @EventListener
-    public void onCacheMiss(CacheMissEvent event) {
-        meterRegistry.counter("cache.misses",
-            "cache", event.getCacheName()).increment();
-    }
-
-    @Scheduled(fixedRate = 60000) // Every minute
-    public void logCacheStatistics() {
-        cacheManager.getCacheNames().forEach(cacheName -> {
+            <p>Cache strategies define when and how data is loaded into and removed from the cache. Common strategies include Cache-Aside (application manages cache), Write-Through (write to cache and database simultaneously), Write-Behind (write to cache immediately, database later), and Read-Through (cache loads data automatically on miss). Each strategy has trade-offs between consistency, performance, and complexity, making strategy selection crucial for application requirements.</p>
             Cache cache = cacheManager.getCache(cacheName);
             if (cache.getNativeCache() instanceof com.github.benmanes.caffeine.cache.Cache) {
                 var stats = ((com.github.benmanes.caffeine.cache.Cache<?, ?>)
                     cache.getNativeCache()).stats();
 
-                logger.info("Cache {}: hit rate={:.2f}%, size={}, evictions={}",
-                    cacheName, stats.hitRate() * 100,
-                    cache.getNativeCache().size(), stats.evictionCount());
-            }
-        });
+            <p>Cache best practices ensure optimal performance, memory usage, and data consistency while avoiding common pitfalls. These include choosing appropriate cache keys, setting reasonable TTL values, implementing cache warming for critical data, monitoring cache performance, handling cache failures gracefully, and avoiding cache stampedes. Following best practices prevents memory leaks, ensures cache effectiveness, and maintains application reliability.</p>
     }
 }</code></pre>
 
@@ -660,22 +688,10 @@ public class FaultTolerantCacheService {
             <pre><code class="language-java">@Configuration
 public class OptimalCacheConfig {
 
-    @Bean
-    public CacheManager cacheManager() {
-        CaffeineCacheManager manager = new CaffeineCacheManager();
-
-        // Configure based on data characteristics
+            <p>Distributed caching extends caching across multiple application instances or servers, providing shared cache storage that all instances can access. This enables horizontal scaling while maintaining cache consistency and eliminates cache warm-up requirements for new instances. Distributed caching is essential for microservices architectures and applications running on multiple servers or containers.</p>
         manager.registerCustomCache("user-profiles",
             Caffeine.newBuilder()
-                .maximumSize(10000)           // Limit memory usage
-                .expireAfterWrite(1, TimeUnit.HOURS)    // Data freshness
-                .refreshAfterWrite(45, TimeUnit.MINUTES) // Proactive refresh
-                .recordStats()                // Monitor performance
-                .build());
-
-        manager.registerCustomCache("session-data",
-            Caffeine.newBuilder()
-                .maximumSize(50000)
+            <p>Cache strategies define when and how data is loaded into and removed from the cache. Common strategies include Cache-Aside (application manages cache), Write-Through (write to cache and database simultaneously), Write-Behind (write to cache immediately, database later), and Read-Through (cache loads data automatically on miss). Each strategy has trade-offs between consistency, performance, and complexity, making strategy selection crucial for application requirements.</p>
                 .expireAfterAccess(30, TimeUnit.MINUTES) // Session timeout
                 .recordStats()
                 .build());
@@ -685,19 +701,11 @@ public class OptimalCacheConfig {
 }</code></pre>
           </section>
 
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Summary</h2>
-            <p>You've now mastered Spring Boot's comprehensive caching capabilities, from basic cache annotations to sophisticated distributed caching strategies. You understand how caching transforms application performance by storing frequently accessed data in fast-access storage, reducing expensive operations and improving response times dramatically. You've learned to implement cache annotations for declarative caching behavior, configure different cache providers from simple in-memory solutions to enterprise-grade distributed systems, and design effective cache strategies that balance performance with data consistency. The concepts of cache keys, TTL configuration, eviction policies, and cache warming ensure your caching implementation is both performant and reliable. You've also explored distributed caching for scalable applications, multi-level caching strategies for optimal performance, and best practices for monitoring and maintaining cache health in production environments. These skills enable you to build applications that can handle high loads efficiently while providing excellent user experience through optimized data access patterns. Your next lesson will integrate caching with comprehensive monitoring and application performance optimization techniques.</p>
+            <p>Cache best practices ensure optimal performance, memory usage, and data consistency while avoiding common pitfalls. These include choosing appropriate cache keys, setting reasonable TTL values, implementing cache warming for critical data, monitoring cache performance, handling cache failures gracefully, and avoiding cache stampedes. Following best practices prevents memory leaks, ensures cache effectiveness, and maintains application reliability.</p>
           </section>
 
           <section id="programming-challenge" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Programming Challenge</h2>
-            <div class="rounded-lg border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-800">
-              <h3 class="mt-0">Challenge: High-Performance E-commerce Caching System</h3>
-              <p><strong>Task:</strong> Build a Spring Boot e-commerce application with a sophisticated multi-level caching strategy that demonstrates various caching patterns, performance optimization, and intelligent cache management.</p>
-
+            <p>Cache best practices ensure optimal performance, memory usage, and data consistency while avoiding common pitfalls. These include choosing appropriate cache keys, setting reasonable TTL values, implementing cache warming for critical data, monitoring cache performance, handling cache failures gracefully, and avoiding cache stampedes. Following best practices prevents memory leaks, ensures cache effectiveness, and maintains application reliability.</p>
               <p><strong>Requirements:</strong></p>
               <ol>
                 <li>Create core entities and services:</li>
@@ -730,11 +738,7 @@ public class OptimalCacheConfig {
                 </ul>
                 <li>Add performance optimization features:</li>
                 <ul>
-                  <li>Conditional caching based on product popularity and user behavior</li>
-                  <li>Cache compression for large objects (product catalogs, order history)</li>
-                  <li>Cache partitioning by user segments or geographic regions</li>
-                  <li>Async cache refresh to prevent cache stampedes</li>
-                </ul>
+            <p>Distributed caching extends caching across multiple application instances or servers, providing shared cache storage that all instances can access. This enables horizontal scaling while maintaining cache consistency and eliminates cache warm-up requirements for new instances. Distributed caching is essential for microservices architectures and applications running on multiple servers or containers.</p>
                 <li>Create cache monitoring and management:</li>
                 <ul>
                   <li>Cache statistics tracking (hit rates, eviction counts, memory usage)</li>
@@ -747,19 +751,11 @@ public class OptimalCacheConfig {
                   <li>Configure Redis for session storage and shared cache data</li>
                   <li>Implement cache failover from Redis to local cache</li>
                   <li>Cache clustering and data partitioning strategies</li>
-                  <li>Cross-instance cache invalidation messaging</li>
-                </ul>
-              </ol>
-
-              <p><strong>Bonus features:</strong></p>
+            <p>Cache best practices ensure optimal performance, memory usage, and data consistency while avoiding common pitfalls. These include choosing appropriate cache keys, setting reasonable TTL values, implementing cache warming for critical data, monitoring cache performance, handling cache failures gracefully, and avoiding cache stampedes. Following best practices prevents memory leaks, ensures cache effectiveness, and maintains application reliability.</p>
               <ul>
                 <li>Machine learning-based cache warming using user behavior patterns</li>
                 <li>Geographic cache distribution with regional data centers</li>
-                <li>Cache versioning system for rolling updates without cache misses</li>
-                <li>A/B testing framework for different caching strategies</li>
-                <li>Real-time cache analytics dashboard with performance metrics</li>
-                <li>Intelligent cache eviction based on business value and access patterns</li>
-              </ul>
+            <p>Cache best practices ensure optimal performance, memory usage, and data consistency while avoiding common pitfalls. These include choosing appropriate cache keys, setting reasonable TTL values, implementing cache warming for critical data, monitoring cache performance, handling cache failures gracefully, and avoiding cache stampedes. Following best practices prevents memory leaks, ensures cache effectiveness, and maintains application reliability.</p>
 
               <p><strong>Learning Goals:</strong> Master comprehensive caching strategies, understand performance implications of different cache patterns, implement production-ready cache management, practice distributed caching concepts, and build systems that demonstrate measurable performance improvements through intelligent caching.</p>
             </div>
@@ -780,10 +776,6 @@ public class OptimalCacheConfig {
     </footer>
 
     <script>
-      document.getElementById('themeToggle').addEventListener('click', function(){
-        const r=document.documentElement; const d=r.classList.toggle('dark');
-        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
-      });
     </script>
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
@@ -792,6 +784,4 @@ public class OptimalCacheConfig {
         Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
         Prism.highlightAll();
       }
-    </script>
-  </body>
-</html>
+            <p>Distributed caching extends caching across multiple application instances or servers, providing shared cache storage that all instances can access. This enables horizontal scaling while maintaining cache consistency and eliminates cache warm-up requirements for new instances. Distributed caching is essential for microservices architectures and applications running on multiple servers or containers.</p>

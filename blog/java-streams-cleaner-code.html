@@ -1,12 +1,11 @@
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Why Java Streams Make Your Code Cleaner (and When They Don’t)</title>
     <meta name="description" content="A practical guide to Java Streams: where they shine, when to avoid them, patterns, pitfalls, performance notes, and readable alternatives." />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' ry='12' fill='%234f46e5'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' font-size='28' font-family='Inter, -apple-system, Segoe UI, Roboto, Arial, sans-serif' fill='white'%3EWL☕%3C/text%3E%3C/svg%3E" />
-    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <script>
       tailwind.config = { darkMode:'class', theme:{extend:{fontFamily:{sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"]}}}};
@@ -19,7 +18,7 @@
         <a href="../" class="group inline-flex items-center gap-3">
           <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
           <div class="leading-tight">
-            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="text-sm text-slate-500 dark:text-slate-400">Software Engineer</div>
             <div class="font-semibold">Wassim Lagnaoui</div>
           </div>
         </a>
@@ -63,7 +62,7 @@
               <span class="grid h-9 w-9 place-items-center rounded-full bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
               <div class="text-sm leading-tight">
                 <div class="font-medium">Wassim Lagnaoui</div>
-                <div class="text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+                <div class="text-slate-500 dark:text-slate-400">Software Engineer</div>
               </div>
             </div>
             <div class="flex flex-wrap items-center gap-2">
@@ -161,10 +160,6 @@ List&lt;Double&gt; sorted = eurTotals.sorted().toList();</code></pre>
     </footer>
 
     <script>
-      document.getElementById('themeToggle').addEventListener('click', function(){
-        const r=document.documentElement; const d=r.classList.toggle('dark');
-        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
-      });
       (function(){
         const b=document.getElementById('menuToggle');
         const n=document.getElementById('mobileNav');

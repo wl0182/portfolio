@@ -1,11 +1,10 @@
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Lesson 16 - Spring Boot Exception Handling</title>
     <meta name="description" content="Master Spring Boot exception handling: global exception handlers, custom exceptions, error responses, validation, and best practices for robust error management." />
-    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <script>
       tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
@@ -21,7 +20,7 @@
         <a href="../../../" class="group inline-flex items-center gap-3">
           <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
           <div class="leading-tight">
-            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="text-sm text-slate-500 dark:text-slate-400">Software Engineer</div>
             <div class="font-semibold">Wassim Lagnaoui</div>
           </div>
         </a>
@@ -33,10 +32,6 @@
           <a href="../../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
           <a href="../../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
         </nav>
-        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
-          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
-          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        </button>
       </div>
     </header>
 
@@ -114,44 +109,21 @@ throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Database co
             <pre><code class="language-java">// These are automatically handled by Spring Boot
 @GetMapping("/users/{id}")
 public User getUser(@PathVariable Long id) {
-    return userRepository.findById(id)
-        .orElseThrow(() -> new EntityNotFoundException("User not found")); // 404
-}</code></pre>
-          </section>
-
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="global-exception-handling" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Global Exception Handling</h2>
-            <h3>Definition</h3>
             <ul>
                 <li>Global exception handling using @ControllerAdvice allows you to centralize error handling logic across your entire application instead of repeating try-catch blocks in every controller.</li>
                 <li>This annotation creates a global exception handler that intercepts exceptions from any controller and provides consistent error responses.</li>
                 <li>You can handle specific exception types differently and ensure all errors return properly formatted responses with appropriate HTTP status codes and meaningful messages.</li>
             </ul>
 
-            <h3>Analogy</h3>
-            <p>Global exception handling is like having a centralized customer service department in a large company instead of each department handling complaints individually. When a customer has a problem with billing, shipping, or technical support, they all get routed to the same professional customer service team that knows exactly how to handle different types of issues. The customer service team has standard procedures for each problem type - billing issues get one response template, shipping problems get another, and technical issues get escalated appropriately. This ensures every customer gets consistent, professional help regardless of which department caused the problem, and the company maintains its reputation for good customer service across all interactions.</p>
-
             <h3>Examples</h3>
             <p><strong>Basic global exception handler:</strong></p>
             <pre><code class="language-java">@ControllerAdvice
 public class GlobalExceptionHandler {
-
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<String> handleNotFound(EntityNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 }</code></pre>
 
             <p><strong>Handling multiple exception types:</strong></p>
-            <pre><code class="language-java">@ControllerAdvice
-public class GlobalExceptionHandler {
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ErrorResponse> handleBadRequest(IllegalArgumentException ex) {
-        ErrorResponse error = new ErrorResponse("Bad Request", ex.getMessage());
-        return ResponseEntity.badRequest().body(error);
     }
 
     @ExceptionHandler(DataAccessException.class)
@@ -161,83 +133,41 @@ public class GlobalExceptionHandler {
     }
 }</code></pre>
 
-            <p><strong>Generic exception handler:</strong></p>
-            <pre><code class="language-java">@ExceptionHandler(Exception.class)
-public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
     ErrorResponse error = new ErrorResponse("Internal Error", "An unexpected error occurred");
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
 }</code></pre>
 
             <p><strong>Handler with logging:</strong></p>
-            <pre><code class="language-java">@ExceptionHandler(Exception.class)
-public ResponseEntity<ErrorResponse> handleException(Exception ex) {
-    logger.error("Unhandled exception occurred", ex);
     ErrorResponse error = new ErrorResponse("Error", "Something went wrong");
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
 }</code></pre>
           </section>
 
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="custom-exceptions" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Custom Exceptions</h2>
-            <h3>Definition</h3>
             <ul>
                 <li>Custom exceptions allow you to create specific error types for your business logic that carry meaningful information about what went wrong.</li>
                 <li>Instead of throwing generic exceptions, you can create domain-specific exceptions like UserNotFoundException, InsufficientFundsException, or DuplicateEmailException.</li>
                 <li>Custom exceptions make your code more readable, easier to debug, and allow for more precise error handling where different exception types can be handled with different responses and status codes.</li>
             </ul>
-
-            <h3>Analogy</h3>
-            <p>Custom exceptions are like having specific emergency codes in a hospital instead of just saying "something's wrong." Instead of a generic "code blue" for every emergency, hospitals have "code red" for fire, "code silver" for weapons, "code pink" for infant abduction, and "code white" for pediatric emergency. Each code triggers a specific response protocol - the right people respond, they bring the right equipment, and they follow the right procedures. Similarly, custom exceptions like "UserNotFoundException" or "PaymentFailedException" tell your application exactly what type of problem occurred, so it can respond with the right error message, status code, and recovery actions rather than a generic "something went wrong" response.</p>
-
-            <h3>Examples</h3>
             <p><strong>Creating custom exception classes:</strong></p>
             <pre><code class="language-java">public class UserNotFoundException extends RuntimeException {
     public UserNotFoundException(String message) {
         super(message);
     }
-}</code></pre>
 
             <p><strong>Business-specific custom exceptions:</strong></p>
             <pre><code class="language-java">public class InsufficientFundsException extends RuntimeException {
     private final BigDecimal balance;
     private final BigDecimal requested;
-
-    public InsufficientFundsException(BigDecimal balance, BigDecimal requested) {
-        super(String.format("Insufficient funds: balance %.2f, requested %.2f", balance, requested));
-        this.balance = balance;
-        this.requested = requested;
-    }
-}</code></pre>
-
-            <p><strong>Using custom exceptions in services:</strong></p>
-            <pre><code class="language-java">@Service
-public class UserService {
-    public User findUser(Long id) {
-        return userRepository.findById(id)
-            .orElseThrow(() -> new UserNotFoundException("User with ID " + id + " not found"));
-    }
 }</code></pre>
 
             <p><strong>Handling custom exceptions globally:</strong></p>
             <pre><code class="language-java">@ControllerAdvice
 public class GlobalExceptionHandler {
-
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException ex) {
         ErrorResponse error = new ErrorResponse("User Not Found", ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
     @ExceptionHandler(InsufficientFundsException.class)
-    public ResponseEntity<ErrorResponse> handleInsufficientFunds(InsufficientFundsException ex) {
-        ErrorResponse error = new ErrorResponse("Payment Failed", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.PAYMENT_REQUIRED).body(error);
-    }
-}</code></pre>
-          </section>
-
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
           <section id="error-response-structure" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
@@ -248,52 +178,21 @@ public class GlobalExceptionHandler {
                 <li>Good error responses help developers integrate with your API and help users understand what went wrong and how to fix it.</li>
                 <li>The structure should be consistent across all error types so clients can reliably parse and handle errors programmatically.</li>
             </ul>
-
-            <h3>Analogy</h3>
             <p>Error response structure is like a standardized incident report form that emergency services use. Whether it's a car accident, medical emergency, or building fire, the report always includes the same key information: what happened (error type), when it happened (timestamp), where it happened (request path), who was involved (user context), and what actions were taken (status code). This standardized format means that anyone reading the report - whether it's a police officer, insurance agent, or court official - knows exactly where to find the information they need. Similarly, a well-structured API error response gives client applications a predictable format they can rely on to extract the information needed to handle the error appropriately.</p>
 
             <h3>Examples</h3>
             <p><strong>Basic error response class:</strong></p>
             <pre><code class="language-java">public class ErrorResponse {
-    private String error;
-    private String message;
-    private LocalDateTime timestamp;
-    private String path;
-
-    // constructors and getters
-}</code></pre>
-
-            <p><strong>Detailed error response structure:</strong></p>
-            <pre><code class="language-java">public class DetailedErrorResponse {
-    private String error;
-    private String message;
     private LocalDateTime timestamp;
     private String path;
     private String requestId;
     private List<String> details;
 
-    public DetailedErrorResponse(String error, String message, String path) {
-        this.error = error;
         this.message = message;
         this.path = path;
         this.timestamp = LocalDateTime.now();
         this.requestId = UUID.randomUUID().toString();
     }
-}</code></pre>
-
-            <p><strong>Error response with validation details:</strong></p>
-            <pre><code class="language-java">public class ValidationErrorResponse extends ErrorResponse {
-    private Map<String, String> fieldErrors;
-
-    public ValidationErrorResponse(String message, Map<String, String> fieldErrors) {
-        super("Validation Failed", message);
-        this.fieldErrors = fieldErrors;
-    }
-}</code></pre>
-
-            <p><strong>Example JSON error response:</strong></p>
-            <pre><code class="language-json">{
-  "error": "User Not Found",
   "message": "User with ID 123 does not exist",
   "timestamp": "2023-10-15T10:30:00",
   "path": "/api/users/123",
@@ -312,29 +211,11 @@ public class GlobalExceptionHandler {
                 <li>Proper validation handling provides clear, field-specific error messages that help users correct their input.</li>
             </ul>
 
-            <h3>Analogy</h3>
-            <p>Validation handling is like a bouncer at an exclusive club who checks everyone at the door against a specific list of requirements. The bouncer doesn't just say "you can't come in" - they explain exactly what's wrong: "you need to be 21 or older," "you need proper attire," or "you need to be on the guest list." They might check multiple things at once and give you a complete list of everything you need to fix before you can enter. Similarly, validation handling in your API checks incoming data against your rules and provides specific, helpful error messages for each field that doesn't meet the requirements, so users know exactly what to correct in their requests.</p>
-
-            <h3>Examples</h3>
-            <p><strong>Model with validation annotations:</strong></p>
-            <pre><code class="language-java">public class User {
-    @NotBlank(message = "Name is required")
-    private String name;
-
-    @Email(message = "Email must be valid")
-    private String email;
-
-    @Min(value = 18, message = "Age must be at least 18")
-    private Integer age;
-}</code></pre>
 
             <p><strong>Controller with validation:</strong></p>
             <pre><code class="language-java">@PostMapping("/users")
 public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
     User savedUser = userService.save(user);
-    return ResponseEntity.ok(savedUser);
-}</code></pre>
-
             <p><strong>Handling validation exceptions:</strong></p>
             <pre><code class="language-java">@ExceptionHandler(MethodArgumentNotValidException.class)
 public ResponseEntity<ValidationErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
@@ -344,80 +225,36 @@ public ResponseEntity<ValidationErrorResponse> handleValidation(MethodArgumentNo
 
     ValidationErrorResponse response = new ValidationErrorResponse("Validation failed", errors);
     return ResponseEntity.badRequest().body(response);
-}</code></pre>
-
-            <p><strong>Example validation error response:</strong></p>
-            <pre><code class="language-json">{
-  "error": "Validation Failed",
-  "message": "Request contains invalid data",
-  "fieldErrors": {
-    "email": "Email must be valid",
-    "age": "Age must be at least 18"
-  }
-}</code></pre>
-          </section>
-
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
-
-          <section id="http-status-codes" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>HTTP Status Codes</h2>
-            <h3>Definition</h3>
             <ul>
                 <li>HTTP status codes communicate the outcome of API requests using standardized numbers that clients can understand programmatically.</li>
                 <li>Using appropriate status codes helps clients handle responses correctly - 200 for success, 400 for client errors, 404 for not found, 500 for server errors.</li>
                 <li>Each status code has specific meaning and helps both developers and client applications understand whether the request succeeded, failed due to client issues, or failed due to server problems.</li>
             </ul>
-
-            <h3>Analogy</h3>
-            <p>HTTP status codes are like the standardized response signals that air traffic control uses with pilots. When a pilot requests permission to land, they don't get a long explanation - they get a clear, standardized response: "cleared to land" (200 OK), "runway occupied, circle and wait" (429 Too Many Requests), "airport closed" (503 Service Unavailable), or "invalid flight plan" (400 Bad Request). These codes are universally understood by all pilots and air traffic controllers worldwide, so there's no confusion about what action to take. Similarly, HTTP status codes provide a universal language that all web clients and servers understand, making it easy for applications to respond appropriately to different situations without needing to parse complex error messages.</p>
-
             <h3>Examples</h3>
             <p><strong>Using appropriate status codes:</strong></p>
             <pre><code class="language-java">@ExceptionHandler(UserNotFoundException.class)
 public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException ex) {
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(ex.getMessage()));
-}
-
 @ExceptionHandler(IllegalArgumentException.class)
 public ResponseEntity<ErrorResponse> handleBadRequest(IllegalArgumentException ex) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ex.getMessage()));
 }</code></pre>
 
-            <p><strong>Custom status codes for business logic:</strong></p>
-            <pre><code class="language-java">@ExceptionHandler(InsufficientFundsException.class)
-public ResponseEntity<ErrorResponse> handleInsufficientFunds(InsufficientFundsException ex) {
     return ResponseEntity.status(HttpStatus.PAYMENT_REQUIRED).body(new ErrorResponse(ex.getMessage()));
 }
 
 @ExceptionHandler(DuplicateEmailException.class)
 public ResponseEntity<ErrorResponse> handleDuplicateEmail(DuplicateEmailException ex) {
-    return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse(ex.getMessage()));
-}</code></pre>
-
-            <p><strong>Status code mapping examples:</strong></p>
-            <pre><code class="language-java">// 200 OK - Success
-return ResponseEntity.ok(user);
-
-// 201 Created - Resource created
-return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
-
-// 204 No Content - Success with no response body
 return ResponseEntity.noContent().build();</code></pre>
 
             <p><strong>Common status codes for exceptions:</strong></p>
             <pre><code class="language-java">// 400 Bad Request - Invalid input
 // 401 Unauthorized - Authentication required
-// 403 Forbidden - Access denied
-// 404 Not Found - Resource doesn't exist
-// 409 Conflict - Resource already exists
-// 422 Unprocessable Entity - Validation failed
 // 500 Internal Server Error - Unexpected server error</code></pre>
           </section>
 
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
-          <section id="exception-logging" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Exception Logging</h2>
             <h3>Definition</h3>
             <ul>
                 <li>Exception logging captures detailed information about errors for debugging and monitoring purposes while returning user-friendly messages to clients.</li>
@@ -427,109 +264,51 @@ return ResponseEntity.noContent().build();</code></pre>
 
             <h3>Analogy</h3>
             <p>Exception logging is like the detailed incident reports that security guards write versus the brief announcements they make over the intercom. When there's a problem in a shopping mall, the security guard might announce "Attention shoppers, elevator 2 is temporarily out of service" (user-friendly client message), but their incident report includes much more detail: exact time, witness statements, possible causes, photos of the scene, and action steps taken (detailed logs for internal use). The public gets just enough information to adjust their behavior, while management gets the full picture needed to understand what happened, prevent it from happening again, and improve their procedures.</p>
-
-            <h3>Examples</h3>
-            <p><strong>Logging with different levels:</strong></p>
             <pre><code class="language-java">@ExceptionHandler(UserNotFoundException.class)
 public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException ex) {
     logger.warn("User not found: {}", ex.getMessage());
     return ResponseEntity.status(HttpStatus.NOT_FOUND)
         .body(new ErrorResponse("User not found", ex.getMessage()));
-}</code></pre>
-
-            <p><strong>Detailed logging for server errors:</strong></p>
-            <pre><code class="language-java">@ExceptionHandler(DataAccessException.class)
-public ResponseEntity<ErrorResponse> handleDatabaseError(DataAccessException ex) {
-    logger.error("Database error occurred", ex);
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(new ErrorResponse("Database Error", "Service temporarily unavailable"));
-}</code></pre>
-
-            <p><strong>Structured logging with context:</strong></p>
-            <pre><code class="language-java">@ExceptionHandler(Exception.class)
-public ResponseEntity<ErrorResponse> handleGeneral(Exception ex, HttpServletRequest request) {
-    String requestId = UUID.randomUUID().toString();
-
     logger.error("Unhandled exception [requestId: {}, path: {}, method: {}]",
         requestId, request.getRequestURI(), request.getMethod(), ex);
 
     ErrorResponse error = new ErrorResponse("Internal Error", "An error occurred");
     error.setRequestId(requestId);
-    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
-}</code></pre>
-
             <p><strong>Security-conscious logging:</strong></p>
             <pre><code class="language-java">@ExceptionHandler(AuthenticationException.class)
 public ResponseEntity<ErrorResponse> handleAuth(AuthenticationException ex) {
     // Log without sensitive details
     logger.warn("Authentication failed for request: {}", ex.getMessage());
-
-    // Don't expose internal details to client
-    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-        .body(new ErrorResponse("Authentication Required", "Please provide valid credentials"));
 }</code></pre>
           </section>
 
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
-          <section id="error-page-customization" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
-            <h2>Error Page Customization</h2>
-            <h3>Definition</h3>
             <ul>
                 <li>Error page customization allows you to provide branded, user-friendly error pages for web applications instead of generic Spring Boot error pages.</li>
                 <li>You can create custom error pages for different HTTP status codes, add helpful information and navigation, and maintain your application's look and feel even when errors occur.</li>
                 <li>This improves user experience by providing consistent branding and helpful guidance when things go wrong.</li>
             </ul>
-
-            <h3>Analogy</h3>
             <p>Error page customization is like having a professional, helpful receptionist handle problems in your office building instead of just posting generic "OUT OF ORDER" signs. When the elevator breaks down, instead of a basic sign that just says "broken," the receptionist puts up a professional notice that matches the building's branding, explains the situation clearly, provides alternative options (like directions to the stairs or other elevators), includes an estimated repair time, and offers to help with special accommodations. The message maintains the building's professional image while being genuinely helpful to visitors, rather than leaving them confused and frustrated by a bare-bones error message.</p>
 
             <h3>Examples</h3>
             <p><strong>Custom error controller:</strong></p>
             <pre><code class="language-java">@Controller
-public class CustomErrorController implements ErrorController {
-
-    @RequestMapping("/error")
-    public String handleError(HttpServletRequest request, Model model) {
-        Integer statusCode = (Integer) request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);
-
-        if (statusCode == 404) {
-            return "error/404";
-        } else if (statusCode == 500) {
-            return "error/500";
-        }
-        return "error/generic";
-    }
-}</code></pre>
-
             <p><strong>Error page with model data:</strong></p>
             <pre><code class="language-java">@RequestMapping("/error")
 public String handleError(HttpServletRequest request, Model model) {
     String errorMessage = (String) request.getAttribute(RequestDispatcher.ERROR_MESSAGE);
     String requestUri = (String) request.getAttribute(RequestDispatcher.ERROR_REQUEST_URI);
-
-    model.addAttribute("errorMessage", errorMessage);
-    model.addAttribute("requestUri", requestUri);
     return "error/custom";
 }</code></pre>
 
             <p><strong>Custom error page HTML (error/404.html):</strong></p>
             <pre><code class="language-html">&lt;!DOCTYPE html&gt;
-&lt;html&gt;
-&lt;body&gt;
-    &lt;h1&gt;Page Not Found&lt;/h1&gt;
-    &lt;p&gt;The page you're looking for doesn't exist.&lt;/p&gt;
-    &lt;a href="/"&gt;Return to Home&lt;/a&gt;
-&lt;/body&gt;
-&lt;/html&gt;</code></pre>
-
             <p><strong>Status-specific error pages configuration:</strong></p>
             <pre><code class="language-properties"># application.properties
 server.error.whitelabel.enabled=false
 server.error.include-message=always
 server.error.include-binding-errors=always</code></pre>
-          </section>
-
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
           <section id="testing-exceptions" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
@@ -546,50 +325,16 @@ server.error.include-binding-errors=always</code></pre>
             <h3>Examples</h3>
             <p><strong>Testing exception responses:</strong></p>
             <pre><code class="language-java">@Test
-void shouldReturn404WhenUserNotFound() throws Exception {
-    when(userService.findUser(999L)).thenThrow(new UserNotFoundException("User not found"));
-
-    mockMvc.perform(get("/api/users/999"))
-        .andExpect(status().isNotFound())
-        .andExpect(jsonPath("$.error").value("User Not Found"));
-}</code></pre>
-
-            <p><strong>Testing validation exceptions:</strong></p>
-            <pre><code class="language-java">@Test
-void shouldReturn400ForInvalidUser() throws Exception {
-    String invalidUser = "{\\"name\\": \\"\\", \\"email\\": \\"invalid-email\\"}";
-
-    mockMvc.perform(post("/api/users")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(invalidUser))
-        .andExpected(status().isBadRequest())
-        .andExpect(jsonPath("$.fieldErrors.name").exists())
-        .andExpect(jsonPath("$.fieldErrors.email").exists());
-}</code></pre>
-
-            <p><strong>Testing custom exception handling:</strong></p>
-            <pre><code class="language-java">@Test
 void shouldHandleInsufficientFunds() throws Exception {
     when(paymentService.processPayment(any())).thenThrow(
         new InsufficientFundsException(BigDecimal.valueOf(50), BigDecimal.valueOf(100)));
 
     mockMvc.perform(post("/api/payments")
-            .contentType(MediaType.APPLICATION_JSON)
-            .content("{\\"amount\\": 100}"))
-        .andExpect(status().isPaymentRequired())
-        .andExpect(jsonPath("$.error").value("Payment Failed"));
-}</code></pre>
-
-            <p><strong>Unit testing exception handlers:</strong></p>
-            <pre><code class="language-java">@Test
 void globalExceptionHandlerShouldHandleUserNotFound() {
     GlobalExceptionHandler handler = new GlobalExceptionHandler();
     UserNotFoundException exception = new UserNotFoundException("User not found");
 
     ResponseEntity<ErrorResponse> response = handler.handleUserNotFound(exception);
-
-    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-    assertEquals("User not found", response.getBody().getMessage());
 }</code></pre>
           </section>
 
@@ -606,57 +351,16 @@ void globalExceptionHandlerShouldHandleUserNotFound() {
 
             <h3>Analogy</h3>
             <p>Exception handling best practices are like the professional standards that customer service representatives follow when dealing with complaints or problems. Good representatives are trained to listen carefully to understand the specific problem (use specific exception types), provide clear explanations without revealing confidential company information (helpful but secure messages), document the interaction properly for follow-up (appropriate logging), escalate to the right department based on the issue type (correct status codes), and follow up to ensure the problem was resolved (testing). These standards ensure every customer gets consistent, professional service regardless of which representative they speak with, and they protect both the customer and the company during difficult situations.</p>
-
-            <h3>Examples</h3>
-            <p><strong>Secure error messages:</strong></p>
             <pre><code class="language-java">// Good - helpful but not revealing internal details
 @ExceptionHandler(AuthenticationException.class)
 public ResponseEntity<ErrorResponse> handleAuth(AuthenticationException ex) {
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
         .body(new ErrorResponse("Authentication Failed", "Invalid username or password"));
-}
-
-// Bad - reveals too much internal information
-// "Database connection failed: Cannot connect to MySQL server at localhost:3306"</code></pre>
-
-            <p><strong>Consistent error response format:</strong></p>
-            <pre><code class="language-java">// Use the same response structure for all errors
-public class ErrorResponse {
-    private final String error;
-    private final String message;
-    private final LocalDateTime timestamp;
-    private final String path;
-
-    // Always include these core fields for consistency
-}</code></pre>
-
-            <p><strong>Appropriate logging levels:</strong></p>
-            <pre><code class="language-java">// WARN for client errors (400-499)
-logger.warn("User validation failed: {}", ex.getMessage());
-
-// ERROR for server errors (500+)
-logger.error("Database connection failed", ex);
 
 // DEBUG for detailed troubleshooting info
 logger.debug("Request parameters: {}", requestParams);</code></pre>
 
             <p><strong>Exception hierarchy for better handling:</strong></p>
-            <pre><code class="language-java">// Base exception for your application
-public abstract class BusinessException extends RuntimeException {
-    protected BusinessException(String message) {
-        super(message);
-    }
-}
-
-// Specific business exceptions
-public class UserNotFoundException extends BusinessException {
-    public UserNotFoundException(String message) {
-        super(message);
-    }
-}</code></pre>
-          </section>
-
-          <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
 
           <section id="summary" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Summary</h2>
@@ -674,8 +378,6 @@ public class UserNotFoundException extends BusinessException {
                 <li>Create a simple library management application:</li>
                 <ul>
                   <li><code>Book</code>, <code>Author</code>, <code>User</code>, <code>Loan</code> entities</li>
-                  <li>REST endpoints for managing books, users, and loans</li>
-                  <li>Business logic for borrowing and returning books</li>
                 </ul>
                 <li>Implement custom exceptions:</li>
                 <ul>
@@ -684,75 +386,15 @@ public class UserNotFoundException extends BusinessException {
                   <li><code>UserNotFoundException</code> when user doesn't exist</li>
                   <li><code>LoanNotFoundException</code> when loan record doesn't exist</li>
                   <li><code>OverdueLoanException</code> when returning overdue books</li>
-                </ul>
-                <li>Create global exception handler:</li>
-                <ul>
-                  <li>Handle all custom exceptions with appropriate status codes</li>
-                  <li>Handle validation exceptions with field-specific error messages</li>
-                  <li>Handle generic exceptions with secure error responses</li>
-                  <li>Include structured error responses with timestamps and request IDs</li>
-                </ul>
-                <li>Add comprehensive validation:</li>
-                <ul>
-                  <li>Validate book creation (title required, ISBN format, publication year)</li>
-                  <li>Validate user registration (email format, age minimum, name required)</li>
-                  <li>Validate loan requests (valid dates, user exists, book available)</li>
-                </ul>
-                <li>Implement security-conscious logging:</li>
-                <ul>
-                  <li>Log errors with appropriate levels (WARN for client errors, ERROR for server errors)</li>
-                  <li>Include request context without exposing sensitive data</li>
-                  <li>Use correlation IDs for tracking requests across logs</li>
-                </ul>
-                <li>Add comprehensive tests:</li>
-                <ul>
-                  <li>Test each exception scenario with appropriate status codes</li>
-                  <li>Test validation error responses for malformed requests</li>
-                  <li>Test that error responses don't expose sensitive information</li>
-                  <li>Test that appropriate logging occurs for different error types</li>
-                </ul>
-              </ol>
-
-              <p><strong>Bonus features:</strong></p>
-              <ul>
-                <li>Custom error pages for web interface</li>
-                <li>Internationalized error messages (English and one other language)</li>
-                <li>Rate limiting with custom exception for too many requests</li>
-                <li>Circuit breaker pattern for external service calls</li>
-                <li>Health check endpoints that report system status</li>
-              </ul>
-
-              <p><strong>Learning Goals:</strong> Practice implementing comprehensive exception handling strategies, creating meaningful custom exceptions, structuring consistent error responses, and building robust error management that enhances user experience while maintaining security and debuggability.</p>
-            </div>
-          </section>
-
-          <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
             <a href="lesson-15.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Previous</a>
             <a href="lesson-17.html" class="inline-flex items-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">Next</a>
           </nav>
         </div>
       </div>
-    </main>
-
-    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
-      <div class="mx-auto max-w-7xl px-6">
         <p>© 2025 wassim lagnaoui. All rights reserved.</p>
       </div>
     </footer>
 
     <script>
-      document.getElementById('themeToggle').addEventListener('click', function(){
-        const r=document.documentElement; const d=r.classList.toggle('dark');
-        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
-      });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
-    <script>
-      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
-        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
-        Prism.highlightAll();
-      }
-    </script>
-  </body>
-</html>
+            <p>Error page customization allows you to provide branded, user-friendly error pages for web applications instead of generic Spring Boot error pages. You can create custom error pages for different HTTP status codes, add helpful information and navigation, and maintain your application's look and feel even when errors occur. This improves user experience by providing consistent branding and helpful guidance when things go wrong.</p>

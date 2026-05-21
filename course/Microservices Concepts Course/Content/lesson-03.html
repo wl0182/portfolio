@@ -1,11 +1,10 @@
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Lesson 03 - API Gateway & Edge Routing</title>
     <meta name="description" content="API Gateway patterns with Spring Cloud Gateway: routing, load balancing, authentication offloading, rate limiting, predicates, and filters." />
-    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <script>
       tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
@@ -21,7 +20,7 @@
         <a href="../../" class="group inline-flex items-center gap-3">
           <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
           <div class="leading-tight">
-            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="text-sm text-slate-500 dark:text-slate-400">Software Engineer</div>
             <div class="font-semibold">Wassim Lagnaoui</div>
           </div>
         </a>
@@ -33,10 +32,6 @@
           <a href="../../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
           <a href="../" class="text-indigo-600 dark:text-indigo-400">Courses</a>
         </nav>
-        <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
-          <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
-          <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        </button>
       </div>
     </header>
 
@@ -395,7 +390,7 @@ management:
             <h2>Lesson Summary</h2>
 
             <p>In this lesson, we explored API Gateway patterns and Spring Cloud Gateway implementation for microservices architectures. Here's a comprehensive recap of all the key concepts covered:</p>
-
+                .header("X-Request-ID", requestId)
             <h3>API Gateway Fundamentals</h3>
             <ul>
               <li><strong>Purpose:</strong> Single entry point for all client requests, acting as a reverse proxy between clients and microservices</li>
@@ -403,7 +398,7 @@ management:
               <li><strong>Benefits:</strong> Unified interface, simplified client development, and flexible internal service architecture</li>
               <li><strong>Architecture:</strong> Gateway shields clients from internal service structure and handles service evolution transparently</li>
             </ul>
-
+            return chain.filter(exchange)
             <h3>Core Gateway Responsibilities</h3>
             <ul>
               <li><strong>Routing:</strong> Examines requests and directs them to appropriate backend services based on URL paths, methods, or headers</li>
@@ -411,7 +406,7 @@ management:
               <li><strong>Security Offloading:</strong> Centralizes authentication and authorization, ensuring consistent security policies across all services</li>
               <li><strong>Rate Limiting:</strong> Protects backend services from overload using token bucket algorithms and configurable client-specific limits</li>
             </ul>
-
+                    int statusCode = exchange.getResponse().getStatusCode() != null ?
             <h3>Spring Cloud Gateway</h3>
             <ul>
               <li><strong>Architecture:</strong> Built on reactive Spring WebFlux for non-blocking, high-throughput request processing</li>
@@ -419,7 +414,7 @@ management:
               <li><strong>Integration:</strong> Seamless integration with Spring ecosystem, Eureka service discovery, and Spring Security</li>
               <li><strong>Dependencies:</strong> spring-cloud-starter-gateway with Spring Cloud BOM for version management</li>
             </ul>
-
+                        requestId, config.getMessage(), method, path, statusCode, duration.toMillis());
             <h3>Route Predicates</h3>
             <ul>
               <li><strong>Function:</strong> Conditional logic that determines if a request matches a specific route based on request characteristics</li>
@@ -427,15 +422,15 @@ management:
               <li><strong>Combination:</strong> Multiple predicates use logical AND operations for precise routing control</li>
               <li><strong>Use cases:</strong> API versioning, feature flags, canary deployments, and geographic routing strategies</li>
             </ul>
-
+                    Duration duration = Duration.between(startTime, Instant.now());
             <h3>Gateway Filters</h3>
-            <ul>
+    public static class Config {
               <li><strong>Pre-filters:</strong> Modify requests before forwarding to backend services - authentication, validation, header manipulation</li>
               <li><strong>Post-filters:</strong> Modify responses after backend processing - response headers, metrics collection, response transformation</li>
               <li><strong>Built-in filters:</strong> AddRequestHeader, RemoveRequestHeader, RequestRateLimiter, CircuitBreaker, and Retry filters</li>
               <li><strong>Custom filters:</strong> GlobalFilter interface for cross-cutting concerns and AbstractGatewayFilterFactory for route-specific logic</li>
-            </ul>
-
+            return message;
+        }
             <h3>Authentication & Security</h3>
             <ul>
               <li><strong>Centralized security:</strong> Single point for authentication validation eliminates duplication across microservices</li>
@@ -445,21 +440,540 @@ management:
             </ul>
 
             <h3>Production Implementation</h3>
-            <ul>
+    ├── pom.xml
               <li><strong>Maven dependencies:</strong> Gateway starter, Eureka client, and reactive Redis for rate limiting functionality</li>
               <li><strong>Resilience patterns:</strong> Circuit breakers, rate limiting, and retry logic for handling service failures gracefully</li>
               <li><strong>Observability:</strong> Actuator endpoints for monitoring routes, health checks, and operational metrics</li>
               <li><strong>Configuration management:</strong> Environment-specific settings for different deployment stages and service URLs</li>
-            </ul>
-
+            <h3>Task 1: Create Gateway Service</h3>
+            <p>First, let's create the API Gateway service that will serve as the single entry point for all client requests and route them to the appropriate backend services.</p>
             <h3>Key Takeaways</h3>
-            <ul>
+
               <li>API Gateway is essential for managing complexity in microservices architectures and providing unified client interfaces</li>
               <li>Spring Cloud Gateway offers production-ready features with reactive architecture for high-performance scenarios</li>
               <li>Proper security offloading simplifies backend services while ensuring consistent authentication and authorization policies</li>
               <li>Combining routing predicates and filters enables sophisticated traffic management and operational control</li>
               <li>Gateway becomes the operational control point for monitoring, security, and traffic management across your entire API surface</li>
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+    &lt;artifactId&gt;ecommerce-microservices&lt;/artifactId&gt;
+    &lt;version&gt;1.0.0&lt;/version&gt;
+    &lt;packaging&gt;pom&lt;/packaging&gt;
+
+    &lt;modules&gt;
+        &lt;module&gt;eureka-server&lt;/module&gt;
+        &lt;module&gt;api-gateway&lt;/module&gt;
+        &lt;module&gt;user-service&lt;/module&gt;
+        &lt;module&gt;order-service&lt;/module&gt;
+    &lt;/modules&gt;
+
+    &lt;!-- ...existing properties and dependencyManagement... --&gt;
+&lt;/project&gt;
+</code></pre>
+
+            <h4>Create API Gateway Module</h4>
+            <p>Create <code>api-gateway/pom.xml</code>:</p>
+
+            <pre><code class="language-xml">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd"&gt;
+    &lt;modelVersion&gt;4.0.0&lt;/modelVersion&gt;
+
+    &lt;parent&gt;
+        &lt;groupId&gt;com.ecommerce&lt;/groupId&gt;
+        &lt;artifactId&gt;ecommerce-microservices&lt;/artifactId&gt;
+        &lt;version&gt;1.0.0&lt;/version&gt;
+    &lt;/parent&gt;
+
+    &lt;artifactId&gt;api-gateway&lt;/artifactId&gt;
+
+    &lt;dependencies&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-cloud-starter-gateway&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.cloud&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-cloud-starter-netflix-eureka-client&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+        &lt;dependency&gt;
+            &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+            &lt;artifactId&gt;spring-boot-starter-actuator&lt;/artifactId&gt;
+        &lt;/dependency&gt;
+    &lt;/dependencies&gt;
+
+    &lt;build&gt;
+        &lt;plugins&gt;
+            &lt;plugin&gt;
+                &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+                &lt;artifactId&gt;spring-boot-maven-plugin&lt;/artifactId&gt;
+            &lt;/plugin&gt;
+        &lt;/plugins&gt;
+    &lt;/build&gt;
+&lt;/project&gt;
+</code></pre>
+
+            <h4>API Gateway Application</h4>
+            <p>Create <code>api-gateway/src/main/java/com/ecommerce/gateway/ApiGatewayApplication.java</code>:</p>
+
+            <pre><code class="language-java">package com.ecommerce.gateway;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
+
+@SpringBootApplication
+@EnableEurekaClient
+public class ApiGatewayApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(ApiGatewayApplication.class, args);
+    }
+}
+</code></pre>
+
+            <h3>Task 2: Configure Routes</h3>
+            <p>Now we'll configure the routing rules to direct <code>/users/**</code> requests to UserService and <code>/orders/**</code> requests to OrderService using service discovery.</p>
+
+            <h4>Gateway Configuration with Routes</h4>
+            <p>Create <code>api-gateway/src/main/resources/application.yml</code>:</p>
+
+            <pre><code class="language-yaml">spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        # Task 2: Route /users/** → UserService
+        - id: user-service-route
+          uri: lb://user-service
+          predicates:
+            - Path=/users/**
+          filters:
+            - name: RequestLogging
+              args:
+                message: "User Service Request"
+
+        # Task 2: Route /orders/** → OrderService
+        - id: order-service-route
+          uri: lb://order-service
+          predicates:
+            - Path=/orders/**
+          filters:
+            - name: RequestLogging
+              args:
+                message: "Order Service Request"
+
+        # Enhanced route for service discovery endpoint
+        - id: order-user-discovery-route
+          uri: lb://order-service
+          predicates:
+            - Path=/orders/users/**
+          filters:
+            - name: RequestLogging
+              args:
+                message: "Order-User Discovery Request"
+
+      # Global CORS configuration
+      globalcors:
+        cors-configurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+            allowedHeaders: "*"
+
+server:
+  port: 8080
+
+# Eureka Client Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    lease-renewal-interval-in-seconds: 10
+    lease-expiration-duration-in-seconds: 30
+
+# Actuator endpoints for monitoring
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+  endpoint:
+    gateway:
+      enabled: true
+
+logging:
+  level:
+    com.ecommerce.gateway: DEBUG
+    org.springframework.cloud.gateway: DEBUG
+</code></pre>
+
+            <h3>Task 3: Add Simple Filter to Log Requests</h3>
+            <p>Now we'll implement the request logging filter as required by Task 3 to log all requests passing through the gateway.</p>
+
+            <h4>Create Request Logging Filter</h4>
+            <p>Create <code>api-gateway/src/main/java/com/ecommerce/gateway/filter/RequestLoggingFilter.java</code>:</p>
+
+            <pre><code class="language-java">package com.ecommerce.gateway.filter;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.gateway.filter.GatewayFilter;
+import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
+import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
+
+import java.time.Duration;
+import java.time.Instant;
+
+@Component
+@Slf4j
+public class RequestLoggingFilter extends AbstractGatewayFilterFactory&lt;RequestLoggingFilter.Config&gt; {
+
+    public RequestLoggingFilter() {
+        super(Config.class);
+    }
+
+    @Override
+    public GatewayFilter apply(Config config) {
+        return (exchange, chain) -> {
+            // Pre-filter: Log request details
+            Instant startTime = Instant.now();
+            String requestId = java.util.UUID.randomUUID().toString().substring(0, 8);
+            String method = exchange.getRequest().getMethod().toString();
+            String path = exchange.getRequest().getPath().toString();
+            String remoteAddress = exchange.getRequest().getRemoteAddress() != null ?
+                exchange.getRequest().getRemoteAddress().toString() : "unknown";
+
+            log.info(" [{}] {} {} {} - {}",
+                requestId, config.getMessage(), method, path, remoteAddress);
+
+            // Add request ID to headers for tracking
+            exchange.getRequest().mutate()
+                .header("X-Request-ID", requestId)
+                .build();
+
+            // Continue filter chain and add post-filter logic
+            return chain.filter(exchange)
+                .doOnSuccess(aVoid -> {
+                    // Post-filter: Log response details
+                    Duration duration = Duration.between(startTime, Instant.now());
+                    int statusCode = exchange.getResponse().getStatusCode() != null ?
+                        exchange.getResponse().getStatusCode().value() : 0;
+
+                    log.info("✅ [{}] {} {} {} - {} ({}ms)",
+                        requestId, config.getMessage(), method, path, statusCode, duration.toMillis());
+                })
+                .doOnError(throwable -> {
+                    // Post-filter: Log error details
+                    Duration duration = Duration.between(startTime, Instant.now());
+
+                    log.error("❌ [{}] {} {} {} - ERROR: {} ({}ms)",
+                        requestId, config.getMessage(), method, path, throwable.getMessage(), duration.toMillis());
+                });
+        };
+    }
+
+    public static class Config {
+        private String message = "Gateway Request";
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+    }
+}
+</code></pre>
+
+            <h4>Enhanced Global Filter (Optional)</h4>
+            <p>For even more comprehensive logging, you can also create a global filter that applies to all routes:</p>
+
+            <p>Create <code>api-gateway/src/main/java/com/ecommerce/gateway/filter/GlobalRequestLoggingFilter.java</code>:</p>
+
+            <pre><code class="language-java">package com.ecommerce.gateway.filter;
+
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.core.Ordered;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+@Component
+@Slf4j
+public class GlobalRequestLoggingFilter implements GlobalFilter, Ordered {
+
+    private static final String START_TIME_ATTR = "startTime";
+
+    @Override
+    public Mono&lt;Void&gt; filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        ServerHttpRequest request = exchange.getRequest();
+
+        // Store start time for duration calculation
+        exchange.getAttributes().put(START_TIME_ATTR, Instant.now());
+
+        // Log incoming request
+        log.info(" Gateway Request: {} {} from {} at {}",
+            request.getMethod(),
+            request.getPath(),
+            getClientIP(request),
+            LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME));
+
+        // Log request headers (for debugging)
+        if (log.isDebugEnabled()) {
+            request.getHeaders().forEach((name, values) ->
+                log.debug(" Header: {} = {}", name, values));
+        }
+
+        return chain.filter(exchange)
+            .doFinally(signalType -> {
+                Instant startTime = exchange.getAttribute(START_TIME_ATTR);
+                if (startTime != null) {
+                    long duration = Instant.now().toEpochMilli() - startTime.toEpochMilli();
+                    int statusCode = exchange.getResponse().getStatusCode() != null ?
+                        exchange.getResponse().getStatusCode().value() : 0;
+
+                    log.info(" Gateway Response: {} {} → {} ({}ms)",
+                        request.getMethod(),
+                        request.getPath(),
+                        statusCode,
+                        duration);
+                }
+            });
+    }
+
+    private String getClientIP(ServerHttpRequest request) {
+        String xForwardedFor = request.getHeaders().getFirst("X-Forwarded-For");
+        if (xForwardedFor != null && !xForwardedFor.isEmpty()) {
+            return xForwardedFor.split(",")[0].trim();
+        }
+
+        String xRealIP = request.getHeaders().getFirst("X-Real-IP");
+        if (xRealIP != null && !xRealIP.isEmpty()) {
+            return xRealIP;
+        }
+
+        return request.getRemoteAddress() != null ?
+            request.getRemoteAddress().getAddress().getHostAddress() : "unknown";
+    }
+
+    @Override
+    public int getOrder() {
+        return -1; // High priority - execute early
+    }
+}
+</code></pre>
+
+            <h3>Task 4: Build and Test API Routing via Gateway</h3>
+            <p>Now let's start all services and test that the gateway correctly routes requests to our backend services.</p>
+
+            <h4>Start All Services in Order</h4>
+            <pre><code class="language-bash"># Build all services including the new gateway
+mvn clean compile
+
+# 1. Start Eureka Server (Terminal 1)
+cd eureka-server
+mvn spring-boot:run
+
+# 2. Start UserService (Terminal 2)
+cd user-service
+mvn spring-boot:run
+
+# 3. Start OrderService (Terminal 3)
+cd order-service
+mvn spring-boot:run
+
+# 4. Start API Gateway (Terminal 4)
+cd api-gateway
+mvn spring-boot:run
+</code></pre>
+
+            <h4>Verify All Services Are Running</h4>
+            <p>Check that all services are registered and the gateway is operational:</p>
+            <ul>
+              <li><strong>Eureka Dashboard:</strong> <code>http://localhost:8761</code> - Should show all 3 services registered</li>
+              <li><strong>Gateway Actuator:</strong> <code>http://localhost:8080/actuator/gateway/routes</code> - Should show configured routes</li>
+              <li><strong>Gateway Health:</strong> <code>http://localhost:8080/actuator/health</code> - Should show UP status</li>
             </ul>
+
+            <h4>Test Task 2: API Routing via Gateway</h4>
+            <p>Let's test the core requirement: routing requests through the gateway to the appropriate backend services.</p>
+
+            <pre><code class="language-bash"># Test 1: Create a user via gateway (Task requirement)
+curl -X POST http://localhost:8080/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Bob Wilson",
+    "email": "bob.wilson@example.com"
+  }'
+
+# Test 2: Get user via gateway (Task requirement)
+curl -X GET http://localhost:8080/users/1
+
+# Test 3: Create an order via gateway (Task requirement)
+curl -X POST http://localhost:8080/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "userId": 1,
+    "items": [
+      {
+        "productName": "Smartphone",
+        "quantity": 1,
+        "price": 599.99
+      }
+    ]
+  }'
+
+# Test 4: Get order via gateway
+curl -X GET http://localhost:8080/orders/1
+
+# Test 5: Service discovery endpoint via gateway
+curl -X GET http://localhost:8080/orders/users/1
+</code></pre>
+
+            <div class="not-prose mb-6 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-900/50 dark:bg-green-950/20">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.236 4.53L8.53 10.73a.75.75 0 00-1.06 1.061l2.03 2.03a.75.75 0 001.137-.089l3.857-5.401z" clip-rule="evenodd" />
+                </div>
+                <div class="ml-3">
+                  <h3 class="text-sm font-medium text-green-800 dark:text-green-200">Gateway Testing Success ✅</h3>
+                  <div class="mt-2 text-sm text-green-700 dark:text-green-300">
+                    <p>If all curl commands return successful responses, your API Gateway is correctly routing requests to the backend services!</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <h4>Test Task 3: Verify Request Logging</h4>
+            <p>Check the API Gateway logs to verify that the logging filter is working as required by Task 3:</p>
+
+            <pre><code class="language-bash"># Watch the gateway logs in real-time
+tail -f api-gateway/target/spring-boot-logs/api-gateway.log
+
+# Or check the console output in Terminal 4
+# You should see log entries like:
+#  [abc12345] User Service Request GET /users/1 - /127.0.0.1:54321
+# ✅ [abc12345] User Service Request GET /users/1 - 200 (45ms)
+</code></pre>
+
+            <h3>Verify All Task Requirements</h3>
+            <p>Let's confirm we've completed all the requirements from our lesson tasks:</p>
+
+            <div class="not-prose mb-6 rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-900/50 dark:bg-blue-950/20">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zm-4 4a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                </div>
+                <div class="ml-3">
+                  <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">Task Completion Checklist</h3>
+                  <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
+                    <ul class="list-disc list-inside space-y-1">
+                      <li><strong>✅ Task 1:</strong> Gateway Service created with Spring Cloud Gateway</li>
+                      <li><strong>✅ Task 2:</strong> Routes configured: <code>/users/**</code> → UserService, <code>/orders/**</code> → OrderService</li>
+                      <li><strong>✅ Task 3:</strong> <code>GET /users/1</code> and <code>POST /orders</code> work via gateway</li>
+                      <li><strong>✅ Task 4:</strong> Simple filter added to log all requests passing through gateway</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <h3>Advanced Testing: Gateway Resilience</h3>
+            <p>Let's test how the gateway handles service unavailability:</p>
+
+            <pre><code class="language-bash"># Test gateway behavior when a service is down
+# 1. Stop UserService (Ctrl+C in Terminal 2)
+# 2. Try to access users via gateway - should get a 503 error
+curl -X GET http://localhost:8080/users/1
+# Expected: HTTP 503 Service Unavailable
+
+# 3. OrderService should still work through gateway
+curl -X GET http://localhost:8080/orders/1
+# Expected: Success (order details returned)
+
+# 4. Restart UserService
+cd user-service
+mvn spring-boot:run
+
+# 5. Test users endpoint again - should work after service re-registers
+curl -X GET http://localhost:8080/users/1
+# Expected: Success (user details returned)
+</code></pre>
+
+            <h3>Gateway Route Monitoring</h3>
+            <p>Use the built-in actuator endpoints to monitor and debug the gateway:</p>
+
+            <pre><code class="language-bash"># View all configured routes
+curl -X GET http://localhost:8080/actuator/gateway/routes
+
+# View route details for a specific route
+curl -X GET http://localhost:8080/actuator/gateway/routes/user-service-route
+
+# Refresh routes (useful when services change)
+curl -X POST http://localhost:8080/actuator/gateway/refresh
+
+# View gateway filters
+curl -X GET http://localhost:8080/actuator/gateway/globalfilters
+</code></pre>
+
+            <div class="not-prose mb-6 rounded-lg border border-green-200 bg-green-50 p-4 dark:border-green-900/50 dark:bg-green-950/20">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <svg class="h-5 w-5 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.236 4.53L8.53 10.73a.75.75 0 00-1.06 1.061l2.03 2.03a.75.75 0 001.137-.089l3.857-5.401z" clip-rule="evenodd" />
+                </div>
+                <div class="ml-3">
+                  <h3 class="text-sm font-medium text-green-800 dark:text-green-200">Lesson 03 Complete! </h3>
+                  <div class="mt-2 text-sm text-green-700 dark:text-green-300">
+                    <p>You've successfully implemented an API Gateway that provides a unified entry point for all client requests with proper routing and logging!</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <h3>What We've Accomplished</h3>
+            <p>Following our lesson plan exactly, we have:</p>
+
+            <ul>
+              <li><strong>Task 1 Complete:</strong> Created Gateway Service using Spring Cloud Gateway</li>
+              <li><strong>Task 2 Complete:</strong> Configured routes to direct traffic to UserService and OrderService</li>
+              <li><strong>Task 3 Complete:</strong> Verified API routing works for both GET and POST operations</li>
+              <li><strong>Task 4 Complete:</strong> Added request logging filter to monitor all gateway traffic</li>
+            </ul>
+
+            <p>This implementation demonstrates core API Gateway concepts while providing a production-ready solution with monitoring, logging, and service discovery integration. The system now provides a single entry point for clients while maintaining the flexibility and scalability of our microservices architecture.</p>
+
+            <h3>Key Benefits Demonstrated</h3>
+            <ul>
+              <li><strong>Unified Entry Point:</strong> Clients only need to know one URL (gateway) instead of multiple service URLs</li>
+              <li><strong>Dynamic Routing:</strong> Gateway automatically discovers services through Eureka</li>
+              <li><strong>Cross-cutting Concerns:</strong> Logging, CORS, and monitoring handled centrally</li>
+              <li><strong>Service Abstraction:</strong> Internal service structure hidden from external clients</li>
+              <li><strong>Operational Visibility:</strong> Comprehensive logging and monitoring of all API traffic</li>
+            </ul>
+
+            <p>The system is now ready for Lesson 04 where we'll enhance communication patterns between services with both synchronous and asynchronous messaging.</p>
           </section>
 
           <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">

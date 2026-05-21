@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -7,16 +7,6 @@
     <meta name="description" content="Personal Website of a Java/Spring Boot Full Stack developer teaching the skills needed to build full‑stack applications with Spring Boot">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' ry='12' fill='%234f46e5'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' font-size='28' font-family='Inter, -apple-system, Segoe UI, Roboto, Arial, sans-serif' fill='white'%3EWL☕%3C/text%3E%3C/svg%3E" />
 
-    <script>
-      // Apply saved theme before Tailwind loads to prevent FOUC
-      (function () {
-        try {
-          const t = localStorage.getItem('theme');
-          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          if (t === 'dark' || (!t && prefersDark)) document.documentElement.classList.add('dark');
-        } catch {}
-      })();
-    </script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -42,7 +32,7 @@
         <a href="#home" class="group inline-flex items-center gap-3">
           <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30 transition group-hover:scale-105">WL</span>
           <div class="leading-tight">
-            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="text-sm text-slate-500 dark:text-slate-400">Software Engineer</div>
             <div class="font-semibold">Wassim Lagnaoui</div>
           </div>
         </a>
@@ -55,10 +45,6 @@
           <a href="./course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
         </nav>
         <div class="flex items-center gap-3">
-          <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm transition hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
-            <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
-            <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-          </button>
           <a href="#contact" class="hidden rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-indigo-600/30 transition hover:bg-indigo-500 active:scale-95 md:inline-block">Contact me</a>
         </div>
       </div>
@@ -73,61 +59,39 @@
               Learn Java and Spring Boot with Me
             </h1>
             <p class="mt-5 max-w-prose text-lg text-slate-600 dark:text-slate-300">
-              Experienced Java developer teaching the skills needed to build full‑stack applications with Spring Boot, React, PostgreSQL, Docker, and CI/CD.
+              I'm a software engineer sharing what I build at work: courses, tutorials, and articles that cut straight to the point.
             </p>
             <div class="mt-8 flex flex-wrap items-center gap-3">
-              <a href="./projects/" class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-3 font-semibold text-white shadow-sm shadow-indigo-600/30 transition hover:bg-indigo-500 active:scale-95">
-                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
-                View projects
-              </a>
               <a href="./course/" class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-3 font-semibold text-white shadow-sm shadow-indigo-600/30 transition hover:bg-indigo-500 active:scale-95">
-                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
                 View Courses
               </a>
-              <a href="#skills" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800">
-                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M4 9h16"/></svg>
-                Explore skills
+              <a href="./projects/" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
+                View Projects
               </a>
               <a href="https://github.com/wl0182" target="_blank" rel="noreferrer" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-3 font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800">
                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path fill-rule="evenodd" d="M12 .5a12 12 0 0 0-3.79 23.4c.6.11.82-.26.82-.58 0-.29-.01-1.05-.02-2.06-3.34.73-4.04-1.61-4.04-1.61-.55-1.4-1.34-1.77-1.34-1.77-1.09-.75.08-.73.08-.73 1.2.09 1.83 1.23 1.83 1.23 1.07 1.83 2.82 1.3 3.5.99.11-.77.42-1.3.76-1.6-2.66-.3-5.46-1.33-5.46-5.9 0-1.3.47-2.36 1.23-3.19-.12-.3-.53-1.52.12-3.16 0 0 1-.32 3.3 1.22a11.5 11.5 0 0 1 6 0C17.22 6.53 18.22 6.85 18.22 6.85c.65 1.64.24 2.86.12 3.16.76.83 1.22 1.89 1.22 3.19 0 4.58-2.8 5.59-5.47 5.89.43.37.81 1.1.81 2.22 0 1.6-.01 2.88-.01 3.27 0 .32.22.7.83.58A12 12 0 0 0 12 .5Z" clip-rule="evenodd"/></svg>
                 GitHub
               </a>
             </div>
-            <p class="mt-6 text-sm text-slate-500 dark:text-slate-400">Fluent in Arabic, English, and French.</p>
           </div>
           <div class="relative mx-auto w-full max-w-md">
             <div class="absolute -inset-4 -z-10 rounded-3xl bg-gradient-to-tr from-indigo-500/30 via-fuchsia-500/30 to-emerald-500/30 blur-2xl"></div>
             <div class="rounded-3xl border border-slate-200/60 bg-white/70 p-6 shadow-xl shadow-slate-900/5 backdrop-blur dark:border-slate-700/60 dark:bg-slate-900/60">
-              <ul class="mt-6 space-y-3 text-sm">
-                <li class="flex items-start gap-3"><span class="mt-1 h-2.5 w-2.5 rounded-full bg-emerald-500"></span><span>Java Core</span></li>
-                <li class="flex items-start gap-3"><span class="mt-1 h-2.5 w-2.5 rounded-full bg-indigo-500"></span><span>Spring Boot And Spring Data</span></li>
-                <li class="flex items-start gap-3"><span class="mt-1 h-2.5 w-2.5 rounded-full bg-fuchsia-500"></span><span>Spring Security with JWT</span></li>
-                <li class="flex items-start gap-3"><span class="mt-1 h-2.5 w-2.5 rounded-full bg-sky-500"></span><span>React, Vite and Tailwind CSS</span></li>
-                <li class="flex items-start gap-3"><span class="mt-1 h-2.5 w-2.5 rounded-full bg-amber-500"></span><span>Docker, CI/CD with Jenkins</span></li>
+              <p class="text-xs font-semibold uppercase tracking-widest text-slate-400 dark:text-slate-500">What you'll learn</p>
+              <ul class="mt-4 space-y-3 text-sm">
+                <li class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-emerald-500"></span><span>Java Core</span></li>
+                <li class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-indigo-500"></span><span>Spring Boot &amp; Spring Data</span></li>
+                <li class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-fuchsia-500"></span><span>Spring Security with JWT</span></li>
+                <li class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-sky-500"></span><span>React, Vite and Tailwind CSS</span></li>
+                <li class="flex items-center gap-3"><span class="h-2.5 w-2.5 rounded-full bg-amber-500"></span><span>Docker &amp; CI/CD with Jenkins</span></li>
               </ul>
             </div>
           </div>
         </div>
       </section>
-
-      <!-- About -->
-      <section id="about" class="scroll-mt-24 py-14">
-        <h2 class="text-2xl font-bold">About</h2>
-        <p class="mt-4 max-w-3xl text-slate-600 dark:text-slate-300">
-          My Name is Wassim, I'm a Java full-stack engineer with experience delivering enterprise-grade systems in fast-paced environments. I specialize in building reliable backend services with Java and Spring Boot, paired with modern frontends using React and Vite. I’ve worked extensively in enterprise settings where scalability, security, and maintainability were critical, and I now apply those lessons to teaching and building real-world projects.
-        </p>
-        <p class="mt-4 max-w-3xl text-slate-600 dark:text-slate-300">
-          My expertise includes designing and implementing RESTful APIs, optimizing database interactions with SQL and JPA/Hibernate, and containerizing applications with Docker. I’m passionate about clean code, best practices, and continuous learning, which I share through tutorials and courses. Whether you’re a beginner looking to get started or an experienced developer aiming to deepen your skills, I’m here to help you succeed in your Java journey.
-        </p>
-
-        <div class="mt-6 max-w-3xl">
-          <blockquote class="border-l-2 border-slate-300 pl-4 text-lg italic text-slate-700 dark:border-slate-700 dark:text-slate-300">
-            “If you want to master something, teach it.”
-          </blockquote>
-          <div class="mt-1 text-sm text-slate-500 dark:text-slate-400">Richard Feynman</div>
-        </div>
-
-      </section>
+        
 
       <!-- Skills -->
       <section id="skills" class="scroll-mt-24 py-14">
@@ -175,26 +139,26 @@
           <a href="./projects/" class="text-sm text-indigo-600 hover:underline dark:text-indigo-400">View all</a>
         </div>
         <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          <a class="group block rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 transition hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-700/60 dark:bg-slate-900/60" href="https://github.com/wl0182/Restaurant-Ordering-System" target="_blank" rel="noreferrer">
+          <a class="group block rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 transition hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-700/60 dark:bg-slate-900/60" href="./projects/#ecommerce-microservices">
+            <div class="flex items-center justify-between">
+              <h3 class="font-semibold">Ecommerce Microservices Platform</h3>
+              <span class="text-xs text-slate-500">Spring Boot • Kafka</span>
+            </div>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">9 independent services with event-driven architecture, API gateway, service discovery, and resilience patterns.</p>
+          </a>
+          <a class="group block rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 transition hover:-translate-y-0.5 hover:shadow-lg dark:border-slate-700/60 dark:bg-slate-900/60" href="./projects/#restaurant">
             <div class="flex items-center justify-between">
               <h3 class="font-semibold">Restaurant Management System</h3>
-              <span class="text-xs text-slate-500">Full‑stack • Spring Boot • React</span>
+              <span class="text-xs text-slate-500">Full-stack • Spring Boot • React</span>
             </div>
-            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">My end‑to‑end project for servers, kitchen, and admins: auth, menu, orders, analytics.</p>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">End-to-end system for servers, kitchen, and admins: auth, menu, orders, and analytics.</p>
           </a>
-          <div class="group rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 dark:border-slate-700/60 dark:bg-slate-900/60">
+          <div class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 dark:border-slate-700/60 dark:bg-slate-900/60">
             <div class="flex items-center justify-between">
-              <h3 class="font-semibold">Enterprise Platform — API Gateway</h3>
-              <span class="text-xs text-slate-500">Employer‑owned</span>
+              <h3 class="font-semibold">Enterprise Backend Systems</h3>
+              <span class="text-xs text-slate-500">Employer-owned</span>
             </div>
-            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Gateway with rate limiting, circuit breaking, and tracing across microservices.</p>
-          </div>
-          <div class="group rounded-2xl border border-slate-200/60 bg-white/70 p-6 shadow-md shadow-slate-900/5 dark:border-slate-700/60 dark:bg-slate-900/60">
-            <div class="flex items-center justify-between">
-              <h3 class="font-semibold">Enterprise Data Pipelines</h3>
-              <span class="text-xs text-slate-500">Employer‑owned</span>
-            </div>
-            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Optimized SQL/CTE jobs and reporting flows; code not publicly shareable.</p>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">API gateway, data pipelines, and microservices built professionally. Code not publicly shareable.</p>
           </div>
         </div>
       </section>
@@ -254,11 +218,6 @@
 
     <script>
       // Theme toggle
-      document.getElementById('themeToggle').addEventListener('click', function () {
-        const root = document.documentElement;
-        const isDark = root.classList.toggle('dark');
-        try { localStorage.setItem('theme', isDark ? 'dark' : 'light'); } catch {}
-      });
     </script>
   </body>
 </html>

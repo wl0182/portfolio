@@ -1,12 +1,11 @@
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang="en" class="scroll-smooth dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Spring Boot Concurrency Essentials</title>
     <meta name="description" content="An explanatory guide to concurrency in Spring Boot: async methods, executors, scheduling, thread pools, transactions, CompletableFuture, MVC vs WebFlux, synchronization, error handling, and Reactor." />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E⚡%3C/text%3E%3C/svg%3E" />
-    <script>(function(){try{const t=localStorage.getItem('theme');const d=matchMedia('(prefers-color-scheme: dark)').matches;if(t==='dark'||(!t&&d))document.documentElement.classList.add('dark');}catch{}})();</script>
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
     <script>
       tailwind.config = { darkMode:'class', theme:{extend:{fontFamily:{sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"]}}}};
@@ -19,7 +18,7 @@
         <a href="../" class="group inline-flex items-center gap-3">
           <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
           <div class="leading-tight">
-            <div class="text-sm text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+            <div class="text-sm text-slate-500 dark:text-slate-400">Software Engineer</div>
             <div class="font-semibold">Wassim Lagnaoui</div>
           </div>
         </a>
@@ -32,10 +31,6 @@
           <a href="../course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
         </nav>
         <div class="flex items-center gap-2 md:gap-3">
-          <button id="themeToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Toggle theme">
-            <svg class="h-5 w-5 dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v2m0 14v2M5.64 5.64l1.41 1.41M16.95 16.95l1.41 1.41M3 12h2m14 0h2M5.64 18.36l1.41-1.41M16.95 7.05l1.41-1.41"/><circle cx="12" cy="12" r="4"/></svg>
-            <svg class="hidden h-5 w-5 dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-          </button>
           <button id="menuToggle" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 md:hidden dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800" aria-label="Open menu">
             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
           </button>
@@ -67,7 +62,7 @@
               <span class="grid h-9 w-9 place-items-center rounded-full bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
               <div class="text-sm leading-tight">
                 <div class="font-medium">Wassim Lagnaoui</div>
-                <div class="text-slate-500 dark:text-slate-400">Java Full Stack Developer</div>
+                <div class="text-slate-500 dark:text-slate-400">Software Engineer</div>
               </div>
             </div>
             <div class="flex flex-wrap items-center gap-2">
@@ -381,10 +376,6 @@ service.generateReport(42L)
 
     <script>
       // theme toggle
-      document.getElementById('themeToggle').addEventListener('click', function(){
-        const r=document.documentElement; const d=r.classList.toggle('dark');
-        try{localStorage.setItem('theme', d?'dark':'light');}catch{}
-      });
       // mobile menu
       (function(){
         const b=document.getElementById('menuToggle');
