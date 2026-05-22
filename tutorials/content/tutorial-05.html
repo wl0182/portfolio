@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tutorial 05 | Staff API: Endpoints, DTOs, Services</title>
+    <meta name="description" content="Build the staff management API and understand how employee IDs gate user registration." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E📘%3C/text%3E%3C/svg%3E" />
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30 transition group-hover:scale-105">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Software Engineer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../tutorials/" class="text-indigo-600 dark:text-indigo-400">Tutorials</a>
+          <a href="../../course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
+        </nav>
+        <div class="flex items-center gap-3">
+          <a href="../../#contact" class="hidden rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-indigo-600/30 transition hover:bg-indigo-500 active:scale-95 md:inline-block">Contact me</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <header class="max-w-3xl">
+        <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Tutorial 05: Staff API</h1>
+        <p class="mt-2 text-slate-600 dark:text-slate-300">Managing staff records and tying employee IDs to the registration flow.</p>
+        <a href="../" class="mt-4 inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Tutorials</a>
+      </header>
+
+      <div class="tutorial-layout mt-8">
+      <aside class="tutorial-toc">
+        <p class="tutorial-toc-title">On this page</p>
+        <div id="toc-links"></div>
+      </aside>
+
+      <section class="tutorial-content prose prose-slate dark:prose-invert">
+
+        <p>The Staff API serves two purposes: it lets admins manage who works at the restaurant, and it acts as a gate for user registration. Only people with a valid employee ID in the staff table can create an account. This tutorial walks through the API and explains the design decision behind that gate.</p>
+
+        <hr/>
+
+        <h2>1. The Staff entity and repository</h2>
+
+        <p>The <code>Staff</code> entity is reference data — it represents real people who work at the restaurant. It is managed separately from <code>User</code> (the auth entity) and linked by <code>employeeId</code>.</p>
+
+        <pre><code class="language-java">// Staff fields: firstName, lastName, email, employeeId (Long, unique), role (String)
+// Example roles: "waiter", "chef", "manager", "admin"
+
+@Repository
+public interface StaffRepository extends JpaRepository&lt;Staff, Long&gt; {
+    Optional&lt;Staff&gt; findByEmployeeId(Long employeeId);
+}</code></pre>
+        <ul>
+          <li><code>findByEmployeeId</code> is derived automatically by Spring Data — no <code>@Query</code> needed.</li>
+          <li>Returns <code>Optional</code> instead of <code>Staff</code> to make the "not found" case explicit at the call site.</li>
+          <li>The <code>role</code> field is a plain String here (not an enum). This keeps the staff table flexible — roles can be changed without a schema migration.</li>
+        </ul>
+
+        <hr/>
+
+        <h2>2. DTOs: request and response shapes</h2>
+
+        <h3>AddStaffDTO (request)</h3>
+        <pre><code class="language-java">@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class AddStaffDTO {
+    private String firstName;
+    private String lastName;
+    private String email;
+    private Long employeeId;  // must be unique — this is the registration key
+    private String role;      // e.g. "waiter", "chef", "manager"
+}</code></pre>
+
+        <h3>StaffInfoDTO (response)</h3>
+        <pre><code class="language-java">@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class StaffInfoDTO {
+    private String firstName;
+    private String lastName;
+    private String email;
+    private Long employeeId;
+    private String role;
+}</code></pre>
+        <ul>
+          <li>The request and response shapes happen to look the same here. In practice, the response would exclude internal fields (like the DB primary key) while the request excludes auto-generated fields.</li>
+          <li>The <code>staffAddedResponse</code> (returned by the add endpoint) is a simple confirmation: message + the assigned employeeId.</li>
+        </ul>
+
+        <hr/>
+
+        <h2>3. Controller: two endpoints</h2>
+
+        <pre><code class="language-java">@RestController
+@RequestMapping("/api/staff")
+public class StaffController {
+
+    private final StaffManagementService staffManagementService;
+
+    public StaffController(StaffManagementService staffManagementService) {
+        this.staffManagementService = staffManagementService;
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity&lt;staffAddedResponse&gt; addStaff(@RequestBody @Valid AddStaffDTO dto) {
+        staffAddedResponse response = staffManagementService.addStaff(dto);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity&lt;List&lt;StaffInfoDTO&gt;&gt; getAllStaff() {
+        List&lt;StaffInfoDTO&gt; staffList = staffManagementService.getAllStaff();
+        return ResponseEntity.ok(staffList);
+    }
+}</code></pre>
+        <ul>
+          <li>Both endpoints are protected by the security config — only authenticated admin users can reach <code>/api/staff</code>.</li>
+          <li>The class name <code>staffAddedResponse</code> uses lowercase — this is a naming inconsistency in the actual project. Convention is PascalCase for class names.</li>
+        </ul>
+
+        <hr/>
+
+        <h2>4. Service: add staff and list staff</h2>
+
+        <pre><code class="language-java">@Service
+public class StaffManagementService {
+
+    private final StaffRepository staffRepository;
+
+    public StaffManagementService(StaffRepository staffRepository) {
+        this.staffRepository = staffRepository;
+    }
+
+    public staffAddedResponse addStaff(AddStaffDTO dto) {
+        Staff staff = new Staff();
+        staff.setFirstName(dto.getFirstName());
+        staff.setLastName(dto.getLastName());
+        staff.setEmail(dto.getEmail());
+        staff.setEmployeeId(dto.getEmployeeId());
+        staff.setRole(dto.getRole());
+
+        Staff saved = staffRepository.save(staff);
+        return new staffAddedResponse("Staff member added successfully", saved.getEmployeeId());
+    }
+
+    public List&lt;StaffInfoDTO&gt; getAllStaff() {
+        return staffRepository.findAll().stream()
+            .map(s -&gt; new StaffInfoDTO(
+                s.getFirstName(),
+                s.getLastName(),
+                s.getEmail(),
+                s.getEmployeeId(),
+                s.getRole()
+            ))
+            .collect(Collectors.toList());
+    }
+}</code></pre>
+        <ul>
+          <li>No mapper class is used here — the service maps inline. This is fine for simple cases; extract a <code>StaffMapper</code> if the mapping grows complex.</li>
+          <li>The stream-to-DTO pattern (<code>.stream().map(...).collect()</code>) is the same approach used in the menu service — consistent across the codebase.</li>
+        </ul>
+
+        <hr/>
+
+        <h2>5. The employee ID gate: why registration checks staff</h2>
+
+        <p>The registration endpoint in <code>AuthService</code> doesn't just create a user — it first verifies that the submitted <code>employeeId</code> exists in the <code>Staff</code> table:</p>
+
+        <pre><code class="language-java">// Inside AuthService.register()
+public AuthResponse register(RegisterRequestDTO req) {
+    boolean staffExists = staffRepository.findByEmployeeId(req.getEmployeeId()).isPresent();
+
+    if (!staffExists) {
+        throw new UsernameNotFoundException(
+            "Staff with Employee ID " + req.getEmployeeId() + " does not exist."
+        );
+    }
+
+    User user = User.builder()
+        .email(req.getEmail())
+        .password(passwordEncoder.encode(req.getPassword()))
+        .name(req.getName())
+        .role(Role.ROLE_USER)
+        .build();
+
+    userRepository.save(user);
+    return new AuthResponse(jwtService.generateToken(user));
+}</code></pre>
+        <ul>
+          <li><strong>Why:</strong> the restaurant system is internal — only actual employees should be able to create accounts. A public registration form without this check would let anyone sign up.</li>
+          <li><strong>Flow:</strong> an admin adds a staff member first (POST /api/staff/add), giving them an <code>employeeId</code>. The staff member then registers with that ID. Without it, registration is rejected.</li>
+          <li>New users are always created with <code>ROLE_USER</code> — an admin must manually elevate them if admin access is needed. This is a safe default.</li>
+        </ul>
+
+        <hr/>
+
+        <h2>Key Takeaways</h2>
+        <ul>
+          <li>The <code>Staff</code> table is reference data, separate from <code>User</code> (the auth table). They are linked only by <code>employeeId</code> during registration.</li>
+          <li>The employee ID gate prevents open registration. Only people an admin has pre-registered as staff can create accounts.</li>
+          <li>New users always get <code>ROLE_USER</code>. Admin access is granted separately — never by default.</li>
+          <li>Simple mappings (few fields, no nesting) can be done inline in the service. Extract a mapper class when the complexity grows.</li>
+          <li>Returning an <code>Optional</code> from the repository makes the "not found" scenario impossible to ignore — you must handle it at the call site.</li>
+        </ul>
+
+      </section>
+    </div>
+
+    <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+        <a href="./tutorial-04.html" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          Previous
+        </a>
+        <a href="./tutorial-06.html" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">
+          Next
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </a>
+      </nav>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script></script>
+    <script>
+      // Auto-build TOC from h2/h3 headings
+      (function() {
+        const toc = document.getElementById('toc-links');
+        if (!toc) return;
+        const headings = document.querySelectorAll('.tutorial-content h2, .tutorial-content h3');
+        headings.forEach((h, i) => {
+          if (!h.id) h.id = 'section-' + i;
+          const a = document.createElement('a');
+          a.href = '#' + h.id;
+          a.textContent = h.textContent;
+          if (h.tagName === 'H3') a.classList.add('toc-h3');
+          toc.appendChild(a);
+        });
+      })();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>

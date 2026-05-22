@@ -44,7 +44,7 @@
         </a>
         <header class="mt-4">
           <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl">Why Java Streams Make Your Code Cleaner (and When They Don’t)</h1>
-          <p class="mt-3 text-sm text-slate-600 dark:text-slate-300">Readable transformations, fewer loops, and fewer bugs—plus the moments to stick with simple for-loops.</p>
+          <p class="mt-3 text-sm text-slate-600 dark:text-slate-300">Readable transformations, fewer loops, and fewer bugs-plus the moments to stick with simple for-loops.</p>
           <div class="mt-6 flex flex-wrap items-center justify-between gap-3">
             <div class="flex items-center gap-3">
               <span class="grid h-9 w-9 place-items-center rounded-full bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
@@ -112,7 +112,7 @@ List&lt;OrderItem&gt; items = orders.stream()
 
           <h2 class="text-xl font-semibold">When a for-loop is better</h2>
           <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">If you need many steps, early exits, mutation across iterations, or intricate exception handling, a loop keeps control flow obvious.</p>
-          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code class="language-java">// Multiple conditions, early breaks, counters — simpler with a loop
+          <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code class="language-java">// Multiple conditions, early breaks, counters: simpler with a loop
 int retries = 0; double total = 0;
 for (Order o : orders) {
   if (!o.isPaid()) continue;
@@ -124,7 +124,7 @@ for (Order o : orders) {
           <h2 class="text-xl font-semibold">Performance and pitfalls</h2>
           <ul class="mt-3 list-disc pl-5 text-sm text-slate-600 dark:text-slate-300 space-y-1">
             <li>Streams aren’t inherently faster than loops; they’re often on par. Measure.</li>
-            <li>Boxing hurts throughput—prefer primitive streams (<code>IntStream</code>, <code>LongStream</code>).</li>
+            <li>Boxing hurts throughput-prefer primitive streams (<code>IntStream</code>, <code>LongStream</code>).</li>
             <li><code>parallel()</code> shines for CPU-bound bulk work; avoid for small tasks and IO.</li>
             <li>Avoid stateful lambdas that mutate external variables; they break expectations.</li>
           </ul>
@@ -136,7 +136,7 @@ Stream&lt;Double&gt; eurTotals = paid.map(o -&gt; currency.convert(o.total(), "E
 List&lt;Double&gt; sorted = eurTotals.sorted().toList();</code></pre>
 
           <h2 class="text-xl font-semibold">Parallel streams in context</h2>
-          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Use parallel streams when the workload is CPU-heavy, the data set is large, and operations are side‑effect free. Otherwise, stick with sequential streams or dedicated executors for IO.</p>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Use parallel streams when the workload is CPU-heavy, the data set is large, and operations are side-effect free. Otherwise, stick with sequential streams or dedicated executors for IO.</p>
         </section>
       </div>
     </main>

@@ -68,16 +68,16 @@
           </div>
 
           <article class="prose prose-slate prose-lg max-w-none mx-auto mt-8 dark:prose-invert prose-a:text-indigo-600 dark:prose-a:text-indigo-400 prose-pre:bg-slate-950 prose-code:before:content-none prose-code:after:content-none">
-            <p class="lead">Most Spring Boot apps aren’t “hacked.” They’re misconfigured. A role check sits in a controller, a permissive matcher slips into the HTTP config, or a service trusts a user‑supplied ID. Nothing exotic—just enough to leak data when someone guesses another identifier or replays a token.</p>
+            <p class="lead">Most Spring Boot apps aren’t “hacked.” They’re misconfigured. A role check sits in a controller, a permissive matcher slips into the HTTP config, or a service trusts a user-supplied ID. Nothing exotic-just enough to leak data when someone guesses another identifier or replays a token.</p>
             <p class="mt-2 text-sm text-slate-600 dark:text-slate-300"><strong>The root cause:</strong> trusting a single guard (usually the web layer) instead of telling the same authorization story at the route, method, and data levels. The fix isn’t fancy; it’s layered and boring on purpose.</p>
             <p class="mt-2 text-sm italic text-slate-600 dark:text-slate-300">If a request can reference it, your code must prove ownership before returning it.</p>
 
             <h2 class="text-xl font-semibold">How we end up with leaky authorization</h2>
-            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Security incidents in CRUD apps rarely begin with a super-hacker. They start with a reasonable feature request and a deadline. We add an endpoint, check a role in the controller, and ship. Months later a support ticket reveals a user can pass a different ID and suddenly see someone else’s data. Nothing was “hacked”—we simply trusted the request and forgot that the web layer is only one guard on the door.</p>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Security incidents in CRUD apps rarely begin with a super-hacker. They start with a reasonable feature request and a deadline. We add an endpoint, check a role in the controller, and ship. Months later a support ticket reveals a user can pass a different ID and suddenly see someone else’s data. Nothing was “hacked”-we simply trusted the request and forgot that the web layer is only one guard on the door.</p>
             <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">The client is not a source of truth. Controllers are not the only place attackers can slip through. The mistake is assuming that “we checked once” means “we’re safe everywhere.” In practice, authorization needs to be reinforced at each layer that touches a decision: the route, the method, and the data.</p>
 
             <h2 class="text-xl font-semibold">What defense in depth looks like in a Spring app</h2>
-            <p class="mt-3 text-sm text-slate-600 dark:text-slate-300">Think of your application as a set of three checkpoints. At the <strong>HTTP boundary</strong>, you keep public things public and everything else authenticated, with the most specific paths first. At the <strong>service boundary</strong>, you enforce who may call which business operation, not just which URL they hit. And at the <strong>data boundary</strong>, you don’t fetch broadly and filter in memory—you ask the database for exactly “this thing owned by this principal,” so there’s nothing to leak in the first place.</p>
+            <p class="mt-3 text-sm text-slate-600 dark:text-slate-300">Think of your application as a set of three checkpoints. At the <strong>HTTP boundary</strong>, you keep public things public and everything else authenticated, with the most specific paths first. At the <strong>service boundary</strong>, you enforce who may call which business operation, not just which URL they hit. And at the <strong>data boundary</strong>, you don’t fetch broadly and filter in memory-you ask the database for exactly “this thing owned by this principal,” so there’s nothing to leak in the first place.</p>
 
             <h2 class="text-xl font-semibold">Shaping the perimeter: HTTP security (Spring Security 6)</h2>
             <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">A clear perimeter doesn’t mean complicated rules; it means precise ones. Specific matchers first, public endpoints explicit, everything else authenticated and stateless for APIs. The configuration below expresses exactly that intent.</p>
@@ -93,9 +93,9 @@ SecurityFilterChain security(HttpSecurity http) throws Exception {
     .oauth2ResourceServer(oauth -&gt; oauth.jwt())
     .build();
 }</code></pre>
-            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">The usual misconfigurations aren’t sneaky—they’re subtle: a too-broad <code>permitAll("/**")</code>, a misplaced matcher that opens a hole, or enabling sessions without meaning to. Keep the rule order intentional and defaults safe.</p>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">The usual misconfigurations aren’t sneaky-they’re subtle: a too-broad <code>permitAll("/**")</code>, a misplaced matcher that opens a hole, or enabling sessions without meaning to. Keep the rule order intentional and defaults safe.</p>
 
-            <h2 class="text-xl font-semibold">Ownership is a query, not a post‑it note</h2>
+            <h2 class="text-xl font-semibold">Ownership is a query, not a post-it note</h2>
             <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">“We’ll fetch the order and then check if it’s yours” sounds fine until one forgotten branch forgets the check. A safer habit is to encode ownership into the query itself. That way, if the data layer doesn’t return it, the service layer has nothing to leak.</p>
             <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100 not-prose"><code class="language-java">@Configuration
 @EnableMethodSecurity
@@ -115,7 +115,7 @@ class OrderService {
             <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Notice the double lock: a method-level guard that aligns with the caller’s identity and a repository query that encodes the same rule. Either one helps; together they make bypasses unlikely.</p>
 
             <h2 class="text-xl font-semibold">Tokens don’t explain themselves</h2>
-            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">JWTs carry claims, but Spring needs to be told how to turn those into authorities. Different providers use different fields and prefixes. Small mismatches—like expecting <code>ROLE_</code> where none exists—lead to surprising “why is this forbidden?” bugs.</p>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">JWTs carry claims, but Spring needs to be told how to turn those into authorities. Different providers use different fields and prefixes. Small mismatches-like expecting <code>ROLE_</code> where none exists-lead to surprising “why is this forbidden?” bugs.</p>
             <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100 not-prose"><code class="language-java">@Bean
 JwtAuthenticationConverter jwtAuthConverter() {
   var c = new JwtGrantedAuthoritiesConverter();
@@ -128,10 +128,10 @@ JwtAuthenticationConverter jwtAuthConverter() {
             <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Align your checks with reality: if your tokens expose <code>scope=admin</code>, prefer <code>hasAuthority("admin")</code> or add a prefix deliberately. Make your intent explicit and your diagnostics obvious.</p>
 
             <h2 class="text-xl font-semibold">A few recurring pitfalls</h2>
-            <p class="mt-3 text-sm text-slate-600 dark:text-slate-300"><strong>Actuator sprawl</strong> in production exposes more than health and info. <strong>Mock‑only tests</strong> hide real token parsing and authority mapping issues. <strong>Secrets in config</strong> linger in repos and logs—use a vault or KMS and environment variables. And if you mix session CSRF with API clients by accident, you’ll chase 403s until you standardize on a stateless approach for APIs.</p>
+            <p class="mt-3 text-sm text-slate-600 dark:text-slate-300"><strong>Actuator sprawl</strong> in production exposes more than health and info. <strong>Mock-only tests</strong> hide real token parsing and authority mapping issues. <strong>Secrets in config</strong> linger in repos and logs-use a vault or KMS and environment variables. And if you mix session CSRF with API clients by accident, you’ll chase 403s until you standardize on a stateless approach for APIs.</p>
 
             <h2 class="text-xl font-semibold">Prove it in tests</h2>
-            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">It’s tempting to sprinkle <code>@WithMockUser</code> everywhere and call it a day. Keep a few end‑to‑end tests that parse real JWTs, exercise your security chain, and hit the database with ownership constraints. They catch the gaps that unit tests politely ignore.</p>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">It’s tempting to sprinkle <code>@WithMockUser</code> everywhere and call it a day. Keep a few end-to-end tests that parse real JWTs, exercise your security chain, and hit the database with ownership constraints. They catch the gaps that unit tests politely ignore.</p>
             <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100 not-prose"><code class="language-java">@AutoConfigureMockMvc
 @SpringBootTest
 class SecurityIT {
@@ -148,7 +148,7 @@ class SecurityIT {
 }</code></pre>
 
             <h2 class="text-xl font-semibold">Closing thoughts</h2>
-            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Authorization is less a feature than a habit. When the route, the method, and the data layer all tell the same story about who may see what, accidental leaks become rare—and incident reviews become boring. That’s the goal.</p>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Authorization is less a feature than a habit. When the route, the method, and the data layer all tell the same story about who may see what, accidental leaks become rare-and incident reviews become boring. That’s the goal.</p>
           </article>
         </div>
       </div>

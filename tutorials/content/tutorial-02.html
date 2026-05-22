@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Tutorial 02 — Entities and JPA</title>
+    <title>Tutorial 02 | Entities and JPA</title>
     <meta name="description" content="Tutorial 2: Building the domain model with JPA for the Restaurant App series." />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E📘%3C/text%3E%3C/svg%3E" />
     <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
@@ -46,9 +46,14 @@
         <a href="../" class="mt-4 inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Tutorials</a>
       </header>
 
-      <section class="prose prose-slate mt-8 max-w-none dark:prose-invert">
+      <div class="tutorial-layout mt-8">
+      <aside class="tutorial-toc">
+        <p class="tutorial-toc-title">On this page</p>
+        <div id="toc-links"></div>
+      </aside>
+
+      <section class="tutorial-content prose prose-slate dark:prose-invert">
         <!-- Original content starts -->
-        <h1>Tutorial 02 — Entities and JPA</h1>
 <p>A practical, step-by-step tutorial to build the domain model. Each step shows a small code snippet and a short, English explanation.</p>
 <hr />
 
@@ -92,7 +97,7 @@
 Keep all entities and enums together so component scanning and repository wiring stay predictable. Grouping the domain model under one package also makes it easy to apply consistent conventions and to find related code (entities, enums, and later their DTOs and repositories in neighboring packages).</p>
 <hr />
 
-<h3>2. MenuItem — a flat entity</h3>
+<h3>2. MenuItem: a flat entity</h3>
 <pre><code class="language-java">@Entity
 @Data
 @NoArgsConstructor
@@ -137,7 +142,7 @@ public class MenuItem {
 </ul>
 <hr />
 
-<h3>3. Order — parent aggregate with relationships</h3>
+<h3>3. Order: parent aggregate with relationships</h3>
 <pre><code class="language-java">@Entity
 @Data
 @NoArgsConstructor
@@ -177,7 +182,7 @@ public class Order {
 </ul>
 <hr />
 
-<h3>4. OrderItem — owning side of the Order relationship</h3>
+<h3>4. OrderItem: owning side of the Order relationship</h3>
 <pre><code class="language-java">@Entity
 @Data
 @NoArgsConstructor
@@ -211,7 +216,7 @@ public class OrderItem {
 </ul>
 <hr />
 
-<h3>5. TableSession — grouping orders by table/time</h3>
+<h3>5. TableSession: grouping orders by table/time</h3>
 <pre><code class="language-java">@Entity
 @Data
 @AllArgsConstructor
@@ -241,7 +246,7 @@ public class TableSession {
 </ul>
 <hr />
 
-<h3>6. OrderStatus — domain enum for lifecycle</h3>
+<h3>6. OrderStatus: domain enum for lifecycle</h3>
 <pre><code class="language-java">public enum OrderStatus { PLACED, PREPARING, READY, SERVED, CANCELLED }
 </code></pre>
 <h4>Explanation:</h4>
@@ -256,7 +261,7 @@ public class TableSession {
 </ul>
 <hr />
 
-<h3>7. User — integrate with Spring Security</h3>
+<h3>7. User: integrate with Spring Security</h3>
 <pre><code class="language-java">@Entity
 @Table(name = "users")
 @Data
@@ -302,7 +307,7 @@ public class User implements UserDetails {
 </ul>
 <hr />
 
-<h3>8. Staff — reference data for access checks and metadata</h3>
+<h3>8. Staff: reference data for access checks and metadata</h3>
 <pre><code class="language-java">@Entity
 @Data
 @AllArgsConstructor
@@ -373,13 +378,14 @@ public class Staff {
 </ul>
         <!-- Original content ends -->
       </section>
+    </div>
 
-      <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+    <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
         <a href="./tutorial-01.html" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">
           <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
           Previous
         </a>
-        <a href="../tutorial-03.html" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">
+        <a href="./tutorial-03.html" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">
           Next
           <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
         </a>
@@ -393,6 +399,22 @@ public class Staff {
     </footer>
 
     <script>
+    </script>
+    <script>
+      // Auto-build TOC from h2/h3 headings
+      (function() {
+        const toc = document.getElementById('toc-links');
+        if (!toc) return;
+        const headings = document.querySelectorAll('.tutorial-content h2, .tutorial-content h3');
+        headings.forEach((h, i) => {
+          if (!h.id) h.id = 'section-' + i;
+          const a = document.createElement('a');
+          a.href = '#' + h.id;
+          a.textContent = h.textContent;
+          if (h.tagName === 'H3') a.classList.add('toc-h3');
+          toc.appendChild(a);
+        });
+      })();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>

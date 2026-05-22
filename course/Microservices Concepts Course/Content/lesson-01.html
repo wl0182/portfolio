@@ -313,7 +313,7 @@ public class OrderController {
             <h3>What it is</h3>
             <p>A monolithic application is built as a single deployable unit where all components are interconnected and interdependent. All features, from user interface to business logic to data access, are part of one codebase and deployed together. Microservices, in contrast, split these components into separate, independently deployable services that communicate over a network.</p>
 
-            <p>The choice between monoliths and microservices isn't just about architecture—it's about team structure, deployment practices, and organizational maturity. Monoliths work well for smaller teams and simpler applications, while microservices shine when you have multiple teams working on complex systems that need to evolve independently.</p>
+            <p>The choice between monoliths and microservices isn't just about architecture-it's about team structure, deployment practices, and organizational maturity. Monoliths work well for smaller teams and simpler applications, while microservices shine when you have multiple teams working on complex systems that need to evolve independently.</p>
 
             <h3>Why we need to understand the difference</h3>
             <p>Understanding when to use each approach is crucial for project success. Many organizations rush into microservices without considering whether the complexity is justified by their actual needs. Starting with a well-designed monolith is often the right approach for new products or small teams, with the option to extract services later when the benefits become clear.</p>
@@ -363,7 +363,7 @@ public class OrderService {
 
             <p>Consider microservices when you have multiple teams that want to work independently, have different parts of your system that need to scale differently, or want to use different technologies for different components. Microservices also make sense when you have a well-understood domain with clear service boundaries and the operational maturity to handle distributed system complexity.</p>
 
-            <p>Remember that you can start with a modular monolith—a single deployable application with clear internal boundaries—and extract services later when the benefits justify the complexity. This evolutionary approach often works better than trying to design perfect service boundaries upfront.</p>
+            <p>Remember that you can start with a modular monolith-a single deployable application with clear internal boundaries-and extract services later when the benefits justify the complexity. This evolutionary approach often works better than trying to design perfect service boundaries upfront.</p>
           </section>
 
           <hr class="my-10 h-1 border-0 bg-slate-300 dark:bg-slate-700 rounded" />
@@ -371,7 +371,7 @@ public class OrderService {
           <section id="database-per-service" class="prose prose-slate mt-8 max-w-none dark:prose-invert">
             <h2>Database per Service Principle</h2>
             <h3>What it is</h3>
-            <p>The database per service principle means that each microservice owns and manages its own data store completely. No other service can directly access another service's database—all data access must happen through the service's API. This principle ensures that services remain loosely coupled and can evolve their data models independently without affecting other services.</p>
+            <p>The database per service principle means that each microservice owns and manages its own data store completely. No other service can directly access another service's database-all data access must happen through the service's API. This principle ensures that services remain loosely coupled and can evolve their data models independently without affecting other services.</p>
 
             <p>This doesn't necessarily mean each service needs a separate database server, although that's often the case. It means that each service has exclusive ownership of its data schema and tables. Other services cannot make direct SQL queries against another service's tables or share database connections.</p>
 

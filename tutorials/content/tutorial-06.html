@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tutorial 06 | Tables API: Endpoints, DTOs, Services</title>
+    <meta name="description" content="Table session lifecycle: start a session, track active tables, end a session, and generate a checkout summary." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E📘%3C/text%3E%3C/svg%3E" />
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30 transition group-hover:scale-105">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Software Engineer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../tutorials/" class="text-indigo-600 dark:text-indigo-400">Tutorials</a>
+          <a href="../../course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
+        </nav>
+        <div class="flex items-center gap-3">
+          <a href="../../#contact" class="hidden rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-indigo-600/30 transition hover:bg-indigo-500 active:scale-95 md:inline-block">Contact me</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <header class="max-w-3xl">
+        <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Tutorial 06: Tables API</h1>
+        <p class="mt-2 text-slate-600 dark:text-slate-300">Session lifecycle: open a table, track it, and close it with a checkout summary.</p>
+        <a href="../" class="mt-4 inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Tutorials</a>
+      </header>
+
+      <div class="tutorial-layout mt-8">
+      <aside class="tutorial-toc">
+        <p class="tutorial-toc-title">On this page</p>
+        <div id="toc-links"></div>
+      </aside>
+
+      <section class="tutorial-content prose prose-slate dark:prose-invert">
+
+        <p>Every order in the system belongs to a <em>table session</em>. A session opens when a waiter seats guests, and closes when the bill is paid. This tutorial covers how that lifecycle is implemented: starting a session safely, querying active tables, and generating a full checkout summary.</p>
+
+        <hr/>
+
+        <h2>1. Session lifecycle at a glance</h2>
+
+        <p>A <code>TableSession</code> has two timestamps: <code>sessionStart</code> (set when opened) and <code>sessionEnd</code> (null while active, set when closed). The repository uses the null check to find active sessions.</p>
+
+        <pre><code class="language-java">// Key JPQL queries in TableSessionRepository
+@Query("select t from TableSession t where t.tableNumber = :tableNumber and t.sessionEnd is null")
+Optional&lt;TableSession&gt; findActiveTableSessionByTableNumber(@Param("tableNumber") String tableNumber);
+
+@Query("select tb from TableSession tb where tb.sessionEnd is null")
+List&lt;TableSession&gt; findActiveTableSession();</code></pre>
+        <ul>
+          <li><strong>sessionEnd is null:</strong> the idiomatic way to represent "currently active" without a separate boolean column.</li>
+          <li>Returns <code>Optional</code> for the single-session lookup — forces the caller to handle the "no active session" case explicitly.</li>
+        </ul>
+
+        <hr/>
+
+        <h2>2. Controller endpoints</h2>
+
+        <pre><code class="language-java">@RestController
+@RequestMapping("/sessions")
+public class TableSessionController {
+
+    @PostMapping("/start")
+    public ResponseEntity&lt;StartSessionResponse&gt; startSession(@RequestBody @Valid StartSessionDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(tableSessionService.startSession(dto));
+    }
+
+    @PutMapping("/{tableNumber}/end")
+    public ResponseEntity&lt;EndSessionResponse&gt; endSession(@PathVariable String tableNumber) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(tableSessionService.endSession(tableNumber));
+    }
+
+    @GetMapping("/active")
+    public ResponseEntity&lt;List&lt;TableSessionResponse&gt;&gt; getActiveSessions() {
+        return ResponseEntity.ok(tableSessionService.getActiveTableSessions());
+    }
+
+    @GetMapping("/active/{tableNumber}")
+    public ResponseEntity&lt;TableSessionResponse&gt; getActiveSessionByTable(@PathVariable String tableNumber) {
+        return ResponseEntity.ok(tableSessionService.findActiveSessionByTableNumber(tableNumber));
+    }
+
+    @GetMapping("/{id}/checkout-summary")
+    public ResponseEntity&lt;SessionSummary&gt; getCheckoutSummary(@PathVariable Long id) {
+        return ResponseEntity.ok(tableSessionService.getSessionSummaryForCheckout(id));
+    }
+
+    @GetMapping("/{date}/sessions-by-date")
+    public ResponseEntity&lt;List&lt;SessionSummary&gt;&gt; getSessionsByDate(@PathVariable String date) {
+        return ResponseEntity.ok(tableSessionService.getAllSessionByDate(date));
+    }
+}</code></pre>
+        <ul>
+          <li><strong>PUT /{tableNumber}/end:</strong> uses the table number as the path variable, not a session ID. A waiter knows their table number, not the internal DB ID.</li>
+          <li><strong>/active vs /active/{tableNumber}:</strong> one returns all active sessions (for the host dashboard), the other returns the session for a specific table (for the waiter's view).</li>
+        </ul>
+
+        <hr/>
+
+        <h2>3. Starting a session safely</h2>
+
+        <pre><code class="language-java">public StartSessionResponse startSession(StartSessionDTO dto) {
+    // Reject if there's already an open session for this table
+    Optional&lt;TableSession&gt; existing =
+        tableSessionRepository.findActiveTableSessionByTableNumber(dto.getTableNumber());
+
+    if (existing.isPresent()) {
+        throw new ActiveSessionExistsException(
+            "There is already an active session for table: " + dto.getTableNumber()
+        );
+    }
+
+    TableSession session = new TableSession();
+    session.setSessionStart(LocalDateTime.now());
+    session.setTableNumber(dto.getTableNumber());
+    tableSessionRepository.save(session);
+
+    StartSessionResponse resp = new StartSessionResponse();
+    resp.setId(session.getId());
+    resp.setStartTime(LocalDateTime.now());
+    resp.setTableNumber(session.getTableNumber());
+    resp.setActive(true);
+    return resp;
+}</code></pre>
+        <ul>
+          <li>The guard at the top prevents two active sessions for the same table — a common real-world bug if you skip the check.</li>
+          <li><code>ActiveSessionExistsException</code> maps to HTTP 409 Conflict in the global exception handler — the right status when the request is valid but conflicts with current state.</li>
+          <li><code>sessionEnd</code> is left null intentionally — that null value is what marks the session as active.</li>
+        </ul>
+
+        <h2>4. Ending a session</h2>
+
+        <pre><code class="language-java">public EndSessionResponse endSession(String tableNumber) {
+    TableSession session = tableSessionRepository
+        .findActiveTableSessionByTableNumber(tableNumber)
+        .orElseThrow(NoActiveTableSessionFoundException::new);
+
+    session.setSessionEnd(LocalDateTime.now());
+    tableSessionRepository.save(session);
+
+    EndSessionResponse resp = new EndSessionResponse();
+    resp.setMessage("Session ended successfully");
+    resp.setEndTime(LocalDateTime.now());
+    resp.setStartTime(session.getSessionStart());
+    resp.setTableNumber(session.getTableNumber());
+    return resp;
+}</code></pre>
+        <ul>
+          <li>Setting <code>sessionEnd</code> to now is the only change — no status column to update, no extra table. The null-check queries automatically stop seeing this session as active.</li>
+          <li>The response includes both start and end times so the front end can display the session duration on the receipt.</li>
+        </ul>
+
+        <hr/>
+
+        <h2>5. Checkout summary</h2>
+
+        <p>Before closing a session (or at any point), the front end can request a full summary: total orders, total items, total amount, and an item-by-item breakdown.</p>
+
+        <pre><code class="language-java">public SessionSummary getSessionSummaryForCheckout(Long sessionId) {
+    TableSession session = tableSessionRepository.findById(sessionId)
+        .orElseThrow(TableSessionNotFound::new);
+
+    SessionSummary summary = new SessionSummary();
+    summary.setSessionId(session.getId());
+    summary.setTableNumber(session.getTableNumber());
+    summary.setTotalOrders(session.getOrders().stream().count());
+    summary.setTotalItemOrdered(
+        session.getOrders().stream().flatMap(o -&gt; o.getItems().stream()).count()
+    );
+
+    List&lt;ItemSummaryDTO&gt; items = getItemSummaryForSession(session.getId());
+    Double total = items.stream().mapToDouble(ItemSummaryDTO::getTotalPrice).sum();
+    summary.setTotalAmont(total);
+    summary.setItems(items);
+    return summary;
+}</code></pre>
+
+        <p>Example response from <code>GET /sessions/5/checkout-summary</code>:</p>
+        <pre><code class="language-json">{
+  "sessionId": 5,
+  "tableNumber": "T3",
+  "totalOrders": 3,
+  "totalItemOrdered": 11,
+  "totalAmont": 123.75,
+  "items": [
+    { "itemName": "Grilled Salmon", "totalQuantity": 2, "totalPrice": 41.50, "served": true },
+    { "itemName": "Caesar Salad",   "totalQuantity": 3, "totalPrice": 29.85, "served": true }
+  ]
+}</code></pre>
+        <ul>
+          <li><strong>flatMap:</strong> flattens the two-level structure (session has orders, orders have items) into a single stream of items.</li>
+          <li>The total is computed by summing the <code>totalPrice</code> of each <code>ItemSummaryDTO</code> — not from a stored column, since individual prices can change.</li>
+        </ul>
+
+        <hr/>
+
+        <h2>Key Takeaways</h2>
+        <ul>
+          <li>Use a nullable <code>sessionEnd</code> timestamp to represent open vs. closed sessions instead of a separate boolean flag.</li>
+          <li>Always guard session creation against duplicates — a second open session for the same table is a data integrity bug.</li>
+          <li>Use the table number (human-readable) for end-session and active-lookup paths; use the DB ID for summary and order-linking paths.</li>
+          <li><code>flatMap</code> is the right tool for navigating nested collections (session → orders → items) in a single stream pipeline.</li>
+          <li>Compute totals at query time from individual prices rather than storing a cached total — prices can change and cached values go stale.</li>
+        </ul>
+
+      </section>
+    </div>
+
+    <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+        <a href="./tutorial-05.html" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          Previous
+        </a>
+        <a href="./tutorial-07.html" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">
+          Next
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </a>
+      </nav>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script></script>
+    <script>
+      // Auto-build TOC from h2/h3 headings
+      (function() {
+        const toc = document.getElementById('toc-links');
+        if (!toc) return;
+        const headings = document.querySelectorAll('.tutorial-content h2, .tutorial-content h3');
+        headings.forEach((h, i) => {
+          if (!h.id) h.id = 'section-' + i;
+          const a = document.createElement('a');
+          a.href = '#' + h.id;
+          a.textContent = h.textContent;
+          if (h.tagName === 'H3') a.classList.add('toc-h3');
+          toc.appendChild(a);
+        });
+      })();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tutorial 03 | Repositories, Associations &amp; DTOs</title>
+    <meta name="description" content="JPA repositories, custom JPQL queries, the DTO pattern, and mappers in the Restaurant App series." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E📘%3C/text%3E%3C/svg%3E" />
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30 transition group-hover:scale-105">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Software Engineer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../tutorials/" class="text-indigo-600 dark:text-indigo-400">Tutorials</a>
+          <a href="../../course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
+        </nav>
+        <div class="flex items-center gap-3">
+          <a href="../../#contact" class="hidden rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-indigo-600/30 transition hover:bg-indigo-500 active:scale-95 md:inline-block">Contact me</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <header class="max-w-3xl">
+        <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Tutorial 03: Repositories, Associations &amp; DTOs</h1>
+        <p class="mt-2 text-slate-600 dark:text-slate-300">Custom JPQL queries, the DTO pattern, and mappers that keep your layers clean.</p>
+        <a href="../" class="mt-4 inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Tutorials</a>
+      </header>
+
+      <div class="tutorial-layout mt-8">
+      <aside class="tutorial-toc">
+        <p class="tutorial-toc-title">On this page</p>
+        <div id="toc-links"></div>
+      </aside>
+
+      <section class="tutorial-content prose prose-slate dark:prose-invert">
+
+        <p>With entities and relationships in place, the next step is controlling how data flows in and out of the database. This tutorial covers three things that work together: repositories (how you query), DTOs (what shape data takes at the API boundary), and mappers (how you convert between the two).</p>
+
+        <hr/>
+
+        <h2>1. Repositories: more than findAll()</h2>
+
+        <p>Spring Data JPA generates basic CRUD for free. You only need to add methods when the defaults don't fit. In this project most repositories stay small, but a few need custom queries.</p>
+
+        <h3>MenuItemRepository: filtering with JPQL</h3>
+        <pre><code class="language-java">public interface MenuItemRepository extends JpaRepository&lt;MenuItem, Long&gt; {
+
+    @Query("SELECT m FROM MenuItem m WHERE m.category = :category")
+    List&lt;MenuItem&gt; findByCategory(@Param("category") String category);
+
+    @Query("SELECT m FROM MenuItem m WHERE m.available = true")
+    List&lt;MenuItem&gt; findAvailableMenuItems();
+
+    @Query("SELECT m FROM MenuItem m WHERE m.name LIKE %:name%")
+    List&lt;MenuItem&gt; findByNameContaining(@Param("name") String name);
+}</code></pre>
+        <ul>
+          <li><strong>@Query:</strong> replaces the auto-generated method name. Useful when the method name would become too long or ambiguous.</li>
+          <li><strong>:category / @Param:</strong> named parameters bind cleanly and are immune to position errors.</li>
+          <li><strong>LIKE %:name%:</strong> substring search — equivalent to SQL <code>LIKE '%value%'</code>.</li>
+        </ul>
+
+        <h3>OrderRepository: querying across relationships</h3>
+        <pre><code class="language-java">public interface OrderRepository extends JpaRepository&lt;Order, Long&gt; {
+
+    List&lt;Order&gt; findByTableSession(TableSession tableSession);
+
+    @Query("select o from Order o where o.tableSession.id = :sessionId and o.status &lt;&gt; 'SERVED'")
+    List&lt;Order&gt; findUnservedOrderByTableSession(@Param("sessionId") Long sessionId);
+
+    @Query("select o from Order o where o.status &lt;&gt; 'SERVED'")
+    List&lt;Order&gt; findAllUnservedOrder();
+
+    @Query("select o.items from Order o where o.tableSession.id = :sessionId")
+    List&lt;OrderItem&gt; findItemsByTableSession(@Param("sessionId") Long sessionId);
+}</code></pre>
+        <ul>
+          <li><strong>findByTableSession:</strong> Spring Data derives this query automatically from the method name — no @Query needed.</li>
+          <li><strong>o.status &lt;&gt; 'SERVED':</strong> JPQL inequality operator. The string must match the value stored in the DB (the enum name).</li>
+          <li><strong>select o.items:</strong> selects the collection field directly, returning a flat list of <code>OrderItem</code> without loading the parent <code>Order</code>.</li>
+        </ul>
+
+        <h3>OrderItemRepository: JPQL constructor expression (DTO projection)</h3>
+        <pre><code class="language-java">public interface OrderItemRepository extends JpaRepository&lt;OrderItem, Long&gt; {
+
+    @Query("select o from OrderItem o where o.served = false order by o.order.orderDate")
+    List&lt;OrderItem&gt; findUnservedOrderItem();
+
+    @Query("SELECT new com.wassimlagnaoui.RestaurantOrder.DTO.MostOrderedItemDTO(" +
+           "oi.menuItem.name, SUM(oi.quantity), COUNT(DISTINCT oi.order.id)) " +
+           "FROM OrderItem oi WHERE oi.served = true " +
+           "GROUP BY oi.menuItem.name ORDER BY SUM(oi.quantity) DESC")
+    List&lt;MostOrderedItemDTO&gt; findMostOrderedItems();
+}</code></pre>
+        <ul>
+          <li><strong>Constructor expression:</strong> <code>new DTO(field1, field2)</code> tells Hibernate to build a DTO directly in the query — no full entity load, no manual mapping loop.</li>
+          <li><strong>SUM / COUNT DISTINCT:</strong> standard JPQL aggregate functions. <code>DISTINCT oi.order.id</code> counts unique orders, not order item rows.</li>
+          <li><strong>GROUP BY:</strong> required whenever you use aggregates. Groups by item name so each name gets one summary row.</li>
+          <li>The DTO's constructor must match the selected fields in exact order and type.</li>
+        </ul>
+
+        <h3>TableSessionRepository: native SQL for complex aggregations</h3>
+        <pre><code class="language-java">@Query(nativeQuery = true, value =
+    "SELECT DATE(session_totals.session_start) AS session_date, " +
+    "AVG(session_totals.session_total) AS avg_total " +
+    "FROM ( " +
+    "  SELECT ts.id, ts.session_start, COALESCE(SUM(o.total), 0) AS session_total " +
+    "  FROM table_session ts " +
+    "  LEFT JOIN orders o ON ts.id = o.table_session_id " +
+    "  GROUP BY ts.id, ts.session_start " +
+    ") AS session_totals " +
+    "GROUP BY session_date ORDER BY session_date;")
+List&lt;Object[]&gt; findAverageTotalByTableSessionGroupedByDate();</code></pre>
+        <ul>
+          <li><strong>nativeQuery = true:</strong> switches from JPQL to raw SQL. Use it when the query involves subqueries, window functions, or DB-specific functions that JPQL can't express.</li>
+          <li><strong>COALESCE:</strong> returns 0 if a session has no orders, preventing null totals in the average.</li>
+          <li><strong>Returns Object[]:</strong> native queries without a DTO projection return raw rows. The service maps them manually (<code>record[0]</code>, <code>record[1]</code>).</li>
+        </ul>
+
+        <hr/>
+
+        <h2>2. The DTO pattern: separate API shape from entity shape</h2>
+
+        <p>Exposing JPA entities directly from REST endpoints is a common mistake. Entities carry Hibernate proxies, lazy collections, and internal fields that don't belong in an API response. DTOs solve this by defining exactly what goes in and what comes out.</p>
+
+        <h3>Request DTO: what the client sends</h3>
+        <pre><code class="language-java">@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class MenuItemRequest {
+    @NotNull private String name;
+    private String description;
+    @NotNull private Double price;
+    @NotNull private String imageUrl;
+    @NotNull private String category;
+    @NotNull private boolean available;
+}</code></pre>
+
+        <h3>Response DTO: what the client receives</h3>
+        <pre><code class="language-java">@Data
+@AllArgsConstructor
+@NoArgsConstructor
+public class MenuItemResponse {
+    private Long id;
+    private String name;
+    private Double price;
+    private String imageUrl;
+    private String category;
+    private boolean available;
+    // description is intentionally excluded from the response
+}</code></pre>
+        <ul>
+          <li><strong>Validation on the request:</strong> <code>@NotNull</code> and friends belong on the request DTO, not the entity. The entity layer should never trust input.</li>
+          <li><strong>Selective fields on the response:</strong> the response includes the generated <code>id</code> (not present in the request) and omits <code>description</code> — a deliberate design choice to keep the list response compact.</li>
+          <li>Lombok's <code>@Data</code> generates getters, setters, equals, hashCode, and toString. <code>@AllArgsConstructor</code> and <code>@NoArgsConstructor</code> cover both Jackson deserialization and test construction.</li>
+        </ul>
+
+        <hr/>
+
+        <h2>3. Mappers: converting between layers</h2>
+
+        <p>A mapper is a plain Spring component (or static utility) that knows how to convert an entity to a DTO and back. Keeping this logic in one place means changing a field name only requires one edit.</p>
+
+        <pre><code class="language-java">@Component
+public class MenuItemMapper {
+
+    public static MenuItemResponse fromMenuItem(MenuItem item) {
+        MenuItemResponse resp = new MenuItemResponse();
+        resp.setId(item.getId());
+        resp.setName(item.getName());
+        resp.setPrice(item.getPrice());
+        resp.setCategory(item.getCategory());
+        resp.setAvailable(item.isAvailable());
+        resp.setImageUrl(item.getImageUrl());
+        return resp;
+    }
+
+    public static MenuItem toMenuItem(MenuItemRequest req) {
+        MenuItem item = new MenuItem();
+        item.setName(req.getName());
+        item.setPrice(req.getPrice());
+        item.setCategory(req.getCategory());
+        item.setAvailable(req.isAvailable());
+        item.setDescription(req.getDescription());
+        item.setImageUrl(req.getImageUrl());
+        return item;
+    }
+}</code></pre>
+        <ul>
+          <li><strong>fromMenuItem:</strong> entity to response — notice <code>id</code> is included (it exists on the entity after save), while <code>description</code> is excluded.</li>
+          <li><strong>toMenuItem:</strong> request to entity — notice <code>id</code> is NOT set (the DB generates it), but <code>description</code> IS included since the request provides it.</li>
+          <li>Static methods work here because mappers have no state. The <code>@Component</code> annotation lets Spring inject the class when needed by services, but the methods are called statically: <code>MenuItemMapper.fromMenuItem(item)</code>.</li>
+        </ul>
+
+        <h3>OrderItemMapper: mapper with relationships</h3>
+        <pre><code class="language-java">@Component
+public class OrderItemMapper {
+
+    public static OrderItemResponse fromOrderItem(OrderItem orderItem) {
+        OrderItemResponse resp = new OrderItemResponse();
+        double totalPrice = orderItem.getQuantity() * orderItem.getMenuItem().getPrice();
+        resp.setMenuItemId(orderItem.getMenuItem().getId());
+        resp.setUnitPrice(orderItem.getMenuItem().getPrice());
+        resp.setTotalPrice(totalPrice);
+        return resp;
+    }
+
+    public static OrderItem toOrderItem(OrderItemRequest req, MenuItem menuItem, Order order) {
+        OrderItem item = new OrderItem();
+        item.setMenuItem(menuItem);
+        item.setOrder(order);
+        item.setQuantity(req.getQuantity());
+        return item;
+    }
+}</code></pre>
+        <ul>
+          <li>The mapper computes <code>totalPrice</code> at mapping time — the entity stores unit price on the <code>MenuItem</code>, not the line total.</li>
+          <li><code>toOrderItem</code> receives the already-loaded <code>MenuItem</code> and <code>Order</code> as parameters. The service is responsible for loading them; the mapper only assembles the object.</li>
+        </ul>
+
+        <hr/>
+
+        <h2>Key Takeaways</h2>
+        <ul>
+          <li>Use <code>@Query</code> when method-name derivation becomes unreadable or when you need JPQL features like <code>ORDER BY</code> or aggregates.</li>
+          <li>Switch to <code>nativeQuery = true</code> only for queries that JPQL cannot express — subqueries, window functions, or DB-specific functions.</li>
+          <li>Constructor expressions (<code>new DTO(...)</code> in JPQL) avoid loading full entities when you only need aggregated data.</li>
+          <li>Always separate request DTOs (with validation) from response DTOs (with selective fields). Never expose entities directly.</li>
+          <li>Mappers belong in their own class. One method per direction: entity-to-DTO and DTO-to-entity.</li>
+          <li>The mapper computes derived fields (like <code>totalPrice</code>) rather than storing them on the entity — keep the entity as a faithful representation of the database row.</li>
+        </ul>
+
+      </section>
+    </div>
+
+    <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+        <a href="./tutorial-02.html" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          Previous
+        </a>
+        <a href="./tutorial-04.html" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">
+          Next
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </a>
+      </nav>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script></script>
+    <script>
+      // Auto-build TOC from h2/h3 headings
+      (function() {
+        const toc = document.getElementById('toc-links');
+        if (!toc) return;
+        const headings = document.querySelectorAll('.tutorial-content h2, .tutorial-content h3');
+        headings.forEach((h, i) => {
+          if (!h.id) h.id = 'section-' + i;
+          const a = document.createElement('a');
+          a.href = '#' + h.id;
+          a.textContent = h.textContent;
+          if (h.tagName === 'H3') a.classList.add('toc-h3');
+          toc.appendChild(a);
+        });
+      })();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>

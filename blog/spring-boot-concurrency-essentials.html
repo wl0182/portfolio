@@ -115,7 +115,7 @@ public class ReportService {
           <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Think of a TaskExecutor as a pool of workers. You hand it jobs, it finds a free worker thread to do them. This keeps your code simple and your app stable.</p>
           <ul class="mt-3 list-disc pl-5 text-sm text-slate-700 dark:text-slate-300 space-y-1">
             <li><span class="font-medium">Common choices:</span> <code>ThreadPoolTaskExecutor</code> (most apps), <code>SimpleAsyncTaskExecutor</code> (unbounded threads; demo/dev), <code>ConcurrentTaskExecutor</code> (wrap an existing <code>ExecutorService</code>).</li>
-            <li><span class="font-medium">Why it matters:</span> You can size pools, name threads, and monitor queues—key for stability and debugging.</li>
+            <li><span class="font-medium">Why it matters:</span> You can size pools, name threads, and monitor queues-key for stability and debugging.</li>
             <li><span class="font-medium">How to inject:</span> Define as a bean and inject by type or qualifier.</li>
           </ul>
           <pre class="mt-3 overflow-auto rounded-lg bg-slate-950 p-4 text-sm text-slate-100"><code class="language-java">@Service
@@ -339,7 +339,7 @@ service.generateReport(42L)
 </code></pre>
 
           <h2 class="text-xl font-semibold">Reactive concurrency with Project Reactor (optional)</h2>
-          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Reactor offers non-blocking types—<code>Mono</code> and <code>Flux</code>—and schedulers to control where work runs. It enables high concurrency with fewer threads.</p>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">Reactor offers non-blocking types-<code>Mono</code> and <code>Flux</code>-and schedulers to control where work runs. It enables high concurrency with fewer threads.</p>
           <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">If you’re new: this is a different style where you return a pipeline (not a value). It shines for apps that call many slow services and need to scale with minimal threads.</p>
           <ul class="mt-3 list-disc pl-5 text-sm text-slate-700 dark:text-slate-300 space-y-1">
             <li><span class="font-medium">Types:</span> <code>Mono&lt;T&gt;</code> for 0..1 values, <code>Flux&lt;T&gt;</code> for 0..N.</li>

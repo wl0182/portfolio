@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tutorial 04 | Menu Items API: Endpoints, DTOs, Services</title>
+    <meta name="description" content="Build the full menu management API: controller endpoints, service logic, DTOs, and the mapper pattern." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E📘%3C/text%3E%3C/svg%3E" />
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30 transition group-hover:scale-105">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Software Engineer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../tutorials/" class="text-indigo-600 dark:text-indigo-400">Tutorials</a>
+          <a href="../../course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
+        </nav>
+        <div class="flex items-center gap-3">
+          <a href="../../#contact" class="hidden rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-indigo-600/30 transition hover:bg-indigo-500 active:scale-95 md:inline-block">Contact me</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <header class="max-w-3xl">
+        <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Tutorial 04: Menu Items API</h1>
+        <p class="mt-2 text-slate-600 dark:text-slate-300">Controller, service, DTOs, and mapper for full menu management.</p>
+        <a href="../" class="mt-4 inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Tutorials</a>
+      </header>
+
+      <div class="tutorial-layout mt-8">
+      <aside class="tutorial-toc">
+        <p class="tutorial-toc-title">On this page</p>
+        <div id="toc-links"></div>
+      </aside>
+
+      <section class="tutorial-content prose prose-slate dark:prose-invert">
+
+        <p>The menu items feature is a good reference implementation of a clean three-layer design: the controller handles HTTP, the service owns the business logic, and the mapper converts between the entity and the API shape. Everything flows through DTOs at the boundaries.</p>
+
+        <hr/>
+
+        <h2>1. The Controller: HTTP layer only</h2>
+
+        <p>The controller's only job is to translate HTTP verbs and paths into service calls, and wrap the result in a <code>ResponseEntity</code>. No business logic belongs here.</p>
+
+        <pre><code class="language-java">@RestController
+@RequestMapping("/api/menu-items")
+public class MenuItemController {
+
+    private final MenuItemService menuItemService;
+
+    public MenuItemController(MenuItemService menuItemService) {
+        this.menuItemService = menuItemService;
+    }
+
+    @PostMapping("/add")
+    public ResponseEntity&lt;MenuItemResponse&gt; createMenuItem(
+            @RequestBody @Valid MenuItemRequest req) {
+        MenuItemResponse response = menuItemService.createMenuItem(req);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity&lt;MenuItemResponse&gt; getMenuItemByID(@PathVariable Long id) {
+        return ResponseEntity.ok(menuItemService.findById(id));
+    }
+
+    @GetMapping
+    public ResponseEntity&lt;List&lt;MenuItemResponse&gt;&gt; getAllMenuItems() {
+        return ResponseEntity.ok(menuItemService.findAll());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity&lt;MenuItemResponse&gt; updateAvailability(@PathVariable Long id) {
+        return ResponseEntity.ok(menuItemService.updateAvailability(id));
+    }
+
+    @GetMapping("/available")
+    public ResponseEntity&lt;List&lt;MenuItemResponse&gt;&gt; getAvailableMenuItems() {
+        return ResponseEntity.ok(menuItemService.getAvailableMenuItems());
+    }
+
+    @GetMapping("/category/{category}")
+    public ResponseEntity&lt;List&lt;MenuItemResponse&gt;&gt; getMenuItemsByCategory(
+            @PathVariable String category) {
+        return ResponseEntity.ok(menuItemService.getMenuItemsByCategory(category));
+    }
+}</code></pre>
+        <ul>
+          <li><strong>@RestController:</strong> combines <code>@Controller</code> and <code>@ResponseBody</code> — every method return value is serialized to JSON automatically.</li>
+          <li><strong>@RequestMapping("/api/menu-items"):</strong> sets the base path for all methods in the class.</li>
+          <li><strong>@Valid on @RequestBody:</strong> triggers Bean Validation on the incoming DTO before the method body runs. Invalid fields throw a <code>MethodArgumentNotValidException</code> automatically.</li>
+          <li><strong>ResponseEntity.status(CREATED):</strong> POST returns 201 Created — semantically more correct than 200 OK for resource creation.</li>
+          <li>Constructor injection (not <code>@Autowired</code> on the field) is the recommended style — it makes the dependency explicit and works without Spring context in tests.</li>
+        </ul>
+
+        <h2>2. The Service: business logic</h2>
+
+        <h3>Creating a menu item</h3>
+        <pre><code class="language-java">@Slf4j
+@Service
+public class MenuItemService {
+
+    private final MenuItemRepository menuItemRepository;
+
+    public MenuItemService(MenuItemRepository menuItemRepository) {
+        this.menuItemRepository = menuItemRepository;
+    }
+
+    public MenuItemResponse createMenuItem(MenuItemRequest req) {
+        MenuItem item = MenuItemMapper.toMenuItem(req);  // request DTO → entity
+        menuItemRepository.save(item);                   // persist (ID is generated)
+        return MenuItemMapper.fromMenuItem(item);        // entity → response DTO
+    }
+}</code></pre>
+
+        <h3>Finding by ID with exception on miss</h3>
+        <pre><code class="language-java">public MenuItemResponse findById(Long id) {
+    MenuItem item = menuItemRepository.findById(id)
+        .orElseThrow(() -> new MenuItemIdNotFoundException(id));
+    return MenuItemMapper.fromMenuItem(item);
+}</code></pre>
+
+        <h3>Toggling availability</h3>
+        <pre><code class="language-java">public MenuItemResponse updateAvailability(Long id) {
+    MenuItem item = menuItemRepository.findById(id)
+        .orElseThrow(MenuItemNotAvailableException::new);
+
+    item.setAvailable(!item.isAvailable()); // toggle the flag
+    menuItemRepository.save(item);
+
+    return MenuItemMapper.fromMenuItem(item);
+}</code></pre>
+        <ul>
+          <li><strong>orElseThrow:</strong> avoids null checks. The exception type determines the HTTP status — the global exception handler maps it to 404 or 400 automatically.</li>
+          <li><strong>Toggle pattern:</strong> a single PUT endpoint handles both enable and disable. The client doesn't pass a value — it just sends the ID and the server flips the flag.</li>
+          <li><strong>@Slf4j:</strong> injects a <code>log</code> field for logging without boilerplate. Use <code>log.info()</code> or <code>log.warn()</code> in the service for traceability in production.</li>
+        </ul>
+
+        <h3>Filtering by category</h3>
+        <pre><code class="language-java">public List&lt;MenuItemResponse&gt; getMenuItemsByCategory(String category) {
+    return menuItemRepository.findByCategory(category)
+        .stream()
+        .map(MenuItemMapper::fromMenuItem)
+        .collect(Collectors.toList());
+}</code></pre>
+        <ul>
+          <li>The stream pipeline replaces the manual for-loop: <code>findByCategory</code> returns entities, <code>map</code> converts each one, <code>collect</code> gathers the results.</li>
+          <li>Method reference <code>MenuItemMapper::fromMenuItem</code> is equivalent to <code>item -> MenuItemMapper.fromMenuItem(item)</code> — shorter and clearer.</li>
+        </ul>
+
+        <hr/>
+
+        <h2>3. The full endpoint map</h2>
+
+        <table>
+          <thead><tr><th>Method</th><th>Path</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td>POST</td><td>/api/menu-items/add</td><td>Create a new item (admin)</td></tr>
+            <tr><td>GET</td><td>/api/menu-items</td><td>List all items</td></tr>
+            <tr><td>GET</td><td>/api/menu-items/{id}</td><td>Get one item by ID</td></tr>
+            <tr><td>GET</td><td>/api/menu-items/available</td><td>List only available items</td></tr>
+            <tr><td>GET</td><td>/api/menu-items/category/{cat}</td><td>Filter by category</td></tr>
+            <tr><td>PUT</td><td>/api/menu-items/{id}</td><td>Toggle availability</td></tr>
+            <tr><td>PUT</td><td>/api/menu-items/{id}/price</td><td>Update price</td></tr>
+            <tr><td>PUT</td><td>/api/menu-items/{id}/name</td><td>Update name</td></tr>
+          </tbody>
+        </table>
+
+        <hr/>
+
+        <h2>Key Takeaways</h2>
+        <ul>
+          <li>Controllers translate HTTP to service calls — validation, status codes, and response wrapping live here, nothing else.</li>
+          <li><code>@Valid</code> on <code>@RequestBody</code> runs Bean Validation automatically before your method executes.</li>
+          <li>Always use <code>orElseThrow</code> instead of <code>if (item == null)</code> — the exception type carries the semantic meaning and the global handler converts it to the right HTTP status.</li>
+          <li>The toggle pattern (single PUT that flips a boolean) avoids separate enable/disable endpoints and keeps the API surface small.</li>
+          <li>Stream + method reference is the idiomatic way to map a list of entities to DTOs — replace manual for-loops.</li>
+        </ul>
+
+      </section>
+    </div>
+
+    <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+        <a href="./tutorial-03.html" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          Previous
+        </a>
+        <a href="./tutorial-05.html" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">
+          Next
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </a>
+      </nav>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script></script>
+    <script>
+      // Auto-build TOC from h2/h3 headings
+      (function() {
+        const toc = document.getElementById('toc-links');
+        if (!toc) return;
+        const headings = document.querySelectorAll('.tutorial-content h2, .tutorial-content h3');
+        headings.forEach((h, i) => {
+          if (!h.id) h.id = 'section-' + i;
+          const a = document.createElement('a');
+          a.href = '#' + h.id;
+          a.textContent = h.textContent;
+          if (h.tagName === 'H3') a.classList.add('toc-h3');
+          toc.appendChild(a);
+        });
+      })();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>
