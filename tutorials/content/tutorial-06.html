@@ -28,7 +28,6 @@
         <nav class="hidden items-center gap-6 md:flex">
           <a href="../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
           <a href="../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
-          <a href="../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
           <a href="../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
           <a href="../../tutorials/" class="text-indigo-600 dark:text-indigo-400">Tutorials</a>
           <a href="../../course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
@@ -70,7 +69,7 @@ Optional&lt;TableSession&gt; findActiveTableSessionByTableNumber(@Param("tableNu
 List&lt;TableSession&gt; findActiveTableSession();</code></pre>
         <ul>
           <li><strong>sessionEnd is null:</strong> the idiomatic way to represent "currently active" without a separate boolean column.</li>
-          <li>Returns <code>Optional</code> for the single-session lookup — forces the caller to handle the "no active session" case explicitly.</li>
+          <li>Returns <code>Optional</code> for the single-session lookup: forces the caller to handle the "no active session" case explicitly.</li>
         </ul>
 
         <hr/>
@@ -144,9 +143,9 @@ public class TableSessionController {
     return resp;
 }</code></pre>
         <ul>
-          <li>The guard at the top prevents two active sessions for the same table — a common real-world bug if you skip the check.</li>
-          <li><code>ActiveSessionExistsException</code> maps to HTTP 409 Conflict in the global exception handler — the right status when the request is valid but conflicts with current state.</li>
-          <li><code>sessionEnd</code> is left null intentionally — that null value is what marks the session as active.</li>
+          <li>The guard at the top prevents two active sessions for the same table: a common real-world bug if you skip the check.</li>
+          <li><code>ActiveSessionExistsException</code> maps to HTTP 409 Conflict in the global exception handler: the right status when the request is valid but conflicts with current state.</li>
+          <li><code>sessionEnd</code> is left null intentionally: that null value is what marks the session as active.</li>
         </ul>
 
         <h2>4. Ending a session</h2>
@@ -167,7 +166,7 @@ public class TableSessionController {
     return resp;
 }</code></pre>
         <ul>
-          <li>Setting <code>sessionEnd</code> to now is the only change — no status column to update, no extra table. The null-check queries automatically stop seeing this session as active.</li>
+          <li>Setting <code>sessionEnd</code> to now is the only change: no status column to update, no extra table. The null-check queries automatically stop seeing this session as active.</li>
           <li>The response includes both start and end times so the front end can display the session duration on the receipt.</li>
         </ul>
 
@@ -210,7 +209,7 @@ public class TableSessionController {
 }</code></pre>
         <ul>
           <li><strong>flatMap:</strong> flattens the two-level structure (session has orders, orders have items) into a single stream of items.</li>
-          <li>The total is computed by summing the <code>totalPrice</code> of each <code>ItemSummaryDTO</code> — not from a stored column, since individual prices can change.</li>
+          <li>The total is computed by summing the <code>totalPrice</code> of each <code>ItemSummaryDTO</code>: not from a stored column, since individual prices can change.</li>
         </ul>
 
         <hr/>
@@ -218,10 +217,10 @@ public class TableSessionController {
         <h2>Key Takeaways</h2>
         <ul>
           <li>Use a nullable <code>sessionEnd</code> timestamp to represent open vs. closed sessions instead of a separate boolean flag.</li>
-          <li>Always guard session creation against duplicates — a second open session for the same table is a data integrity bug.</li>
+          <li>Always guard session creation against duplicates: a second open session for the same table is a data integrity bug.</li>
           <li>Use the table number (human-readable) for end-session and active-lookup paths; use the DB ID for summary and order-linking paths.</li>
           <li><code>flatMap</code> is the right tool for navigating nested collections (session → orders → items) in a single stream pipeline.</li>
-          <li>Compute totals at query time from individual prices rather than storing a cached total — prices can change and cached values go stale.</li>
+          <li>Compute totals at query time from individual prices rather than storing a cached total: prices can change and cached values go stale.</li>
         </ul>
 
       </section>

@@ -28,7 +28,6 @@
         <nav class="hidden items-center gap-6 md:flex">
           <a href="../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
           <a href="../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
-          <a href="../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
           <a href="../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
           <a href="../../tutorials/" class="text-indigo-600 dark:text-indigo-400">Tutorials</a>
           <a href="../../course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
@@ -89,8 +88,8 @@ public class StatsController {
     }
 }</code></pre>
           <ul>
-            <li>All four are GET — stats endpoints are read-only and should be idempotent.</li>
-            <li>Two endpoints return <code>HashMap&lt;String, Double&gt;</code> directly — simple enough for a dashboard chart where the key is the label and the value is the amount.</li>
+            <li>All four are GET: stats endpoints are read-only and should be idempotent.</li>
+            <li>Two endpoints return <code>HashMap&lt;String, Double&gt;</code> directly: simple enough for a dashboard chart where the key is the label and the value is the amount.</li>
             <li>The controller is thin: each method is a one-liner delegating entirely to the service.</li>
           </ul>
 
@@ -98,7 +97,7 @@ public class StatsController {
 
           <h2>2. Most-ordered items: JPQL aggregation</h2>
 
-          <p>This is the most efficient stat — computed entirely in the database via a JPQL constructor expression.</p>
+          <p>This is the most efficient stat: computed entirely in the database via a JPQL constructor expression.</p>
 
           <pre><code class="language-java">// OrderItemRepository
 @Query("SELECT new com.wassimlagnaoui.RestaurantOrder.DTO.MostOrderedItemDTO(" +
@@ -109,7 +108,7 @@ public class StatsController {
        "ORDER BY SUM(oi.quantity) DESC")
 List&lt;MostOrderedItemDTO&gt; findMostOrderedItems();
 
-// MostOrderedItemDTO — must have a matching constructor
+// MostOrderedItemDTO: must have a matching constructor
 public class MostOrderedItemDTO {
     private String name;
     private Long totalQuantity;
@@ -118,9 +117,9 @@ public class MostOrderedItemDTO {
     public MostOrderedItemDTO(String name, Long totalQuantity, Long orderCount) { ... }
 }</code></pre>
           <ul>
-            <li><strong>Constructor expression</strong> (<code>new DTO(...)</code> in JPQL): the DB executes the GROUP BY and SUM, and Spring instantiates the DTO directly from the result set — no intermediate entity objects are created.</li>
+            <li><strong>Constructor expression</strong> (<code>new DTO(...)</code> in JPQL): the DB executes the GROUP BY and SUM, and Spring instantiates the DTO directly from the result set: no intermediate entity objects are created.</li>
             <li><code>WHERE oi.served = true</code> ensures only delivered items count towards popularity.</li>
-            <li><code>COUNT(DISTINCT oi.order.id)</code> counts how many separate orders contained this item — different from total quantity.</li>
+            <li><code>COUNT(DISTINCT oi.order.id)</code> counts how many separate orders contained this item: different from total quantity.</li>
             <li>The fully-qualified class name is required in the JPQL <code>new</code> expression.</li>
           </ul>
 
@@ -145,8 +144,8 @@ public class MostOrderedItemDTO {
     return result;
 }</code></pre>
           <ul>
-            <li><strong>Trade-off:</strong> <code>findAll()</code> loads every order item into memory and filters in Java. This works at small scale but becomes slow as the table grows — a DB-level GROUP BY query would be more efficient.</li>
-            <li><code>mapToDouble(...).sum()</code> is the stream equivalent of a for-loop accumulator — cleaner and avoids boxing overhead.</li>
+            <li><strong>Trade-off:</strong> <code>findAll()</code> loads every order item into memory and filters in Java. This works at small scale but becomes slow as the table grows: a DB-level GROUP BY query would be more efficient.</li>
+            <li><code>mapToDouble(...).sum()</code> is the stream equivalent of a for-loop accumulator: cleaner and avoids boxing overhead.</li>
             <li><code>toLocalDate().toString()</code> formats the date as <code>"yyyy-MM-dd"</code> automatically, matching the format returned by <code>findAllDates()</code>.</li>
           </ul>
 
@@ -154,7 +153,7 @@ public class MostOrderedItemDTO {
 
           <h2>4. Average session revenue by date: native SQL</h2>
 
-          <pre><code class="language-java">// TableSessionRepository — native SQL returning Object[]
+          <pre><code class="language-java">// TableSessionRepository: native SQL returning Object[]
 @Query(value =
     "SELECT TO_CHAR(session_start, 'YYYY-MM-DD') AS session_date, " +
     "       AVG(total) AS avg_total " +
@@ -165,7 +164,7 @@ public class MostOrderedItemDTO {
     nativeQuery = true)
 List&lt;Object[]&gt; findAverageTotalByTableSessionGroupedByDate();
 
-// Service — map Object[] to a typed DTO
+// Service: map Object[] to a typed DTO
 public List&lt;TableSessionAverageRevenueByDate&gt; getAverageTotalByTableSessionGroupedByDate() {
     return tableSessionRepository.findAverageTotalByTableSessionGroupedByDate()
         .stream()
@@ -177,18 +176,18 @@ public List&lt;TableSessionAverageRevenueByDate&gt; getAverageTotalByTableSessio
 }</code></pre>
           <ul>
             <li><strong>nativeQuery = true:</strong> drops out of JPQL into raw SQL. Necessary here because <code>TO_CHAR</code> is a PostgreSQL-specific function that has no JPQL equivalent.</li>
-            <li><strong>Object[] mapping:</strong> native queries return rows as <code>Object[]</code>. The service manually casts each column by index. This is fragile — if the SELECT column order changes, the mapping silently breaks. Projections or a <code>@SqlResultSetMapping</code> are safer alternatives.</li>
-            <li><code>AVG(total)</code> operates on the stored order total — not recomputed from items, so it reflects the value at the time the order was placed.</li>
+            <li><strong>Object[] mapping:</strong> native queries return rows as <code>Object[]</code>. The service manually casts each column by index. This is fragile: if the SELECT column order changes, the mapping silently breaks. Projections or a <code>@SqlResultSetMapping</code> are safer alternatives.</li>
+            <li><code>AVG(total)</code> operates on the stored order total: not recomputed from items, so it reflects the value at the time the order was placed.</li>
           </ul>
 
           <hr/>
 
           <h2>Key Takeaways</h2>
           <ul>
-            <li>Push aggregation (SUM, COUNT, AVG, GROUP BY) into the database where possible — a JPQL constructor expression is the cleanest way to map results directly to a DTO.</li>
-            <li>In-memory filtering with <code>findAll().stream().filter()</code> is quick to write but doesn't scale — refactor to a DB query when the dataset grows.</li>
+            <li>Push aggregation (SUM, COUNT, AVG, GROUP BY) into the database where possible: a JPQL constructor expression is the cleanest way to map results directly to a DTO.</li>
+            <li>In-memory filtering with <code>findAll().stream().filter()</code> is quick to write but doesn't scale: refactor to a DB query when the dataset grows.</li>
             <li>Use <code>nativeQuery = true</code> only when JPQL can't express what you need (DB-specific functions, complex window queries). Document why native SQL was chosen.</li>
-            <li><code>Object[]</code> mapping from native queries is positional and fragile — prefer Spring Data projections (interface-based) for type safety.</li>
+            <li><code>Object[]</code> mapping from native queries is positional and fragile: prefer Spring Data projections (interface-based) for type safety.</li>
             <li><code>mapToDouble(...).sum()</code> is the idiomatic stream way to accumulate a numeric total without a mutable variable.</li>
           </ul>
 

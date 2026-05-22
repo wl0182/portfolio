@@ -28,7 +28,6 @@
         <nav class="hidden items-center gap-6 md:flex">
           <a href="../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
           <a href="../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
-          <a href="../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
           <a href="../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
           <a href="../../tutorials/" class="text-indigo-600 dark:text-indigo-400">Tutorials</a>
           <a href="../../course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
@@ -106,11 +105,11 @@ public class MenuItemController {
     }
 }</code></pre>
         <ul>
-          <li><strong>@RestController:</strong> combines <code>@Controller</code> and <code>@ResponseBody</code> — every method return value is serialized to JSON automatically.</li>
+          <li><strong>@RestController:</strong> combines <code>@Controller</code> and <code>@ResponseBody</code>: every method return value is serialized to JSON automatically.</li>
           <li><strong>@RequestMapping("/api/menu-items"):</strong> sets the base path for all methods in the class.</li>
           <li><strong>@Valid on @RequestBody:</strong> triggers Bean Validation on the incoming DTO before the method body runs. Invalid fields throw a <code>MethodArgumentNotValidException</code> automatically.</li>
-          <li><strong>ResponseEntity.status(CREATED):</strong> POST returns 201 Created — semantically more correct than 200 OK for resource creation.</li>
-          <li>Constructor injection (not <code>@Autowired</code> on the field) is the recommended style — it makes the dependency explicit and works without Spring context in tests.</li>
+          <li><strong>ResponseEntity.status(CREATED):</strong> POST returns 201 Created: semantically more correct than 200 OK for resource creation.</li>
+          <li>Constructor injection (not <code>@Autowired</code> on the field) is the recommended style: it makes the dependency explicit and works without Spring context in tests.</li>
         </ul>
 
         <h2>2. The Service: business logic</h2>
@@ -151,8 +150,8 @@ public class MenuItemService {
     return MenuItemMapper.fromMenuItem(item);
 }</code></pre>
         <ul>
-          <li><strong>orElseThrow:</strong> avoids null checks. The exception type determines the HTTP status — the global exception handler maps it to 404 or 400 automatically.</li>
-          <li><strong>Toggle pattern:</strong> a single PUT endpoint handles both enable and disable. The client doesn't pass a value — it just sends the ID and the server flips the flag.</li>
+          <li><strong>orElseThrow:</strong> avoids null checks. The exception type determines the HTTP status: the global exception handler maps it to 404 or 400 automatically.</li>
+          <li><strong>Toggle pattern:</strong> a single PUT endpoint handles both enable and disable. The client doesn't pass a value: it just sends the ID and the server flips the flag.</li>
           <li><strong>@Slf4j:</strong> injects a <code>log</code> field for logging without boilerplate. Use <code>log.info()</code> or <code>log.warn()</code> in the service for traceability in production.</li>
         </ul>
 
@@ -165,7 +164,7 @@ public class MenuItemService {
 }</code></pre>
         <ul>
           <li>The stream pipeline replaces the manual for-loop: <code>findByCategory</code> returns entities, <code>map</code> converts each one, <code>collect</code> gathers the results.</li>
-          <li>Method reference <code>MenuItemMapper::fromMenuItem</code> is equivalent to <code>item -> MenuItemMapper.fromMenuItem(item)</code> — shorter and clearer.</li>
+          <li>Method reference <code>MenuItemMapper::fromMenuItem</code> is equivalent to <code>item -> MenuItemMapper.fromMenuItem(item)</code>: shorter and clearer.</li>
         </ul>
 
         <hr/>
@@ -190,11 +189,11 @@ public class MenuItemService {
 
         <h2>Key Takeaways</h2>
         <ul>
-          <li>Controllers translate HTTP to service calls — validation, status codes, and response wrapping live here, nothing else.</li>
+          <li>Controllers translate HTTP to service calls: validation, status codes, and response wrapping live here, nothing else.</li>
           <li><code>@Valid</code> on <code>@RequestBody</code> runs Bean Validation automatically before your method executes.</li>
-          <li>Always use <code>orElseThrow</code> instead of <code>if (item == null)</code> — the exception type carries the semantic meaning and the global handler converts it to the right HTTP status.</li>
+          <li>Always use <code>orElseThrow</code> instead of <code>if (item == null)</code>: the exception type carries the semantic meaning and the global handler converts it to the right HTTP status.</li>
           <li>The toggle pattern (single PUT that flips a boolean) avoids separate enable/disable endpoints and keeps the API surface small.</li>
-          <li>Stream + method reference is the idiomatic way to map a list of entities to DTOs — replace manual for-loops.</li>
+          <li>Stream + method reference is the idiomatic way to map a list of entities to DTOs: replace manual for-loops.</li>
         </ul>
 
       </section>

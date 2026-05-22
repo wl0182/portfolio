@@ -28,7 +28,6 @@
         <nav class="hidden items-center gap-6 md:flex">
           <a href="../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
           <a href="../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
-          <a href="../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
           <a href="../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
           <a href="../../tutorials/" class="text-indigo-600 dark:text-indigo-400">Tutorials</a>
           <a href="../../course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
@@ -41,7 +40,7 @@
 
     <main class="mx-auto max-w-7xl px-6 py-10">
       <header class="max-w-3xl">
-        <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Tutorial 08: Orders API — Part 2</h1>
+        <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Tutorial 08: Orders API: Part 2</h1>
         <p class="mt-2 text-slate-600 dark:text-slate-300">Kitchen queue, serving items and orders, filtering by status, and checking order completion.</p>
         <a href="../" class="mt-4 inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Tutorials</a>
       </header>
@@ -62,7 +61,7 @@
 
           <p>The kitchen screen calls <code>GET /orders/kitchen/queue</code> to see every unserved item across all active orders, sorted by the time the order was placed.</p>
 
-          <pre><code class="language-java">// Repository query — ordered by orderDate so older items appear first
+          <pre><code class="language-java">// Repository query: ordered by orderDate so older items appear first
 @Query("select o from OrderItem o where o.served = false order by o.order.orderDate")
 List&lt;OrderItem&gt; findUnservedOrderItem();
 
@@ -82,8 +81,8 @@ public List&lt;KitchenOrderQueueResponse&gt; getNotServedItems() {
     }).collect(Collectors.toList());
 }</code></pre>
           <ul>
-            <li>The JPQL query filters at the DB level — no in-memory filtering of all rows.</li>
-            <li><code>order by o.order.orderDate</code> — JPQL lets you navigate relationships directly in the ORDER BY clause, so items from earlier orders surface first.</li>
+            <li>The JPQL query filters at the DB level: no in-memory filtering of all rows.</li>
+            <li><code>order by o.order.orderDate</code>: JPQL lets you navigate relationships directly in the ORDER BY clause, so items from earlier orders surface first.</li>
             <li>The table number is reached by navigating <code>orderItem → order → tableSession → tableNumber</code>. Hibernate resolves these joins automatically.</li>
           </ul>
 
@@ -107,7 +106,7 @@ public MarkOrderItemServedDTO serveOrderItem(Long orderItemId) {
     return response;
 }</code></pre>
           <ul>
-            <li>Only <code>served</code> is changed — no status string to update, no cascading effect on the parent order.</li>
+            <li>Only <code>served</code> is changed: no status string to update, no cascading effect on the parent order.</li>
             <li>A minimal response (ID + message) is enough here. The kitchen screen just needs confirmation.</li>
           </ul>
 
@@ -126,8 +125,8 @@ public OrderResponse markOrderAsServed(Long id) {
     return OrderMapper.fromOrder(order);
 }</code></pre>
           <ul>
-            <li>This updates the <code>Order.status</code> field to <code>"SERVED"</code> — a coarse-grained flag for the whole order, separate from the per-item <code>served</code> boolean.</li>
-            <li><code>OrderMapper.fromOrder</code> is reused here — a static utility that converts an <code>Order</code> entity to <code>OrderResponse</code>. Because this mapping is used in multiple places, it justifies a dedicated mapper class.</li>
+            <li>This updates the <code>Order.status</code> field to <code>"SERVED"</code>: a coarse-grained flag for the whole order, separate from the per-item <code>served</code> boolean.</li>
+            <li><code>OrderMapper.fromOrder</code> is reused here: a static utility that converts an <code>Order</code> entity to <code>OrderResponse</code>. Because this mapping is used in multiple places, it justifies a dedicated mapper class.</li>
           </ul>
 
           <hr/>
@@ -158,11 +157,11 @@ public List&lt;OrderItemResponse&gt; getUnServedItemsBySession(Long sessionId) {
         .collect(Collectors.toUnmodifiableList());
 }
 
-// GET /orders/sessions/{id}/served  — same but filter is:
+// GET /orders/sessions/{id}/served: same but filter is:
 .filter(OrderItem::getServed)</code></pre>
           <ul>
             <li><code>flatMap</code> collapses the two-level structure (session has orders, orders have items) into a single flat stream of <code>OrderItem</code>s.</li>
-            <li>The served endpoint uses the method reference <code>OrderItem::getServed</code> instead of a lambda — equivalent to <code>oi -&gt; oi.getServed()</code> but cleaner.</li>
+            <li>The served endpoint uses the method reference <code>OrderItem::getServed</code> instead of a lambda: equivalent to <code>oi -&gt; oi.getServed()</code> but cleaner.</li>
             <li><code>Collectors.toUnmodifiableList()</code> returns an immutable list. Use <code>Collectors.toList()</code> if the caller needs to mutate it.</li>
           </ul>
 
@@ -189,7 +188,7 @@ public OrderServedStatusDTO checkStatusOfItemsByOrder(Long id) {
     return dto;
 }</code></pre>
           <ul>
-            <li><strong>allMatch / anyMatch / noneMatch:</strong> terminal stream operations that short-circuit — they stop iterating as soon as the answer is known.</li>
+            <li><strong>allMatch / anyMatch / noneMatch:</strong> terminal stream operations that short-circuit: they stop iterating as soon as the answer is known.</li>
             <li>Returning all three flags in one response lets the front end drive different UI states (e.g., "all ready", "partially ready", "none ready") without three round trips.</li>
             <li>These are mutually exclusive: if <code>allServed</code> is true, <code>someServed</code> is also true but <code>noneServed</code> is false. The client can check <code>allServed</code> first.</li>
           </ul>
@@ -198,10 +197,10 @@ public OrderServedStatusDTO checkStatusOfItemsByOrder(Long id) {
 
           <h2>Key Takeaways</h2>
           <ul>
-            <li>Filter at the database level with JPQL (<code>where o.served = false</code>), not in Java — it is always faster than fetching all rows and filtering in memory.</li>
+            <li>Filter at the database level with JPQL (<code>where o.served = false</code>), not in Java: it is always faster than fetching all rows and filtering in memory.</li>
             <li><code>flatMap</code> is the idiomatic way to flatten a two-level collection (orders → items) into a single stream for filtering and mapping.</li>
             <li>Two granularities of "served": a per-item <code>boolean served</code> for individual dish tracking, and an order-level <code>status</code> string for coarse workflow state.</li>
-            <li><code>allMatch</code> / <code>anyMatch</code> / <code>noneMatch</code> short-circuit — prefer them over manual loops when checking predicates across a collection.</li>
+            <li><code>allMatch</code> / <code>anyMatch</code> / <code>noneMatch</code> short-circuit: prefer them over manual loops when checking predicates across a collection.</li>
             <li>Extract a mapper class (<code>OrderMapper</code>) when the same entity-to-DTO conversion is needed in more than one place; inline the mapping when it is one-off.</li>
           </ul>
 

@@ -28,7 +28,6 @@
         <nav class="hidden items-center gap-6 md:flex">
           <a href="../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
           <a href="../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
-          <a href="../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
           <a href="../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
           <a href="../../tutorials/" class="text-indigo-600 dark:text-indigo-400">Tutorials</a>
           <a href="../../course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
@@ -70,7 +69,7 @@ EXPOSE 8080</code></pre>
             <li><strong>VOLUME /tmp:</strong> Spring Boot uses <code>/tmp</code> for embedded Tomcat's working directory. Declaring it as a volume moves it to Docker's storage layer, improving performance on some hosts.</li>
             <li><strong>COPY target/...jar app.jar:</strong> assumes the JAR has already been built by <code>mvn package</code> before <code>docker build</code> runs. The Jenkins pipeline does this in the stage before building the image.</li>
             <li><strong>ENTRYPOINT vs CMD:</strong> <code>ENTRYPOINT</code> is used here so the container always runs the JAR. <code>CMD</code> can be overridden at runtime; <code>ENTRYPOINT</code> cannot (without <code>--entrypoint</code>).</li>
-            <li><strong>EXPOSE 8080:</strong> documents the port the app listens on — it doesn't actually publish it. Port publishing happens in <code>docker-compose.yml</code> or the <code>docker run</code> command.</li>
+            <li><strong>EXPOSE 8080:</strong> documents the port the app listens on: it doesn't actually publish it. Port publishing happens in <code>docker-compose.yml</code> or the <code>docker run</code> command.</li>
           </ul>
 
           <hr/>
@@ -115,7 +114,7 @@ volumes:
   db_data:</code></pre>
           <ul>
             <li><strong>All secrets via environment variables:</strong> no credentials are in the compose file itself. A <code>.env</code> file (excluded from git) provides the values at runtime.</li>
-            <li><strong>depends_on:</strong> controls start order — <code>backend</code> starts after <code>db</code>, <code>frontend</code> starts after <code>backend</code>. Note: this only waits for the container to start, not for the service inside to be healthy. A health check would be needed for a stricter guarantee.</li>
+            <li><strong>depends_on:</strong> controls start order: <code>backend</code> starts after <code>db</code>, <code>frontend</code> starts after <code>backend</code>. Note: this only waits for the container to start, not for the service inside to be healthy. A health check would be needed for a stricter guarantee.</li>
             <li><strong>Named volume <code>db_data</code>:</strong> data persists even if the <code>db</code> container is removed and recreated. Without this, every restart wipes the database.</li>
             <li><strong>3000:80 for frontend:</strong> the React app is built as static files and served by nginx inside the container on port 80. The host maps 3000 to 80 so users hit <code>localhost:3000</code>.</li>
             <li>The three services form a chain: requests enter through the frontend, which calls the backend API on port 8080, which reads/writes to PostgreSQL on port 5432.</li>
@@ -171,7 +170,7 @@ volumes:
     }
 }</code></pre>
           <ul>
-            <li><strong>credentials('dockerhub-credentials'):</strong> Jenkins retrieves the Docker Hub username/password from its credential store — never hardcoded in the pipeline file.</li>
+            <li><strong>credentials('dockerhub-credentials'):</strong> Jenkins retrieves the Docker Hub username/password from its credential store: never hardcoded in the pipeline file.</li>
             <li><strong>-DskipTests:</strong> tests are skipped in this pipeline to keep the CI cycle fast. A dedicated test stage (or a separate pipeline) should run the full test suite.</li>
             <li><strong>docker.build(image, context):</strong> the second argument is the Docker build context. <code>'.'</code> for the backend (Dockerfile at root), <code>'frontend'</code> for the React app (Dockerfile inside the frontend directory).</li>
             <li><strong>push('latest'):</strong> tags the image as <code>:latest</code> on Docker Hub. In production pipelines you'd also push a version tag (e.g., the Git commit SHA) to keep a history of deployable images.</li>
@@ -200,7 +199,7 @@ docker compose down       # keeps the db_data volume
 docker compose down -v    # also deletes the volume (wipes the database)</code></pre>
           <ul>
             <li><code>-d</code> runs containers in detached mode (background). Use <code>docker compose logs -f</code> to tail logs.</li>
-            <li><code>docker compose down -v</code> is destructive — it deletes all named volumes including <code>db_data</code>. Useful to reset a dev environment; never run it in production.</li>
+            <li><code>docker compose down -v</code> is destructive: it deletes all named volumes including <code>db_data</code>. Useful to reset a dev environment; never run it in production.</li>
           </ul>
 
           <hr/>
@@ -208,9 +207,9 @@ docker compose down -v    # also deletes the volume (wipes the database)</code><
           <h2>Key Takeaways</h2>
           <ul>
             <li>Use <code>openjdk:17-jdk-slim</code> (not the full JDK image) to keep the backend image as lean as possible.</li>
-            <li>All secrets (DB password, JWT secret, Docker Hub credentials) live in environment variables — never in source-controlled files.</li>
+            <li>All secrets (DB password, JWT secret, Docker Hub credentials) live in environment variables: never in source-controlled files.</li>
             <li>Named volumes make database data persistent across container restarts; without them, every <code>compose down</code> wipes your data.</li>
-            <li><code>depends_on</code> controls start order but not readiness — add health checks if you need to wait for PostgreSQL to be fully ready before the backend starts.</li>
+            <li><code>depends_on</code> controls start order but not readiness: add health checks if you need to wait for PostgreSQL to be fully ready before the backend starts.</li>
             <li>Push a version tag alongside <code>:latest</code> in CI so you can roll back to a specific image if a deployment goes wrong.</li>
             <li><code>cleanWs()</code> in a <code>post { always }</code> block prevents Jenkins agents from running out of disk space after many builds.</li>
           </ul>

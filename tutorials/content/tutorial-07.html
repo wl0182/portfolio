@@ -28,7 +28,6 @@
         <nav class="hidden items-center gap-6 md:flex">
           <a href="../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
           <a href="../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
-          <a href="../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
           <a href="../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
           <a href="../../tutorials/" class="text-indigo-600 dark:text-indigo-400">Tutorials</a>
           <a href="../../course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
@@ -41,7 +40,7 @@
 
     <main class="mx-auto max-w-7xl px-6 py-10">
       <header class="max-w-3xl">
-        <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Tutorial 07: Orders API — Part 1</h1>
+        <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Tutorial 07: Orders API: Part 1</h1>
         <p class="mt-2 text-slate-600 dark:text-slate-300">Placing an order: session lookup, building order items, computing the total, and returning the response.</p>
         <a href="../" class="mt-4 inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Tutorials</a>
       </header>
@@ -54,7 +53,7 @@
 
         <section class="tutorial-content prose prose-slate dark:prose-invert">
 
-          <p>The Orders API is the heart of the system. Every food item a customer gets starts here. This tutorial walks through the <code>placeOrder</code> flow — how the service validates the session, builds the order and its items, calculates the total, and constructs a detailed response without a mapper class.</p>
+          <p>The Orders API is the heart of the system. Every food item a customer gets starts here. This tutorial walks through the <code>placeOrder</code> flow: how the service validates the session, builds the order and its items, calculates the total, and constructs a detailed response without a mapper class.</p>
 
           <hr/>
 
@@ -89,29 +88,29 @@ public class OrderController {
     }
 }</code></pre>
           <ul>
-            <li><strong>POST /orders</strong> returns 201 Created — a new resource was created, so 201 is semantically correct over 200.</li>
-            <li>The path variable on <code>getOrderBySession</code> is <code>{id}</code> but the parameter is named <code>sessionId</code> — the <code>@PathVariable("id")</code> annotation maps them explicitly.</li>
-            <li>No <code>@Valid</code> on <code>placeOrder</code> in this implementation — adding it with Bean Validation annotations on <code>PlaceOrderRequest</code> would be a straightforward improvement.</li>
+            <li><strong>POST /orders</strong> returns 201 Created: a new resource was created, so 201 is semantically correct over 200.</li>
+            <li>The path variable on <code>getOrderBySession</code> is <code>{id}</code> but the parameter is named <code>sessionId</code>: the <code>@PathVariable("id")</code> annotation maps them explicitly.</li>
+            <li>No <code>@Valid</code> on <code>placeOrder</code> in this implementation: adding it with Bean Validation annotations on <code>PlaceOrderRequest</code> would be a straightforward improvement.</li>
           </ul>
 
           <hr/>
 
           <h2>2. The PlaceOrderRequest DTO</h2>
 
-          <pre><code class="language-java">// PlaceOrderRequest — what the client sends
+          <pre><code class="language-java">// PlaceOrderRequest: what the client sends
 public class PlaceOrderRequest {
     private Long tableSessionId;          // which active session to attach this order to
     private List&lt;OrderItemRequest&gt; items; // one entry per line item
 }
 
-// OrderItemRequest — one item line
+// OrderItemRequest: one item line
 public class OrderItemRequest {
     private Long menuItemId; // references MenuItem.id
     private int quantity;
 }</code></pre>
           <ul>
             <li>The client references a <code>tableSessionId</code> (DB ID), not a table number. At this point in the flow, the front end already has the session ID from the start-session call.</li>
-            <li>Each item in <code>items</code> only needs the menu item's ID and a quantity — the price is looked up from the <code>MenuItem</code> entity server-side, so the client can never manipulate it.</li>
+            <li>Each item in <code>items</code> only needs the menu item's ID and a quantity: the price is looked up from the <code>MenuItem</code> entity server-side, so the client can never manipulate it.</li>
           </ul>
 
           <hr/>
@@ -177,9 +176,9 @@ public PlaceOrderResponse placeOrder(PlaceOrderRequest orderRequest) {
           <ul>
             <li><strong>@Transactional:</strong> wraps the entire method in a single DB transaction. If the loop throws (e.g., a menu item ID doesn't exist), the partial order is rolled back automatically.</li>
             <li><strong>Active session check first:</strong> if there's no active session, we fail fast before touching the <code>Order</code> table at all.</li>
-            <li><strong>Price from the server:</strong> <code>menuItem.getPrice()</code> is read from the DB, not from the request. This means the client cannot send a modified price — the server always uses the canonical value.</li>
+            <li><strong>Price from the server:</strong> <code>menuItem.getPrice()</code> is read from the DB, not from the request. This means the client cannot send a modified price: the server always uses the canonical value.</li>
             <li><strong>orderItem.setOrder(order):</strong> the back-reference is set explicitly so JPA's cascade save picks up the items when <code>orderRepository.save(order)</code> is called.</li>
-            <li><strong>total accumulation in the loop:</strong> simpler and more readable than a stream for this use case — keeps the item-building and total-calculation together.</li>
+            <li><strong>total accumulation in the loop:</strong> simpler and more readable than a stream for this use case: keeps the item-building and total-calculation together.</li>
           </ul>
 
           <hr/>
@@ -216,7 +215,7 @@ public PlaceOrderResponse placeOrder(PlaceOrderRequest orderRequest) {
 }</code></pre>
           <ul>
             <li>The outer stream maps <code>Order → OrderResponse</code>; the inner stream maps <code>OrderItem → OrderItemResponse</code>. Nested streams are readable here because each level is short.</li>
-            <li><code>findByTableSession(tableSession)</code> is a derived query — Spring Data generates the JPQL from the method name. No <code>@Query</code> needed.</li>
+            <li><code>findByTableSession(tableSession)</code> is a derived query: Spring Data generates the JPQL from the method name. No <code>@Query</code> needed.</li>
           </ul>
 
           <hr/>
@@ -242,10 +241,10 @@ public PlaceOrderResponse placeOrder(PlaceOrderRequest orderRequest) {
 
           <h2>Key Takeaways</h2>
           <ul>
-            <li>Always look up prices server-side from the <code>MenuItem</code> entity — never trust prices from the client request.</li>
+            <li>Always look up prices server-side from the <code>MenuItem</code> entity: never trust prices from the client request.</li>
             <li><code>@Transactional</code> on the service method ensures the entire order (plus all items) is saved atomically, or not at all.</li>
             <li>Set the back-reference (<code>orderItem.setOrder(order)</code>) before saving so JPA's cascade picks up the child records correctly.</li>
-            <li>Validate the active session before creating any records — fail fast before writing partial data.</li>
+            <li>Validate the active session before creating any records: fail fast before writing partial data.</li>
             <li>Inline response mapping (no mapper class) is fine for complex, one-off response shapes; extract a mapper only when the same mapping is reused in multiple places.</li>
           </ul>
 

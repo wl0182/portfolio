@@ -28,7 +28,6 @@
         <nav class="hidden items-center gap-6 md:flex">
           <a href="../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
           <a href="../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
-          <a href="../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
           <a href="../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
           <a href="../../tutorials/" class="text-indigo-600 dark:text-indigo-400">Tutorials</a>
           <a href="../../course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
@@ -54,13 +53,13 @@
 
         <section class="tutorial-content prose prose-slate dark:prose-invert">
 
-          <p>Without a global exception handler, any unhandled exception in a Spring Boot application results in an ugly 500 Internal Server Error with a stack trace. A well-structured exception handler turns domain failures into clean, consistent JSON error responses with the correct HTTP status code — making the API far easier to consume.</p>
+          <p>Without a global exception handler, any unhandled exception in a Spring Boot application results in an ugly 500 Internal Server Error with a stack trace. A well-structured exception handler turns domain failures into clean, consistent JSON error responses with the correct HTTP status code: making the API far easier to consume.</p>
 
           <hr/>
 
           <h2>1. Custom exception classes</h2>
 
-          <p>Each domain failure gets its own exception class. They all extend <code>RuntimeException</code> — unchecked exceptions that don't need to be declared in method signatures.</p>
+          <p>Each domain failure gets its own exception class. They all extend <code>RuntimeException</code>: unchecked exceptions that don't need to be declared in method signatures.</p>
 
           <pre><code class="language-java">// Pattern for all custom exceptions in this project:
 public class ActiveSessionExistsException extends RuntimeException {
@@ -78,9 +77,9 @@ public class ActiveSessionExistsException extends RuntimeException {
 // NoTableSessionFoundException, TableSessionNotFound
 // OrderNotFoundException, ResourceNotFoundException</code></pre>
           <ul>
-            <li>Each exception class is tiny — just a name and constructors. The name carries all the meaning; no logic needed.</li>
+            <li>Each exception class is tiny: just a name and constructors. The name carries all the meaning; no logic needed.</li>
             <li>Two constructors: one for a message only, one for message + cause. The cause constructor lets you wrap lower-level exceptions without losing the original stack trace.</li>
-            <li>Extending <code>RuntimeException</code> means callers don't need a <code>try/catch</code> — the exception bubbles up to the global handler automatically.</li>
+            <li>Extending <code>RuntimeException</code> means callers don't need a <code>try/catch</code>: the exception bubbles up to the global handler automatically.</li>
           </ul>
 
           <hr/>
@@ -124,8 +123,8 @@ public class GlobalExceptionHandler {
           <ul>
             <li><strong>@RestControllerAdvice</strong> combines <code>@ControllerAdvice</code> and <code>@ResponseBody</code>. Every <code>@ExceptionHandler</code> return value is serialized to JSON automatically.</li>
             <li><strong>@ExceptionHandler(SomeException.class)</strong> registers a method as the handler for that specific exception type. Spring matches the most specific handler first.</li>
-            <li><strong>The catch-all <code>@ExceptionHandler(Exception.class)</code></strong> is a safety net — any exception not handled by a more specific method lands here as a 500. This prevents stack traces from leaking to the client.</li>
-            <li>The error body always includes <code>status</code>, <code>error</code>, <code>message</code>, and <code>timestamp</code> — a consistent shape the front end can rely on.</li>
+            <li><strong>The catch-all <code>@ExceptionHandler(Exception.class)</code></strong> is a safety net: any exception not handled by a more specific method lands here as a 500. This prevents stack traces from leaking to the client.</li>
+            <li>The error body always includes <code>status</code>, <code>error</code>, <code>message</code>, and <code>timestamp</code>: a consistent shape the front end can rely on.</li>
           </ul>
 
           <hr/>
@@ -175,20 +174,20 @@ public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handleMenuItemIdNotFound(
 //   "timestamp": "2025-05-10T14:32:00.000Z"
 // }</code></pre>
           <ul>
-            <li>The service has zero HTTP knowledge — it just throws a domain exception. The handler does the HTTP translation.</li>
-            <li><code>orElseThrow(MenuItemIdNotFoundException::new)</code> — the constructor reference creates a new instance of the exception. Use a lambda <code>() -&gt; new MenuItemIdNotFoundException(id)</code> when you need to pass arguments.</li>
-            <li><code>Instant.now()</code> gives a UTC timestamp in ISO-8601 format — no timezone ambiguity.</li>
+            <li>The service has zero HTTP knowledge: it just throws a domain exception. The handler does the HTTP translation.</li>
+            <li><code>orElseThrow(MenuItemIdNotFoundException::new)</code>: the constructor reference creates a new instance of the exception. Use a lambda <code>() -&gt; new MenuItemIdNotFoundException(id)</code> when you need to pass arguments.</li>
+            <li><code>Instant.now()</code> gives a UTC timestamp in ISO-8601 format: no timezone ambiguity.</li>
           </ul>
 
           <hr/>
 
           <h2>Key Takeaways</h2>
           <ul>
-            <li>One exception class per domain failure — the name makes the problem self-documenting without needing a comment.</li>
+            <li>One exception class per domain failure: the name makes the problem self-documenting without needing a comment.</li>
             <li><code>@RestControllerAdvice</code> centralises all HTTP error handling in one place, keeping service classes free of HTTP concerns.</li>
             <li>Always include a catch-all <code>@ExceptionHandler(Exception.class)</code> to prevent stack traces from reaching the client.</li>
             <li>Map exception types to HTTP status codes semantically: 404 for missing resources, 409 for conflicts, 400 for bad domain state, 500 for unexpected errors.</li>
-            <li>Use <code>Instant.now()</code> for timestamps in error responses — always UTC, always consistent.</li>
+            <li>Use <code>Instant.now()</code> for timestamps in error responses: always UTC, always consistent.</li>
           </ul>
 
         </section>

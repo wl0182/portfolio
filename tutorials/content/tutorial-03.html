@@ -28,7 +28,6 @@
         <nav class="hidden items-center gap-6 md:flex">
           <a href="../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
           <a href="../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
-          <a href="../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
           <a href="../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
           <a href="../../tutorials/" class="text-indigo-600 dark:text-indigo-400">Tutorials</a>
           <a href="../../course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
@@ -77,7 +76,7 @@
         <ul>
           <li><strong>@Query:</strong> replaces the auto-generated method name. Useful when the method name would become too long or ambiguous.</li>
           <li><strong>:category / @Param:</strong> named parameters bind cleanly and are immune to position errors.</li>
-          <li><strong>LIKE %:name%:</strong> substring search — equivalent to SQL <code>LIKE '%value%'</code>.</li>
+          <li><strong>LIKE %:name%:</strong> substring search: equivalent to SQL <code>LIKE '%value%'</code>.</li>
         </ul>
 
         <h3>OrderRepository: querying across relationships</h3>
@@ -95,7 +94,7 @@
     List&lt;OrderItem&gt; findItemsByTableSession(@Param("sessionId") Long sessionId);
 }</code></pre>
         <ul>
-          <li><strong>findByTableSession:</strong> Spring Data derives this query automatically from the method name — no @Query needed.</li>
+          <li><strong>findByTableSession:</strong> Spring Data derives this query automatically from the method name: no @Query needed.</li>
           <li><strong>o.status &lt;&gt; 'SERVED':</strong> JPQL inequality operator. The string must match the value stored in the DB (the enum name).</li>
           <li><strong>select o.items:</strong> selects the collection field directly, returning a flat list of <code>OrderItem</code> without loading the parent <code>Order</code>.</li>
         </ul>
@@ -113,7 +112,7 @@
     List&lt;MostOrderedItemDTO&gt; findMostOrderedItems();
 }</code></pre>
         <ul>
-          <li><strong>Constructor expression:</strong> <code>new DTO(field1, field2)</code> tells Hibernate to build a DTO directly in the query — no full entity load, no manual mapping loop.</li>
+          <li><strong>Constructor expression:</strong> <code>new DTO(field1, field2)</code> tells Hibernate to build a DTO directly in the query: no full entity load, no manual mapping loop.</li>
           <li><strong>SUM / COUNT DISTINCT:</strong> standard JPQL aggregate functions. <code>DISTINCT oi.order.id</code> counts unique orders, not order item rows.</li>
           <li><strong>GROUP BY:</strong> required whenever you use aggregates. Groups by item name so each name gets one summary row.</li>
           <li>The DTO's constructor must match the selected fields in exact order and type.</li>
@@ -171,7 +170,7 @@ public class MenuItemResponse {
 }</code></pre>
         <ul>
           <li><strong>Validation on the request:</strong> <code>@NotNull</code> and friends belong on the request DTO, not the entity. The entity layer should never trust input.</li>
-          <li><strong>Selective fields on the response:</strong> the response includes the generated <code>id</code> (not present in the request) and omits <code>description</code> — a deliberate design choice to keep the list response compact.</li>
+          <li><strong>Selective fields on the response:</strong> the response includes the generated <code>id</code> (not present in the request) and omits <code>description</code>: a deliberate design choice to keep the list response compact.</li>
           <li>Lombok's <code>@Data</code> generates getters, setters, equals, hashCode, and toString. <code>@AllArgsConstructor</code> and <code>@NoArgsConstructor</code> cover both Jackson deserialization and test construction.</li>
         </ul>
 
@@ -207,8 +206,8 @@ public class MenuItemMapper {
     }
 }</code></pre>
         <ul>
-          <li><strong>fromMenuItem:</strong> entity to response — notice <code>id</code> is included (it exists on the entity after save), while <code>description</code> is excluded.</li>
-          <li><strong>toMenuItem:</strong> request to entity — notice <code>id</code> is NOT set (the DB generates it), but <code>description</code> IS included since the request provides it.</li>
+          <li><strong>fromMenuItem:</strong> entity to response: notice <code>id</code> is included (it exists on the entity after save), while <code>description</code> is excluded.</li>
+          <li><strong>toMenuItem:</strong> request to entity: notice <code>id</code> is NOT set (the DB generates it), but <code>description</code> IS included since the request provides it.</li>
           <li>Static methods work here because mappers have no state. The <code>@Component</code> annotation lets Spring inject the class when needed by services, but the methods are called statically: <code>MenuItemMapper.fromMenuItem(item)</code>.</li>
         </ul>
 
@@ -234,7 +233,7 @@ public class OrderItemMapper {
     }
 }</code></pre>
         <ul>
-          <li>The mapper computes <code>totalPrice</code> at mapping time — the entity stores unit price on the <code>MenuItem</code>, not the line total.</li>
+          <li>The mapper computes <code>totalPrice</code> at mapping time: the entity stores unit price on the <code>MenuItem</code>, not the line total.</li>
           <li><code>toOrderItem</code> receives the already-loaded <code>MenuItem</code> and <code>Order</code> as parameters. The service is responsible for loading them; the mapper only assembles the object.</li>
         </ul>
 
@@ -243,11 +242,11 @@ public class OrderItemMapper {
         <h2>Key Takeaways</h2>
         <ul>
           <li>Use <code>@Query</code> when method-name derivation becomes unreadable or when you need JPQL features like <code>ORDER BY</code> or aggregates.</li>
-          <li>Switch to <code>nativeQuery = true</code> only for queries that JPQL cannot express — subqueries, window functions, or DB-specific functions.</li>
+          <li>Switch to <code>nativeQuery = true</code> only for queries that JPQL cannot express: subqueries, window functions, or DB-specific functions.</li>
           <li>Constructor expressions (<code>new DTO(...)</code> in JPQL) avoid loading full entities when you only need aggregated data.</li>
           <li>Always separate request DTOs (with validation) from response DTOs (with selective fields). Never expose entities directly.</li>
           <li>Mappers belong in their own class. One method per direction: entity-to-DTO and DTO-to-entity.</li>
-          <li>The mapper computes derived fields (like <code>totalPrice</code>) rather than storing them on the entity — keep the entity as a faithful representation of the database row.</li>
+          <li>The mapper computes derived fields (like <code>totalPrice</code>) rather than storing them on the entity: keep the entity as a faithful representation of the database row.</li>
         </ul>
 
       </section>

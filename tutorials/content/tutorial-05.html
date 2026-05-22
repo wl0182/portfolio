@@ -28,7 +28,6 @@
         <nav class="hidden items-center gap-6 md:flex">
           <a href="../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
           <a href="../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
-          <a href="../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
           <a href="../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
           <a href="../../tutorials/" class="text-indigo-600 dark:text-indigo-400">Tutorials</a>
           <a href="../../course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
@@ -60,7 +59,7 @@
 
         <h2>1. The Staff entity and repository</h2>
 
-        <p>The <code>Staff</code> entity is reference data — it represents real people who work at the restaurant. It is managed separately from <code>User</code> (the auth entity) and linked by <code>employeeId</code>.</p>
+        <p>The <code>Staff</code> entity is reference data: it represents real people who work at the restaurant. It is managed separately from <code>User</code> (the auth entity) and linked by <code>employeeId</code>.</p>
 
         <pre><code class="language-java">// Staff fields: firstName, lastName, email, employeeId (Long, unique), role (String)
 // Example roles: "waiter", "chef", "manager", "admin"
@@ -70,9 +69,9 @@ public interface StaffRepository extends JpaRepository&lt;Staff, Long&gt; {
     Optional&lt;Staff&gt; findByEmployeeId(Long employeeId);
 }</code></pre>
         <ul>
-          <li><code>findByEmployeeId</code> is derived automatically by Spring Data — no <code>@Query</code> needed.</li>
+          <li><code>findByEmployeeId</code> is derived automatically by Spring Data: no <code>@Query</code> needed.</li>
           <li>Returns <code>Optional</code> instead of <code>Staff</code> to make the "not found" case explicit at the call site.</li>
-          <li>The <code>role</code> field is a plain String here (not an enum). This keeps the staff table flexible — roles can be changed without a schema migration.</li>
+          <li>The <code>role</code> field is a plain String here (not an enum). This keeps the staff table flexible: roles can be changed without a schema migration.</li>
         </ul>
 
         <hr/>
@@ -87,7 +86,7 @@ public class AddStaffDTO {
     private String firstName;
     private String lastName;
     private String email;
-    private Long employeeId;  // must be unique — this is the registration key
+    private Long employeeId;  // must be unique: this is the registration key
     private String role;      // e.g. "waiter", "chef", "manager"
 }</code></pre>
 
@@ -134,8 +133,8 @@ public class StaffController {
     }
 }</code></pre>
         <ul>
-          <li>Both endpoints are protected by the security config — only authenticated admin users can reach <code>/api/staff</code>.</li>
-          <li>The class name <code>staffAddedResponse</code> uses lowercase — this is a naming inconsistency in the actual project. Convention is PascalCase for class names.</li>
+          <li>Both endpoints are protected by the security config: only authenticated admin users can reach <code>/api/staff</code>.</li>
+          <li>The class name <code>staffAddedResponse</code> uses lowercase: this is a naming inconsistency in the actual project. Convention is PascalCase for class names.</li>
         </ul>
 
         <hr/>
@@ -176,15 +175,15 @@ public class StaffManagementService {
     }
 }</code></pre>
         <ul>
-          <li>No mapper class is used here — the service maps inline. This is fine for simple cases; extract a <code>StaffMapper</code> if the mapping grows complex.</li>
-          <li>The stream-to-DTO pattern (<code>.stream().map(...).collect()</code>) is the same approach used in the menu service — consistent across the codebase.</li>
+          <li>No mapper class is used here: the service maps inline. This is fine for simple cases; extract a <code>StaffMapper</code> if the mapping grows complex.</li>
+          <li>The stream-to-DTO pattern (<code>.stream().map(...).collect()</code>) is the same approach used in the menu service: consistent across the codebase.</li>
         </ul>
 
         <hr/>
 
         <h2>5. The employee ID gate: why registration checks staff</h2>
 
-        <p>The registration endpoint in <code>AuthService</code> doesn't just create a user — it first verifies that the submitted <code>employeeId</code> exists in the <code>Staff</code> table:</p>
+        <p>The registration endpoint in <code>AuthService</code> doesn't just create a user: it first verifies that the submitted <code>employeeId</code> exists in the <code>Staff</code> table:</p>
 
         <pre><code class="language-java">// Inside AuthService.register()
 public AuthResponse register(RegisterRequestDTO req) {
@@ -207,9 +206,9 @@ public AuthResponse register(RegisterRequestDTO req) {
     return new AuthResponse(jwtService.generateToken(user));
 }</code></pre>
         <ul>
-          <li><strong>Why:</strong> the restaurant system is internal — only actual employees should be able to create accounts. A public registration form without this check would let anyone sign up.</li>
+          <li><strong>Why:</strong> the restaurant system is internal: only actual employees should be able to create accounts. A public registration form without this check would let anyone sign up.</li>
           <li><strong>Flow:</strong> an admin adds a staff member first (POST /api/staff/add), giving them an <code>employeeId</code>. The staff member then registers with that ID. Without it, registration is rejected.</li>
-          <li>New users are always created with <code>ROLE_USER</code> — an admin must manually elevate them if admin access is needed. This is a safe default.</li>
+          <li>New users are always created with <code>ROLE_USER</code>: an admin must manually elevate them if admin access is needed. This is a safe default.</li>
         </ul>
 
         <hr/>
@@ -218,9 +217,9 @@ public AuthResponse register(RegisterRequestDTO req) {
         <ul>
           <li>The <code>Staff</code> table is reference data, separate from <code>User</code> (the auth table). They are linked only by <code>employeeId</code> during registration.</li>
           <li>The employee ID gate prevents open registration. Only people an admin has pre-registered as staff can create accounts.</li>
-          <li>New users always get <code>ROLE_USER</code>. Admin access is granted separately — never by default.</li>
+          <li>New users always get <code>ROLE_USER</code>. Admin access is granted separately: never by default.</li>
           <li>Simple mappings (few fields, no nesting) can be done inline in the service. Extract a mapper class when the complexity grows.</li>
-          <li>Returning an <code>Optional</code> from the repository makes the "not found" scenario impossible to ignore — you must handle it at the call site.</li>
+          <li>Returning an <code>Optional</code> from the repository makes the "not found" scenario impossible to ignore: you must handle it at the call site.</li>
         </ul>
 
       </section>

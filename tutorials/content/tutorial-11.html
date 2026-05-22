@@ -28,7 +28,6 @@
         <nav class="hidden items-center gap-6 md:flex">
           <a href="../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
           <a href="../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
-          <a href="../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
           <a href="../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
           <a href="../../tutorials/" class="text-indigo-600 dark:text-indigo-400">Tutorials</a>
           <a href="../../course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
@@ -54,7 +53,7 @@
 
         <section class="tutorial-content prose prose-slate dark:prose-invert">
 
-          <p>The restaurant system is internal — only authenticated staff should access it. This tutorial walks through the JWT security layer: how tokens are generated and validated by <code>JwtService</code>, how each request is intercepted and authenticated by <code>JwtAuthenticationFilter</code>, and how <code>SecurityConfig</code> wires it all together with a stateless session policy.</p>
+          <p>The restaurant system is internal: only authenticated staff should access it. This tutorial walks through the JWT security layer: how tokens are generated and validated by <code>JwtService</code>, how each request is intercepted and authenticated by <code>JwtAuthenticationFilter</code>, and how <code>SecurityConfig</code> wires it all together with a stateless session policy.</p>
 
           <hr/>
 
@@ -107,9 +106,9 @@ public class JwtService {
     }
 }</code></pre>
           <ul>
-            <li><strong>@Value injection:</strong> <code>jwt.secret</code> and <code>jwt.expiration</code> are read from <code>application.yml</code> — never hardcoded. The secret stays out of source control.</li>
+            <li><strong>@Value injection:</strong> <code>jwt.secret</code> and <code>jwt.expiration</code> are read from <code>application.yml</code>: never hardcoded. The secret stays out of source control.</li>
             <li><strong>Extra claims:</strong> the role is embedded in the token payload so the front end can read it without an extra API call. The role is also re-validated server-side on every request.</li>
-            <li><strong>HS256:</strong> symmetric signing algorithm — the same secret is used to sign and verify. For a multi-service architecture, RS256 (asymmetric) is preferred.</li>
+            <li><strong>HS256:</strong> symmetric signing algorithm: the same secret is used to sign and verify. For a multi-service architecture, RS256 (asymmetric) is preferred.</li>
             <li><strong>extractClaim</strong> is a generic helper: it parses all claims once and applies a <code>Function&lt;Claims, T&gt;</code> to extract whichever field is needed.</li>
             <li><code>isTokenValid</code> checks two things: the username in the token matches the user we loaded from DB, and the token hasn't expired.</li>
           </ul>
@@ -167,11 +166,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 }</code></pre>
           <ul>
             <li><strong>OncePerRequestFilter:</strong> guarantees the filter runs exactly once per HTTP request, even in forward/include scenarios.</li>
-            <li><strong>Early return for /api/auth:</strong> login and register must be reachable without a token — skipping the filter for these paths avoids a chicken-and-egg problem.</li>
+            <li><strong>Early return for /api/auth:</strong> login and register must be reachable without a token: skipping the filter for these paths avoids a chicken-and-egg problem.</li>
             <li><strong>authHeader.substring(7):</strong> strips the <code>"Bearer "</code> prefix (7 characters) to get the raw token string.</li>
             <li><strong>Authentication == null check:</strong> prevents re-processing a request that's already been authenticated by an earlier filter in the chain.</li>
             <li><strong>SecurityContextHolder.getContext().setAuthentication(authToken):</strong> this single line tells Spring Security "this request is authenticated as this user." Every downstream security check reads from this context.</li>
-            <li>No credentials are stored in the auth token (second argument is <code>null</code>) — the password is not needed after authentication.</li>
+            <li>No credentials are stored in the auth token (second argument is <code>null</code>): the password is not needed after authentication.</li>
           </ul>
 
           <hr/>
@@ -230,7 +229,7 @@ public class SecurityConfig {
     }
 }</code></pre>
           <ul>
-            <li><strong>SessionCreationPolicy.STATELESS:</strong> Spring Security will never create an HTTP session. Every request must carry its own JWT — this is the defining trait of a REST API.</li>
+            <li><strong>SessionCreationPolicy.STATELESS:</strong> Spring Security will never create an HTTP session. Every request must carry its own JWT: this is the defining trait of a REST API.</li>
             <li><strong>csrf disabled:</strong> CSRF attacks require a session cookie to hijack. Since this API is stateless and uses Bearer tokens (not cookies), CSRF protection is unnecessary.</li>
             <li><strong>addFilterBefore:</strong> inserts the JWT filter before Spring's default <code>UsernamePasswordAuthenticationFilter</code>, so JWT authentication runs first on every request.</li>
             <li><strong>permitAll paths:</strong> auth endpoints, Swagger UI, and the orders/sessions paths are public. Everything else requires a valid JWT.</li>
@@ -265,11 +264,11 @@ public class SecurityConfig {
 
           <h2>Key Takeaways</h2>
           <ul>
-            <li>Never hardcode JWT secrets — inject them via <code>@Value</code> from environment-specific config files that are excluded from source control.</li>
-            <li><code>SessionCreationPolicy.STATELESS</code> is non-negotiable for a JWT REST API — it prevents Spring from creating server-side sessions that contradict the stateless design.</li>
-            <li>The filter sets authentication in the <code>SecurityContext</code> — this single object is what all downstream Spring Security checks read from.</li>
+            <li>Never hardcode JWT secrets: inject them via <code>@Value</code> from environment-specific config files that are excluded from source control.</li>
+            <li><code>SessionCreationPolicy.STATELESS</code> is non-negotiable for a JWT REST API: it prevents Spring from creating server-side sessions that contradict the stateless design.</li>
+            <li>The filter sets authentication in the <code>SecurityContext</code>: this single object is what all downstream Spring Security checks read from.</li>
             <li>Skip the filter for auth endpoints explicitly (<code>/api/auth/**</code>), otherwise login and register are unreachable without a token.</li>
-            <li>BCrypt is the right password hasher — never store plain text or use MD5/SHA-1 for passwords.</li>
+            <li>BCrypt is the right password hasher: never store plain text or use MD5/SHA-1 for passwords.</li>
           </ul>
 
         </section>
