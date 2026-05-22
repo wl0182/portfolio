@@ -3,6 +3,8 @@
 main > header {
   text-align: center;
   max-width: none;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 main > header a {

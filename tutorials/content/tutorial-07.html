@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tutorial 07 | Orders API: Placing Orders</title>
+    <meta name="description" content="Place an order against an active table session, build the order items list, compute the total, and return a full response." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E📘%3C/text%3E%3C/svg%3E" />
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30 transition group-hover:scale-105">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Software Engineer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../tutorials/" class="text-indigo-600 dark:text-indigo-400">Tutorials</a>
+          <a href="../../course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
+        </nav>
+        <div class="flex items-center gap-3">
+          <a href="../../#contact" class="hidden rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-indigo-600/30 transition hover:bg-indigo-500 active:scale-95 md:inline-block">Contact me</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <header class="max-w-3xl">
+        <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Tutorial 07: Orders API — Part 1</h1>
+        <p class="mt-2 text-slate-600 dark:text-slate-300">Placing an order: session lookup, building order items, computing the total, and returning the response.</p>
+        <a href="../" class="mt-4 inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Tutorials</a>
+      </header>
+
+      <div class="tutorial-layout mt-8">
+        <aside class="tutorial-toc">
+          <p class="tutorial-toc-title">On this page</p>
+          <div id="toc-links"></div>
+        </aside>
+
+        <section class="tutorial-content prose prose-slate dark:prose-invert">
+
+          <p>The Orders API is the heart of the system. Every food item a customer gets starts here. This tutorial walks through the <code>placeOrder</code> flow — how the service validates the session, builds the order and its items, calculates the total, and constructs a detailed response without a mapper class.</p>
+
+          <hr/>
+
+          <h2>1. Controller: order endpoints</h2>
+
+          <pre><code class="language-java">@RestController
+@RequestMapping("/orders")
+public class OrderController {
+
+    private final OrderService orderService;
+
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
+
+    @PostMapping()
+    public ResponseEntity&lt;PlaceOrderResponse&gt; placeOrder(
+            @RequestBody PlaceOrderRequest placeOrderRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(orderService.placeOrder(placeOrderRequest));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity&lt;OrderResponse&gt; getOrderById(@PathVariable Long id) {
+        return ResponseEntity.ok(orderService.getOrderById(id));
+    }
+
+    @GetMapping("/sessions/{id}")
+    public ResponseEntity&lt;List&lt;OrderResponse&gt;&gt; getOrderBySession(
+            @PathVariable Long sessionId) {
+        return ResponseEntity.ok(orderService.getOrderBySessionId(sessionId));
+    }
+}</code></pre>
+          <ul>
+            <li><strong>POST /orders</strong> returns 201 Created — a new resource was created, so 201 is semantically correct over 200.</li>
+            <li>The path variable on <code>getOrderBySession</code> is <code>{id}</code> but the parameter is named <code>sessionId</code> — the <code>@PathVariable("id")</code> annotation maps them explicitly.</li>
+            <li>No <code>@Valid</code> on <code>placeOrder</code> in this implementation — adding it with Bean Validation annotations on <code>PlaceOrderRequest</code> would be a straightforward improvement.</li>
+          </ul>
+
+          <hr/>
+
+          <h2>2. The PlaceOrderRequest DTO</h2>
+
+          <pre><code class="language-java">// PlaceOrderRequest — what the client sends
+public class PlaceOrderRequest {
+    private Long tableSessionId;          // which active session to attach this order to
+    private List&lt;OrderItemRequest&gt; items; // one entry per line item
+}
+
+// OrderItemRequest — one item line
+public class OrderItemRequest {
+    private Long menuItemId; // references MenuItem.id
+    private int quantity;
+}</code></pre>
+          <ul>
+            <li>The client references a <code>tableSessionId</code> (DB ID), not a table number. At this point in the flow, the front end already has the session ID from the start-session call.</li>
+            <li>Each item in <code>items</code> only needs the menu item's ID and a quantity — the price is looked up from the <code>MenuItem</code> entity server-side, so the client can never manipulate it.</li>
+          </ul>
+
+          <hr/>
+
+          <h2>3. placeOrder: the full service flow</h2>
+
+          <pre><code class="language-java">@Transactional
+public PlaceOrderResponse placeOrder(PlaceOrderRequest orderRequest) {
+    // 1. Verify the session is active
+    TableSession tableSession = tableSessionRepository
+        .findActiveTableSessionById(orderRequest.getTableSessionId())
+        .orElseThrow(NoActiveTableSessionFoundException::new);
+
+    // 2. Create the Order shell
+    Order order = new Order();
+    order.setStatus(OrderStatus.PLACED.name());
+    order.setTableSession(tableSession);
+    order.setOrderDate(LocalDateTime.now());
+
+    // 3. Build each OrderItem and accumulate the total
+    List&lt;OrderItem&gt; orderItems = new ArrayList&lt;&gt;();
+    Double total = 0.0;
+
+    for (OrderItemRequest req : orderRequest.getItems()) {
+        MenuItem menuItem = menuItemRepository.findById(req.getMenuItemId())
+            .orElseThrow(MenuItemNotFoundException::new);
+
+        OrderItem orderItem = new OrderItem();
+        orderItem.setServed(false);
+        orderItem.setMenuItem(menuItem);
+        orderItem.setQuantity(req.getQuantity());
+        orderItem.setOrder(order);           // back-reference so JPA cascades correctly
+
+        total += req.getQuantity() * menuItem.getPrice();
+        orderItems.add(orderItem);
+    }
+
+    order.setItems(orderItems);
+    order.setTotal(total);
+    orderRepository.save(order);            // cascades to OrderItems via @OneToMany(cascade = ALL)
+
+    // 4. Build the response
+    PlaceOrderResponse response = new PlaceOrderResponse();
+    response.setOrderId(order.getId());
+    response.setSessionId(tableSession.getId());
+    response.setCreatedAt(order.getOrderDate());
+    response.setStatus(order.getStatus());
+
+    List&lt;OrderItemResponse&gt; itemResponses = orderItems.stream().map(oi -&gt; {
+        OrderItemResponse r = new OrderItemResponse();
+        r.setItemId(oi.getId());
+        r.setMenuItemId(oi.getMenuItem().getId());
+        r.setName(oi.getMenuItem().getName());
+        r.setQuantity(oi.getQuantity());
+        r.setServed(oi.getServed());
+        r.setTotalPrice(oi.getQuantity() * oi.getMenuItem().getPrice());
+        return r;
+    }).collect(Collectors.toList());
+
+    response.setItems(itemResponses);
+    return response;
+}</code></pre>
+          <ul>
+            <li><strong>@Transactional:</strong> wraps the entire method in a single DB transaction. If the loop throws (e.g., a menu item ID doesn't exist), the partial order is rolled back automatically.</li>
+            <li><strong>Active session check first:</strong> if there's no active session, we fail fast before touching the <code>Order</code> table at all.</li>
+            <li><strong>Price from the server:</strong> <code>menuItem.getPrice()</code> is read from the DB, not from the request. This means the client cannot send a modified price — the server always uses the canonical value.</li>
+            <li><strong>orderItem.setOrder(order):</strong> the back-reference is set explicitly so JPA's cascade save picks up the items when <code>orderRepository.save(order)</code> is called.</li>
+            <li><strong>total accumulation in the loop:</strong> simpler and more readable than a stream for this use case — keeps the item-building and total-calculation together.</li>
+          </ul>
+
+          <hr/>
+
+          <h2>4. Fetching orders by session</h2>
+
+          <pre><code class="language-java">public List&lt;OrderResponse&gt; getOrderBySessionId(Long sessionId) {
+    TableSession tableSession = tableSessionRepository.findById(sessionId)
+        .orElseThrow(NoTableSessionFoundException::new);
+
+    List&lt;Order&gt; orders = orderRepository.findByTableSession(tableSession);
+
+    return orders.stream().map(order -&gt; {
+        OrderResponse resp = new OrderResponse();
+        resp.setOrderId(order.getId());
+        resp.setStatus(order.getStatus());
+        resp.setSessionId(order.getTableSession().getId());
+
+        List&lt;OrderItemResponse&gt; items = order.getItems().stream().map(oi -&gt; {
+            OrderItemResponse ir = new OrderItemResponse();
+            ir.setItemId(oi.getId());
+            ir.setMenuItemId(oi.getMenuItem().getId());
+            ir.setName(oi.getMenuItem().getName());
+            ir.setQuantity(oi.getQuantity());
+            ir.setServed(oi.getServed());
+            ir.setUnitPrice(oi.getMenuItem().getPrice());
+            ir.setTotalPrice(oi.getMenuItem().getPrice() * oi.getQuantity());
+            return ir;
+        }).collect(Collectors.toList());
+
+        resp.setOrderItems(items);
+        return resp;
+    }).collect(Collectors.toList());
+}</code></pre>
+          <ul>
+            <li>The outer stream maps <code>Order → OrderResponse</code>; the inner stream maps <code>OrderItem → OrderItemResponse</code>. Nested streams are readable here because each level is short.</li>
+            <li><code>findByTableSession(tableSession)</code> is a derived query — Spring Data generates the JPQL from the method name. No <code>@Query</code> needed.</li>
+          </ul>
+
+          <hr/>
+
+          <h2>5. Endpoint map</h2>
+
+          <table>
+            <thead><tr><th>Method</th><th>Path</th><th>Purpose</th></tr></thead>
+            <tbody>
+              <tr><td>POST</td><td>/orders</td><td>Place a new order</td></tr>
+              <tr><td>GET</td><td>/orders/{id}</td><td>Get one order by ID</td></tr>
+              <tr><td>GET</td><td>/orders/sessions/{id}</td><td>All orders for a session</td></tr>
+              <tr><td>GET</td><td>/orders/sessions/{id}/served</td><td>Served items for a session</td></tr>
+              <tr><td>GET</td><td>/orders/sessions/{id}/unserved</td><td>Unserved items for a session</td></tr>
+              <tr><td>POST</td><td>/orders/{id}/serve</td><td>Mark whole order as served</td></tr>
+              <tr><td>POST</td><td>/orders/orderItem/{id}/serve</td><td>Mark one item as served</td></tr>
+              <tr><td>GET</td><td>/orders/kitchen/queue</td><td>Kitchen view of pending items</td></tr>
+              <tr><td>GET</td><td>/orders/{id}/Items-status</td><td>Check served status of all items</td></tr>
+            </tbody>
+          </table>
+
+          <hr/>
+
+          <h2>Key Takeaways</h2>
+          <ul>
+            <li>Always look up prices server-side from the <code>MenuItem</code> entity — never trust prices from the client request.</li>
+            <li><code>@Transactional</code> on the service method ensures the entire order (plus all items) is saved atomically, or not at all.</li>
+            <li>Set the back-reference (<code>orderItem.setOrder(order)</code>) before saving so JPA's cascade picks up the child records correctly.</li>
+            <li>Validate the active session before creating any records — fail fast before writing partial data.</li>
+            <li>Inline response mapping (no mapper class) is fine for complex, one-off response shapes; extract a mapper only when the same mapping is reused in multiple places.</li>
+          </ul>
+
+        </section>
+      </div>
+
+      <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+        <a href="./tutorial-06.html" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          Previous
+        </a>
+        <a href="./tutorial-08.html" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">
+          Next
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </a>
+      </nav>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script></script>
+    <script>
+      (function() {
+        const toc = document.getElementById('toc-links');
+        if (!toc) return;
+        const headings = document.querySelectorAll('.tutorial-content h2, .tutorial-content h3');
+        headings.forEach((h, i) => {
+          if (!h.id) h.id = 'section-' + i;
+          const a = document.createElement('a');
+          a.href = '#' + h.id;
+          a.textContent = h.textContent;
+          if (h.tagName === 'H3') a.classList.add('toc-h3');
+          toc.appendChild(a);
+        });
+      })();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>

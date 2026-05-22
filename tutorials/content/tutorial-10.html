@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tutorial 10 | Global Exception Handling</title>
+    <meta name="description" content="Custom exceptions, @RestControllerAdvice, and how exception types map cleanly to HTTP status codes." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E📘%3C/text%3E%3C/svg%3E" />
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30 transition group-hover:scale-105">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Software Engineer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../tutorials/" class="text-indigo-600 dark:text-indigo-400">Tutorials</a>
+          <a href="../../course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
+        </nav>
+        <div class="flex items-center gap-3">
+          <a href="../../#contact" class="hidden rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-indigo-600/30 transition hover:bg-indigo-500 active:scale-95 md:inline-block">Contact me</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <header class="max-w-3xl">
+        <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Tutorial 10: Global Exception Handling</h1>
+        <p class="mt-2 text-slate-600 dark:text-slate-300">Custom exceptions, @RestControllerAdvice, and mapping exception types to the right HTTP status codes.</p>
+        <a href="../" class="mt-4 inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Tutorials</a>
+      </header>
+
+      <div class="tutorial-layout mt-8">
+        <aside class="tutorial-toc">
+          <p class="tutorial-toc-title">On this page</p>
+          <div id="toc-links"></div>
+        </aside>
+
+        <section class="tutorial-content prose prose-slate dark:prose-invert">
+
+          <p>Without a global exception handler, any unhandled exception in a Spring Boot application results in an ugly 500 Internal Server Error with a stack trace. A well-structured exception handler turns domain failures into clean, consistent JSON error responses with the correct HTTP status code — making the API far easier to consume.</p>
+
+          <hr/>
+
+          <h2>1. Custom exception classes</h2>
+
+          <p>Each domain failure gets its own exception class. They all extend <code>RuntimeException</code> — unchecked exceptions that don't need to be declared in method signatures.</p>
+
+          <pre><code class="language-java">// Pattern for all custom exceptions in this project:
+public class ActiveSessionExistsException extends RuntimeException {
+    public ActiveSessionExistsException(String message) {
+        super(message);
+    }
+    public ActiveSessionExistsException(String message, Throwable cause) {
+        super(message, cause);
+    }
+}
+
+// Other exceptions follow the same pattern:
+// MenuItemIdNotFoundException, MenuItemNotFoundException, MenuItemNotAvailableException
+// NoActiveTableSessionFoundException, NoActiveSessionsFoundExceptions
+// NoTableSessionFoundException, TableSessionNotFound
+// OrderNotFoundException, ResourceNotFoundException</code></pre>
+          <ul>
+            <li>Each exception class is tiny — just a name and constructors. The name carries all the meaning; no logic needed.</li>
+            <li>Two constructors: one for a message only, one for message + cause. The cause constructor lets you wrap lower-level exceptions without losing the original stack trace.</li>
+            <li>Extending <code>RuntimeException</code> means callers don't need a <code>try/catch</code> — the exception bubbles up to the global handler automatically.</li>
+          </ul>
+
+          <hr/>
+
+          <h2>2. @RestControllerAdvice: the global handler</h2>
+
+          <pre><code class="language-java">@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ActiveSessionExistsException.class)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handleActiveSessionExists(
+            ActiveSessionExistsException ex) {
+        Map&lt;String, Object&gt; error = new HashMap&lt;&gt;();
+        error.put("status", HttpStatus.CONFLICT.value());   // 409
+        error.put("error", "Active Session Exists");
+        error.put("message", ex.getMessage());
+        error.put("timestamp", Instant.now());
+        return new ResponseEntity&lt;&gt;(error, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(TableSessionNotFound.class)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handleSessionNotFound(TableSessionNotFound ex) {
+        Map&lt;String, Object&gt; error = new HashMap&lt;&gt;();
+        error.put("status", HttpStatus.NOT_FOUND.value());  // 404
+        error.put("error", "Not Found");
+        error.put("message", "Table Session Not Found");
+        error.put("timestamp", Instant.now());
+        return new ResponseEntity&lt;&gt;(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handleAllOtherExceptions(Exception ex) {
+        Map&lt;String, Object&gt; error = new HashMap&lt;&gt;();
+        error.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value()); // 500
+        error.put("error", "Internal Server Error");
+        error.put("message", ex.getMessage());
+        error.put("timestamp", Instant.now());
+        return new ResponseEntity&lt;&gt;(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}</code></pre>
+          <ul>
+            <li><strong>@RestControllerAdvice</strong> combines <code>@ControllerAdvice</code> and <code>@ResponseBody</code>. Every <code>@ExceptionHandler</code> return value is serialized to JSON automatically.</li>
+            <li><strong>@ExceptionHandler(SomeException.class)</strong> registers a method as the handler for that specific exception type. Spring matches the most specific handler first.</li>
+            <li><strong>The catch-all <code>@ExceptionHandler(Exception.class)</code></strong> is a safety net — any exception not handled by a more specific method lands here as a 500. This prevents stack traces from leaking to the client.</li>
+            <li>The error body always includes <code>status</code>, <code>error</code>, <code>message</code>, and <code>timestamp</code> — a consistent shape the front end can rely on.</li>
+          </ul>
+
+          <hr/>
+
+          <h2>3. Exception-to-status mapping</h2>
+
+          <table>
+            <thead><tr><th>Exception</th><th>HTTP Status</th><th>Why</th></tr></thead>
+            <tbody>
+              <tr><td>ActiveSessionExistsException</td><td>409 Conflict</td><td>Request valid but conflicts with current state</td></tr>
+              <tr><td>TableSessionNotFound</td><td>404 Not Found</td><td>Requested resource doesn't exist</td></tr>
+              <tr><td>NoActiveTableSessionFoundException</td><td>404 Not Found</td><td>No active session matches the lookup</td></tr>
+              <tr><td>NoActiveSessionsFoundExceptions</td><td>404 Not Found</td><td>No active sessions exist at all</td></tr>
+              <tr><td>MenuItemIdNotFoundException</td><td>404 Not Found</td><td>Menu item ID not in the database</td></tr>
+              <tr><td>MenuItemNotFoundException</td><td>404 Not Found</td><td>Menu item lookup by criteria failed</td></tr>
+              <tr><td>MenuItemNotAvailableException</td><td>400 Bad Request</td><td>Item exists but is not available to order</td></tr>
+              <tr><td>OrderNotFoundException</td><td>404 Not Found</td><td>Order ID not found</td></tr>
+              <tr><td>ResourceNotFoundException</td><td>404 Not Found</td><td>Generic resource not found</td></tr>
+              <tr><td>Exception (catch-all)</td><td>500 Internal Server Error</td><td>Unexpected / unhandled error</td></tr>
+            </tbody>
+          </table>
+
+          <hr/>
+
+          <h2>4. How it all connects</h2>
+
+          <p>The flow from a service call to a JSON error response:</p>
+
+          <pre><code class="language-java">// Service throws a domain exception:
+MenuItem menuItem = menuItemRepository.findById(id)
+    .orElseThrow(MenuItemIdNotFoundException::new);  // thrown here
+
+// GlobalExceptionHandler catches it:
+@ExceptionHandler(MenuItemIdNotFoundException.class)
+public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handleMenuItemIdNotFound(
+        MenuItemIdNotFoundException ex) {
+    // ... builds error map ...
+    return new ResponseEntity&lt;&gt;(error, HttpStatus.NOT_FOUND); // 404 returned to client
+}
+
+// Client receives:
+// HTTP 404
+// {
+//   "status": 404,
+//   "error": "Menu Item Not Found",
+//   "message": "Menu item with id 42 not found",
+//   "timestamp": "2025-05-10T14:32:00.000Z"
+// }</code></pre>
+          <ul>
+            <li>The service has zero HTTP knowledge — it just throws a domain exception. The handler does the HTTP translation.</li>
+            <li><code>orElseThrow(MenuItemIdNotFoundException::new)</code> — the constructor reference creates a new instance of the exception. Use a lambda <code>() -&gt; new MenuItemIdNotFoundException(id)</code> when you need to pass arguments.</li>
+            <li><code>Instant.now()</code> gives a UTC timestamp in ISO-8601 format — no timezone ambiguity.</li>
+          </ul>
+
+          <hr/>
+
+          <h2>Key Takeaways</h2>
+          <ul>
+            <li>One exception class per domain failure — the name makes the problem self-documenting without needing a comment.</li>
+            <li><code>@RestControllerAdvice</code> centralises all HTTP error handling in one place, keeping service classes free of HTTP concerns.</li>
+            <li>Always include a catch-all <code>@ExceptionHandler(Exception.class)</code> to prevent stack traces from reaching the client.</li>
+            <li>Map exception types to HTTP status codes semantically: 404 for missing resources, 409 for conflicts, 400 for bad domain state, 500 for unexpected errors.</li>
+            <li>Use <code>Instant.now()</code> for timestamps in error responses — always UTC, always consistent.</li>
+          </ul>
+
+        </section>
+      </div>
+
+      <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+        <a href="./tutorial-09.html" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          Previous
+        </a>
+        <a href="./tutorial-11.html" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">
+          Next
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </a>
+      </nav>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script></script>
+    <script>
+      (function() {
+        const toc = document.getElementById('toc-links');
+        if (!toc) return;
+        const headings = document.querySelectorAll('.tutorial-content h2, .tutorial-content h3');
+        headings.forEach((h, i) => {
+          if (!h.id) h.id = 'section-' + i;
+          const a = document.createElement('a');
+          a.href = '#' + h.id;
+          a.textContent = h.textContent;
+          if (h.tagName === 'H3') a.classList.add('toc-h3');
+          toc.appendChild(a);
+        });
+      })();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tutorial 12 | Docker and CI with Jenkins</title>
+    <meta name="description" content="Containerise the backend and frontend with Docker, compose the full stack, and automate builds and pushes with a Jenkins pipeline." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E📘%3C/text%3E%3C/svg%3E" />
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30 transition group-hover:scale-105">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Software Engineer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../tutorials/" class="text-indigo-600 dark:text-indigo-400">Tutorials</a>
+          <a href="../../course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
+        </nav>
+        <div class="flex items-center gap-3">
+          <a href="../../#contact" class="hidden rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-indigo-600/30 transition hover:bg-indigo-500 active:scale-95 md:inline-block">Contact me</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <header class="max-w-3xl">
+        <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Tutorial 12: Docker and CI with Jenkins</h1>
+        <p class="mt-2 text-slate-600 dark:text-slate-300">Containerise the backend and frontend, compose the full stack, and automate builds and Docker Hub pushes with Jenkins.</p>
+        <a href="../" class="mt-4 inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Tutorials</a>
+      </header>
+
+      <div class="tutorial-layout mt-8">
+        <aside class="tutorial-toc">
+          <p class="tutorial-toc-title">On this page</p>
+          <div id="toc-links"></div>
+        </aside>
+
+        <section class="tutorial-content prose prose-slate dark:prose-invert">
+
+          <p>The final step is packaging the application for deployment. This tutorial covers the Dockerfile that containerises the Spring Boot backend, the <code>docker-compose.yml</code> that runs the entire stack (database, backend, frontend) with a single command, and the Jenkins pipeline that automates building and pushing images to Docker Hub on every commit.</p>
+
+          <hr/>
+
+          <h2>1. Backend Dockerfile</h2>
+
+          <pre><code class="language-dockerfile">FROM openjdk:17-jdk-slim
+VOLUME /tmp
+COPY target/RestaurantOrder-0.0.1-SNAPSHOT.jar app.jar
+ENTRYPOINT ["java", "-jar", "/app.jar"]
+EXPOSE 8080</code></pre>
+          <ul>
+            <li><strong>openjdk:17-jdk-slim:</strong> the <code>slim</code> variant strips out tools not needed at runtime, reducing the image size significantly compared to the full JDK image.</li>
+            <li><strong>VOLUME /tmp:</strong> Spring Boot uses <code>/tmp</code> for embedded Tomcat's working directory. Declaring it as a volume moves it to Docker's storage layer, improving performance on some hosts.</li>
+            <li><strong>COPY target/...jar app.jar:</strong> assumes the JAR has already been built by <code>mvn package</code> before <code>docker build</code> runs. The Jenkins pipeline does this in the stage before building the image.</li>
+            <li><strong>ENTRYPOINT vs CMD:</strong> <code>ENTRYPOINT</code> is used here so the container always runs the JAR. <code>CMD</code> can be overridden at runtime; <code>ENTRYPOINT</code> cannot (without <code>--entrypoint</code>).</li>
+            <li><strong>EXPOSE 8080:</strong> documents the port the app listens on — it doesn't actually publish it. Port publishing happens in <code>docker-compose.yml</code> or the <code>docker run</code> command.</li>
+          </ul>
+
+          <hr/>
+
+          <h2>2. docker-compose.yml: the full stack</h2>
+
+          <pre><code class="language-yaml">services:
+  db:
+    image: postgres:14
+    container_name: restaurant_postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data  # persists data across container restarts
+
+  backend:
+    image: wassim4592/restaurant_backend:latest
+    container_name: restaurant_backend
+    depends_on:
+      - db
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "8080:8080"
+
+  frontend:
+    image: wassim4592/restaurant_frontend:latest
+    container_name: restaurant_frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:80"   # React build served by nginx inside the container on port 80
+
+volumes:
+  db_data:</code></pre>
+          <ul>
+            <li><strong>All secrets via environment variables:</strong> no credentials are in the compose file itself. A <code>.env</code> file (excluded from git) provides the values at runtime.</li>
+            <li><strong>depends_on:</strong> controls start order — <code>backend</code> starts after <code>db</code>, <code>frontend</code> starts after <code>backend</code>. Note: this only waits for the container to start, not for the service inside to be healthy. A health check would be needed for a stricter guarantee.</li>
+            <li><strong>Named volume <code>db_data</code>:</strong> data persists even if the <code>db</code> container is removed and recreated. Without this, every restart wipes the database.</li>
+            <li><strong>3000:80 for frontend:</strong> the React app is built as static files and served by nginx inside the container on port 80. The host maps 3000 to 80 so users hit <code>localhost:3000</code>.</li>
+            <li>The three services form a chain: requests enter through the frontend, which calls the backend API on port 8080, which reads/writes to PostgreSQL on port 5432.</li>
+          </ul>
+
+          <hr/>
+
+          <h2>3. Jenkinsfile: the CI pipeline</h2>
+
+          <pre><code class="language-groovy">pipeline {
+    agent any
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials') // Jenkins credential ID
+        BACKEND_IMAGE  = "wassim4592/restaurant_backend:latest"
+        FRONTEND_IMAGE = "wassim4592/restaurant_frontend:latest"
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm   // pull the latest code from the configured SCM (GitHub)
+            }
+        }
+        stage('Build Backend JAR') {
+            steps {
+                sh './mvnw clean package -DskipTests'  // compile + package, skip tests for speed
+            }
+        }
+        stage('Build and Push Backend Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS) {
+                        def backendImage = docker.build(env.BACKEND_IMAGE, '.')
+                        backendImage.push('latest')
+                    }
+                }
+            }
+        }
+        stage('Build and Push Frontend Docker Image') {
+            steps {
+                script {
+                    docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS) {
+                        def frontendImage = docker.build(env.FRONTEND_IMAGE, 'frontend')
+                        frontendImage.push('latest')
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            cleanWs()  // delete workspace after every build to avoid stale artifacts
+        }
+    }
+}</code></pre>
+          <ul>
+            <li><strong>credentials('dockerhub-credentials'):</strong> Jenkins retrieves the Docker Hub username/password from its credential store — never hardcoded in the pipeline file.</li>
+            <li><strong>-DskipTests:</strong> tests are skipped in this pipeline to keep the CI cycle fast. A dedicated test stage (or a separate pipeline) should run the full test suite.</li>
+            <li><strong>docker.build(image, context):</strong> the second argument is the Docker build context. <code>'.'</code> for the backend (Dockerfile at root), <code>'frontend'</code> for the React app (Dockerfile inside the frontend directory).</li>
+            <li><strong>push('latest'):</strong> tags the image as <code>:latest</code> on Docker Hub. In production pipelines you'd also push a version tag (e.g., the Git commit SHA) to keep a history of deployable images.</li>
+            <li><strong>post { always { cleanWs() } }:</strong> workspace cleanup runs even if a stage fails, preventing disk space from accumulating on the Jenkins agent.</li>
+          </ul>
+
+          <hr/>
+
+          <h2>4. Running the full stack locally</h2>
+
+          <pre><code class="language-bash"># 1. Build the backend JAR
+./mvnw clean package -DskipTests
+
+# 2. Create a .env file with your secrets
+cp .env.example .env
+# edit .env with your DB password, JWT secret, etc.
+
+# 3. Start everything
+docker compose up -d
+
+# 4. Check it's running
+docker compose ps
+
+# 5. Stop and tear down
+docker compose down       # keeps the db_data volume
+docker compose down -v    # also deletes the volume (wipes the database)</code></pre>
+          <ul>
+            <li><code>-d</code> runs containers in detached mode (background). Use <code>docker compose logs -f</code> to tail logs.</li>
+            <li><code>docker compose down -v</code> is destructive — it deletes all named volumes including <code>db_data</code>. Useful to reset a dev environment; never run it in production.</li>
+          </ul>
+
+          <hr/>
+
+          <h2>Key Takeaways</h2>
+          <ul>
+            <li>Use <code>openjdk:17-jdk-slim</code> (not the full JDK image) to keep the backend image as lean as possible.</li>
+            <li>All secrets (DB password, JWT secret, Docker Hub credentials) live in environment variables — never in source-controlled files.</li>
+            <li>Named volumes make database data persistent across container restarts; without them, every <code>compose down</code> wipes your data.</li>
+            <li><code>depends_on</code> controls start order but not readiness — add health checks if you need to wait for PostgreSQL to be fully ready before the backend starts.</li>
+            <li>Push a version tag alongside <code>:latest</code> in CI so you can roll back to a specific image if a deployment goes wrong.</li>
+            <li><code>cleanWs()</code> in a <code>post { always }</code> block prevents Jenkins agents from running out of disk space after many builds.</li>
+          </ul>
+
+        </section>
+      </div>
+
+      <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+        <a href="./tutorial-11.html" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          Previous
+        </a>
+        <span class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-400 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-600">
+          Series complete
+        </span>
+      </nav>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script></script>
+    <script>
+      (function() {
+        const toc = document.getElementById('toc-links');
+        if (!toc) return;
+        const headings = document.querySelectorAll('.tutorial-content h2, .tutorial-content h3');
+        headings.forEach((h, i) => {
+          if (!h.id) h.id = 'section-' + i;
+          const a = document.createElement('a');
+          a.href = '#' + h.id;
+          a.textContent = h.textContent;
+          if (h.tagName === 'H3') a.classList.add('toc-h3');
+          toc.appendChild(a);
+        });
+      })();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>

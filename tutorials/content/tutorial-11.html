@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tutorial 11 | API Security with JWT</title>
+    <meta name="description" content="JWT token generation, the authentication filter, and Spring Security configuration for a stateless REST API." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='0.9em' font-size='90'%3E📘%3C/text%3E%3C/svg%3E" />
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{ extend:{ fontFamily:{ sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"] } } } };
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <link rel="stylesheet" href="../tutorials.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10"><div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div></div>
+
+    <header class="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30 transition group-hover:scale-105">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Software Engineer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../../blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="../../#skills" class="hover:text-indigo-600 dark:hover:text-indigo-400">Skills</a>
+          <a href="../../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../../tutorials/" class="text-indigo-600 dark:text-indigo-400">Tutorials</a>
+          <a href="../../course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
+        </nav>
+        <div class="flex items-center gap-3">
+          <a href="../../#contact" class="hidden rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-indigo-600/30 transition hover:bg-indigo-500 active:scale-95 md:inline-block">Contact me</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <header class="max-w-3xl">
+        <h1 class="text-3xl font-extrabold tracking-tight sm:text-4xl">Tutorial 11: API Security with JWT</h1>
+        <p class="mt-2 text-slate-600 dark:text-slate-300">Token generation, the authentication filter, stateless session policy, and Spring Security configuration.</p>
+        <a href="../" class="mt-4 inline-block text-sm text-indigo-600 hover:underline dark:text-indigo-400">← Back to Tutorials</a>
+      </header>
+
+      <div class="tutorial-layout mt-8">
+        <aside class="tutorial-toc">
+          <p class="tutorial-toc-title">On this page</p>
+          <div id="toc-links"></div>
+        </aside>
+
+        <section class="tutorial-content prose prose-slate dark:prose-invert">
+
+          <p>The restaurant system is internal — only authenticated staff should access it. This tutorial walks through the JWT security layer: how tokens are generated and validated by <code>JwtService</code>, how each request is intercepted and authenticated by <code>JwtAuthenticationFilter</code>, and how <code>SecurityConfig</code> wires it all together with a stateless session policy.</p>
+
+          <hr/>
+
+          <h2>1. JwtService: token generation and validation</h2>
+
+          <pre><code class="language-java">@Service
+public class JwtService {
+
+    @Value("${jwt.secret}")
+    private String secretKey;
+
+    @Value("${jwt.expiration}")
+    private long jwtExpiration; // milliseconds, e.g. 86400000 = 24h
+
+    // Build a signed JWT containing the user's email and role
+    public String generateToken(UserDetails userDetails) {
+        Map&lt;String, Object&gt; extraClaims = new HashMap&lt;&gt;();
+
+        if (userDetails instanceof User user) {
+            extraClaims.put("role", user.getRole().name()); // embed "ROLE_ADMIN" or "ROLE_USER"
+        }
+        return generateToken(extraClaims, userDetails);
+    }
+
+    public String generateToken(Map&lt;String, Object&gt; extraClaims, UserDetails userDetails) {
+        return Jwts.builder()
+            .setClaims(extraClaims)
+            .setSubject(userDetails.getUsername())          // email = subject
+            .setIssuedAt(new Date(System.currentTimeMillis()))
+            .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
+            .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+            .compact();
+    }
+
+    private Key getSignInKey() {
+        return Keys.hmacShaKeyFor(secretKey.getBytes());
+    }
+
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return username.equals(userDetails.getUsername()) &amp;&amp; !isTokenExpired(token);
+    }
+
+    private boolean isTokenExpired(String token) {
+        return extractClaim(token, Claims::getExpiration).before(new Date());
+    }
+}</code></pre>
+          <ul>
+            <li><strong>@Value injection:</strong> <code>jwt.secret</code> and <code>jwt.expiration</code> are read from <code>application.yml</code> — never hardcoded. The secret stays out of source control.</li>
+            <li><strong>Extra claims:</strong> the role is embedded in the token payload so the front end can read it without an extra API call. The role is also re-validated server-side on every request.</li>
+            <li><strong>HS256:</strong> symmetric signing algorithm — the same secret is used to sign and verify. For a multi-service architecture, RS256 (asymmetric) is preferred.</li>
+            <li><strong>extractClaim</strong> is a generic helper: it parses all claims once and applies a <code>Function&lt;Claims, T&gt;</code> to extract whichever field is needed.</li>
+            <li><code>isTokenValid</code> checks two things: the username in the token matches the user we loaded from DB, and the token hasn't expired.</li>
+          </ul>
+
+          <hr/>
+
+          <h2>2. JwtAuthenticationFilter: intercepting every request</h2>
+
+          <pre><code class="language-java">@Component
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private final JwtService jwtService;
+    private final CustomUserDetailsService customUserDetailsService;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
+
+        // 1. Skip JWT check for auth endpoints
+        if (request.getServletPath().startsWith("/api/auth")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // 2. Extract the Authorization header
+        final String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // 3. Extract token and username
+        final String jwtToken = authHeader.substring(7); // strip "Bearer "
+        final String userEmail = jwtService.extractUsername(jwtToken);
+
+        // 4. If not already authenticated, load and validate
+        if (userEmail != null &amp;&amp;
+                SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails =
+                customUserDetailsService.loadUserByUsername(userEmail);
+
+            if (jwtService.isTokenValid(jwtToken, userDetails)) {
+                UsernamePasswordAuthenticationToken authToken =
+                    new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
+
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+        }
+
+        filterChain.doFilter(request, response);
+    }
+}</code></pre>
+          <ul>
+            <li><strong>OncePerRequestFilter:</strong> guarantees the filter runs exactly once per HTTP request, even in forward/include scenarios.</li>
+            <li><strong>Early return for /api/auth:</strong> login and register must be reachable without a token — skipping the filter for these paths avoids a chicken-and-egg problem.</li>
+            <li><strong>authHeader.substring(7):</strong> strips the <code>"Bearer "</code> prefix (7 characters) to get the raw token string.</li>
+            <li><strong>Authentication == null check:</strong> prevents re-processing a request that's already been authenticated by an earlier filter in the chain.</li>
+            <li><strong>SecurityContextHolder.getContext().setAuthentication(authToken):</strong> this single line tells Spring Security "this request is authenticated as this user." Every downstream security check reads from this context.</li>
+            <li>No credentials are stored in the auth token (second argument is <code>null</code>) — the password is not needed after authentication.</li>
+          </ul>
+
+          <hr/>
+
+          <h2>3. SecurityConfig: wiring it all together</h2>
+
+          <pre><code class="language-java">@Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
+public class SecurityConfig {
+
+    private final CustomUserDetailsService customUserDetailsService;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager() {
+        return new ProviderManager(daoAuthenticationProvider());
+    }
+
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(customUserDetailsService);
+        provider.setPasswordEncoder(passwordEncoder());
+        return provider;
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .cors(withDefaults())
+            .csrf(csrf -&gt; csrf.disable())
+            .authorizeHttpRequests(auth -&gt; auth
+                .requestMatchers(
+                    "/api/auth/**",
+                    "/swagger-ui/**",
+                    "/v3/api-docs/**",
+                    "/orders/*",
+                    "/sessions/*"
+                ).permitAll()
+                .anyRequest().authenticated()
+            )
+            .sessionManagement(sess -&gt;
+                sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .authenticationProvider(daoAuthenticationProvider())
+            .addFilterBefore(jwtAuthenticationFilter,
+                UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+}</code></pre>
+          <ul>
+            <li><strong>SessionCreationPolicy.STATELESS:</strong> Spring Security will never create an HTTP session. Every request must carry its own JWT — this is the defining trait of a REST API.</li>
+            <li><strong>csrf disabled:</strong> CSRF attacks require a session cookie to hijack. Since this API is stateless and uses Bearer tokens (not cookies), CSRF protection is unnecessary.</li>
+            <li><strong>addFilterBefore:</strong> inserts the JWT filter before Spring's default <code>UsernamePasswordAuthenticationFilter</code>, so JWT authentication runs first on every request.</li>
+            <li><strong>permitAll paths:</strong> auth endpoints, Swagger UI, and the orders/sessions paths are public. Everything else requires a valid JWT.</li>
+            <li><strong>BCryptPasswordEncoder:</strong> passwords are hashed with bcrypt before storage. The work factor makes brute-force attacks expensive even if the database is compromised.</li>
+            <li><strong>DaoAuthenticationProvider:</strong> the bridge between Spring Security's auth mechanism and your <code>UserDetailsService</code> (which loads users from the DB).</li>
+          </ul>
+
+          <hr/>
+
+          <h2>4. The full request flow</h2>
+
+          <pre><code class="language-java">// 1. Client sends:
+//    POST /api/auth/login  { "email": "...", "password": "..." }
+
+// 2. AuthService validates credentials and returns:
+//    { "token": "eyJhbGciOiJIUzI1NiJ9..." }
+
+// 3. Client stores the token and sends on every subsequent request:
+//    GET /api/menu-items
+//    Authorization: Bearer eyJhbGciOiJIUzI1NiJ9...
+
+// 4. JwtAuthenticationFilter intercepts the request:
+//    → extracts "Bearer " → raw token
+//    → extracts email from claims
+//    → loads UserDetails from DB
+//    → validates token signature + expiry
+//    → sets Authentication in SecurityContext
+
+// 5. Spring Security allows the request through to the controller</code></pre>
+
+          <hr/>
+
+          <h2>Key Takeaways</h2>
+          <ul>
+            <li>Never hardcode JWT secrets — inject them via <code>@Value</code> from environment-specific config files that are excluded from source control.</li>
+            <li><code>SessionCreationPolicy.STATELESS</code> is non-negotiable for a JWT REST API — it prevents Spring from creating server-side sessions that contradict the stateless design.</li>
+            <li>The filter sets authentication in the <code>SecurityContext</code> — this single object is what all downstream Spring Security checks read from.</li>
+            <li>Skip the filter for auth endpoints explicitly (<code>/api/auth/**</code>), otherwise login and register are unreachable without a token.</li>
+            <li>BCrypt is the right password hasher — never store plain text or use MD5/SHA-1 for passwords.</li>
+          </ul>
+
+        </section>
+      </div>
+
+      <nav class="mt-12 flex items-center justify-between border-t border-slate-200/60 pt-6 dark:border-slate-800/60">
+        <a href="./tutorial-10.html" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          Previous
+        </a>
+        <a href="./tutorial-12.html" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium shadow-sm hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:hover:bg-slate-800">
+          Next
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </a>
+      </nav>
+    </main>
+
+    <footer class="border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 wassim lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+
+    <script></script>
+    <script>
+      (function() {
+        const toc = document.getElementById('toc-links');
+        if (!toc) return;
+        const headings = document.querySelectorAll('.tutorial-content h2, .tutorial-content h3');
+        headings.forEach((h, i) => {
+          if (!h.id) h.id = 'section-' + i;
+          const a = document.createElement('a');
+          a.href = '#' + h.id;
+          a.textContent = h.textContent;
+          if (h.tagName === 'H3') a.classList.add('toc-h3');
+          toc.appendChild(a);
+        });
+      })();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
+  </body>
+</html>
