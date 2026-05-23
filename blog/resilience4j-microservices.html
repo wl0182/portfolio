@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Circuit Breakers, Retries & Bulkheads with Resilience4j in Spring Boot</title>
+    <meta name="description" content="A practical guide to Resilience4j patterns in Spring Boot microservices: circuit breakers, retries, rate limiters, and bulkheads with real configuration examples." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' ry='12' fill='%234f46e5'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' font-size='28' font-family='Inter, -apple-system, Segoe UI, Roboto, Arial, sans-serif' fill='white'%3EWL☕%3C/text%3E%3C/svg%3E" />
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    <script>
+      tailwind.config = { darkMode:'class', theme:{extend:{fontFamily:{sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"]}}}};
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <header class="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30 transition group-hover:scale-105">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Software Engineer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="../#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="../blog/" class="text-indigo-600 dark:text-indigo-400">Blog</a>
+          <a href="../projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="../tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="../course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
+          <a href="../services.html" class="hover:text-indigo-600 dark:hover:text-indigo-400">Services</a>
+        </nav>
+        <div class="flex items-center gap-3">
+          <a href="../#contact" class="hidden rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-indigo-600/30 transition hover:bg-indigo-500 active:scale-95 md:inline-block">Contact me</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-7xl px-6 py-10">
+      <div class="mx-auto max-w-4xl">
+        <a href="./" class="inline-flex items-center gap-2 text-sm text-slate-600 hover:text-indigo-600 dark:text-slate-300 dark:hover:text-indigo-400">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+          Back to Blog
+        </a>
+        <header class="mt-4">
+          <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl">Circuit Breakers, Retries &amp; Bulkheads with Resilience4j in Spring Boot</h1>
+          <p class="mt-2 text-sm text-slate-600 dark:text-slate-300">A practical guide to the four Resilience4j patterns I applied across 9 microservices in a production ecommerce platform: with real configuration you can use today.</p>
+          <div class="mt-6 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <span class="grid h-9 w-9 place-items-center rounded-full bg-indigo-600 text-white shadow-md shadow-indigo-600/30">WL</span>
+              <div class="text-sm leading-tight">
+                <div class="font-medium">Wassim Lagnaoui</div>
+                <div class="text-slate-500 dark:text-slate-400">Software Engineer</div>
+              </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="rounded-full border border-indigo-200 bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700 dark:border-indigo-900/50 dark:bg-indigo-950/50 dark:text-indigo-300">Spring Boot</span>
+              <span class="rounded-full border border-fuchsia-200 bg-fuchsia-50 px-3 py-1 text-xs font-medium text-fuchsia-700 dark:border-fuchsia-900/50 dark:bg-fuchsia-950/50 dark:text-fuchsia-300">Resilience4j</span>
+              <span class="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/50 dark:text-emerald-300">Microservices</span>
+            </div>
+          </div>
+        </header>
+
+        <section class="mt-10 space-y-6 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+
+          <h2 class="text-xl font-semibold text-slate-900 dark:text-white">Why resilience patterns matter in microservices</h2>
+          <p>In a monolith, a failing database query throws an exception and you handle it. In a microservices architecture, a slow downstream service doesn't just fail: it <em>hangs</em>. Threads pile up waiting for a response that never comes. The service that made the call runs out of thread pool capacity. Now a second service is degraded because the first one is stuck. This cascade failure can take down your entire platform in minutes.</p>
+          <p>Resilience4j is a lightweight fault-tolerance library designed for Java 8+ that gives you four tools to prevent this: <strong>Circuit Breaker</strong>, <strong>Retry</strong>, <strong>Rate Limiter</strong>, and <strong>Bulkhead</strong>. Here's how each works and how I configured them across the ecommerce microservices platform.</p>
+
+          <h2 class="text-xl font-semibold text-slate-900 dark:text-white mt-8">1. Circuit Breaker: stop calling a failing service</h2>
+          <p>A circuit breaker wraps a remote call. It monitors the failure rate over a sliding window of calls. When the failure rate crosses a threshold, it <strong>opens</strong>: subsequent calls immediately return a fallback response without even attempting the remote call. After a configurable wait time, it enters <strong>half-open</strong> state and allows a few trial calls through. If those succeed, it closes and normal operation resumes.</p>
+          <p>This prevents thread exhaustion and gives the failing downstream service time to recover.</p>
+
+          <p><strong>Configuration (application.yml):</strong></p>
+          <div class="rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-900 text-xs font-mono leading-6 overflow-x-auto">
+            <pre><code>resilience4j:
+  circuitbreaker:
+    instances:
+      paymentService:
+        registerHealthIndicator: true
+        slidingWindowSize: 10          # evaluate last 10 calls
+        minimumNumberOfCalls: 5        # wait for 5 calls before evaluating
+        permittedNumberOfCallsInHalfOpenState: 3
+        waitDurationInOpenState: 10s   # stay open for 10 seconds
+        failureRateThreshold: 50       # open if 50% of calls fail
+        slowCallRateThreshold: 80      # also open if 80% are slow
+        slowCallDurationThreshold: 3s  # a "slow" call takes > 3s</code></pre>
+          </div>
+
+          <p><strong>Applying it in code:</strong></p>
+          <div class="rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-900 text-xs font-mono leading-6 overflow-x-auto">
+            <pre><code>@Service
+public class OrderService {
+
+    @CircuitBreaker(name = "paymentService", fallbackMethod = "paymentFallback")
+    public PaymentResponse initiatePayment(PaymentRequest request) {
+        return paymentClient.processPayment(request);
+    }
+
+    // Called automatically when the circuit is open or call fails
+    public PaymentResponse paymentFallback(PaymentRequest request, Exception ex) {
+        log.warn("Payment service unavailable, queuing for retry: {}", ex.getMessage());
+        // Queue to outbox for async retry, return pending status
+        return PaymentResponse.pending(request.getOrderId());
+    }
+}</code></pre>
+          </div>
+
+          <h2 class="text-xl font-semibold text-slate-900 dark:text-white mt-8">2. Retry: handle transient failures automatically</h2>
+          <p>Not all failures are worth a fallback. A network blip, a momentary database lock, or a brief Kafka broker restart are <em>transient</em>: retrying after a short wait usually succeeds. The Retry pattern wraps a call and automatically retries it a configured number of times with exponential backoff before giving up.</p>
+          <p>The key insight: retry only on exceptions that are genuinely recoverable. Don't retry a 400 Bad Request: retrying it a hundred times won't fix a malformed payload.</p>
+
+          <div class="rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-900 text-xs font-mono leading-6 overflow-x-auto">
+            <pre><code>resilience4j:
+  retry:
+    instances:
+      inventoryService:
+        maxAttempts: 3
+        waitDuration: 500ms
+        enableExponentialBackoff: true
+        exponentialBackoffMultiplier: 2  # 500ms → 1000ms → 2000ms
+        retryExceptions:
+          - java.net.ConnectException
+          - java.util.concurrent.TimeoutException
+        ignoreExceptions:
+          - com.example.exceptions.InvalidRequestException</code></pre>
+          </div>
+
+          <div class="rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-900 text-xs font-mono leading-6 overflow-x-auto">
+            <pre><code>@Retry(name = "inventoryService", fallbackMethod = "inventoryFallback")
+@CircuitBreaker(name = "inventoryService")
+public InventoryResponse checkStock(String productId) {
+    return inventoryClient.getStock(productId);
+}
+
+// Tip: stack @Retry inside @CircuitBreaker
+// Retry fires first; if it exhausts attempts, CircuitBreaker counts it as a failure</code></pre>
+          </div>
+
+          <h2 class="text-xl font-semibold text-slate-900 dark:text-white mt-8">3. Rate Limiter: protect your service from being overwhelmed</h2>
+          <p>Rate limiting is about protecting <em>your</em> service from too many inbound requests, not about being polite to downstream services. In the API Gateway of the ecommerce platform, rate limiting prevents a single client from flooding the system and degrading service for everyone else.</p>
+
+          <div class="rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-900 text-xs font-mono leading-6 overflow-x-auto">
+            <pre><code>resilience4j:
+  ratelimiter:
+    instances:
+      apiGateway:
+        limitForPeriod: 100         # max 100 requests...
+        limitRefreshPeriod: 1s      # ...per second
+        timeoutDuration: 0          # don't wait: reject immediately if over limit</code></pre>
+          </div>
+
+          <div class="rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-900 text-xs font-mono leading-6 overflow-x-auto">
+            <pre><code>@RateLimiter(name = "apiGateway", fallbackMethod = "rateLimitFallback")
+public ResponseEntity&lt;?&gt; handleRequest(HttpServletRequest request) {
+    return processRequest(request);
+}
+
+public ResponseEntity&lt;?&gt; rateLimitFallback(HttpServletRequest request,
+                                             RequestNotPermitted ex) {
+    return ResponseEntity.status(429)
+        .header("Retry-After", "1")
+        .body("Too many requests. Please slow down.");
+}</code></pre>
+          </div>
+
+          <h2 class="text-xl font-semibold text-slate-900 dark:text-white mt-8">4. Bulkhead: isolate thread pools between services</h2>
+          <p>Without bulkheads, all your outbound calls share the same thread pool. If calls to the Payment Service hang (because payment is slow), they consume all available threads and starve calls to other services like Inventory or Shipping: even though those services are perfectly healthy. A bulkhead assigns a dedicated, limited thread pool to each downstream dependency.</p>
+
+          <div class="rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-900 text-xs font-mono leading-6 overflow-x-auto">
+            <pre><code>resilience4j:
+  bulkhead:
+    instances:
+      paymentService:
+        maxConcurrentCalls: 10   # max 10 concurrent calls to payment
+        maxWaitDuration: 100ms   # wait 100ms for a slot, then reject
+      shippingService:
+        maxConcurrentCalls: 15
+        maxWaitDuration: 0ms     # reject immediately if no slot</code></pre>
+          </div>
+
+          <div class="rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-900 text-xs font-mono leading-6 overflow-x-auto">
+            <pre><code>@Bulkhead(name = "paymentService", type = Bulkhead.Type.SEMAPHORE,
+          fallbackMethod = "bulkheadFallback")
+@CircuitBreaker(name = "paymentService")
+public PaymentResponse charge(ChargeRequest request) {
+    return paymentClient.charge(request);
+}
+
+public PaymentResponse bulkheadFallback(ChargeRequest request,
+                                         BulkheadFullException ex) {
+    // Payment service is saturated: queue the request
+    outboxService.queuePayment(request);
+    return PaymentResponse.queued(request.getOrderId());
+}</code></pre>
+          </div>
+
+          <h2 class="text-xl font-semibold text-slate-900 dark:text-white mt-8">Stacking the patterns: the right order</h2>
+          <p>When you combine multiple Resilience4j decorators on the same method, the order matters. Spring applies them outermost-first, so the annotation listed first in the stack is the outermost wrapper.</p>
+          <div class="rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-900 text-xs font-mono leading-6 overflow-x-auto">
+            <pre><code>// Recommended stack for an outbound service call:
+@RateLimiter(name = "paymentService")   // 1. Check rate limit first
+@Bulkhead(name = "paymentService")      // 2. Check thread capacity
+@CircuitBreaker(name = "paymentService") // 3. Check circuit state
+@Retry(name = "paymentService")         // 4. Retry on transient failure
+public PaymentResponse charge(ChargeRequest request) {
+    return paymentClient.charge(request);
+}</code></pre>
+          </div>
+
+          <h2 class="text-xl font-semibold text-slate-900 dark:text-white mt-8">Key takeaways</h2>
+          <ul class="list-disc list-inside space-y-2">
+            <li><strong>Circuit Breaker</strong>: stops calling a downstream service when it's consistently failing: prevents cascade failures.</li>
+            <li><strong>Retry</strong>: handles transient failures automatically: only retry exceptions that are actually recoverable.</li>
+            <li><strong>Rate Limiter</strong>: protects your service from inbound overload: return 429 immediately rather than queueing indefinitely.</li>
+            <li><strong>Bulkhead</strong>: isolates thread pools per dependency: one slow service can't starve calls to healthy ones.</li>
+            <li>Stack all four: <code class="rounded bg-slate-100 px-1.5 py-0.5 font-mono text-xs dark:bg-slate-800">RateLimiter → Bulkhead → CircuitBreaker → Retry</code>: for defence in depth.</li>
+          </ul>
+
+          <div class="mt-10 rounded-2xl border border-indigo-200/60 bg-indigo-50/70 p-6 dark:border-indigo-900/40 dark:bg-indigo-950/30">
+            <p class="font-semibold text-indigo-900 dark:text-indigo-200">Want to see the full configuration?</p>
+            <p class="mt-1 text-sm text-indigo-800 dark:text-indigo-300">The complete ecommerce microservices platform with Resilience4j wired across all 9 services is on GitHub.</p>
+            <div class="mt-4 flex flex-wrap gap-3">
+              <a href="https://github.com/wl0182/Ecommerce-Microservices" target="_blank" rel="noreferrer" class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-indigo-500">View on GitHub →</a>
+              <a href="../projects/#ecommerce-microservices" class="inline-flex items-center gap-2 rounded-lg border border-indigo-300 px-4 py-2 text-sm font-semibold text-indigo-700 transition hover:bg-indigo-100 dark:border-indigo-700 dark:text-indigo-300 dark:hover:bg-indigo-950">Project overview →</a>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="mt-16 border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 Wassim Lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+  </body>
+</html>

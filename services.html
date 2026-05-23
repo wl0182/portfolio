@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Services | Wassim Lagnaoui | Custom Ecommerce Backend</title>
+    <meta name="description" content="Custom ecommerce platforms built with Spring Boot microservices, Kafka, and React. Production-ready, fully deployed, source code included." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' ry='12' fill='%234f46e5'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' font-size='28' font-family='Inter, -apple-system, Segoe UI, Roboto, Arial, sans-serif' fill='white'%3EWL☕%3C/text%3E%3C/svg%3E" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Inter var", "Inter", "ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Helvetica", "Arial", "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"],
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
+    <div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10">
+      <div class="absolute inset-0 bg-gradient-to-br from-indigo-500/10 via-fuchsia-500/10 to-emerald-500/10 blur-2xl"></div>
+    </div>
+
+    <header class="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
+      <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <a href="../" class="group inline-flex items-center gap-3">
+          <span class="grid h-9 w-9 place-items-center rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-600/30 transition group-hover:scale-105">WL</span>
+          <div class="leading-tight">
+            <div class="text-sm text-slate-500 dark:text-slate-400">Software Engineer</div>
+            <div class="font-semibold">Wassim Lagnaoui</div>
+          </div>
+        </a>
+        <nav class="hidden items-center gap-6 md:flex">
+          <a href="./#about" class="hover:text-indigo-600 dark:hover:text-indigo-400">About</a>
+          <a href="./blog/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Blog</a>
+          <a href="./projects/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Projects</a>
+          <a href="./tutorials/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Tutorials</a>
+          <a href="./course/" class="hover:text-indigo-600 dark:hover:text-indigo-400">Courses</a>
+          <a href="./services.html" class="text-indigo-600 dark:text-indigo-400">Services</a>
+        </nav>
+        <div class="flex items-center gap-3">
+          <a href="mailto:lagnaouiw@gmail.com" class="hidden rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-indigo-600/30 transition hover:bg-indigo-500 active:scale-95 md:inline-block">Get a Quote</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-5xl px-6 py-16">
+
+      <!-- Hero -->
+      <section class="text-center">
+        <span class="inline-block rounded-full bg-indigo-100 px-4 py-1.5 text-sm font-semibold text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300">Available for new projects</span>
+        <h1 class="mt-6 text-4xl font-extrabold tracking-tight sm:text-5xl">
+          A Custom Ecommerce Platform<br class="hidden sm:block" /> Built for Your Business
+        </h1>
+        <p class="mt-5 mx-auto max-w-2xl text-lg text-slate-600 dark:text-slate-300">
+          Off-the-shelf platforms like Shopify work until they don't. If you need custom workflows, multiple vendors, B2B pricing, or full ownership of your data: I'll build it for you from a production-grade foundation.
+        </p>
+        <div class="mt-8 flex flex-wrap justify-center gap-3">
+          <a href="mailto:lagnaouiw@gmail.com" class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-3 font-semibold text-white shadow-sm shadow-indigo-600/30 transition hover:bg-indigo-500 active:scale-95">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="m22 6-10 7L2 6"/></svg>
+            Email me directly
+          </a>
+          <a href="./projects/#ecommerce-microservices" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-6 py-3 font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 active:scale-95 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:hover:bg-slate-800">
+            See the live project →
+          </a>
+        </div>
+      </section>
+
+      <!-- What you get -->
+      <section class="mt-24">
+        <h2 class="text-2xl font-bold text-center">Everything included out of the box</h2>
+        <p class="mt-2 text-center text-slate-500 dark:text-slate-400">No half-built MVPs. Every delivery includes a fully working, deployed system.</p>
+        <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <!-- Feature cards -->
+          <div class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 dark:border-slate-700/60 dark:bg-slate-900/60">
+            <div class="flex items-center gap-3">
+              <span class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-indigo-100 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-300">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </span>
+              <h3 class="font-semibold">User Auth & Accounts</h3>
+            </div>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Registration, login, JWT tokens, password reset, and address management.</p>
+          </div>
+          <div class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 dark:border-slate-700/60 dark:bg-slate-900/60">
+            <div class="flex items-center gap-3">
+              <span class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-fuchsia-100 text-fuchsia-600 dark:bg-fuchsia-950 dark:text-fuchsia-300">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+              </span>
+              <h3 class="font-semibold">Product Catalog</h3>
+            </div>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Categories, inventory tracking, search, and product variants.</p>
+          </div>
+          <div class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 dark:border-slate-700/60 dark:bg-slate-900/60">
+            <div class="flex items-center gap-3">
+              <span class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-300">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+              </span>
+              <h3 class="font-semibold">Cart & Checkout</h3>
+            </div>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Persistent cart, quantity management, and a smooth checkout flow.</p>
+          </div>
+          <div class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 dark:border-slate-700/60 dark:bg-slate-900/60">
+            <div class="flex items-center gap-3">
+              <span class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-amber-100 text-amber-600 dark:bg-amber-950 dark:text-amber-300">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </span>
+              <h3 class="font-semibold">Order Management</h3>
+            </div>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Full order lifecycle: placed → paid → shipped → delivered, with history.</p>
+          </div>
+          <div class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 dark:border-slate-700/60 dark:bg-slate-900/60">
+            <div class="flex items-center gap-3">
+              <span class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-sky-100 text-sky-600 dark:bg-sky-950 dark:text-sky-300">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+              </span>
+              <h3 class="font-semibold">Payments</h3>
+            </div>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Payment processing, refunds, and payment status tracking. Gateway integration on request.</p>
+          </div>
+          <div class="rounded-2xl border border-slate-200/60 bg-white/70 p-5 dark:border-slate-700/60 dark:bg-slate-900/60">
+            <div class="flex items-center gap-3">
+              <span class="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-rose-100 text-rose-600 dark:bg-rose-950 dark:text-rose-300">
+                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.7 13.9 19.79 19.79 0 0 1 1.67 5.36 2 2 0 0 1 3.64 3h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10.9a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 18.36c0 .06.19.14.19.56z"/></svg>
+              </span>
+              <h3 class="font-semibold">Shipping & Notifications</h3>
+            </div>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Shipment creation, tracking updates, and email notifications at every step.</p>
+          </div>
+        </div>
+        <p class="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">All services are independently deployable, event-driven via Kafka, and protected by an API Gateway with rate limiting and JWT auth.</p>
+      </section>
+
+      <!-- Pricing -->
+      <section class="mt-24">
+        <h2 class="text-2xl font-bold text-center">Pricing</h2>
+        <p class="mt-2 text-center text-slate-500 dark:text-slate-400">Fixed-scope packages. No surprise invoices.</p>
+        <div class="mt-10 grid gap-6 md:grid-cols-3">
+
+          <!-- Starter -->
+          <div class="rounded-2xl border border-slate-200/60 bg-white/70 p-8 dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="text-xs font-bold uppercase tracking-widest text-slate-500">Starter</p>
+            <p class="mt-3 text-3xl font-extrabold">€2k – €4k</p>
+            <p class="mt-1 text-sm text-slate-500">One-time</p>
+            <ul class="mt-6 space-y-3 text-sm">
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-emerald-500">✓</span> Full backend deployed to your server</li>
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-emerald-500">✓</span> Your domain wired and SSL configured</li>
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-emerald-500">✓</span> Demo data seeded, ready to show</li>
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-emerald-500">✓</span> Full source code, yours to keep</li>
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-emerald-500">✓</span> 30-day support</li>
+            </ul>
+            <a href="mailto:lagnaouiw@gmail.com?subject=Starter Package Enquiry" class="mt-8 block w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-center text-sm font-semibold text-slate-800 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700">Get in touch</a>
+          </div>
+
+          <!-- Custom: highlighted -->
+          <div class="rounded-2xl border-2 border-indigo-500 bg-white/70 p-8 shadow-lg shadow-indigo-500/10 dark:bg-slate-900/60 relative">
+            <span class="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-indigo-600 px-4 py-1 text-xs font-bold text-white">Most Popular</span>
+            <p class="text-xs font-bold uppercase tracking-widest text-indigo-500">Custom</p>
+            <p class="mt-3 text-3xl font-extrabold">€6k – €12k</p>
+            <p class="mt-1 text-sm text-slate-500">One-time</p>
+            <ul class="mt-6 space-y-3 text-sm">
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-emerald-500">✓</span> Everything in Starter</li>
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-emerald-500">✓</span> Custom React frontend (your branding)</li>
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-emerald-500">✓</span> Payment gateway integration (Stripe / local)</li>
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-emerald-500">✓</span> Admin dashboard for products & orders</li>
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-emerald-500">✓</span> 90-day support</li>
+            </ul>
+            <a href="mailto:lagnaouiw@gmail.com?subject=Custom Package Enquiry" class="mt-8 block w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-center text-sm font-semibold text-white shadow-sm shadow-indigo-600/30 transition hover:bg-indigo-500">Get in touch</a>
+          </div>
+
+          <!-- Full Build -->
+          <div class="rounded-2xl border border-slate-200/60 bg-white/70 p-8 dark:border-slate-700/60 dark:bg-slate-900/60">
+            <p class="text-xs font-bold uppercase tracking-widest text-slate-500">Full Build</p>
+            <p class="mt-3 text-3xl font-extrabold">€12k+</p>
+            <p class="mt-1 text-sm text-slate-500">+ optional monthly retainer</p>
+            <ul class="mt-6 space-y-3 text-sm">
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-emerald-500">✓</span> Everything in Custom</li>
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-emerald-500">✓</span> Multi-vendor or B2B-specific features</li>
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-emerald-500">✓</span> CI/CD pipeline setup</li>
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-emerald-500">✓</span> Ongoing feature development retainer</li>
+              <li class="flex items-start gap-2"><span class="mt-0.5 text-emerald-500">✓</span> Priority support SLA</li>
+            </ul>
+            <a href="mailto:lagnaouiw@gmail.com?subject=Full Build Enquiry" class="mt-8 block w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-center text-sm font-semibold text-slate-800 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700">Get in touch</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- How it works -->
+      <section class="mt-24">
+        <h2 class="text-2xl font-bold text-center">How it works</h2>
+        <div class="mt-10 grid gap-6 md:grid-cols-3">
+          <div class="text-center">
+            <span class="inline-grid h-12 w-12 place-items-center rounded-2xl bg-indigo-100 text-xl font-extrabold text-indigo-600 dark:bg-indigo-950 dark:text-indigo-300">1</span>
+            <h3 class="mt-4 font-semibold">Discovery call</h3>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">We talk through your business needs, must-have features, and timeline. 30 minutes, no commitment.</p>
+          </div>
+          <div class="text-center">
+            <span class="inline-grid h-12 w-12 place-items-center rounded-2xl bg-fuchsia-100 text-xl font-extrabold text-fuchsia-600 dark:bg-fuchsia-950 dark:text-fuchsia-300">2</span>
+            <h3 class="mt-4 font-semibold">Proposal & kickoff</h3>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">You get a fixed-scope proposal with timeline and price. Once agreed, work starts within a week.</p>
+          </div>
+          <div class="text-center">
+            <span class="inline-grid h-12 w-12 place-items-center rounded-2xl bg-emerald-100 text-xl font-extrabold text-emerald-600 dark:bg-emerald-950 dark:text-emerald-300">3</span>
+            <h3 class="mt-4 font-semibold">Build, deploy & hand off</h3>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">You get a live system on your domain, full source code, and documentation. I stay available for support.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- FAQ -->
+      <section class="mt-24">
+        <h2 class="text-2xl font-bold">Common questions</h2>
+        <div class="mt-6 space-y-5">
+          <div class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 dark:border-slate-700/60 dark:bg-slate-900/60">
+            <h3 class="font-semibold">Do I own the code?</h3>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Yes, 100%. Full source code transfer is included in every package. No licensing fees, no lock-in.</p>
+          </div>
+          <div class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 dark:border-slate-700/60 dark:bg-slate-900/60">
+            <h3 class="font-semibold">What hosting do I need?</h3>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">A VPS with 8GB RAM runs the full stack. I recommend Hetzner (~€6/mo) or DigitalOcean (~€48/mo). Setup is included in every package.</p>
+          </div>
+          <div class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 dark:border-slate-700/60 dark:bg-slate-900/60">
+            <h3 class="font-semibold">Can you integrate with Shopify or existing tools?</h3>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Yes. The API Gateway exposes standard REST endpoints that can connect to any third-party service, ERP, or payment provider.</p>
+          </div>
+          <div class="rounded-2xl border border-slate-200/60 bg-white/70 p-6 dark:border-slate-700/60 dark:bg-slate-900/60">
+            <h3 class="font-semibold">How long does it take?</h3>
+            <p class="mt-2 text-sm text-slate-600 dark:text-slate-400">Starter: 1–2 weeks. Custom: 3–5 weeks. Full Build: 6–10 weeks, depending on feature scope.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA -->
+      <section class="mt-24">
+        <div class="rounded-2xl border border-indigo-200/60 bg-indigo-50/70 p-10 text-center dark:border-indigo-900/40 dark:bg-indigo-950/30">
+          <h2 class="text-2xl font-bold">Ready to talk?</h2>
+          <p class="mt-3 text-slate-600 dark:text-slate-300">Send me a message with a brief description of what you need. I'll reply within 24 hours.</p>
+          <a href="mailto:lagnaouiw@gmail.com?subject=Ecommerce Project Enquiry" class="mt-6 inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-7 py-3.5 font-semibold text-white shadow-sm shadow-indigo-600/30 transition hover:bg-indigo-500 active:scale-95">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="m22 6-10 7L2 6"/></svg>
+            lagnaouiw@gmail.com
+          </a>
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="mt-16 border-t border-slate-200/60 py-10 text-center text-sm text-slate-500 dark:border-slate-800/60 dark:text-slate-400">
+      <div class="mx-auto max-w-7xl px-6">
+        <p>© 2025 Wassim Lagnaoui. All rights reserved.</p>
+      </div>
+    </footer>
+  </body>
+</html>
