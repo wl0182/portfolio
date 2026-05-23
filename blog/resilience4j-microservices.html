@@ -11,6 +11,73 @@
       tailwind.config = { darkMode:'class', theme:{extend:{fontFamily:{sans:["Inter var","Inter","ui-sans-serif","system-ui","-apple-system","Segoe UI","Roboto","Helvetica","Arial","Noto Sans","Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"]}}}};
     </script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1/themes/prism-tomorrow.min.css" />
+    <style>
+      .code-card {
+        position: relative;
+        margin: 1.5rem 0;
+        border-radius: 0.875rem;
+        border: 1px solid rgba(99, 102, 241, 0.22);
+        background: linear-gradient(180deg, #0f172a 0%, #0a1020 100%);
+        box-shadow:
+          0 12px 32px -12px rgba(2, 6, 23, 0.65),
+          0 0 0 1px rgba(99, 102, 241, 0.06),
+          inset 0 1px 0 rgba(255, 255, 255, 0.04);
+        overflow: hidden;
+      }
+      .code-card::before {
+        content: attr(data-lang);
+        position: absolute;
+        top: 0.7rem;
+        right: 0.85rem;
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: #a5b4fc;
+        background: rgba(99, 102, 241, 0.14);
+        padding: 0.2rem 0.6rem;
+        border-radius: 0.4rem;
+        border: 1px solid rgba(99, 102, 241, 0.28);
+        z-index: 2;
+        pointer-events: none;
+      }
+      .code-card::after {
+        content: "";
+        position: absolute;
+        top: 0.85rem;
+        left: 1rem;
+        width: 42px;
+        height: 10px;
+        background-image:
+          radial-gradient(circle, #ef4444 5px, transparent 5px),
+          radial-gradient(circle, #f59e0b 5px, transparent 5px),
+          radial-gradient(circle, #10b981 5px, transparent 5px);
+        background-position: 0 0, 16px 0, 32px 0;
+        background-size: 10px 10px;
+        background-repeat: no-repeat;
+        opacity: 0.55;
+        pointer-events: none;
+      }
+      .code-card pre {
+        margin: 0 !important;
+        padding: 2.5rem 1.5rem 1.4rem !important;
+        background: transparent !important;
+        overflow-x: auto;
+        border-radius: 0 !important;
+      }
+      .code-card pre code {
+        font-family: "Fira Code", "JetBrains Mono", "Cascadia Code", ui-monospace, monospace !important;
+        font-size: 0.82rem !important;
+        line-height: 1.75 !important;
+        background: transparent !important;
+        text-shadow: none !important;
+        color: #e2e8f0;
+      }
+      .code-card pre code.language-none {
+        color: #cbd5e1;
+        white-space: pre;
+      }
+    </style>
   </head>
   <body class="bg-white text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-100">
     <header class="sticky top-0 z-20 backdrop-blur supports-[backdrop-filter]:bg-white/60 supports-[backdrop-filter]:dark:bg-slate-950/40 border-b border-slate-200/60 dark:border-slate-800/60">
@@ -72,8 +139,8 @@
           <p>This prevents thread exhaustion and gives the failing downstream service time to recover.</p>
 
           <p><strong>Configuration (application.yml):</strong></p>
-          <div class="rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-900 text-xs font-mono leading-6 overflow-x-auto">
-            <pre><code>resilience4j:
+          <div class="code-card" data-lang="YAML">
+            <pre><code class="language-yaml">resilience4j:
   circuitbreaker:
     instances:
       paymentService:
@@ -88,8 +155,8 @@
           </div>
 
           <p><strong>Applying it in code:</strong></p>
-          <div class="rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-900 text-xs font-mono leading-6 overflow-x-auto">
-            <pre><code>@Service
+          <div class="code-card" data-lang="JAVA">
+            <pre><code class="language-java">@Service
 public class OrderService {
 
     @CircuitBreaker(name = "paymentService", fallbackMethod = "paymentFallback")
@@ -110,8 +177,8 @@ public class OrderService {
           <p>Not all failures are worth a fallback. A network blip, a momentary database lock, or a brief Kafka broker restart are <em>transient</em>: retrying after a short wait usually succeeds. The Retry pattern wraps a call and automatically retries it a configured number of times with exponential backoff before giving up.</p>
           <p>The key insight: retry only on exceptions that are genuinely recoverable. Don't retry a 400 Bad Request: retrying it a hundred times won't fix a malformed payload.</p>
 
-          <div class="rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-900 text-xs font-mono leading-6 overflow-x-auto">
-            <pre><code>resilience4j:
+          <div class="code-card" data-lang="YAML">
+            <pre><code class="language-yaml">resilience4j:
   retry:
     instances:
       inventoryService:
@@ -126,8 +193,8 @@ public class OrderService {
           - com.example.exceptions.InvalidRequestException</code></pre>
           </div>
 
-          <div class="rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-900 text-xs font-mono leading-6 overflow-x-auto">
-            <pre><code>@Retry(name = "inventoryService", fallbackMethod = "inventoryFallback")
+          <div class="code-card" data-lang="JAVA">
+            <pre><code class="language-java">@Retry(name = "inventoryService", fallbackMethod = "inventoryFallback")
 @CircuitBreaker(name = "inventoryService")
 public InventoryResponse checkStock(String productId) {
     return inventoryClient.getStock(productId);
@@ -140,8 +207,8 @@ public InventoryResponse checkStock(String productId) {
           <h2 class="text-xl font-semibold text-slate-900 dark:text-white mt-8">3. Rate Limiter: protect your service from being overwhelmed</h2>
           <p>Rate limiting is about protecting <em>your</em> service from too many inbound requests, not about being polite to downstream services. In the API Gateway of the ecommerce platform, rate limiting prevents a single client from flooding the system and degrading service for everyone else.</p>
 
-          <div class="rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-900 text-xs font-mono leading-6 overflow-x-auto">
-            <pre><code>resilience4j:
+          <div class="code-card" data-lang="YAML">
+            <pre><code class="language-yaml">resilience4j:
   ratelimiter:
     instances:
       apiGateway:
@@ -150,8 +217,8 @@ public InventoryResponse checkStock(String productId) {
         timeoutDuration: 0          # don't wait: reject immediately if over limit</code></pre>
           </div>
 
-          <div class="rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-900 text-xs font-mono leading-6 overflow-x-auto">
-            <pre><code>@RateLimiter(name = "apiGateway", fallbackMethod = "rateLimitFallback")
+          <div class="code-card" data-lang="JAVA">
+            <pre><code class="language-java">@RateLimiter(name = "apiGateway", fallbackMethod = "rateLimitFallback")
 public ResponseEntity&lt;?&gt; handleRequest(HttpServletRequest request) {
     return processRequest(request);
 }
@@ -167,8 +234,8 @@ public ResponseEntity&lt;?&gt; rateLimitFallback(HttpServletRequest request,
           <h2 class="text-xl font-semibold text-slate-900 dark:text-white mt-8">4. Bulkhead: isolate thread pools between services</h2>
           <p>Without bulkheads, all your outbound calls share the same thread pool. If calls to the Payment Service hang (because payment is slow), they consume all available threads and starve calls to other services like Inventory or Shipping: even though those services are perfectly healthy. A bulkhead assigns a dedicated, limited thread pool to each downstream dependency.</p>
 
-          <div class="rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-900 text-xs font-mono leading-6 overflow-x-auto">
-            <pre><code>resilience4j:
+          <div class="code-card" data-lang="YAML">
+            <pre><code class="language-yaml">resilience4j:
   bulkhead:
     instances:
       paymentService:
@@ -179,8 +246,8 @@ public ResponseEntity&lt;?&gt; rateLimitFallback(HttpServletRequest request,
         maxWaitDuration: 0ms     # reject immediately if no slot</code></pre>
           </div>
 
-          <div class="rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-900 text-xs font-mono leading-6 overflow-x-auto">
-            <pre><code>@Bulkhead(name = "paymentService", type = Bulkhead.Type.SEMAPHORE,
+          <div class="code-card" data-lang="JAVA">
+            <pre><code class="language-java">@Bulkhead(name = "paymentService", type = Bulkhead.Type.SEMAPHORE,
           fallbackMethod = "bulkheadFallback")
 @CircuitBreaker(name = "paymentService")
 public PaymentResponse charge(ChargeRequest request) {
@@ -197,8 +264,8 @@ public PaymentResponse bulkheadFallback(ChargeRequest request,
 
           <h2 class="text-xl font-semibold text-slate-900 dark:text-white mt-8">Stacking the patterns: the right order</h2>
           <p>When you combine multiple Resilience4j decorators on the same method, the order matters. Spring applies them outermost-first, so the annotation listed first in the stack is the outermost wrapper.</p>
-          <div class="rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-900 text-xs font-mono leading-6 overflow-x-auto">
-            <pre><code>// Recommended stack for an outbound service call:
+          <div class="code-card" data-lang="JAVA">
+            <pre><code class="language-java">// Recommended stack for an outbound service call:
 @RateLimiter(name = "paymentService")   // 1. Check rate limit first
 @Bulkhead(name = "paymentService")      // 2. Check thread capacity
 @CircuitBreaker(name = "paymentService") // 3. Check circuit state
@@ -236,5 +303,11 @@ public PaymentResponse charge(ChargeRequest request) {
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-core.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script>
+      if (window.Prism && Prism.plugins && Prism.plugins.autoloader) {
+        Prism.plugins.autoloader.languages_path = 'https://cdn.jsdelivr.net/npm/prismjs@1/components/';
+        Prism.highlightAll();
+      }
+    </script>
   </body>
 </html>
